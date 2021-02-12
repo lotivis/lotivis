@@ -12,7 +12,7 @@ export class Dataset {
         this.data = [];
 
         if (!rawJSON.data || rawJSON.data.length) {
-            throw `Invalid dataset format. Missing 'data' property.`
+            throw `Invalid dataset format. Missing 'data' property.`;
         }
 
         for (let index = 0; index < rawJSON.data.length; index++) {

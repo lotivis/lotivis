@@ -54,7 +54,7 @@ export class ModalPopup extends Popup {
             .catch(function (error) {
                 console.log(error);
                 content.html(Language.translate(''));
-            })
+            });
     }
 
     /**

@@ -28,7 +28,7 @@ export function flattenDatasets(datasets) {
         dataCollection.forEach(item => {
             item.dataset = dataset.dlabel;
             item.stack = dataset.stack;
-            flattenList.push(item)
+            flattenList.push(item);
         });
     }
     return flattenList;

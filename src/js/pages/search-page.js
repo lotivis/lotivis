@@ -268,7 +268,7 @@ export class SearchPage extends Page {
                     label: searchWord,
                     stack: stack,
                     data: mapData
-                }
+                };
 
                 localDatasets.push(newDataset);
 

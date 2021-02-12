@@ -6,11 +6,11 @@ export class Item {
 
     constructor(rawJSON) {
         if (!rawJSON.label) {
-            throw `Invalid item format. Missing 'value' property.`
+            throw `Invalid item format. Missing 'value' property.`;
         }
         this.label = rawJSON.label;
         if (!rawJSON.value) {
-            throw `Invalid item format. Missing 'label' property.`
+            throw `Invalid item format. Missing 'label' property.`;
         }
         this.value = rawJSON.value;
 

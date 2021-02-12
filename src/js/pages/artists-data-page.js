@@ -40,7 +40,7 @@ export class ArtistsDataPage extends Page {
     renderSVG() {
         this.chartView = this.card.content;
         this.svg = this.chartView
-            .append("svg")
+            .append("svg");
         this.graph = this.svg
             .append("g")
             .attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
@@ -67,7 +67,7 @@ export class ArtistsDataPage extends Page {
         this.graph.selectAll('text').remove();
         this.graph.selectAll('rect').remove();
 
-        this.svg.attr('viewBox', `0 0 ${this.width} ${this.height}`)
+        this.svg.attr('viewBox', `0 0 ${this.width} ${this.height}`);
 
         const x = d3.scaleLinear()
             .domain([0, max])
@@ -88,7 +88,7 @@ export class ArtistsDataPage extends Page {
 
         this.graph
             .append("g")
-            .call(d3.axisLeft(y))
+            .call(d3.axisLeft(y));
 
         const barGroup = this.graph
             .selectAll("chart-rect")

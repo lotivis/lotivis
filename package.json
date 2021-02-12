@@ -16,11 +16,8 @@
     "build": "rollup -c",
     "dev": "karma start --auto-watch --no-single-run --browsers chrome --grep",
     "docs": "cd docs && npm install && npm run build",
-    "lint-js": "eslint samples/**/*.html samples/**/*.js src/**/*.js test/**/*.js",
-    "lint-tsc": "tsc",
-    "lint-types": "eslint types/**/*.d.ts",
-    "lint": "concurrently \"npm:lint-*\"",
-    "test": "npm run lint && cross-env NODE_ENV=test karma start --auto-watch --single-run --coverage --grep",
+    "lint-js": "eslint src/js/**/*.js test/**/*.js",
+    "test": "npm run lint-js && cross-env NODE_ENV=test karma start --auto-watch --single-run --coverage --grep",
     "typedoc": "npx typedoc"
   },
   "repository": {
@@ -40,10 +37,13 @@
   "devDependencies": {
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^11.1.1",
+    "cross-env": "^7.0.3",
+    "eslint": "^7.19.0",
     "karma-chrome-launcher": "^3.1.0",
     "karma-firefox-launcher": "^2.1.0",
     "karma-requirejs": "^1.1.0",
     "karma-safari-launcher": "^1.0.0",
+    "lint": "^0.7.0",
     "mocha": "^8.3.0",
     "rollup": "^2.39.0",
     "rollup-plugin-cleanup": "^3.2.1",

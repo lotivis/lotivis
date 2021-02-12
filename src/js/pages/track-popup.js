@@ -60,9 +60,9 @@ export class TrackPopup extends Popup {
             for (let j = 0; j < words.length; j++) {
                 let word = words[j];
                 if (word.toLowerCase() === input.toLowerCase()) {
-                    html += `<b class="important">${word}</b>`
+                    html += `<b class="important">${word}</b>`;
                 } else if (word.toLowerCase() === `${input},`.toLowerCase()) {
-                    html += `<b class="important">${word}</b>`
+                    html += `<b class="important">${word}</b>`;
                 } else {
                     html += word;
                 }

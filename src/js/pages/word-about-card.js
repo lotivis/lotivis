@@ -61,6 +61,6 @@ export class WordAboutCard extends Card {
                 popup.track = item;
                 popup.update();
                 popup.showBigModal();
-            })
+            });
     }
 }

@@ -54,7 +54,7 @@ export class MapChart extends Component {
         this.departmentsData = [];
         this.excludedFeatureCodes = [
             '2A', '2B'
-        ]
+        ];
     }
 
     /**
@@ -83,7 +83,7 @@ export class MapChart extends Component {
             .append('svg')
             .attr('id', 'map')
             .classed('map', true)
-            .attr('viewBox', `0 0 ${this.width} ${this.height}`)
+            .attr('viewBox', `0 0 ${this.width} ${this.height}`);
 
         // .call(d3.zoom().on('zoom', function (event) {
         //     if (!this.isZoomable) return;
@@ -119,9 +119,9 @@ export class MapChart extends Component {
             .style('position', 'absolute')
             .style('color', 'black')
             .style('border', function () {
-                return `solid 1px ${color}`
+                return `solid 1px ${color}`;
             })
-            .style('opacity', 0)
+            .style('opacity', 0);
 
         this.bounds = this.svg
             .append('rect')
@@ -131,7 +131,7 @@ export class MapChart extends Component {
             .style('fill-opacity', 0)
             .style('stroke', 'red')
             .style('stroke-width', '0.7px')
-            .style('stroke-dasharray', '1,1')
+            .style('stroke-dasharray', '1,1');
     }
 
     renderLegend() {
@@ -192,7 +192,7 @@ export class MapChart extends Component {
                 d3.select(this)
                     .attr('stroke', () => tintColor)
                     .attr('stroke-width', '2')
-                    .attr('stroke-dasharray', '0')
+                    .attr('stroke-dasharray', '0');
 
 
                 // set tooltip content
@@ -211,7 +211,7 @@ export class MapChart extends Component {
                 if (data) {
                     for (let index = 0; index < data.length; index++) {
                         let item = data[index];
-                        components.push(item.datasetName + ': ' + item.value)
+                        components.push(item.datasetName + ': ' + item.value);
                     }
                 }
 
@@ -271,7 +271,7 @@ export class MapChart extends Component {
                     .style('width', featureBoundsWidth + 'px')
                     .style('height', featureBoundsHeight + 'px')
                     .style('x', featureLowerLeft[0])
-                    .style('y', featureUpperRight[1])
+                    .style('y', featureUpperRight[1]);
 
             })
             .on('mouseout', function (event, feature) {
@@ -280,10 +280,10 @@ export class MapChart extends Component {
                     .attr('stroke-width', '0.7')
                     .attr('stroke-dasharray', function (feature) {
                         return feature.departmentsData ? '0' : '1,4';
-                    })
+                    });
                 tooltip.style('opacity', 0);
-                boundsRectangle.style('opacity', 0)
-            })
+                boundsRectangle.style('opacity', 0);
+            });
     }
 
     /**
@@ -353,7 +353,7 @@ export class MapChart extends Component {
             }.bind(this))
             .attr('y', function (feature) {
                 return this.projection(feature.center)[1];
-            }.bind(this))
+            }.bind(this));
     }
 
     /**
