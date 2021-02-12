@@ -1,0 +1,46 @@
+// MARK: - Classes
+
+.no-padding {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-end {
+  text-align: right;
+}
+
+.margin-top {
+  margin-top: $border;
+}
+
+.margin-bottom {
+  margin-bottom: $border;
+}
+
+.margin-left {
+  margin-left: $border;
+}
+
+.margin-right {
+  margin-right: $border;
+}
+
+.larger {
+  font-size: larger;
+}
+
+.primary {
+  color: $primary-text-color;
+}
+
+.secondary {
+  color: $secondary-text-color;
+}
+
+.important {
+  color: $red;
+}

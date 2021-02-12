@@ -1,0 +1,55 @@
+
+.popup-underground {
+    display: none;
+    position: fixed;
+    z-index: 99991;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: scroll;
+    background-color: rgb(255,255,255);
+    background-color: rgba(255,255,255,0.15);
+
+    .card {
+        background-color: $background;
+        box-shadow: rgba(0, 0, 0, 0.3) 0 0 60px 0;
+    }
+}
+
+.popup {
+
+}
+
+.fade-in {
+    animation: fadeIn ease 0.3s;
+    -webkit-animation: fadeIn ease 0.3s;
+    -moz-animation: fadeIn ease 0.3s;
+    -o-animation: fadeIn ease 0.3s;
+    -ms-animation: fadeIn ease 0.3s;
+}
+
+@keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+}
+
+@-moz-keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+}
+
+@-webkit-keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+}
+
+@-o-keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+}
+
+@-ms-keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+}

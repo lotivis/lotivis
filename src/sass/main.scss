@@ -1,0 +1,49 @@
+// MARK: - Font
+$primary-font-size: 15px;
+$primary-font-family: sans-serif;
+
+$monospace-font-size: 15px;
+$monospace-font-family: "Lucida Console", "Courier New", monospace;
+
+// MARK: - Border / Spacing
+$small-border: 10px;
+$border: 20px;
+$hugh-border: 30px;
+$spacing: 5px;
+$radius: 8px;
+
+// MARK: - Colors
+$primary-text-color: #333;
+$secondary-text-color: #888;
+
+$tint-color: #1E4659;
+
+$background: #f0f0f1;
+$darkGray: #464845;
+$lightGray: #919191;
+$textBrown1: #563B3C;
+$textBrown2: #99877B;
+$lilac: #806C91;
+$red: #BF5450;
+$blue: #306E91;
+$yellow: #EEDA8D;
+$green: #627D66;
+
+$orange: #B78C76;
+$deepBlue: #1E4659;
+
+
+@import "reset.scss";
+@import "classes.scss";
+@import "card.scss";
+@import "grid.scss";
+@import "style.scss";
+@import "button.scss";
+@import "input.scss";
+@import "menu.scss";
+@import "modal.scss";
+@import "popup.scss";
+@import "tooltip.scss";
+@import "footer.scss";
+@import "custom.scss";
+@import "map-tooltip.scss";

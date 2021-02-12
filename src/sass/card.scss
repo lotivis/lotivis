@@ -1,0 +1,25 @@
+/* MARK: - Card */
+
+.card {
+  background-color: #FFFFFFAA;
+  padding: 10px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: $radius;
+  box-shadow: rgba(0, 0, 0, 0.05) 0 0 30px 0;
+  color: #464845;
+  margin: 0 0 20px 0;
+}
+
+.card-header {
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+  width: 100%;
+}
+
+.card-footer {
+  padding-top: 6px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}

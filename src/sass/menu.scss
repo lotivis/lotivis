@@ -1,0 +1,15 @@
+// MARK: - Menu
+
+.menu a {
+  display: compact;
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-size: 24px;
+  line-height: 2;
+}
+
+.menu a::after {
+  content: '\2192';
+  margin: 0 0 0 $spacing;
+  text-decoration: none;
+}

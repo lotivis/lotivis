@@ -1,0 +1,22 @@
+
+// disable pointer events on map labels and tooltip.
+.map-label {
+  pointer-events: none;
+}
+
+/* Style for Custom Tooltip */
+.map-tooltip {
+  position: absolute;
+  padding: $small-border;
+  background: $background;
+  font: 12px sans-serif;
+  stroke-width: 2;
+  border-radius: $radius;
+  pointer-events: none;
+  line-height: 1.4;
+  //width: 180px;
+}
+
+svg {
+  overflow: visible;
+}
