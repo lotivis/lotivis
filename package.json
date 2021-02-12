@@ -1,5 +1,6 @@
 {
   "name": "lotivis",
+  "homepage": "https://github.com/lukasdanckwerth/lotivis#readme",
   "description": "Location and time data visualization",
   "license": "MIT",
   "version": "1.0.1",
@@ -13,7 +14,14 @@
   "scripts": {
     "autobuild": "rollup -c -w",
     "build": "rollup -c",
-    "test": "echo \"Error: no test specified\""
+    "dev": "karma start --auto-watch --no-single-run --browsers chrome --grep",
+    "docs": "cd docs && npm install && npm run build",
+    "lint-js": "eslint samples/**/*.html samples/**/*.js src/**/*.js test/**/*.js",
+    "lint-tsc": "tsc",
+    "lint-types": "eslint types/**/*.d.ts",
+    "lint": "concurrently \"npm:lint-*\"",
+    "test": "npm run lint && cross-env NODE_ENV=test karma start --auto-watch --single-run --coverage --grep",
+    "typedoc": "npx typedoc"
   },
   "repository": {
     "type": "git",
@@ -29,12 +37,17 @@
   "bugs": {
     "url": "https://github.com/lukasdanckwerth/lotivis/issues"
   },
-  "homepage": "https://github.com/lukasdanckwerth/lotivis#readme",
   "devDependencies": {
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^11.1.1",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-firefox-launcher": "^2.1.0",
+    "karma-requirejs": "^1.1.0",
+    "karma-safari-launcher": "^1.0.0",
+    "mocha": "^8.3.0",
     "rollup": "^2.39.0",
     "rollup-plugin-cleanup": "^3.2.1",
+    "rollup-plugin-scss": "^2.6.1",
     "rollup-plugin-terser": "^7.0.2"
   }
 }
