@@ -40,31 +40,32 @@ export class MainPage extends Page {
             .append('div')
             .classed('col-lg-3', true);
 
+        let title = this.application.delegate.name;
         this.titleLabel = this.titleContainer
             .append('h1')
-            .text(Language.translate('French Rap Corpus Visualization'));
+            .text(title);
 
         this.titleInfoBox = this.titleContainer
             .append('div')
             .classed('info-box', true);
 
-        this.versionLabel = this.titleInfoBox
-            // .append('p')
-            // .classed('margin-bottom margin-top', true)
-            .append('samp')
-            .text(Language.translate('Version') + ': ')
-            .append('samp')
-            .attr('id', 'version-label')
-            .text('-');
-
-        this.environmentLabel = this.titleInfoBox
-            // .append('p')
-            // .classed('margin-bottom margin-top', true)
-            .append('samp')
-            .text(Language.translate('Server') + ': ')
-            .append('samp')
-            .attr('id', 'environment-label')
-            .text('-');
+        // this.versionLabel = this.titleInfoBox
+        //     // .append('p')
+        //     // .classed('margin-bottom margin-top', true)
+        //     .append('samp')
+        //     .text(Language.translate('Version') + ': ')
+        //     .append('samp')
+        //     .attr('id', 'version-label')
+        //     .text('-');
+        //
+        // this.environmentLabel = this.titleInfoBox
+        //     // .append('p')
+        //     // .classed('margin-bottom margin-top', true)
+        //     .append('samp')
+        //     .text(Language.translate('Server') + ': ')
+        //     .append('samp')
+        //     .attr('id', 'environment-label')
+        //     .text('-');
 
     }
 

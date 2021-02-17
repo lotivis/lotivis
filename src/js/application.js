@@ -3,26 +3,38 @@ import {CorpusDataPage} from './pages/corpus-data-page';
 import {MainPage} from "./pages/main-page";
 import {DiachronicAboutPage} from "./pages/diachronic-about-page";
 import {ArtistsDataPage} from "./pages/artists-data-page";
-import {Corpus} from "./corpus-model/corpus";
 import {URLParameters} from "./shared/url-parameters";
 import {Language} from "./language/language";
-import {DiatopicDataPage} from "./pages/diatopic-data-page";
+import {LocationDataPage} from "./pages/location-data-page";
+import {DataDelegate} from "./data-source/data-delegate";
+import {DefaultDataDelegate} from "./data-source/default-data-delegate";
 
 /**
  *
+ * @class Application
  */
 export class Application {
-    /**
-     * Creates a new instance in the container with the given id.
-     */
-    constructor(selector) {
+
+  /**
+   * Creates a new instance in the container with the given id.
+   *
+   * @param selector The id of the `div` element.
+   * @param delegate A data delegate which provides data for the app.
+   */
+    constructor(selector, delegate) {
         if (!selector) throw 'No selector specified.';
+        if (!delegate) delegate = new DefaultDataDelegate();
+
         this.selector = selector;
+        this.delegate = delegate;
+
         this.willInitialize();
         this.initialize();
         this.didInitialize();
+
         Application.default = this;
     }
+
 
     // MARK: - Life Cycle
 
@@ -84,7 +96,7 @@ export class Application {
                 this.currentPage = new DiachronicAboutPage(this);
                 break;
             case 'diatopic-data':
-                this.currentPage = new DiatopicDataPage(this);
+                this.currentPage = new LocationDataPage(this);
                 break;
             default:
                 this.currentPage = new MainPage(this);
@@ -119,9 +131,9 @@ export class Application {
         let url = "../../corpus/original";
         d3.json(url)
             .then(function (json) {
-                thisReference.corpus = new Corpus(json);
-                thisReference.isLoading = false;
-                thisReference.fetchDepartements(completion);
+                // thisReference.corpus = new Corpus(json);
+                // thisReference.isLoading = false;
+                // thisReference.fetchDepartements(completion);
             });
     }
 
@@ -147,6 +159,7 @@ export class Application {
                 return departement;
             }
         }
+
         return null;
     }
 
@@ -168,3 +181,5 @@ class MenuItem {
 Application.Pages = {
 
 };
+
+exports.DataDelegate = DataDelegate;

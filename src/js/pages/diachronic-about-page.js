@@ -1,5 +1,5 @@
 import {Page} from './page';
-import {DiachronicChartCard} from "../diachronic-chart/diachronic-chart-card";
+import {DiachronicChartCard} from "../time-chart/diachronic-chart-card";
 import {RadioGroup} from "../components/radio-group";
 import {Language} from "../language/language";
 import {URLParameters} from "../shared/url-parameters";
