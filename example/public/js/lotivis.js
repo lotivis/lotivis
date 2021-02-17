@@ -71,48 +71,49 @@ class Button extends Component {
 }
 
 class URLParameters {
-    static getInstance() {
-        if (!URLParameters.instance) {
-            URLParameters.instance = new URLParameters();
-        }
-        return URLParameters.instance;
+  static getInstance() {
+    if (!URLParameters.instance) {
+      URLParameters.instance = new URLParameters();
     }
-    getURL() {
-        return new URL(window.location.href);
+    return URLParameters.instance;
+  }
+  getURL() {
+    return new URL(window.location.href);
+  }
+  getBoolean(parameter, defaultValue = false) {
+    let value = this.getURL().searchParams.get(parameter);
+    return value ? value === 'true' : defaultValue;
+  }
+  getString(parameter, defaultValue = '') {
+    return this.getURL().searchParams.get(parameter) || defaultValue;
+  }
+  set(parameter, newValue) {
+    const url = this.getURL();
+    if (newValue === false) {
+      url.searchParams.delete(parameter);
+    } else {
+      url.searchParams.set(parameter, newValue);
     }
-    getBoolean(parameter, defaultValue = false) {
-        let value = this.getURL().searchParams.get(parameter);
-        return value ? value === 'true' : defaultValue;
-    }
-    getString(parameter, defaultValue = '') {
-        return this.getURL().searchParams.get(parameter) || defaultValue;
-    }
-    set(parameter, newValue) {
-        const url = this.getURL();
-        if (newValue === false) {
-            url.searchParams.delete(parameter);
-        } else {
-            url.searchParams.set(parameter, newValue);
-        }
-        window.history.replaceState(null, null, url);
-        this.updateCurrentPageFooter();
-    }
-    setWithoutDeleting(parameter, newValue) {
-        const url = this.getURL();
-        url.searchParams.set(parameter, newValue);
-        window.history.replaceState(null, null, url);
-        this.updateCurrentPageFooter();
-    }
-    clear() {
-        const url = this.getURL();
-        const newPath = url.protocol + url.host;
-        const newURL = new URL(newPath);
-        window.history.replaceState(null, null, newURL);
-        this.updateCurrentPageFooter();
-    }
-    updateCurrentPageFooter() {
-        Application.default.currentPage.updateFooter();
-    }
+    window.history.replaceState(null, null, url);
+    this.updateCurrentPageFooter();
+  }
+  setWithoutDeleting(parameter, newValue) {
+    const url = this.getURL();
+    url.searchParams.set(parameter, newValue);
+    window.history.replaceState(null, null, url);
+    this.updateCurrentPageFooter();
+  }
+  clear() {
+    const url = this.getURL();
+    const newPath = url.protocol + url.host;
+    const newURL = new URL(newPath);
+    window.history.replaceState(null, null, newURL);
+    this.updateCurrentPageFooter();
+  }
+  updateCurrentPageFooter() {
+    console.log('window.lotivisApplication: ' + window.lotivisApplication);
+    window.lotivisApplication.currentPage.updateFooter();
+  }
 }
 URLParameters.language = 'language';
 URLParameters.page = 'page';
@@ -524,226 +525,226 @@ class ModalPopup extends Popup {
 }
 
 class Page {
-    constructor(application, title = 'Unknown') {
-        if (!application) {
-            throw 'No application given.';
-        }
-        this.title = title || 'Unknown';
-        this.application = application;
-        this.element = application.element;
-        this.renderHeader();
-        this.renderBody();
-        this.renderFooter();
-        application.makeContainerNormal();
-        document.title = 'FRC-Visualization - ' + this.title;
+  constructor(application, title = 'Unknown') {
+    if (!application) {
+      throw 'No application given.';
     }
-    buildSubpage() {
-        this.titleLabel = this.centerHeaderContainer.append('h1')
-            .text(this.title);
+    this.title = title || 'Unknown';
+    this.application = application;
+    this.element = application.element;
+    this.renderHeader();
+    this.renderBody();
+    this.renderFooter();
+    application.makeContainerNormal();
+    document.title = 'FRC-Visualization - ' + this.title;
+  }
+  buildSubpage() {
+    this.titleLabel = this.centerHeaderContainer.append('h1')
+      .text(this.title);
+  }
+  addRow(toParent = this.element) {
+    return this.addContainer(toParent, 'row');
+  }
+  addContainer(toParent = this.element, classes = '') {
+    let parent = toParent || this.element;
+    return parent
+      .append('div')
+      .classed(classes, true);
+  }
+  setTitle(newTitle) {
+    this.title = newTitle;
+    this.titleLabel.text(newTitle);
+  }
+  addSpace(toParent = this.element, width) {
+    toParent
+      .append('label')
+      .style('width', width + 'px');
+    return this;
+  }
+  renderHeader() {
+    this.headerRow = this.addRow(this.element)
+      .classed('row margin-bottom', true);
+    this.leftHeaderContainer = this.headerRow
+      .append('div')
+      .classed('col-3', true);
+    this.centerHeaderContainer = this.headerRow
+      .append('div')
+      .classed('col-6 text-center', true);
+    this.rightHeaderContainer = this.headerRow
+      .append('div')
+      .classed('col-3 text-end button-group', true);
+    this.backButton = this.addBackButton(this.leftHeaderContainer);
+  }
+  renderBody() {
+    this.row = this.addRow(this.element);
+  }
+  renderFooterRow() {
+    this.footerRow = this.addRow(this.element)
+      .classed('footer', true);
+  }
+  renderFooterLinks() {
+    this.footerLinksContainer = this.footerRow
+      .append('div')
+      .classed('col-12 text-center', true);
+    this.footerLinksContainer
+      .append('a')
+      .text(Language.translate('Impress'))
+      .on('click', function () {
+        let language = Language.language;
+        let url = `/html/impress-${language}.html`;
+        this.presentModalPopup(url);
+      }.bind(this));
+    this.footerLinksContainer
+      .append('a')
+      .text(Language.translate('Privacy Policy'))
+      .on('click', function () {
+        let language = Language.language;
+        let url = `/html/privacy-policy-${language}.html`;
+        this.presentModalPopup(url);
+      }.bind(this));
+    this.footerLinksContainer
+      .append('a')
+      .text(Language.translate('About the Project'))
+      .on('click', function () {
+        let language = Language.language;
+        let url = `/html/about-project-${language}.html`;
+        this.presentModalPopup(url);
+      }.bind(this));
+  }
+  presentModalPopup(contentURL) {
+    let parent = window.frcvApp.element;
+    let impressPopup = new ModalPopup(parent);
+    impressPopup.loadContent(contentURL);
+    impressPopup.showBigModal();
+  }
+  renderFooterURL() {
+    this.footerURLContainer = this.footerRow
+      .append('div')
+      .classed('col-12 text-center', true);
+    this.footerURLContainer.append('br');
+    this.footerTooltipContainer = this.footerURLContainer
+      .append('div')
+      .classed('tooltip', true);
+    this.footerURLLabel = this.footerTooltipContainer
+      .append('a')
+      .append('samp')
+      .on('click', this.copyLocationToClipboard);
+    let text = Language.translate('Click on URL to copy it to clipboard');
+    this.footerURLLabelTooltip = this.footerTooltipContainer
+      .append('span')
+      .classed('tooltiptext', true)
+      .text(text);
+  }
+  copyLocationToClipboard() {
+    let urlPath = window.location.href;
+    navigator.clipboard.writeText(urlPath).then(function () {
+      console.log('Async: Copying to clipboard was successful!');
+    }, function (err) {
+      console.error('Async: Could not copy text: ', err);
+    });
+  }
+  renderFooterCorpusInfo() {
+    this.footerCorpusInfoContainer = this.footerRow
+      .append('div')
+      .classed('col-12 text-center', true);
+    this.footerDebugLabel = this.footerCorpusInfoContainer
+      .append('samp');
+    this.updateFooterDebugInfo();
+  }
+  renderFooterLanguageInfo() {
+    this.footerLanguageInfoContainer = this.footerRow
+      .append('div')
+      .classed('col-12 text-center', true);
+    this.footerLanguageLabel = this.footerLanguageInfoContainer
+      .append('samp');
+    this.footerLanguageRadioGroup = new RadioGroup(
+      this.footerLanguageInfoContainer
+    );
+    this.footerLanguageRadioGroup.setOptions([
+      [Language.English, 'English'],
+      [Language.German, 'German'],
+      [Language.French, 'French'],
+    ]);
+    this.footerLanguageRadioGroup.onChange = function (value) {
+      Language.setLanguage(value);
+      URLParameters.getInstance().set(URLParameters.language, value);
+      Application.default.reloadPage();
+    };
+    this.footerLanguageRadioGroup.setSelectedOption(
+      Language.language
+    );
+  }
+  renderFooter() {
+    this.renderFooterRow();
+    this.renderFooterLinks();
+    this.renderFooterURL();
+    this.renderFooterCorpusInfo();
+    this.renderFooterLanguageInfo();
+  }
+  updateFooter() {
+    this.updateFooterURL();
+    this.updateFooterDebugInfo();
+  }
+  updateFooterURL() {
+    let url = URLParameters.getInstance().getURL();
+    this.footerURLLabel.text(url);
+  }
+  updateFooterDebugInfo() {
+    let label = Language.translate('Corpus loaded status');
+    let isCorpusLoaded = this.application.isCorpusLoaded();
+    let valueTranslated = Language.translate('' + isCorpusLoaded);
+    this.footerDebugLabel.text(`${label}: ${valueTranslated}`);
+  }
+  addLoadingView(toParent = this.element) {
+    toParent.loadingView = toParent
+      .append('div')
+      .classed('loading-container', true);
+    toParent.loadingView
+      .append('div')
+      .classed('loading-card', true)
+      .text(Language.translate('Loading...'));
+    return toParent.loadingView;
+  }
+  showLoadingView() {
+    this.loadingView = this.addLoadingView(this.element);
+  }
+  hideLoadingView() {
+    if (!this.loadingView) return;
+    this.loadingView.remove();
+  }
+  addBackButton(toParent = this.element) {
+    let button = new Button(toParent);
+    button.element.classed('back-button', true);
+    button.setText(Language.translate('Back'));
+    let applicationReference = this.application;
+    button.onClick = function () {
+      applicationReference.showPage('main', true);
+    };
+    return button;
+  }
+  showBackButton() {
+    this.backButton.element.style('visibility', 'visible');
+  }
+  hideBackButton() {
+    this.backButton.element.style('visibility', 'hidden');
+  }
+  loadCorpusIfNeeded() {
+    this.willLoadCorpus();
+    if (this.application.isCorpusLoaded()) {
+      this.didLoadCorpus();
+    } else {
+      let ref = this;
+      this.application.loadCorpus(function () {
+        ref.didLoadCorpus();
+      });
     }
-    addRow(toParent = this.element) {
-        return this.addContainer(toParent, 'row');
-    }
-    addContainer(toParent = this.element, classes = '') {
-        let parent = toParent || this.element;
-        return parent
-            .append('div')
-            .classed(classes, true);
-    }
-    setTitle(newTitle) {
-        this.title = newTitle;
-        this.titleLabel.text(newTitle);
-    }
-    addSpace(toParent = this.element, width) {
-        toParent
-            .append('label')
-            .style('width', width + 'px');
-        return this;
-    }
-    renderHeader() {
-        this.headerRow = this.addRow(this.element)
-            .classed('row margin-bottom', true);
-        this.leftHeaderContainer = this.headerRow
-            .append('div')
-            .classed('col-3', true);
-        this.centerHeaderContainer = this.headerRow
-            .append('div')
-            .classed('col-6 text-center', true);
-        this.rightHeaderContainer = this.headerRow
-            .append('div')
-            .classed('col-3 text-end button-group', true);
-        this.backButton = this.addBackButton(this.leftHeaderContainer);
-    }
-    renderBody() {
-        this.row = this.addRow(this.element);
-    }
-    renderFooterRow() {
-        this.footerRow = this.addRow(this.element)
-            .classed('footer', true);
-    }
-    renderFooterLinks() {
-        this.footerLinksContainer = this.footerRow
-            .append('div')
-            .classed('col-12 text-center', true);
-        this.footerLinksContainer
-            .append('a')
-            .text(Language.translate('Impress'))
-            .on('click', function () {
-                let language = Language.language;
-                let url = `/html/impress-${language}.html`;
-                this.presentModalPopup(url);
-            }.bind(this));
-        this.footerLinksContainer
-            .append('a')
-            .text(Language.translate('Privacy Policy'))
-            .on('click', function () {
-                let language = Language.language;
-                let url = `/html/privacy-policy-${language}.html`;
-                this.presentModalPopup(url);
-            }.bind(this));
-        this.footerLinksContainer
-            .append('a')
-            .text(Language.translate('About the Project'))
-            .on('click', function () {
-                let language = Language.language;
-                let url = `/html/about-project-${language}.html`;
-                this.presentModalPopup(url);
-            }.bind(this));
-    }
-    presentModalPopup(contentURL) {
-        let parent = window.frcvApp.element;
-        let impressPopup = new ModalPopup(parent);
-        impressPopup.loadContent(contentURL);
-        impressPopup.showBigModal();
-    }
-    renderFooterURL() {
-        this.footerURLContainer = this.footerRow
-            .append('div')
-            .classed('col-12 text-center', true);
-        this.footerURLContainer.append('br');
-        this.footerTooltipContainer = this.footerURLContainer
-            .append('div')
-            .classed('tooltip', true);
-        this.footerURLLabel = this.footerTooltipContainer
-            .append('a')
-            .append('samp')
-            .on('click', this.copyLocationToClipboard);
-        let text = Language.translate('Click on URL to copy it to clipboard');
-        this.footerURLLabelTooltip = this.footerTooltipContainer
-            .append('span')
-            .classed('tooltiptext', true)
-            .text(text);
-    }
-    copyLocationToClipboard() {
-        let urlPath = window.location.href;
-        navigator.clipboard.writeText(urlPath).then(function () {
-            console.log('Async: Copying to clipboard was successful!');
-        }, function (err) {
-            console.error('Async: Could not copy text: ', err);
-        });
-    }
-    renderFooterCorpusInfo() {
-        this.footerCorpusInfoContainer = this.footerRow
-            .append('div')
-            .classed('col-12 text-center', true);
-        this.footerDebugLabel = this.footerCorpusInfoContainer
-            .append('samp');
-        this.updateFooterDebugInfo();
-    }
-    renderFooterLanguageInfo() {
-        this.footerLanguageInfoContainer = this.footerRow
-            .append('div')
-            .classed('col-12 text-center', true);
-        this.footerLanguageLabel = this.footerLanguageInfoContainer
-            .append('samp');
-        this.footerLanguageRadioGroup = new RadioGroup(
-            this.footerLanguageInfoContainer
-        );
-        this.footerLanguageRadioGroup.setOptions([
-            [Language.English, 'English'],
-            [Language.German, 'German'],
-            [Language.French, 'French'],
-        ]);
-        this.footerLanguageRadioGroup.onChange = function (value) {
-            Language.setLanguage(value);
-            URLParameters.getInstance().set(URLParameters.language, value);
-            Application.default.reloadPage();
-        };
-        this.footerLanguageRadioGroup.setSelectedOption(
-            Language.language
-        );
-    }
-    renderFooter() {
-        this.renderFooterRow();
-        this.renderFooterLinks();
-        this.renderFooterURL();
-        this.renderFooterCorpusInfo();
-        this.renderFooterLanguageInfo();
-    }
-    updateFooter() {
-        this.updateFooterURL();
-        this.updateFooterDebugInfo();
-    }
-    updateFooterURL() {
-        let url = URLParameters.getInstance().getURL();
-        this.footerURLLabel.text(url);
-    }
-    updateFooterDebugInfo() {
-        let label = Language.translate('Corpus loaded status');
-        let isCorpusLoaded = this.application.isCorpusLoaded();
-        let valueTranslated = Language.translate('' + isCorpusLoaded);
-        this.footerDebugLabel.text(`${label}: ${valueTranslated}`);
-    }
-    addLoadingView(toParent = this.element) {
-        toParent.loadingView = toParent
-            .append('div')
-            .classed('loading-container', true);
-        toParent.loadingView
-            .append('div')
-            .classed('loading-card', true)
-            .text(Language.translate('Loading...'));
-        return toParent.loadingView;
-    }
-    showLoadingView() {
-        this.loadingView = this.addLoadingView(this.element);
-    }
-    hideLoadingView() {
-        if (!this.loadingView) return;
-        this.loadingView.remove();
-    }
-    addBackButton(toParent = this.element) {
-        let button = new Button(toParent);
-        button.element.classed('back-button', true);
-        button.setText(Language.translate('Back'));
-        let applicationReference = this.application;
-        button.onClick = function () {
-            applicationReference.showPage('main', true);
-        };
-        return button;
-    }
-    showBackButton() {
-        this.backButton.element.style('visibility', 'visible');
-    }
-    hideBackButton() {
-        this.backButton.element.style('visibility', 'hidden');
-    }
-    loadCorpusIfNeeded() {
-        this.willLoadCorpus();
-        if (this.application.isCorpusLoaded()) {
-            this.didLoadCorpus();
-        } else {
-            let ref = this;
-            this.application.loadCorpus(function () {
-                ref.didLoadCorpus();
-            });
-        }
-    }
-    willLoadCorpus() {
-    }
-    didLoadCorpus() {
-        this.updateFooterURL();
-        this.updateFooterDebugInfo();
-    }
+  }
+  willLoadCorpus() {
+  }
+  didLoadCorpus() {
+    this.updateFooterURL();
+    this.updateFooterDebugInfo();
+  }
 }
 
 class Option {
@@ -890,23 +891,23 @@ SearchPageSettingsPopup.ViewMode = {
 };
 
 function randomColor() {
-    return "rgb(" +
-        (Math.random() * 255) + ", " +
-        (Math.random() * 255) + "," +
-        (Math.random() * 255) + ")";
+  return "rgb(" +
+    (Math.random() * 255) + ", " +
+    (Math.random() * 255) + "," +
+    (Math.random() * 255) + ")";
 }
 class Color {
-    constructor(r, g, b) {
-        this.r = Math.round(r);
-        this.g = Math.round(g);
-        this.b = Math.round(b);
-    }
-    rgbString() {
-        return `rgb(${this.r},${this.g},${this.b})`;
-    }
-    colorAdding(r, g, b) {
-        return new Color(this.r + r, this.g + g, this.b + b);
-    }
+  constructor(r, g, b) {
+    this.r = Math.round(r);
+    this.g = Math.round(g);
+    this.b = Math.round(b);
+  }
+  rgbString() {
+    return `rgb(${this.r},${this.g},${this.b})`;
+  }
+  colorAdding(r, g, b) {
+    return new Color(this.r + r, this.g + g, this.b + b);
+  }
 }
 Color.organgeLow = new Color(250, 211, 144);
 Color.organgeHigh = new Color(229, 142, 38);
@@ -919,82 +920,82 @@ Color.lightBlueHight = new Color(10, 61, 98);
 Color.greenLow = new Color(184, 233, 148);
 Color.greenHight = new Color(7, 153, 146);
 Color.stackColors = [
-    [Color.blueHigh, Color.blueLow],
-    [Color.redHigh, Color.redLow],
-    [Color.greenHight, Color.greenLow],
-    [Color.organgeHigh, Color.organgeLow],
-    [Color.lightBlueHight, Color.lightBlueLow],
+  [Color.blueHigh, Color.blueLow],
+  [Color.redHigh, Color.redLow],
+  [Color.greenHight, Color.greenLow],
+  [Color.organgeHigh, Color.organgeLow],
+  [Color.lightBlueHight, Color.lightBlueLow],
 ];
 function colorsForStack(stack, amount) {
-    if (!Number.isInteger(stack)) {
-        return [Color.stackColors[0]];
-    }
-    let usedAmount = Math.max(amount, 5);
-    let stackColors = Color.stackColors[stack % Color.stackColors.length];
-    let highColor = stackColors[0];
-    let lowColor = stackColors[1];
-    let redDiff = lowColor.r - highColor.r;
-    let greenDiff = lowColor.g - highColor.g;
-    let blueDiff = lowColor.b - highColor.b;
-    let redStep = redDiff / usedAmount;
-    let greenStep = greenDiff / usedAmount;
-    let blueStep = blueDiff / usedAmount;
-    let colors = [];
-    for (let i = 0; i < amount; i++) {
-        let newColor = highColor.colorAdding(redStep * i, greenStep * i, blueStep * i);
-        colors.push(newColor);
-    }
-    return colors;
+  if (!Number.isInteger(stack)) {
+    return [Color.stackColors[0]];
+  }
+  let usedAmount = Math.max(amount, 5);
+  let stackColors = Color.stackColors[stack % Color.stackColors.length];
+  let highColor = stackColors[0];
+  let lowColor = stackColors[1];
+  let redDiff = lowColor.r - highColor.r;
+  let greenDiff = lowColor.g - highColor.g;
+  let blueDiff = lowColor.b - highColor.b;
+  let redStep = redDiff / usedAmount;
+  let greenStep = greenDiff / usedAmount;
+  let blueStep = blueDiff / usedAmount;
+  let colors = [];
+  for (let i = 0; i < amount; i++) {
+    let newColor = highColor.colorAdding(redStep * i, greenStep * i, blueStep * i);
+    colors.push(newColor);
+  }
+  return colors;
 }
 
 class TestData {
 }
 TestData.datasets = [
-    {
-        label: 'Merde',
-        stack: 'Merde',
-        data: [
-            {label: 2012, year: 2012, yearTotal: 100, value: 12},
-            {label: 2013, year: 2013, yearTotal: 120, value: 24},
-            {label: 2014, year: 2014, yearTotal: 140, value: 12},
-        ]
-    },
-    {
-        label: 'Gucci',
-        stack: 'Gucci,Lacoste',
-        data: [
-            {label: 2012, year: 2012, yearTotal: 100, value: 5},
-            {label: 2013, year: 2013, yearTotal: 120, value: 10},
-            {label: 2014, year: 2014, yearTotal: 140, value: 15},
-        ]
-    },
-    {
-        label: 'Lacoste',
-        stack: 'Gucci,Lacoste',
-        data: [
-            {label: 2012, year: 2012, yearTotal: 100, value: 8},
-            {label: 2013, year: 2013, yearTotal: 120, value: 8},
-            {label: 2014, year: 2014, yearTotal: 140, value: 5},
-        ]
-    },
-    {
-        label: 'Nike',
-        stack: 'Nike,Puma',
-        data: [
-            {label: 2012, year: 2012, yearTotal: 100, value: 2},
-            {label: 2013, year: 2013, yearTotal: 120, value: 4},
-            {label: 2014, year: 2014, yearTotal: 140, value: 20},
-        ]
-    },
-    {
-        label: 'Puma',
-        stack: 'Nike,Puma',
-        data: [
-            {label: 2012, year: 2012, yearTotal: 100, value: 15},
-            {label: 2013, year: 2013, yearTotal: 120, value: 30},
-            {label: 2014, year: 2014, yearTotal: 140, value: 10},
-        ]
-    }
+  {
+    label: 'Merde',
+    stack: 'Merde',
+    data: [
+      {label: 2012, year: 2012, yearTotal: 100, value: 12},
+      {label: 2013, year: 2013, yearTotal: 120, value: 24},
+      {label: 2014, year: 2014, yearTotal: 140, value: 12},
+    ]
+  },
+  {
+    label: 'Gucci',
+    stack: 'Gucci,Lacoste',
+    data: [
+      {label: 2012, year: 2012, yearTotal: 100, value: 5},
+      {label: 2013, year: 2013, yearTotal: 120, value: 10},
+      {label: 2014, year: 2014, yearTotal: 140, value: 15},
+    ]
+  },
+  {
+    label: 'Lacoste',
+    stack: 'Gucci,Lacoste',
+    data: [
+      {label: 2012, year: 2012, yearTotal: 100, value: 8},
+      {label: 2013, year: 2013, yearTotal: 120, value: 8},
+      {label: 2014, year: 2014, yearTotal: 140, value: 5},
+    ]
+  },
+  {
+    label: 'Nike',
+    stack: 'Nike,Puma',
+    data: [
+      {label: 2012, year: 2012, yearTotal: 100, value: 2},
+      {label: 2013, year: 2013, yearTotal: 120, value: 4},
+      {label: 2014, year: 2014, yearTotal: 140, value: 20},
+    ]
+  },
+  {
+    label: 'Puma',
+    stack: 'Nike,Puma',
+    data: [
+      {label: 2012, year: 2012, yearTotal: 100, value: 15},
+      {label: 2013, year: 2013, yearTotal: 120, value: 30},
+      {label: 2014, year: 2014, yearTotal: 140, value: 10},
+    ]
+  }
 ];
 
 class DiachronicChart extends Component {
@@ -1674,46 +1675,46 @@ class DiachronicChartCard extends Card {
 const RecentSearchesLocalStorageKey = 'de.beuth.frc-visualization.RecentSearchesLocalStorageKey';
 const MaxItemsCount = 100;
 class RecentSearches {
-    constructor() {
-        this.loadFromLocalStorage();
+  constructor() {
+    this.loadFromLocalStorage();
+  }
+  static getInstance() {
+    if (!RecentSearches.instance) {
+      RecentSearches.instance = new RecentSearches();
     }
-    static getInstance() {
-        if (!RecentSearches.instance) {
-            RecentSearches.instance = new RecentSearches();
-        }
-        return RecentSearches.instance;
+    return RecentSearches.instance;
+  }
+  append(searchText) {
+    this.removeIfExisting(searchText);
+    this.insert(searchText);
+    this.storeToLocalStorage();
+  }
+  insert(value) {
+    this.values.splice(0, 0, value);
+    this.removeDispensableValues();
+  }
+  removeIfExisting(value) {
+    let index = this.values.indexOf(value);
+    if (index < 0) return;
+    this.values.splice(index, 1);
+  }
+  removeDispensableValues() {
+    if (this.values.length < MaxItemsCount) return;
+    let tooMuch = this.values.length - MaxItemsCount;
+    console.log("tooMuch: " + tooMuch);
+    this.values.splice(MaxItemsCount, tooMuch);
+  }
+  loadFromLocalStorage() {
+    let wordlist = localStorage.getItem(RecentSearchesLocalStorageKey);
+    if (wordlist) {
+      this.values = wordlist.split('\n');
+    } else {
+      this.values = [];
     }
-    append(searchText) {
-        this.removeIfExisting(searchText);
-        this.insert(searchText);
-        this.storeToLocalStorage();
-    }
-    insert(value) {
-        this.values.splice(0, 0, value);
-        this.removeDispensableValues();
-    }
-    removeIfExisting(value) {
-        let index = this.values.indexOf(value);
-        if (index < 0) return;
-        this.values.splice(index, 1);
-    }
-    removeDispensableValues() {
-        if (this.values.length < MaxItemsCount) return;
-        let tooMuch = this.values.length - MaxItemsCount;
-        console.log("tooMuch: " + tooMuch);
-        this.values.splice(MaxItemsCount, tooMuch);
-    }
-    loadFromLocalStorage() {
-        let wordlist = localStorage.getItem(RecentSearchesLocalStorageKey);
-        if (wordlist) {
-            this.values = wordlist.split('\n');
-        } else {
-            this.values = [];
-        }
-    }
-    storeToLocalStorage() {
-        localStorage.setItem(RecentSearchesLocalStorageKey, this.values.join('\n'));
-    }
+  }
+  storeToLocalStorage() {
+    localStorage.setItem(RecentSearchesLocalStorageKey, this.values.join('\n'));
+  }
 }
 
 class SearchField extends Component {
@@ -1949,132 +1950,132 @@ class InnovationListPopup extends Popup {
 }
 
 class SearchCard extends Card {
-    constructor(parent) {
-        super(parent);
-        this.header.style('display', 'none');
-        this.row = this.body
-            .append('div')
-            .classed('row margin-top', true);
-        this.renderSearchField();
-        this.renderCaseSensitiveDropdown();
-        this.renderRangeDropdown();
-        this.renderRelativeAbsolute();
-        this.renderFooterRow();
-        this.renderPresentInnovationListPopupButton();
-        this.renderSearchButton();
+  constructor(parent) {
+    super(parent);
+    this.header.style('display', 'none');
+    this.row = this.body
+      .append('div')
+      .classed('row margin-top', true);
+    this.renderSearchField();
+    this.renderCaseSensitiveDropdown();
+    this.renderRangeDropdown();
+    this.renderRelativeAbsolute();
+    this.renderFooterRow();
+    this.renderPresentInnovationListPopupButton();
+    this.renderSearchButton();
+  }
+  renderSearchField() {
+    this.searchFieldContainer = this.row
+      .append('div')
+      .classed('col-4', true);
+    this.searchField = new SearchField(this.searchFieldContainer);
+    this.searchField.onEnter = function () {
+      this.startSearching();
+    }.bind(this);
+  }
+  renderCaseSensitiveDropdown() {
+    this.caseSensetiveGroupContainer = this.row
+      .append('div')
+      .classed('col-2', true);
+    this.sensitivityDropdown = new Dropdown(this.caseSensetiveGroupContainer)
+      .setOptions([
+        new Option('case-sensitive', 'Case Sensitive'),
+        new Option('case-insensitive', 'Case Insensitive'),
+      ]);
+    this.sensitivityDropdown.label.text('Sensitivity');
+    this.sensitivityDropdown.onChange = function (value) {
+      URLParameters.getInstance().set(URLParameters.searchSensitivity, value);
+      this.startSearching();
+    }.bind(this);
+  }
+  renderRangeDropdown() {
+    let startYear = 1995;
+    let endYear = 2020;
+    let defaultStartYear = 2000;
+    let options = [];
+    for (let year = startYear; year <= endYear; year++) {
+      options.push([year, year]);
     }
-    renderSearchField() {
-        this.searchFieldContainer = this.row
-            .append('div')
-            .classed('col-4', true);
-        this.searchField = new SearchField(this.searchFieldContainer);
-        this.searchField.onEnter = function () {
-            this.startSearching();
-        }.bind(this);
-    }
-    renderCaseSensitiveDropdown() {
-        this.caseSensetiveGroupContainer = this.row
-            .append('div')
-            .classed('col-2', true);
-        this.sensitivityDropdown = new Dropdown(this.caseSensetiveGroupContainer)
-            .setOptions([
-                new Option('case-sensitive', 'Case Sensitive'),
-                new Option('case-insensitive', 'Case Insensitive'),
-            ]);
-        this.sensitivityDropdown.label.text('Sensitivity');
-        this.sensitivityDropdown.onChange = function (value) {
-            URLParameters.getInstance().set(URLParameters.searchSensitivity, value);
-            this.startSearching();
-        }.bind(this);
-    }
-    renderRangeDropdown() {
-        let startYear = 1995;
-        let endYear = 2020;
-        let defaultStartYear = 2000;
-        let options = [];
-        for (let year = startYear; year <= endYear; year++) {
-            options.push([year, year]);
-        }
-        this.yearStartContainer = this.row.append('div').classed('col-2', true);
-        this.yearStartDropdown = new Dropdown(this.yearStartContainer)
-            .setLabelText(Language.translate('from'))
-            .setOptions(options)
-            .setSelectedOption(defaultStartYear)
-            .setOnChange(function (startYear) {
-                URLParameters.getInstance().set(URLParameters.startYear, startYear);
-                this.startSearching();
-            }.bind(this));
-        this.yearEndContainer = this.row.append('div').classed('col-2', true);
-        this.yearEndDropdown = new Dropdown(this.yearEndContainer)
-            .setLabelText(Language.translate('till'))
-            .setOptions(options)
-            .setSelectedOption(endYear)
-            .setOnChange(function (endYear) {
-                URLParameters.getInstance().set(URLParameters.endYear, endYear);
-                this.startSearching();
-            }.bind(this));
-    }
-    renderRelativeAbsolute() {
-        let container2 = this.row
-            .append('div')
-            .classed('col-2', true);
-        this.valueRadioGroup = new RadioGroup(container2);
-        this.valueRadioGroup.setOptions([
-            new Option('relative', 'Relative'),
-            new Option('absolute', 'Absolute')
-        ]);
-        this.valueRadioGroup.onChange = function (value) {
-            this.diachronicChart.valueType = value;
-            this.diachronicChart.update();
-            this.valueType = value;
-            URLParameters.getInstance().set(URLParameters.valueType, value);
-            this.startSearching();
-        }.bind(this);
-    }
-    renderFooterRow() {
-        this.footer = this.row
-            .append('div')
-            .classed('col-12 button-group margin-top text-end', true);
-    }
-    renderPresentInnovationListPopupButton() {
-        this.presentInnovationListPopupButton = new Button(this.footer);
-        this.presentInnovationListPopupButton.element.classed('button-down', true);
-        this.presentInnovationListPopupButton.setText(Language.translate('Innovation List'));
-        this.presentInnovationListPopupButton.onClick = function (event) {
-            if (!event || !event.target) return;
-            let application = Application.default;
-            let popup = new InnovationListPopup(application.element);
-            popup.searchCard = this;
-            popup.showUnder(event.target, 'center');
-        }.bind(this);
-    }
-    renderSearchButton() {
-        this.searchButton = new Button(this.footer);
-        this.searchButton.element.classed('button round-button', true);
-        this.searchButton.setText(Language.translate('Search'));
-        this.searchButton.onClick = function () {
-            this.startSearching();
-        }.bind(this);
-    }
-    getSearchText() {
-        return this.searchField.getText();
-    }
-    startSearching() {
-    }
-    createFooter() {
-    }
-    get searchText() {
-        return this.searchField.getText();
-    }
-    get sensitivity() {
-        return this.sensitivityDropdown.value;
-    }
-    get firstYear() {
-        return this.yearStartDropdown.value;
-    }
-    get lastYear() {
-        return this.yearEndDropdown.value;
-    }
+    this.yearStartContainer = this.row.append('div').classed('col-2', true);
+    this.yearStartDropdown = new Dropdown(this.yearStartContainer)
+      .setLabelText(Language.translate('from'))
+      .setOptions(options)
+      .setSelectedOption(defaultStartYear)
+      .setOnChange(function (startYear) {
+        URLParameters.getInstance().set(URLParameters.startYear, startYear);
+        this.startSearching();
+      }.bind(this));
+    this.yearEndContainer = this.row.append('div').classed('col-2', true);
+    this.yearEndDropdown = new Dropdown(this.yearEndContainer)
+      .setLabelText(Language.translate('till'))
+      .setOptions(options)
+      .setSelectedOption(endYear)
+      .setOnChange(function (endYear) {
+        URLParameters.getInstance().set(URLParameters.endYear, endYear);
+        this.startSearching();
+      }.bind(this));
+  }
+  renderRelativeAbsolute() {
+    let container2 = this.row
+      .append('div')
+      .classed('col-2', true);
+    this.valueRadioGroup = new RadioGroup(container2);
+    this.valueRadioGroup.setOptions([
+      new Option('relative', 'Relative'),
+      new Option('absolute', 'Absolute')
+    ]);
+    this.valueRadioGroup.onChange = function (value) {
+      this.diachronicChart.valueType = value;
+      this.diachronicChart.update();
+      this.valueType = value;
+      URLParameters.getInstance().set(URLParameters.valueType, value);
+      this.startSearching();
+    }.bind(this);
+  }
+  renderFooterRow() {
+    this.footer = this.row
+      .append('div')
+      .classed('col-12 button-group margin-top text-end', true);
+  }
+  renderPresentInnovationListPopupButton() {
+    this.presentInnovationListPopupButton = new Button(this.footer);
+    this.presentInnovationListPopupButton.element.classed('button-down', true);
+    this.presentInnovationListPopupButton.setText(Language.translate('Innovation List'));
+    this.presentInnovationListPopupButton.onClick = function (event) {
+      if (!event || !event.target) return;
+      let application = Application.default;
+      let popup = new InnovationListPopup(application.element);
+      popup.searchCard = this;
+      popup.showUnder(event.target, 'center');
+    }.bind(this);
+  }
+  renderSearchButton() {
+    this.searchButton = new Button(this.footer);
+    this.searchButton.element.classed('button round-button', true);
+    this.searchButton.setText(Language.translate('Search'));
+    this.searchButton.onClick = function () {
+      this.startSearching();
+    }.bind(this);
+  }
+  getSearchText() {
+    return this.searchField.getText();
+  }
+  startSearching() {
+  }
+  createFooter() {
+  }
+  get searchText() {
+    return this.searchField.getText();
+  }
+  get sensitivity() {
+    return this.sensitivityDropdown.value;
+  }
+  get firstYear() {
+    return this.yearStartDropdown.value;
+  }
+  get lastYear() {
+    return this.yearEndDropdown.value;
+  }
 }
 
 class GeoJson {
@@ -2712,12 +2713,6 @@ class MapChartCard extends Card {
     this.slider.value = 2000;
   }
   renderMenuItems() {
-    this.centerButton = new Button(this.headerRightComponent);
-    this.centerButton.setText(Language.translate('Center'));
-    this.centerButton.hide();
-    this.centerButton.onClick = function (event) {
-      console.log(event);
-    }.bind(this);
     this.screenshotButton = new Button(this.headerRightComponent);
     this.screenshotButton.setText('Screenshot');
     this.screenshotButton.element.classed('simple-button', true);
@@ -2731,7 +2726,7 @@ class MapChartCard extends Card {
   }
   renderMapChart() {
     this.mapChart = new MapChart(this.body);
-    this.mapChart.loadGeoJSON('/assets/geojson/Departements-Simple.geojson');
+    this.mapChart.loadGeoJSON('/assets/Departements-Simple.geojson');
   }
   screenshotButtonAction() {
     let name = 'my_image.jpg';
@@ -2804,53 +2799,55 @@ class TrackPopup extends Popup {
 }
 
 class WordAboutCard extends Card {
-    constructor(parent) {
-        super(parent);
-    }
-    update() {
-        this.body.html('');
-        if (!this.datasets) return;
-        this.divs = this.body
-            .selectAll('div')
-            .data(this.datasets)
-            .enter()
-            .append('div')
-            .html(function (dataset, index) {
-                let components = [];
-                if (index !== 0) { components.push(`<br>`); }
-                components.push(`<b class="larger">`);
-                components.push(`${dataset.label}`);
-                components.push(` (${dataset.data.length} Tracks)`);
-                components.push(`</b>`);
-                return components.join('');
-            })
-            .selectAll("div")
-            .data(function (dataset) {
-                dataset.data.forEach(item => item.dataset = dataset.label);
-                return dataset.data
-                    .sort(function (item1, item2) {
-                    return d3.descending(item1.releaseYear, item2.releaseYear);
-                });
-            })
-            .enter()
-            .append("div")
-            .style('cursor', 'pointer')
-            .html(function (item) {
-                let components = [];
-                components.push(`<span class="primary">${item.title}</span>`);
-                components.push(`<span class="secondary">(by ${item.artist}, ${item.releaseYear})</span>`);
-                return `<li>${components.join(' ')}</li>`;
-            })
-            .on('click', function (event, item) {
-                let parent = window.frcvApp.element;
-                let popup = new TrackPopup(parent);
-                console.log(item);
-                popup.searchWord = item.dataset;
-                popup.track = item;
-                popup.update();
-                popup.showBigModal();
-            });
-    }
+  constructor(parent) {
+    super(parent);
+  }
+  update() {
+    this.body.html('');
+    if (!this.datasets) return;
+    this.divs = this.body
+      .selectAll('div')
+      .data(this.datasets)
+      .enter()
+      .append('div')
+      .html(function (dataset, index) {
+        let components = [];
+        if (index !== 0) {
+          components.push(`<br>`);
+        }
+        components.push(`<b class="larger">`);
+        components.push(`${dataset.label}`);
+        components.push(` (${dataset.data.length} Tracks)`);
+        components.push(`</b>`);
+        return components.join('');
+      })
+      .selectAll("div")
+      .data(function (dataset) {
+        dataset.data.forEach(item => item.dataset = dataset.label);
+        return dataset.data
+          .sort(function (item1, item2) {
+            return d3.descending(item1.releaseYear, item2.releaseYear);
+          });
+      })
+      .enter()
+      .append("div")
+      .style('cursor', 'pointer')
+      .html(function (item) {
+        let components = [];
+        components.push(`<span class="primary">${item.title}</span>`);
+        components.push(`<span class="secondary">(by ${item.artist}, ${item.releaseYear})</span>`);
+        return `<li>${components.join(' ')}</li>`;
+      })
+      .on('click', function (event, item) {
+        let parent = window.frcvApp.element;
+        let popup = new TrackPopup(parent);
+        console.log(item);
+        popup.searchWord = item.dataset;
+        popup.track = item;
+        popup.update();
+        popup.showBigModal();
+      });
+  }
 }
 
 class DatasetCollection extends Array {
@@ -3106,149 +3103,186 @@ class SearchPage extends Page {
 SearchPage.viewModeKey = 'de.beuth.frc-visualization.SearchPageViewMode';
 
 class CorpusDataPage extends Page {
-    constructor(application) {
-        super(application, Language.translate('Corpus Metadata'));
-        this.createLeftPanel();
-        this.createCard();
-        this.loadCorpusIfNeeded();
-    }
-    willLoadCorpus() {
-        super.willLoadCorpus();
-        this.loadingView = this.addLoadingView(this.cardBody);
-    }
-    didLoadCorpus() {
-        super.didLoadCorpus();
-        this.loadingView.remove();
-        this.update();
-    }
-    createLeftPanel() {
-        this.leftPanel = this.addContainer(this.row, 'col-lg-3');
-        this.titleLabel = this.leftPanel
-            .append('h1')
-            .text(this.title);
-    }
-    createCard() {
-        this.wrapper = this.addContainer(this.row, 'col-lg-6 col-12');
-        this.card = this.addContainer(this.wrapper, 'card card-corpus-metadata');
-        this.cardBody = this.addContainer(this.card, 'card-body');
-        this.cardBodyRow = this.addRow(this.cardBody);
-    }
-    update() {
-        this.clearContent();
-        let corpus = this.application.corpus;
-        this.currentGroup = this.createGroup();
-        this.createLine('# Artists', corpus.artists.length);
-        this.createLine('# Female Artists', corpus.femaleArtists().length);
-        this.createLine('# Male Artists', corpus.maleArtists().length);
-        this.createLine('# Group Artists', corpus.groupArtists().length);
-        this.currentGroup = this.createGroup();
-        this.createLine('# Albums', corpus.allAlbums().length);
-        this.currentGroup = this.createGroup();
-        this.createLine('# Tracks w/o Album', corpus.allTracksWithoutAlbum().length);
-        this.createLine('# Tracks', corpus.allTracks().length);
-        this.currentGroup = this.createGroup();
-        this.createLine('# Words', corpus.allWords().length);
-    }
-    createGroup() {
-        return this.addContainer(this.cardBodyRow, 'group');
-    }
-    createLine(title, value) {
-        let row = this.currentGroup
-            .append('div')
-            .classed('row text-vertical-center', true);
-        row.append('div')
-            .classed('col-6 text-end label', true)
-            .text(appendColon(title));
-        row.append('div')
-            .classed('col-6', true)
-            .append('samp')
-            .text(value);
-    }
-    clearContent() {
-        this.cardBody.selectAll('div').remove();
-        this.cardBodyRow = this.addRow(this.cardBody);
-    }
+  constructor(application) {
+    super(application, Language.translate('Corpus Metadata'));
+    this.createLeftPanel();
+    this.createCard();
+    this.loadCorpusIfNeeded();
+  }
+  willLoadCorpus() {
+    super.willLoadCorpus();
+    this.loadingView = this.addLoadingView(this.cardBody);
+  }
+  didLoadCorpus() {
+    super.didLoadCorpus();
+    this.loadingView.remove();
+    this.update();
+  }
+  createLeftPanel() {
+    this.leftPanel = this.addContainer(this.row, 'col-lg-3');
+    this.titleLabel = this.leftPanel
+      .append('h1')
+      .text(this.title);
+  }
+  createCard() {
+    this.wrapper = this.addContainer(this.row, 'col-lg-6 col-12');
+    this.card = this.addContainer(this.wrapper, 'card card-corpus-metadata');
+    this.cardBody = this.addContainer(this.card, 'card-body');
+    this.cardBodyRow = this.addRow(this.cardBody);
+  }
+  update() {
+    this.clearContent();
+    let corpus = this.application.corpus;
+    this.currentGroup = this.createGroup();
+    this.createLine('# Artists', corpus.artists.length);
+    this.createLine('# Female Artists', corpus.femaleArtists().length);
+    this.createLine('# Male Artists', corpus.maleArtists().length);
+    this.createLine('# Group Artists', corpus.groupArtists().length);
+    this.currentGroup = this.createGroup();
+    this.createLine('# Albums', corpus.allAlbums().length);
+    this.currentGroup = this.createGroup();
+    this.createLine('# Tracks w/o Album', corpus.allTracksWithoutAlbum().length);
+    this.createLine('# Tracks', corpus.allTracks().length);
+    this.currentGroup = this.createGroup();
+    this.createLine('# Words', corpus.allWords().length);
+  }
+  createGroup() {
+    return this.addContainer(this.cardBodyRow, 'group');
+  }
+  createLine(title, value) {
+    let row = this.currentGroup
+      .append('div')
+      .classed('row text-vertical-center', true);
+    row.append('div')
+      .classed('col-6 text-end label', true)
+      .text(appendColon(title));
+    row.append('div')
+      .classed('col-6', true)
+      .append('samp')
+      .text(value);
+  }
+  clearContent() {
+    this.cardBody.selectAll('div').remove();
+    this.cardBodyRow = this.addRow(this.cardBody);
+  }
 }
 function appendColon(text) {
-    return text.endsWith(':') ? text : text + ':';
+  return text.endsWith(':') ? text : text + ':';
+}
+
+class ProgressBar extends Component {
+  constructor(parent) {
+    super(parent);
+    this.renderBar();
+  }
+  renderBar() {
+    this.barContainerSelector = createUUID();
+    this.barContainer = this.parent
+      .append('div')
+      .attr('id', this.barContainerSelector)
+      .attr('class', 'progress-bar-container');
+    this.barSelector = createUUID();
+    this.bar = this.barContainer
+      .append('div')
+      .attr('id', this.barSelector)
+      .attr('class', 'progress-bar')
+      .html('&nbsp;');
+  }
+  set value(newValue) {
+    let valueAsNumber = Number(newValue);
+    let barContainer = document.getElementById(this.barContainerSelector);
+    let totalWidth = barContainer.getBoundingClientRect().width;
+    let totalWidthAsNumber = Number(totalWidth);
+    let width = (totalWidthAsNumber * valueAsNumber);
+    document.getElementById(this.barSelector)
+      .setAttribute('style', 'width:' + width + 'px');
+  }
+  get value() {
+    let totalWidth = document.getElementById(this.barContainerSelector).style.width;
+    document.getElementById(this.barSelector).style.width;
+    console.log('totalWidth: ' + totalWidth);
+  }
 }
 
 class MainPage extends Page {
-    constructor(application) {
-        super(application, 'Main');
-        if (!application) {
-            throw 'No application given.';
-        }
-        this.application = application;
-        this.element = application.element;
-        this.renderLeftTitleComponent();
-        this.renderCard();
-        this.renderMenuItems();
-        this.hideBackButton();
-        this.fetchServerInfo();
-        this.updateFooterURL();
-        this.updateFooterDebugInfo();
+  constructor(application) {
+    super(application, 'Main');
+    if (!application) {
+      throw 'No application given.';
     }
-    renderLeftTitleComponent() {
-        this.titleContainer = this.row
-            .append('div')
-            .classed('col-lg-3', true);
-        let title = this.application.delegate.name;
-        this.titleLabel = this.titleContainer
-            .append('h1')
-            .text(title);
-        this.titleInfoBox = this.titleContainer
-            .append('div')
-            .classed('info-box', true);
+    this.application = application;
+    this.element = application.element;
+    this.renderLeftTitleComponent();
+    this.renderMenuCard();
+    this.renderMenuItems();
+    this.renderProgressBar();
+    this.hideBackButton();
+    this.updateFooterURL();
+    this.updateFooterDebugInfo();
+    this.loadData();
+  }
+  renderLeftTitleComponent() {
+    this.titleContainer = this.row
+      .append('div')
+      .classed('col-lg-3', true);
+    let title = this.application.delegate.name;
+    this.titleLabel = this.titleContainer
+      .append('h1')
+      .text(title);
+    this.titleInfoBox = this.titleContainer
+      .append('div')
+      .classed('info-box', true);
+  }
+  renderMenuCard() {
+    this.menuCardContainer = this.row
+      .append('div')
+      .classed('col-6', true);
+    this.menuCard = this.menuCardContainer
+      .append('div')
+      .classed('card card-inset menu', true);
+  }
+  renderMenuItems() {
+    let application = this.application;
+    let pages = [
+      ['search', Language.translate('Search')],
+      ['diachronic-data', Language.translate('Diachronic Data')],
+      ['diatopic-data', Language.translate('Diatopic Data')],
+      ['corpus-data', Language.translate('Corpus Data')]
+    ];
+    for (let i = 0; i < pages.length; i++) {
+      let pageItem = pages[i];
+      let pageId = pageItem[0];
+      let pageTitle = pageItem[1];
+      this.addMenuButton(pageTitle, function () {
+        application.showPage(pageId, true);
+      });
     }
-    renderCard() {
-        this.menuCard = this.row
-            .append('div')
-            .classed('col-6', true)
-            .append('div')
-            .classed('card card-inset menu', true);
-    }
-    renderMenuItems() {
-        let application = this.application;
-        let pages = [
-            ['search', Language.translate('Search')],
-            ['diachronic-data', Language.translate('Diachronic Data')],
-            ['diatopic-data', Language.translate('Diatopic Data')],
-            ['corpus-data', Language.translate('Corpus Data')],
-            ['artists-data', Language.translate('Artists Data')]
-        ];
-        for (let i = 0; i < pages.length; i++) {
-            let pageItem = pages[i];
-            let pageId = pageItem[0];
-            let pageTitle = pageItem[1];
-            this.addMenuButton(pageTitle, function () {
-                application.showPage(pageId, true);
-            });
-        }
-    }
-    addMenuButton(name, functionToCall) {
-        let link = this.menuCard
-            .append('a')
-            .text(name)
-            .on('click', function () {
-                if (!functionToCall)
-                    return;
-                functionToCall();
-            });
-        this.menuCard.append('br');
-        return link;
-    }
-    fetchServerInfo() {
-        let thisReference = this;
-        fetch("info")
-            .then(response => response.json())
-            .then(function (json) {
-                thisReference.versionLabel
-                    .text(json.application_version);
-                thisReference.environmentLabel
-                    .text(json.environment);
-            });
-    }
+  }
+  addMenuButton(name, functionToCall) {
+    let link = this.menuCard
+      .append('a')
+      .text(name)
+      .on('click', function () {
+        if (!functionToCall)
+          return;
+        functionToCall();
+      });
+    this.menuCard.append('br');
+    return link;
+  }
+  renderProgressBar() {
+    this.progressBar = new ProgressBar(this.menuCardContainer);
+    this.progressBar.value = 0;
+  }
+  loadData() {
+    let delegate = this.application.delegate;
+    if (delegate.rawJSON) return;
+    let progressBar = this.progressBar;
+    delegate.loadData(function (progress, error) {
+      progressBar.value = progress;
+      console.log('progress: ' + progress);
+    });
+  }
 }
 
 class DiachronicAboutPage extends Page {
@@ -3582,6 +3616,7 @@ class LocationDataPage extends Page {
     this.buildSubpage();
     this.applyURLParameters();
     this.loadGeoJSONFromDelegate();
+    this.didLoadGeoJSONFromDelegate();
   }
   renderBody() {
     super.renderBody();
@@ -3592,26 +3627,6 @@ class LocationDataPage extends Page {
     this.mapChartCard.mapChart.isShowLabels = true;
     this.mapChartCard.mapChart.isZoomable = false;
   }
-  didLoadCorpus() {
-    super.didLoadCorpus();
-    let mapChart = this.mapChartCard.mapChart;
-    let corpus = this.application.corpus;
-    let departmentData = corpus.getDepartementsData();
-    let data = [];
-    departmentData.forEach(function (departmentData) {
-      data.push({
-        departmentName: departmentData.departmentName,
-        dlabel: departmentData.departmentNumber,
-        value: departmentData.value,
-      });
-    });
-    let dataset = {
-      dlabel: 'Total Lyrics',
-      stack: 'Total Lyrics',
-      data: data
-    };
-    mapChart.setDatasets([dataset]);
-  }
   applyURLParameters() {
     let parameters = URLParameters.getInstance();
     let showLabels = parameters.getBoolean('map-show-labels', true);
@@ -3621,6 +3636,10 @@ class LocationDataPage extends Page {
   loadGeoJSONFromDelegate() {
     let url = this.application.delegate.geoJSON;
     this.mapChartCard.mapChart.loadGeoJSON(url);
+  }
+  didLoadGeoJSONFromDelegate() {
+    this.mapChartCard.mapChart;
+    this.application.corpus;
   }
 }
 
@@ -3637,126 +3656,124 @@ class DefaultDataDelegate extends DataDelegate {
 }
 
 class Application {
-    constructor(selector, delegate) {
-        if (!selector) throw 'No selector specified.';
-        if (!delegate) delegate = new DefaultDataDelegate();
-        this.selector = selector;
-        this.delegate = delegate;
-        this.willInitialize();
-        this.initialize();
-        this.didInitialize();
-        Application.default = this;
+  constructor(selector, delegate) {
+    if (!selector) throw 'No selector specified.';
+    if (!delegate) delegate = new DefaultDataDelegate();
+    this.selector = selector;
+    this.delegate = delegate;
+    this.willInitialize();
+    this.initialize();
+    this.didInitialize();
+  }
+  willInitialize() {
+  }
+  initialize() {
+    this.element = d3
+      .select(`#${this.selector}`)
+      .classed('container', true);
+    window.lotivisApplication = this;
+    let parameters = URLParameters.getInstance();
+    let language = parameters.getString(URLParameters.language, Language.English);
+    Language.setLanguage(language);
+  }
+  didInitialize() {
+    this.loadPage();
+  }
+  clearContainer() {
+    document.getElementById(this.selector).innerHTML = '';
+  }
+  loadPage() {
+    let page = URLParameters.getInstance().getString(URLParameters.page, 'main');
+    this.showPage(page, false);
+  }
+  showPage(selector, updateHistory = false) {
+    this.clearContainer();
+    if (updateHistory) {
+      URLParameters.getInstance().clear();
+      URLParameters.getInstance().set(URLParameters.page, selector);
+      URLParameters.getInstance().set(URLParameters.language, Language.language);
     }
-    willInitialize() {
+    this.currentPageSelector = selector;
+    switch (selector) {
+      case 'search':
+        this.currentPage = new SearchPage(this);
+        break;
+      case 'about':
+        this.currentPage = new AboutPage(this);
+        break;
+      case 'corpus-data':
+        this.currentPage = new CorpusDataPage(this);
+        break;
+      case 'artists-data':
+        this.currentPage = new ArtistsDataPage(this);
+        break;
+      case 'diachronic-data':
+        this.currentPage = new DiachronicAboutPage(this);
+        break;
+      case 'diatopic-data':
+        this.currentPage = new LocationDataPage(this);
+        break;
+      default:
+        this.currentPage = new MainPage(this);
+        this.currentPageSelector = 'main';
+        break;
     }
-    initialize() {
-        this.element = d3
-            .select(`#${this.selector}`)
-            .classed('container', true);
-        window.frcvApp = this;
-        window.frcvConfig = {};
-        let parameters = URLParameters.getInstance();
-        let language = parameters.getString(URLParameters.language, Language.English);
-        Language.setLanguage(language);
-    }
-    didInitialize() {
-        this.loadPage();
-    }
-    clearContainer() {
-        document.getElementById(this.selector).innerHTML = '';
-    }
-    loadPage() {
-        let page = URLParameters.getInstance().getString(URLParameters.page, 'main');
-        this.showPage(page, false);
-    }
-    showPage(selector, updateHistory = false) {
-        this.clearContainer();
-        if (updateHistory) {
-            URLParameters.getInstance().clear();
-            URLParameters.getInstance().set(URLParameters.page, selector);
-            URLParameters.getInstance().set(URLParameters.language, Language.language);
+    console.log(this.currentPage);
+  }
+  reloadPage() {
+    this.showPage(this.currentPageSelector);
+  }
+  makeFluit() {
+    this.element.classed('container-fluit', true);
+    this.element.classed('container', false);
+  }
+  makeUnfluit() {
+    this.element.classed('container-fluit', false);
+    this.element.classed('container', true);
+  }
+  isCorpusLoaded() {
+    return this.corpus !== undefined;
+  }
+  loadCorpus(completion) {
+    this.isLoading = true;
+    let url = "../../corpus/original";
+    d3.json(url)
+      .then(function (json) {
+      });
+  }
+  fetchDepartements(completion) {
+    let thisReference = this;
+    this.isFetchingDepartements = true;
+    fetch("../../departements")
+      .then(response => response.json())
+      .then(function (json) {
+        thisReference.departements = json;
+        thisReference.corpus.departements = json;
+        thisReference.isFetchingDepartements = false;
+        if (completion) {
+          completion();
         }
-        this.currentPageSelector = selector;
-        switch (selector) {
-            case 'search':
-                this.currentPage = new SearchPage(this);
-                break;
-            case 'about':
-                this.currentPage = new AboutPage(this);
-                break;
-            case 'corpus-data':
-                this.currentPage = new CorpusDataPage(this);
-                break;
-            case 'artists-data':
-                this.currentPage = new ArtistsDataPage(this);
-                break;
-            case 'diachronic-data':
-                this.currentPage = new DiachronicAboutPage(this);
-                break;
-            case 'diatopic-data':
-                this.currentPage = new LocationDataPage(this);
-                break;
-            default:
-                this.currentPage = new MainPage(this);
-                this.currentPageSelector = 'main';
-                break;
-        }
+      });
+  }
+  getDepartementForNumber(departementNumber) {
+    for (let i = 0; i < this.departements.length; i++) {
+      const departement = this.departements[i];
+      if (departementNumber === departement.deptCode) {
+        return departement;
+      }
     }
-    reloadPage() {
-        this.showPage(this.currentPageSelector);
-    }
-    makeFluit() {
-        this.element.classed('container-fluit', true);
-        this.element.classed('container', false);
-    }
-    makeUnfluit() {
-        this.element.classed('container-fluit', false);
-        this.element.classed('container', true);
-    }
-    isCorpusLoaded() {
-        return this.corpus !== undefined;
-    }
-    loadCorpus(completion) {
-        this.isLoading = true;
-        let url = "../../corpus/original";
-        d3.json(url)
-            .then(function (json) {
-            });
-    }
-    fetchDepartements(completion) {
-        let thisReference = this;
-        this.isFetchingDepartements = true;
-        fetch("../../departements")
-            .then(response => response.json())
-            .then(function (json) {
-                thisReference.departements = json;
-                thisReference.corpus.departements = json;
-                thisReference.isFetchingDepartements = false;
-                if (completion) {
-                    completion();
-                }
-            });
-    }
-    getDepartementForNumber(departementNumber) {
-        for (let i = 0; i < this.departements.length; i++) {
-            const departement = this.departements[i];
-            if (departementNumber === departement.deptCode) {
-                return departement;
-            }
-        }
-        return null;
-    }
-    makeContainerNormal() {
-        this.element.classed('container-full', false);
-        this.element.classed('container', true);
-    }
-    makeContainerFull() {
-        this.element.classed('container', false);
-        this.element.classed('container-full', true);
-    }
+    return null;
+  }
+  makeContainerNormal() {
+    this.element.classed('container-full', false);
+    this.element.classed('container', true);
+  }
+  makeContainerFull() {
+    this.element.classed('container', false);
+    this.element.classed('container-full', true);
+  }
 }
-Application.Pages = {
-};
+Application.Pages = {};
 exports.DataDelegate = DataDelegate;
 
 exports.Application = Application;

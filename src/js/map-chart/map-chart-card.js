@@ -1,12 +1,8 @@
 import {Card} from "../components/card";
 import {Button} from "../components/button";
 import {MapChart} from "./map-chart";
-import {Language} from "../language/language";
-import {Checkbox} from "../components/checkbox";
-import {URLParameters} from "../shared/url-parameters";
 import {Slider} from "../components/slider";
 import {screenshotElement} from "../shared/screenshot";
-import {DiachronicChartSettingsPopup} from "../time-chart/diachronic-chart-settings-popup";
 import {MapChartSettingsPopup} from "./map-chart-settings-popup";
 
 /**
@@ -23,7 +19,6 @@ export class MapChartCard extends Card {
    */
   constructor(parent) {
     super(parent);
-    // this.renderSlider();
     this.renderMenuItems();
     this.renderMapChart();
   }
@@ -42,34 +37,6 @@ export class MapChartCard extends Card {
    *
    */
   renderMenuItems() {
-
-    // this.showLabelsCheckbox = new Checkbox(this.headerRightComponent)
-    //     .setText(Language.translate('Labels'))
-    //     .setChecked(true);
-    //
-    // this.showLabelsCheckbox.onClick = function (checked) {
-    //     this.mapChart.isShowLabels = checked;
-    //     this.mapChart.update();
-    //     URLParameters.getInstance().setWithoutDeleting('map-show-labels', checked);
-    // }.bind(this);
-    //
-    // this.zoomEnabledCheckbox = new Checkbox(this.headerRightComponent)
-    //     .setText(Language.translate('Zoom'))
-    //     .setChecked(true);
-    //
-    // this.zoomEnabledCheckbox.onClick = function (checked) {
-    //     this.mapChart.isZoomable = checked;
-    //     this.mapChart.update();
-    //     URLParameters.getInstance().setWithoutDeleting('map-zoomable', checked);
-    // }.bind(this);
-
-    this.centerButton = new Button(this.headerRightComponent);
-    this.centerButton.setText(Language.translate('Center'));
-    this.centerButton.hide();
-    this.centerButton.onClick = function (event) {
-      console.log(event);
-    }.bind(this);
-
     this.screenshotButton = new Button(this.headerRightComponent);
     this.screenshotButton.setText('Screenshot');
     this.screenshotButton.element.classed('simple-button', true);
@@ -89,7 +56,7 @@ export class MapChartCard extends Card {
    */
   renderMapChart() {
     this.mapChart = new MapChart(this.body);
-    this.mapChart.loadGeoJSON('/assets/geojson/Departements-Simple.geojson');
+    this.mapChart.loadGeoJSON('/assets/Departements-Simple.geojson');
   }
 
 

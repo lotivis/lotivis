@@ -32,8 +32,9 @@ module.exports = [
       })
     ],
     output: {
+      sourcemap: true,
       name: 'lotivis',
-      file: 'dist/lotivis.js',
+      file: 'example/public/js/lotivis.js',
       banner,
       format: 'umd',
       indent: false,
@@ -51,8 +52,9 @@ module.exports = [
       })
     ],
     output: {
+      sourcemap: true,
       name: 'lotivis',
-      file: 'dist/lotivis.min.js',
+      file: 'example/public/js/lotivis.min.js',
       format: 'umd',
       indent: false,
     },
@@ -61,25 +63,25 @@ module.exports = [
     input: inputSCSS,
     plugins: [
       scss({
-        output: "./dist/lotivis.css",
+        output: "./example/public/css/lotivis.css",
         failOnError: true
       })
     ],
     output: {
-      file: "./dist/lotivis.min.css"
+      dir: "./example/public/css",
     }
   },
   {
     input: inputSCSS,
     plugins: [
       scss({
-        output: "./dist/lotivis.min.css",
+        output: "./example/public/css/lotivis.min.css",
         outputStyle: "compressed",
         failOnError: true
       })
     ],
     output: {
-      file: "./dist/lotivis.min.css"
+      dir: "./example/public/css",
     }
   }
 ];

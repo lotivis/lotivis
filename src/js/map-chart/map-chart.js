@@ -461,7 +461,7 @@ export class MapChart extends Component {
   // MARK: - Load JSON
 
   /**
-   *
+   * Loads the geo json at the given url into the map.
    */
   loadGeoJSON(geoJSONURL) {
     d3.json(geoJSONURL)

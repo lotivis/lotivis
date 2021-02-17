@@ -1,6 +1,6 @@
 import {Page} from "./page";
 import {Language} from "../language/language";
-import {MapChartCard} from "../location-chart/map-chart-card";
+import {MapChartCard} from "../map-chart/map-chart-card";
 import {URLParameters} from "../shared/url-parameters";
 
 /**
@@ -17,6 +17,7 @@ export class LocationDataPage extends Page {
     this.buildSubpage();
     this.applyURLParameters();
     this.loadGeoJSONFromDelegate();
+    this.didLoadGeoJSONFromDelegate();
   }
 
   renderBody() {
@@ -29,31 +30,6 @@ export class LocationDataPage extends Page {
     this.mapChartCard.mapChart.isZoomable = false;
   }
 
-  didLoadCorpus() {
-    super.didLoadCorpus();
-
-    let mapChart = this.mapChartCard.mapChart;
-    let corpus = this.application.corpus;
-    let departmentData = corpus.getDepartementsData();
-    let data = [];
-
-    departmentData.forEach(function (departmentData) {
-      data.push({
-        departmentName: departmentData.departmentName,
-        dlabel: departmentData.departmentNumber,
-        value: departmentData.value,
-      });
-    });
-
-    let dataset = {
-      dlabel: 'Total Lyrics',
-      stack: 'Total Lyrics',
-      data: data
-    };
-
-    mapChart.setDatasets([dataset]);
-  }
-
   applyURLParameters() {
     let parameters = URLParameters.getInstance();
     let showLabels = parameters.getBoolean('map-show-labels', true);
@@ -64,5 +40,29 @@ export class LocationDataPage extends Page {
   loadGeoJSONFromDelegate() {
     let url = this.application.delegate.geoJSON;
     this.mapChartCard.mapChart.loadGeoJSON(url);
+  }
+
+  didLoadGeoJSONFromDelegate() {
+    let mapChart = this.mapChartCard.mapChart;
+    let corpus = this.application.corpus;
+    // let delegate = this.application.delegate;
+    // let departmentData = corpus.getDepartementsData();
+    // let data = [];
+    //
+    // departmentData.forEach(function (departmentData) {
+    //   data.push({
+    //     departmentName: departmentData.departmentName,
+    //     dlabel: departmentData.departmentNumber,
+    //     value: departmentData.value,
+    //   });
+    // });
+    //
+    // let dataset = {
+    //   dlabel: 'Total Lyrics',
+    //   stack: 'Total Lyrics',
+    //   data: data
+    // };
+    //
+    // mapChart.setDatasets([dataset]);
   }
 }

@@ -1,57 +1,72 @@
 import {Application} from "../application";
 
+/**
+ *
+ * @class URLParameters
+ */
 export class URLParameters {
-    static getInstance() {
-        if (!URLParameters.instance) {
-            URLParameters.instance = new URLParameters();
-        }
-        return URLParameters.instance;
+
+  /**
+   * Returns the singleton instance.
+   *
+   * @returns {URLParameters}
+   */
+  static getInstance() {
+    if (!URLParameters.instance) {
+      URLParameters.instance = new URLParameters();
+    }
+    return URLParameters.instance;
+  }
+
+  /**
+   * Return the current window URL.
+   * @returns {URL}
+   */
+  getURL() {
+    return new URL(window.location.href);
+  }
+
+  getBoolean(parameter, defaultValue = false) {
+    let value = this.getURL().searchParams.get(parameter);
+    return value ? value === 'true' : defaultValue;
+  }
+
+  getString(parameter, defaultValue = '') {
+    return this.getURL().searchParams.get(parameter) || defaultValue;
+  }
+
+  set(parameter, newValue) {
+    const url = this.getURL();
+
+    if (newValue === false) {
+      url.searchParams.delete(parameter);
+    } else {
+      url.searchParams.set(parameter, newValue);
     }
 
-    getURL() {
-        return new URL(window.location.href);
-    }
+    window.history.replaceState(null, null, url);
+    this.updateCurrentPageFooter();
+  }
 
-    getBoolean(parameter, defaultValue = false) {
-        let value = this.getURL().searchParams.get(parameter);
-        return value ? value === 'true' : defaultValue;
-    }
+  setWithoutDeleting(parameter, newValue) {
+    const url = this.getURL();
+    url.searchParams.set(parameter, newValue);
+    window.history.replaceState(null, null, url);
+    this.updateCurrentPageFooter();
+  }
 
-    getString(parameter, defaultValue = '') {
-        return this.getURL().searchParams.get(parameter) || defaultValue;
-    }
+  clear() {
+    const url = this.getURL();
+    const newPath = url.protocol + url.host;
+    const newURL = new URL(newPath);
+    window.history.replaceState(null, null, newURL);
+    this.updateCurrentPageFooter();
+  }
 
-    set(parameter, newValue) {
-        const url = this.getURL();
-
-        if (newValue === false) {
-            url.searchParams.delete(parameter);
-        } else {
-            url.searchParams.set(parameter, newValue);
-        }
-
-        window.history.replaceState(null, null, url);
-        this.updateCurrentPageFooter();
-    }
-
-    setWithoutDeleting(parameter, newValue) {
-        const url = this.getURL();
-        url.searchParams.set(parameter, newValue);
-        window.history.replaceState(null, null, url);
-        this.updateCurrentPageFooter();
-    }
-
-    clear() {
-        const url = this.getURL();
-        const newPath = url.protocol + url.host;
-        const newURL = new URL(newPath);
-        window.history.replaceState(null, null, newURL);
-        this.updateCurrentPageFooter();
-    }
-
-    updateCurrentPageFooter() {
-        Application.default.currentPage.updateFooter();
-    }
+  updateCurrentPageFooter() {
+    console.log('window.lotivisApplication: ' + window.lotivisApplication);
+    window.lotivisApplication.currentPage.updateFooter();
+  }
 }
 
 URLParameters.language = 'language';

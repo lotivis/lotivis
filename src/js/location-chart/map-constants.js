@@ -1,6 +1,0 @@
-export const CENTER_FRANCE_LAT = 1.9;
-export const CENTER_FRANCE_LNG = 49.3;
-export const CENTER_FRANCE_LAT_LNT = [CENTER_FRANCE_LAT, CENTER_FRANCE_LNG];
-export const PARIS_LAT = 48.864716;
-export const PARIS_LNG = 2.349014;
-export const PARIS_LAT_LNT = [PARIS_LAT, PARIS_LNG];

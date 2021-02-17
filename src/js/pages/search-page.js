@@ -7,7 +7,7 @@ import {RecentSearches} from "../shared/recent-searches";
 import {URLParameters} from "../shared/url-parameters";
 import {Language} from "../language/language";
 import {randomColor} from "../shared/colors";
-import {MapChartCard} from "../location-chart/map-chart-card";
+import {MapChartCard} from "../map-chart/map-chart-card";
 import {WordAboutCard} from "./word-about-card";
 import {DatasetCollection} from "../data-model/dataset-collection";
 

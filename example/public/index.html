@@ -19,6 +19,7 @@
 <script src="corpus-model/artist.js"></script>
 <script src="corpus-model/department.js"></script>
 <script src="corpus-model/corpus.js"></script>
+<script src="corpus-model/delegate.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@nidi/html2canvas@1.0.0-rc.13/dist/html2canvas.min.js"></script>
@@ -26,9 +27,10 @@
 
 <script>
 
-  let delegate = new lotivis.DataDelegate();
-  delegate.name = 'French Rap Corpus Visualization';
-  delegate.geoJSON = 'assets/Departements-Simple.geojson'
+  let delegate = new FRCDelegate();
+  // let delegate = new lotivis.DataDelegate();
+  // delegate.name = 'French Rap Corpus Visualization';
+  // delegate.geoJSON = 'assets/Departements-Simple.geojson'
 
   let application = new lotivis.Application('frc-visualization', delegate);
 
