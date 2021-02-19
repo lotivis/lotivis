@@ -1,7 +1,6 @@
 import {Card} from "../components/card";
 import {Button} from "../components/button";
 import {MapChart} from "./map-chart";
-import {Slider} from "../components/slider";
 import {screenshotElement} from "../shared/screenshot";
 import {MapChartSettingsPopup} from "./map-chart-settings-popup";
 
@@ -26,16 +25,6 @@ export class MapChartCard extends Card {
   /**
    *
    */
-  renderSlider() {
-    this.slider = new Slider(this.headerCenterComponent);
-    this.slider.minimum = 1995;
-    this.slider.maximum = 2020;
-    this.slider.value = 2000;
-  }
-
-  /**
-   *
-   */
   renderMenuItems() {
     this.screenshotButton = new Button(this.headerRightComponent);
     this.screenshotButton.setText('Screenshot');
@@ -48,7 +37,6 @@ export class MapChartCard extends Card {
     this.moreButton.element.classed('simple-button', true);
     this.moreButton.setFontAwesomeImage('ellipsis-h');
     this.moreButton.onClick = this.presentSettingsPopupAction.bind(this);
-
   }
 
   /**

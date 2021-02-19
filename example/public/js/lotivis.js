@@ -3181,6 +3181,7 @@ class ProgressBar extends Component {
       .append('div')
       .attr('id', this.barContainerSelector)
       .attr('class', 'progress-bar-container');
+    this.element = this.barContainer;
     this.barSelector = createUUID();
     this.bar = this.barContainer
       .append('div')
@@ -3280,7 +3281,8 @@ class MainPage extends Page {
     let progressBar = this.progressBar;
     delegate.loadData(function (progress, error) {
       progressBar.value = progress;
-      console.log('progress: ' + progress);
+    }, function () {
+      progressBar.hide();
     });
   }
 }

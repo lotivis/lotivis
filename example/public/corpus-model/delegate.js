@@ -14,7 +14,7 @@ class FRCDelegate {
     this.dataJSON = 'assets/Corpus-Original.json';
 
     let delegate = this;
-    this.loadData = function (progressFunction) {
+    this.loadData = function (progressFunction, completion) {
 
       let req = new XMLHttpRequest();
 
@@ -30,10 +30,15 @@ class FRCDelegate {
 
       // load responseText into a new script element
       req.addEventListener("load", function (event) {
+
         let rawJSON = event.target.responseText;
         delegate.rawJSON = rawJSON;
+
         let corpusJSON = JSON.parse(rawJSON);
         delegate.corpus = new Corpus(corpusJSON);
+
+        completion();
+
       }, false);
 
       req.open("GET", this.dataJSON);

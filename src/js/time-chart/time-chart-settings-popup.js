@@ -8,10 +8,10 @@ import {Option} from "../components/option";
 
 /**
  *
- * @class DiachronicChartSettingsPopup
+ * @class TimeChartSettingsPopup
  * @extends Popup
  */
-export class DiachronicChartSettingsPopup extends Popup {
+export class TimeChartSettingsPopup extends Popup {
 
   render() {
     this.card

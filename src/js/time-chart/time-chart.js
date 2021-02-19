@@ -8,7 +8,7 @@ import {TestData} from "../shared/test-data";
  * @class Diachronic Chart Component
  * @extends Component
  */
-export class DiachronicChart extends Component {
+export class TimeChart extends Component {
 
   /**
    * Creates an instance of DiachronicChart.
@@ -50,7 +50,7 @@ export class DiachronicChart extends Component {
     this.presentedStacks = [];
 
     this.labelColor = new Color(155, 155, 155).rgbString();
-    this.type = DiachronicChart.ChartType.Bar;
+    this.type = TimeChart.ChartType.Bar;
     this.valueType = 'relative';
 
     this.isShowLabels = false;
@@ -301,7 +301,7 @@ export class DiachronicChart extends Component {
       // .attr('height', this.height)
       .attr('preserveAspectRatio', 'xMidYMid meet')
       .attr("viewBox", `0 0 ${this.width} ${this.height}`)
-      .attr('id', DiachronicChart.svgID);
+      .attr('id', TimeChart.svgID);
 
     let image = new Image;
 
@@ -773,13 +773,13 @@ export class DiachronicChart extends Component {
 
 // MARK: - Statics
 
-DiachronicChart.svgID = 'chart-svg';
+TimeChart.svgID = 'chart-svg';
 
 /**
  * @enum
  * Enumeration of available chart types.
  */
-DiachronicChart.ChartType = {
+TimeChart.ChartType = {
   /** Case for bar chart type. */
   Bar: 'Bar',
   /** Case for line chart type. */

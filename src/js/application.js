@@ -6,8 +6,8 @@ import {ArtistsDataPage} from "./pages/artists-data-page";
 import {URLParameters} from "./shared/url-parameters";
 import {Language} from "./language/language";
 import {LocationDataPage} from "./pages/location-data-page";
-import {DataDelegate} from "./data-source/data-delegate";
-import {DefaultDataDelegate} from "./data-source/default-data-delegate";
+import {Datasource} from "./datasource/datasource";
+import {DefaultDataDelegate} from "./data/default-data-delegate";
 
 /**
  *
@@ -189,4 +189,4 @@ class MenuItem {
 
 Application.Pages = {};
 
-exports.DataDelegate = DataDelegate;
+exports.DataDelegate = Datasource;

@@ -1,18 +1,18 @@
 import {Card} from "../components/card";
 import {Button} from "../components/button";
-import {DiachronicChart} from "./diachronic-chart";
+import {TimeChart} from "./time-chart";
 import {createUUID} from "../shared/uuid";
-import {DiachronicChartSettingsPopup} from "./diachronic-chart-settings-popup";
+import {TimeChartSettingsPopup} from "./time-chart-settings-popup";
 import {URLParameters} from "../shared/url-parameters";
 import {screenshotElement} from "../shared/screenshot";
 
 /**
  *
  *
- * @class DiachronicChartCard
+ * @class TimeChartCard
  * @extends Card
  */
-export class DiachronicChartCard extends Card {
+export class TimeChartCard extends Card {
 
   /**
    *
@@ -36,7 +36,7 @@ export class DiachronicChartCard extends Card {
    *
    */
   renderChart() {
-    this.chart = new DiachronicChart(this.body);
+    this.chart = new TimeChart(this.body);
     this.chart.margin.left = 150;
     this.chart.margin.right = 150;
   }
@@ -95,7 +95,7 @@ export class DiachronicChartCard extends Card {
   presentSettingsPopup() {
     let application = window.frcvApp;
     let button = document.getElementById(this.moreActionButton.selector);
-    let settingsPopup = new DiachronicChartSettingsPopup(application.element);
+    let settingsPopup = new TimeChartSettingsPopup(application.element);
     settingsPopup.diachronicChart = this.chart;
     settingsPopup.showUnder(button, 'right');
   }

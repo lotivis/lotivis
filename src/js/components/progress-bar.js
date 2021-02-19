@@ -27,6 +27,7 @@ export class ProgressBar extends Component {
       .append('div')
       .attr('id', this.barContainerSelector)
       .attr('class', 'progress-bar-container');
+    this.element = this.barContainer;
 
     this.barSelector = createUUID();
     this.bar = this.barContainer

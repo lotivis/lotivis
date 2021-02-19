@@ -94,20 +94,3 @@ export class GeoJson {
         return coordinatesCollection;
     }
 }
-
-export class Feature {
-
-    constructor(source) {
-        this.type = source.type;
-        this.properties = source.properties;
-        this.geometry = new Geometry(source.geometry);
-    }
-}
-
-export class Geometry {
-
-    constructor(source) {
-        this.type = source.type;
-        this.coordinates = source.coordinates;
-    }
-}

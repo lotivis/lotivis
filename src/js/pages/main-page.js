@@ -104,12 +104,8 @@ export class MainPage extends Page {
     let progressBar = this.progressBar;
     delegate.loadData(function (progress, error) {
       progressBar.value = progress;
-      console.log('progress: ' + progress);
-      // if (progress < 1) {
-      //
-      // } else {
-      //
-      // }
+    }, function () {
+      progressBar.hide();
     });
   }
 }
