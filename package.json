@@ -19,8 +19,8 @@
     "lint-js": "eslint src/js/**/*.js test/**/*.js",
     "test": "npm run lint-js && cross-env NODE_ENV=test karma start --auto-watch --single-run --coverage --grep",
     "typedoc": "npx typedoc",
-    "example": "node example/server.js",
-    "example-production": "NODE_ENV=production node example/server.js"
+    "example": "node ../../server.js",
+    "example-production": "NODE_ENV=production node ../../server.js"
   },
   "repository": {
     "type": "git",
