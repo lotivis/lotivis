@@ -21,9 +21,7 @@ export class TimeChartCard extends Card {
    */
   constructor(selector, name) {
     super(selector);
-    if (!selector) {
-      throw 'No selector specified.';
-    }
+    if (!selector) throw 'No selector specified.';
     this.selector = selector;
     this.name = selector;
     this.renderChart();
@@ -53,7 +51,7 @@ export class TimeChartCard extends Card {
     this.screenshotButton.element.classed('simple-button', true);
     this.screenshotButton.element.html('<i class="fas fa-camera"></i>');
 
-    this.screenshotButton.onClick = function (event) {
+    this.screenshotButton.onClick = function () {
       let name = 'my_image.jpg';
       let chartID = this.chartID;
       screenshotElement("#" + chartID, name);
@@ -94,8 +92,9 @@ export class TimeChartCard extends Card {
    */
   presentSettingsPopup() {
     let application = window.frcvApp;
+    let bodyElement = d3.select('body');
     let button = document.getElementById(this.moreActionButton.selector);
-    let settingsPopup = new TimeChartSettingsPopup(application.element);
+    let settingsPopup = new TimeChartSettingsPopup(bodyElement);
     settingsPopup.diachronicChart = this.chart;
     settingsPopup.showUnder(button, 'right');
   }

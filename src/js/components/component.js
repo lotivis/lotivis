@@ -6,30 +6,43 @@ import {createUUID} from "../shared/uuid";
  */
 export class Component {
 
-    /**
-     *
-     * @param parent
-     */
-    constructor(parent) {
-        if (!parent) {
-            throw 'No parent specified.';
-        }
-        this.selector = createUUID();
-        this.parent = parent;
+  /**
+   *
+   * @param parent
+   */
+  constructor(parent) {
+    if (!parent) throw 'No parent or selector specified.';
+    if (typeof parent === 'string') {
+      this.initializeFromSelector(parent);
+    } else {
+      this.initializeFromParent(parent);
     }
+  }
 
-    show() {
-        if (!this.element) return;
-        this.element.style('display', 'inline-block');
-    }
+  initializeFromSelector(selector) {
+    this.selector = selector;
+    this.parent = d3.select('#' + selector);
+  }
 
-    hide() {
-        if (!this.element) return;
-        this.element.style('display', 'none');
-    }
+  initializeFromParent(parent) {
+    this.selector = createUUID();
+    this.parent = parent;
+  }
 
-    get isVisible() {
-        if (!this.element) return false;
-        return this.element.style('display') !== 'none';
-    }
+  // MARK: - Functions
+
+  show() {
+    if (!this.element) return;
+    this.element.style('display', '');
+  }
+
+  hide() {
+    if (!this.element) return;
+    this.element.style('display', 'none');
+  }
+
+  get isVisible() {
+    if (!this.element) return false;
+    return this.element.style('display') !== 'none';
+  }
 }
