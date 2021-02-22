@@ -1,5 +1,9 @@
-import {Geometry} from "./geojson";
+import {Geometry} from "./geometry";
 
+/**
+ *
+ * @class Feature
+ */
 export class Feature {
 
   constructor(source) {

@@ -1,7 +1,9 @@
 import {Component} from '../components/component';
 import {GeoJson} from '../geojson/geojson';
-import {colorsForStack} from '../shared/colors';
-import {combine, combineDataByLabel, flatArrayOfArrays, flattenDatasets} from '../shared/auxiliary';
+import {Color, colorsForStack} from '../shared/colors';
+import { combine, flattenDatasets } from '../data/dataset-functions';
+import {log_debug} from "../shared/debug";
+import {formatNumber} from "../shared/format";
 
 /**
  * A component which renders a geo json with d3.
@@ -41,8 +43,8 @@ export class MapChart extends Component {
     this.width = 1000;
     this.height = 1000;
 
-    this.tintColor = 'blue';
-    this.backgroundColor = 'gray';
+    this.tintColor = Color.defaultTint.rgbString();
+    this.backgroundColor = 'white';
     this.backgroundOpacity = 0.2;
 
     this.isDrawsBackground = true;
@@ -52,9 +54,7 @@ export class MapChart extends Component {
     this.datasets = [];
     this.geoJSON = null;
     this.departmentsData = [];
-    this.excludedFeatureCodes = [
-      '2A', '2B'
-    ];
+    this.excludedFeatureCodes = [];
   }
 
   /**
@@ -72,7 +72,7 @@ export class MapChart extends Component {
   }
 
 
-  // MARK: - Render
+  // MARK: - Inject
 
   /**
    *
@@ -163,10 +163,10 @@ export class MapChart extends Component {
       feature.departmentsData = this.departmentsData.find(dataset => +dataset.departmentNumber === +code);
     }.bind(this));
 
-    let max = d3.max(this.departmentsData, data => data.value);
+    // let max = d3.max(this.departmentsData, data => data.value);
     let tooltip = this.tooltip;
     let boundsRectangle = this.bounds;
-    let tooltipWidth = String(this.tooltip.style('width') || 210).replace('px', '');
+    // let tooltipWidth = String(this.tooltip.style('width') || 210).replace('px', '');
     let tintColor = this.tintColor;
     let thisReference = this;
 
@@ -202,16 +202,17 @@ export class MapChart extends Component {
         let code = properties.code;
         let propertiesSelection = Object.keys(properties);
         let components = propertiesSelection.map(function (propertyName) {
-          return `${propertyName.capitalize()}: ${properties[propertyName]}`;
+          return `${propertyName}: ${properties[propertyName]}`;
         });
 
         let flatData = flattenDatasets(thisReference.datasets);
-        let data = flatData.filter(item => +item.dlabel === +code);
+        let data = flatData.filter(item => +item.location === +code);
 
         if (data) {
+          components.push('');
           for (let index = 0; index < data.length; index++) {
             let item = data[index];
-            components.push(item.datasetName + ': ' + item.value);
+            components.push(item.stack + ': ' + item.value);
           }
         }
 
@@ -233,7 +234,7 @@ export class MapChart extends Component {
         // svg is presented in dynamic sized view box so we need to get the actual size
         // of the element in order to calculate a scale for the position of the tooltip.
         let effectiveSize = thisReference.getElementEffectiveSize();
-        let widthFactor = effectiveSize[0] / thisReference.width;
+        let factor = effectiveSize[0] / thisReference.width;
         let heightFactor = effectiveSize[1] / thisReference.height;
 
         // calculate offset
@@ -243,13 +244,13 @@ export class MapChart extends Component {
         let top = 0;
 
         if ((featureLowerLeft[1] * heightFactor) > (effectiveSize[1] / 2)) {
-          top = featureUpperRight[1];
-          top *= widthFactor;
+          top += featureUpperRight[1];
+          top *= factor;
           top -= tooltipHeight;
           top -= 5;
         } else {
-          top = featureLowerLeft[1];
-          top *= widthFactor; // Use width factor instead of heightFactor for propert using. Can't figure out why width factor works better.
+          top += featureLowerLeft[1];
+          top *= factor; // Use width factor instead of heightFactor for propert using. Can't figure out why width factor works better.
           top += 5;
         }
 
@@ -258,7 +259,7 @@ export class MapChart extends Component {
         // calculate tooltip center
         let centerBottom = featureLowerLeft[0];
         centerBottom += (featureBoundsWidth / 2);
-        centerBottom *= widthFactor;
+        centerBottom *= factor;
         centerBottom -= (Number(tooltipWidth) / 2);
         centerBottom += positionOffset[0];
 
@@ -274,7 +275,7 @@ export class MapChart extends Component {
           .style('y', featureUpperRight[1]);
 
       })
-      .on('mouseout', function (event, feature) {
+      .on('mouseout', function () {
         d3.select(this)
           .attr('stroke', 'black')
           .attr('stroke-width', '0.7')
@@ -287,16 +288,14 @@ export class MapChart extends Component {
   }
 
   /**
-   *
+   * Iterates the datasets per stack and draws them on svg.
    */
   renderDatasets() {
     if (!this.geoJSON) return;
     if (!this.datasets) return;
-
+    this.calculateAuxiliaryData();
     let stackNames = this.getStackNames();
-    let flatData = flattenDatasets(this.datasets);
-    let combinedData = combineDataByLabel(flatData);
-    let color = colorsForStack(0, 1)[0];
+    let combinedData = this.combinedData;
 
     // reset colors
     this.svg
@@ -307,12 +306,13 @@ export class MapChart extends Component {
     for (let index = 0; index < stackNames.length; index++) {
       let stackName = stackNames[index];
       let dataForStack = combinedData.filter(data => data.stack === stackName);
+      log_debug('dataForStack', dataForStack);
       let max = d3.max(dataForStack, item => item.value);
       let color = colorsForStack(index, 1)[0];
 
       for (let index = 0; index < dataForStack.length; index++) {
         let datasetEntry = dataForStack[index];
-        let id = +datasetEntry.dlabel;
+        let id = +datasetEntry.location;
         this.svg
           .selectAll('path')
           .filter(item => +item.properties.code === id)
@@ -322,15 +322,26 @@ export class MapChart extends Component {
     }
   }
 
+  /**
+   * Removes all labels.
+   */
+  removeDatasetLabels() {
+    this.svg.selectAll('.map-label').remove();
+  }
+
+  /**
+   * Appends labels from datasets.
+   */
   renderDatasetLabels() {
-    if (!this.geoJSON) return;
-    if (!this.datasets) return;
+    log_debug('renderDatasetLabels');
+    log_debug(this.geoJSON);
+    if (!this.geoJSON) return log_debug('no geoJSON');
+    if (!this.datasets) return log_debug('no datasets');
 
     let geoJSON = this.geoJSON;
-    let datasetsFlatten = flattenDatasets(this.datasets);
-    let combinedData = combineDataByLabel(datasetsFlatten);
+    let combinedData = this.combinedData;
 
-    this.svg.selectAll('.map-label').remove();
+    this.removeDatasetLabels();
     this.svg
       .selectAll('text')
       .data(geoJSON.features)
@@ -345,8 +356,8 @@ export class MapChart extends Component {
       }.bind(this))
       .text(function (feature) {
         let code = +feature.properties.code;
-        let dataset = combinedData.find(dataset => +dataset.dlabel === code);
-        return dataset ? dataset.value : '';
+        let dataset = combinedData.find(dataset => +dataset.location === code);
+        return dataset ? formatNumber(dataset.value) : '';
       })
       .attr('x', function (feature) {
         return this.projection(feature.center)[0];
@@ -356,19 +367,25 @@ export class MapChart extends Component {
       }.bind(this));
   }
 
+  removeDatasetLegend() {
+    this.legend.selectAll('rect').remove();
+    this.legend.selectAll('text').remove();
+  }
+
   /**
    *
    */
   renderDatasetsLegend() {
     if (!this.datasets) return;
 
+    if (!this.combinedData) {
+      this.calculateAuxiliaryData();
+    }
     let stackNames = this.getStackNames();
-    let flatData = flattenDatasets(this.datasets);
-    let combinedData = combine(flatData);
+    let combinedData = this.combinedData;
 
     this.legend.raise();
-    this.legend.selectAll('rect').remove();
-    this.legend.selectAll('text').remove();
+    this.removeDatasetLegend();
 
     for (let index = 0; index < stackNames.length; index++) {
 
@@ -424,9 +441,18 @@ export class MapChart extends Component {
         .style('stroke-width', 1)
         .style('fill-opacity', (d, i) => i / steps)
         .text(function (d, i) {
-          return ((i / steps) * max);
-        });
+          return formatNumber((i / steps) * max);
+        }.bind(this));
     }
+  }
+
+  calculateAuxiliaryData() {
+    this.stackNames = this.getStackNames();
+    this.flatData = flattenDatasets(this.datasets);
+    this.combinedData = combine(this.flatData);
+    log_debug('this.stackNames', this.stackNames);
+    log_debug('this.flatData', this.flatData);
+    log_debug('this.combinedData', this.combinedData);
   }
 
   /**

@@ -285,8 +285,8 @@ export class SearchPage extends Page {
     this.diachronicChart.datasets = localDatasets;
     this.diachronicChart.update();
 
-    this.mapChartCard.mapChart.datasets = mapDatasets;
-    this.mapChartCard.mapChart.update();
+    this.mapChartCard.chart.datasets = mapDatasets;
+    this.mapChartCard.chart.update();
 
     this.wordAboutCard.datasets = trackDatasets;
     this.wordAboutCard.update();

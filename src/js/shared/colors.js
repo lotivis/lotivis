@@ -21,6 +21,7 @@ export class Color {
   }
 }
 
+Color.defaultTint = new Color(0, 122, 255);
 Color.organgeLow = new Color(250, 211, 144);
 Color.organgeHigh = new Color(229, 142, 38);
 Color.redLow = new Color(248, 194, 145);

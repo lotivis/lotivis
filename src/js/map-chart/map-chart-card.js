@@ -1,15 +1,14 @@
-import {Card} from "../components/card";
-import {Button} from "../components/button";
 import {MapChart} from "./map-chart";
 import {screenshotElement} from "../shared/screenshot";
 import {MapChartSettingsPopup} from "./map-chart-settings-popup";
+import {ChartCard} from "../components/chart-card";
 
 /**
  *
  * @class MapChartCard
- * @extends Card
+ * @extends ChartCard
  */
-export class MapChartCard extends Card {
+export class MapChartCard extends ChartCard {
 
   /**
    * Creates a new instance of MapChartCard.
@@ -18,44 +17,21 @@ export class MapChartCard extends Card {
    */
   constructor(parent) {
     super(parent);
-    this.renderMenuItems();
-    this.renderMapChart();
   }
 
   /**
-   *
+   * Creates and injects the map chart.
    */
-  renderMenuItems() {
-    this.screenshotButton = new Button(this.headerRightComponent);
-    this.screenshotButton.setText('Screenshot');
-    this.screenshotButton.element.classed('simple-button', true);
-    this.screenshotButton.setFontAwesomeImage('camera');
-    this.screenshotButton.onClick = this.screenshotButtonAction.bind(this);
-
-    this.moreButton = new Button(this.headerRightComponent);
-    this.moreButton.setText('More');
-    this.moreButton.element.classed('simple-button', true);
-    this.moreButton.setFontAwesomeImage('ellipsis-h');
-    this.moreButton.onClick = this.presentSettingsPopupAction.bind(this);
+  injectMapChart() {
+    this.chart = new MapChart(this.body);
   }
-
-  /**
-   *
-   */
-  renderMapChart() {
-    this.mapChart = new MapChart(this.body);
-    this.mapChart.loadGeoJSON('/assets/Departements-Simple.geojson');
-  }
-
-
-  // MARK: - Actions
 
   /**
    * Triggered when the screenshot button is pushed.
    */
   screenshotButtonAction() {
     let name = 'my_image.jpg';
-    let chartID = this.mapChart.selector;
+    let chartID = this.chart.selector;
     screenshotElement("#" + chartID, name);
   }
 
@@ -63,10 +39,10 @@ export class MapChartCard extends Card {
    * Triggered when the more button is pushed.
    */
   presentSettingsPopupAction() {
-    let application = window.frcvApp;
+    let bodyElement = d3.select('body');
     let button = document.getElementById(this.moreButton.selector);
-    let settingsPopup = new MapChartSettingsPopup(application.element);
-    settingsPopup.mapChart = this.mapChart;
+    let settingsPopup = new MapChartSettingsPopup(bodyElement);
+    settingsPopup.mapChart = this.chart;
     settingsPopup.showUnder(button, 'right');
   }
 }

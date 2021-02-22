@@ -5,6 +5,9 @@ import {createUUID} from "../shared/uuid";
 import {TimeChartSettingsPopup} from "./time-chart-settings-popup";
 import {URLParameters} from "../shared/url-parameters";
 import {screenshotElement} from "../shared/screenshot";
+import {RadioGroup} from "../components/radio-group";
+import {Option} from "../components/option";
+import {ChartCard} from "../components/chart-card";
 
 /**
  *
@@ -12,7 +15,7 @@ import {screenshotElement} from "../shared/screenshot";
  * @class TimeChartCard
  * @extends Card
  */
-export class TimeChartCard extends Card {
+export class TimeChartCard extends ChartCard {
 
   /**
    *
@@ -24,9 +27,9 @@ export class TimeChartCard extends Card {
     if (!selector) throw 'No selector specified.';
     this.selector = selector;
     this.name = selector;
+    this.datasets = [];
     this.renderChart();
-    this.renderScreenshotButton();
-    this.renderMoreActionsButton();
+    this.renderRadioGroup();
     this.applyURLParameters();
   }
 
@@ -35,41 +38,32 @@ export class TimeChartCard extends Card {
    */
   renderChart() {
     this.chart = new TimeChart(this.body);
-    this.chart.margin.left = 150;
-    this.chart.margin.right = 150;
+    this.chart.margin.left = 50;
+    this.chart.margin.right = 50;
   }
 
-  /**
-   *
-   */
-  renderScreenshotButton() {
-    this.chartID = createUUID();
-    this.body.attr('id', this.chartID);
-
-    this.screenshotButton = new Button(this.headerRightComponent);
-    this.screenshotButton.setText('Screenshot');
-    this.screenshotButton.element.classed('simple-button', true);
-    this.screenshotButton.element.html('<i class="fas fa-camera"></i>');
-
-    this.screenshotButton.onClick = function () {
-      let name = 'my_image.jpg';
-      let chartID = this.chartID;
-      screenshotElement("#" + chartID, name);
+  renderRadioGroup() {
+    this.radioGroup = new RadioGroup(this.headerCenterComponent);
+    this.radioGroup.onChange = function (value) {
+      let dataset = this.datasets.find(dataset => dataset.label === value);
+      this.chart.datasets = [dataset];
+      this.chart.update();
     }.bind(this);
   }
 
-  /**
-   *
-   */
-  renderMoreActionsButton() {
-    this.moreActionButton = new Button(this.headerRightComponent);
-    this.moreActionButton.setText('More');
-    this.moreActionButton.element.classed('simple-button', true);
-    this.moreActionButton.element.html('<i class="fas fa-ellipsis-h"></i>');
-    this.moreActionButton.onClick = function (event) {
-      if (!event || !event.target) return;
-      this.presentSettingsPopup();
-    }.bind(this);
+  updateRadioGroup() {
+    if (!this.datasets) return;
+    let names = this.datasets.map(dataset => dataset.label);
+    let options = names.map(name => new Option(name));
+    this.radioGroup.setOptions(options);
+  }
+
+  setDatasets(datasets) {
+    this.datasets = datasets;
+    this.updateRadioGroup();
+    let firstDataset = datasets[0];
+    this.chart.datasets = [firstDataset];
+    this.chart.update();
   }
 
   /**
@@ -91,7 +85,6 @@ export class TimeChartCard extends Card {
    *
    */
   presentSettingsPopup() {
-    let application = window.frcvApp;
     let bodyElement = d3.select('body');
     let button = document.getElementById(this.moreActionButton.selector);
     let settingsPopup = new TimeChartSettingsPopup(bodyElement);

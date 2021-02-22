@@ -15,7 +15,7 @@ export class RadioGroup extends Component {
         super(parent);
 
         this.inputElements = [];
-        this.element = parent.append('form');
+        this.element = this.parent.append('form');
         this.element.classed('radio-group', true);
     }
 

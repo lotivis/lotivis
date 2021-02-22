@@ -6,6 +6,12 @@ import {TimeChart} from "./time-chart/time-chart";
 import {MapChart} from "./map-chart/map-chart";
 import {MapChartCard} from "./map-chart/map-chart-card";
 import {Component} from "./components/component";
+import {Dataset} from "./data/dataset";
+import {Item} from "./data/item";
+import {DatasetCollection} from "./data/dataset-collection";
+import {RadioGroup} from "./components/radio-group";
+import {Option} from "./components/option";
+import {GeoJson} from "./geojson/geojson";
 
 /**
  *
@@ -65,4 +71,12 @@ exports.TimeChart = TimeChart;
 exports.TimeChartCard = TimeChartCard;
 exports.MapChart = MapChart;
 exports.MapChartCard = MapChartCard;
+
 exports.DataDelegate = Datasource;
+exports.DatasetCollection = DatasetCollection;
+exports.Dataset = Dataset;
+exports.Item = Item;
+exports.GeoJson = GeoJson;
+
+exports.RadioGroup = RadioGroup;
+exports.Option = Option;

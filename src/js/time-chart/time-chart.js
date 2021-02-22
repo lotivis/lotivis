@@ -687,7 +687,9 @@ export class TimeChart extends Component {
     legendsTexts.on('click', function (event) {
       if (!event || !event.target) return;
       if (!event.target.innerHTML) return;
-      let label = event.target.innerHTML.split(' ')[0];
+      let components = event.target.innerHTML.split(' (');
+      components.pop();
+      let label = components.join(" (");
       this.toggleDataset(label);
     }.bind(this));
   }
@@ -751,6 +753,7 @@ export class TimeChart extends Component {
    * @param label
    */
   toggleDataset(label) {
+    console.log(label);
     let dataset = this._datasets.find(dataset => dataset.label === label);
     dataset.isEnabled = !dataset.isEnabled;
     this.update();

@@ -64,8 +64,8 @@ export class URLParameters {
   }
 
   updateCurrentPageFooter() {
-    console.log('window.lotivisApplication: ' + window.lotivisApplication);
-    window.lotivisApplication.currentPage.updateFooter();
+    // console.log('window.lotivisApplication: ' + window.lotivisApplication);
+    // window.lotivisApplication.currentPage.updateFooter();
   }
 }
 

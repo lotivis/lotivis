@@ -25,25 +25,25 @@ export class LocationDataPage extends Page {
     this.mapChartContainer = this.row.append('div').classed('col-12', true);
     this.mapChartCard = new MapChartCard(this.mapChartContainer);
     this.mapChartCard.titleLabel.text(Language.translate('Map'));
-    this.mapChartCard.mapChart.isDrawsBackground = false;
-    this.mapChartCard.mapChart.isShowLabels = true;
-    this.mapChartCard.mapChart.isZoomable = false;
+    this.mapChartCard.chart.isDrawsBackground = false;
+    this.mapChartCard.chart.isShowLabels = true;
+    this.mapChartCard.chart.isZoomable = false;
   }
 
   applyURLParameters() {
     let parameters = URLParameters.getInstance();
     let showLabels = parameters.getBoolean('map-show-labels', true);
-    this.mapChartCard.mapChart.isShowLabels = showLabels;
-    this.mapChartCard.mapChart.update();
+    this.mapChartCard.chart.isShowLabels = showLabels;
+    this.mapChartCard.chart.update();
   }
 
   loadGeoJSONFromDelegate() {
     let url = this.application.delegate.geoJSON;
-    this.mapChartCard.mapChart.loadGeoJSON(url);
+    this.mapChartCard.chart.loadGeoJSON(url);
   }
 
   didLoadGeoJSONFromDelegate() {
-    let mapChart = this.mapChartCard.mapChart;
+    let mapChart = this.mapChartCard.chart;
     let corpus = this.application.corpus;
     // let delegate = this.application.delegate;
     // let departmentData = corpus.getDepartementsData();
