@@ -2,6 +2,8 @@ import {Component} from "../components/component";
 import {Color, colorsForStack} from "../shared/colors";
 import {URLParameters} from "../shared/url-parameters";
 import {TestData} from "../shared/test-data";
+import {flattenDatasets} from "../data/dataset-functions";
+import {log_debug} from "../shared/debug";
 
 /**
  *
@@ -189,20 +191,29 @@ export class TimeChart extends Component {
   calculateListOfStacks() {
     let temporaryMap = d3.map(this.presentedDatasets, dataset => dataset.stack || dataset.label);
     this.listOfStacks = Array.from(new Set(temporaryMap));
+    log_debug('this.listOfStacks', this.listOfStacks)
 
     let temporaryMap2 = d3.map(this._datasets, dataset => dataset.stack || dataset.label);
     this.listOfAllStacks = Array.from(new Set(temporaryMap2));
+    log_debug('this.listOfAllStacks', this.listOfAllStacks)
   }
 
-  /**
+  /**s
    *
    */
   calculateListOfYears() {
+
+    let flat = flattenDatasets(this._datasets);
+    log_debug('flat', flat);
+
     if (this.presentedDatasets.length > 0) {
-      this.listOfYears = this.presentedDatasets[0].data.map(item => item.year);
+      this.listOfDates = Array.from(new Set(flat.map(item => item.date)));
+      this.listOfDates = this.listOfDates.sort();
     } else {
-      this.listOfYears = [];
+      this.listOfDates = [];
     }
+
+    log_debug('this.listOfYears', this.listOfDates);
   }
 
   /**
@@ -217,10 +228,10 @@ export class TimeChart extends Component {
    */
   calculateDatasetsPerYear() {
     let flattenData = this.flattenData;
-    this.datasetsPerYear = this.listOfYears.map(function (year) {
+    this.datasetsPerYear = this.listOfDates.map(function (year) {
       let yearSet = {year: year};
       flattenData
-        .filter(item => item.year === year)
+        .filter(item => item.date === year)
         .forEach(function (entry) {
           yearSet[entry.label] = entry.value;
           yearSet.total = entry.yearTotal;
@@ -228,10 +239,10 @@ export class TimeChart extends Component {
       return yearSet;
     });
 
-    this.presentedDatasetsPerYear = this.listOfYears.map(function (year) {
+    this.presentedDatasetsPerYear = this.listOfDates.map(function (year) {
       let yearSet = {year: year};
       flattenData
-        .filter(item => item.year === year)
+        .filter(item => item.date === year)
         .filter(item => item.isEnabled === true)
         .forEach(function (entry) {
           yearSet[entry.label] = entry.value;
@@ -338,6 +349,8 @@ export class TimeChart extends Component {
     // console.log('this.listOfDatasetNames: ' + this.listOfDatasetNames);
     // console.log('this.listOfStacks: ' + this.listOfStacks);
 
+    log_debug('this.allDatasetStacks', this.allDatasetStacks);
+
     let max = d3.max(this.allDatasetStacks, function (stack) {
       return d3.max(stack, function (serie) {
         let values = serie.map(item => item['1']);
@@ -348,7 +361,7 @@ export class TimeChart extends Component {
     console.log('this.max: ' + this.max);
 
     this.xChart = d3.scaleBand()
-      .domain(this.listOfYears)
+      .domain(this.listOfDates)
       .rangeRound([this.margin.left, this.width - this.margin.right])
       .paddingInner(0.1);
 
@@ -511,7 +524,7 @@ export class TimeChart extends Component {
       .enter()
       .append('text')
       .attr("transform", function (item) {
-        let x = xChartRef(item.data.year) + xStackRef(stack.label) + (xStackRef.bandwidth() / 2);
+        let x = xChartRef(item.data.date) + xStackRef(stack.label) + (xStackRef.bandwidth() / 2);
         let y = yChartRef(item[1]) - 5;
         return `translate(${x},${y})rotate(-60)`;
       })
@@ -578,10 +591,10 @@ export class TimeChart extends Component {
       .on("mousemove", function (event, item) {
         let text = "<b>" + item.searchText + "</b>"
           + " in "
-          + "<b>" + item.year + "</b>"
+          + "<b>" + item.date + "</b>"
           + "<br>Abs.: <b>" + item.value + "</b>"
           + "<br>Rel.: <b>" + item.relativeValue + "</b>"
-          + "<br>Total Year: <b>" + item.yearTotal + "</b>";
+          + "<br>Total Date: <b>" + item.dateTotal + "</b>";
         tooltip
           .style("left", event.pageX - 20 + "px")
           .style("top", event.pageY - 160 + "px")
@@ -611,7 +624,7 @@ export class TimeChart extends Component {
       .data(dataset.data.filter((item) => item.value > 0))
       .enter()
       .append('text')
-      .attr("x", (item) => this.x0(item.year))
+      .attr("x", (item) => this.x0(item.date))
       .attr("y", (item) => this.y0(item.value))
       .attr('dy', '-10')
       .attr('text-anchor', 'middle')
