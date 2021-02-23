@@ -9,7 +9,12 @@
   "main": "dist/lotivis.js",
   "module": "dist/lotivis.esm.js",
   "files": [
-    "dist/*.js"
+    "dist/css/lotivis.css",
+    "dist/css/lotivis.min.css",
+    "dist/js/lotivis.js",
+    "dist/js/lotivis.js.map",
+    "dist/js/lotivis.min.js",
+    "dist/js/lotivis.min.js.map"
   ],
   "scripts": {
     "autobuild": "rollup -c -w",
