@@ -6,34 +6,25 @@
   "version": "1.0.10",
   "jsdelivr": [
     "dist/css/lotivis.css",
-    "dist/css/lotivis.min.css",
     "dist/js/lotivis.js",
-    "dist/js/lotivis.js.map",
-    "dist/js/lotivis.min.js",
-    "dist/js/lotivis.min.js.map"
+    "dist/js/lotivis.js.map"
   ],
   "unpkg": "dist/js/lotivis.min.js",
   "main": "dist/js/lotivis.js",
-  "module": "dist/js/lotivis.esm.js",
-  "file": "dist/js/lotivis.js",
   "files": [
     "dist/css/lotivis.css",
-    "dist/css/lotivis.min.css",
     "dist/js/lotivis.js",
-    "dist/js/lotivis.js.map",
-    "dist/js/lotivis.min.js",
-    "dist/js/lotivis.min.js.map"
+    "dist/js/lotivis.js.map"
   ],
   "scripts": {
-    "autobuild": "rollup -c -w",
-    "build": "rollup -c",
-    "dev": "karma start --auto-watch --no-single-run --browsers safari --grep",
-    "docs": "cd docs && npm install && npm run build",
+    "develop": "rollup -c -w",
+    "build:js": "rollup -c",
+    "build:css:sass": "sass src/scss/main.scss > dist/lotivis.css",
+    "dev-alt": "karma start --auto-watch --no-single-run --browsers safari --grep",
     "lint-js": "eslint src/js/**/*.js test/*.js",
     "test": "mocha",
     "test-alt": "npm run lint-js && cross-env NODE_ENV=test karma start --auto-watch --single-run --coverage --grep",
-    "typedoc": "npx typedoc",
-    "example": "node server.js"
+    "example": "npm run build:js && npm run build:css:sass && node server.js"
   },
   "repository": {
     "type": "git",
@@ -67,6 +58,7 @@
     "rollup-plugin-postcss": "^4.0.0",
     "rollup-plugin-scss": "^2.6.1",
     "rollup-plugin-sourcemaps": "^0.6.3",
-    "rollup-plugin-terser": "^7.0.2"
+    "rollup-plugin-terser": "^7.0.2",
+    "sass": "^1.32.8"
   }
 }
