@@ -5,9 +5,9 @@
   "license": "MIT",
   "version": "1.0.11",
   "jsdelivr": [
-    "dist/css/lotivis.css",
-    "dist/js/lotivis.js",
-    "dist/js/lotivis.js.map"
+    "dist/lotivis.css",
+    "dist/lotivis.js",
+    "dist/lotivis.js.map"
   ],
   "unpkg": "dist/js/lotivis.min.js",
   "main": "dist/js/lotivis.js",
