@@ -4,6 +4,8 @@
 name: Node.js Package
 
 on:
+  tag:
+    branches: [main]
   release:
     types: [created]
 
@@ -16,6 +18,7 @@ jobs:
         with:
           node-version: 12
       - run: npm ci
+      - run: npm run build --if-present
       - run: npm test
 
   publish-npm:
