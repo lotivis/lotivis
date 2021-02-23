@@ -14,18 +14,19 @@ import {Application} from "./js/application";
 
 export default Application;
 
-// exports.Component = Component;
-// exports.TimeChart = TimeChart;
-// exports.TimeChartCard = TimeChartCard;
-// exports.MapChart = MapChart;
-// exports.MapChartCard = MapChartCard;
-//
-// exports.DataDelegate = Datasource;
-// exports.DatasetCollection = DatasetCollection;
-// exports.Dataset = Dataset;
-// exports.Item = Item;
-// exports.GeoJson = GeoJson;
-//
-// exports.RadioGroup = RadioGroup;
-// exports.Option = Option;
-// exports.Application = Application;
+
+exports.Component = Component;
+exports.GeoJson = GeoJson;
+exports.RadioGroup = RadioGroup;
+exports.Option = Option;
+
+exports.TimeChart = TimeChart;
+exports.TimeChartCard = TimeChartCard;
+
+exports.MapChart = MapChart;
+exports.MapChartCard = MapChartCard;
+
+exports.DataDelegate = Datasource;
+exports.DatasetCollection = DatasetCollection;
+exports.Dataset = Dataset;
+exports.Item = Item;
