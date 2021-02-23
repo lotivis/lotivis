@@ -3,7 +3,7 @@
   "homepage": "https://github.com/lukasdanckwerth/lotivis#readme",
   "description": "Location and time data visualization",
   "license": "MIT",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "jsdelivr": "dist/lotivis.min.js",
   "unpkg": "dist/lotivis.min.js",
   "main": "dist/lotivis.js",
