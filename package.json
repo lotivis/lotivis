@@ -9,12 +9,12 @@
     "dist/lotivis.js",
     "dist/lotivis.js.map"
   ],
-  "unpkg": "dist/js/lotivis.min.js",
-  "main": "dist/js/lotivis.js",
+  "unpkg": "dist/lotivis.js",
+  "main": "dist/lotivis.js",
   "files": [
-    "dist/css/lotivis.css",
-    "dist/js/lotivis.js",
-    "dist/js/lotivis.js.map"
+    "dist/lotivis.css",
+    "dist/lotivis.js",
+    "dist/lotivis.js.map"
   ],
   "scripts": {
     "develop": "rollup -c -w",
