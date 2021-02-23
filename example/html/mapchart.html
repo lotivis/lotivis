@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
+  <link rel="stylesheet" href="../../dist/lotivis.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <title>FRCV - Map Data</title>
+</head>
+<body>
+
+<div class="container">
+  <div class="row">
+    <div class="col-2">
+      <a href="../index.html">
+        <button class="back-button">
+          Back
+        </button>
+      </a>
+    </div>
+    <div class="col-8 text-center">
+      <h1>Map Data</h1>
+    </div>
+    <div class="col-12">
+      <div id="map-chart-card">
+        <!-- Map Chart Here -->
+      </div>
+    <div class="col-12">
+      <samp id="data">
+        <!-- Data Here -->
+      </samp>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@nidi/html2canvas@1.0.0-rc.13/dist/html2canvas.min.js"></script>
+<script src="../../dist/lotivis.js"></script>
+
+<script>
+
+  const geoJsonURL = '/assets/Departements.geojson';
+  const geoJsonURLGermany = '/assets/Germany.geojson';
+
+  const mapChartCard = new lotivis.MapChartCard('map-chart-card');
+  const chart = mapChartCard.chart;
+
+  chart.excludedFeatureCodes = [ '2A', '2B' ];
+
+  mapChartCard.onSelectedDatasetChanged = function (value) {
+    let dataset = mapChartCard.datasets.find(dataset => dataset.stack === value);
+    let string = JSON.stringify(dataset, null, 4);
+    let element = document.getElementById('data');
+    element.innerHTML = string;
+  }
+
+  Promise
+    .all([
+      d3.json('/assets/tracks-per-departement.json'),
+      d3.json('/assets/words-per-departement.json'),
+      d3.json('/assets/words-per-departement-relative.json'),
+      d3.json('/assets/types-per-departement.json'),
+      d3.json('/assets/types-per-departement-relative.json'),
+      d3.json(geoJsonURL)
+    ])
+    .then(function (datasetsAndGeoJSON) {
+      let rawGeoJSON = datasetsAndGeoJSON.pop();
+      let datasets = datasetsAndGeoJSON;
+      chart.setGeoJSON(new lotivis.GeoJson(rawGeoJSON));
+      mapChartCard.setDatasets(datasets);
+    });
+
+</script>
+
+</body>
+</html>

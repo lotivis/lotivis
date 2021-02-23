@@ -83,3 +83,7 @@ li {
 .card-inset {
   padding: ($border * 2) ($border * 2);
 }
+
+samp {
+  white-space: pre-wrap;
+}

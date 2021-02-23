@@ -46,8 +46,7 @@ export class TimeChartCard extends ChartCard {
     this.radioGroup = new RadioGroup(this.headerCenterComponent);
     this.radioGroup.onChange = function (value) {
       let dataset = this.datasets.find(dataset => dataset.label === value);
-      this.chart.datasets = [dataset];
-      this.chart.update();
+      this.setDataset(dataset);
     }.bind(this);
   }
 
@@ -56,14 +55,6 @@ export class TimeChartCard extends ChartCard {
     let names = this.datasets.map(dataset => dataset.label);
     let options = names.map(name => new Option(name));
     this.radioGroup.setOptions(options);
-  }
-
-  setDatasets(datasets) {
-    this.datasets = datasets;
-    this.updateRadioGroup();
-    let firstDataset = datasets[0];
-    this.chart.datasets = [firstDataset];
-    this.chart.update();
   }
 
   /**

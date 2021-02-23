@@ -70,18 +70,19 @@ export class ChartCard extends Card {
     this.radioGroup.setOptions(options);
   }
 
-  /**
-   *
-   *
-   * @param datasets
-   */
   setDatasets(datasets) {
     this.datasets = datasets;
     this.updateRadioGroup();
     let firstDataset = datasets[0];
-    this.chart.datasets = [firstDataset];
+    this.setDataset(firstDataset);
+  }
+
+  setDataset(dataset) {
+    this.chart.datasets = [dataset];
     this.chart.update();
-    this.chart.datasetsDidChange();
+    if (this.onSelectedDatasetChanged) {
+      this.onSelectedDatasetChanged(dataset.stack);
+    }
   }
 
   /**
@@ -97,6 +98,13 @@ export class ChartCard extends Card {
    * Should be overridden by subclasses.
    */
   presentSettingsPopupAction() {
+    // empty
+  }
+
+
+  // Empty Functions (for definition)
+
+  onSelectedDatasetChanged() {
     // empty
   }
 }
