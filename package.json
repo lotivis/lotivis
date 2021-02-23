@@ -12,9 +12,10 @@
     "dist/js/lotivis.min.js",
     "dist/js/lotivis.min.js.map"
   ],
-  "unpkg": "dist/lotivis.min.js",
-  "main": "dist/lotivis.js",
-  "module": "dist/lotivis.esm.js",
+  "unpkg": "dist/js/lotivis.min.js",
+  "main": "dist/js/lotivis.js",
+  "module": "dist/js/lotivis.esm.js",
+  "file": "dist/js/lotivis.js",
   "files": [
     "dist/css/lotivis.css",
     "dist/css/lotivis.min.css",
@@ -26,14 +27,13 @@
   "scripts": {
     "autobuild": "rollup -c -w",
     "build": "rollup -c",
-    "dev": "karma start --auto-watch --no-single-run --browsers chrome --grep",
+    "dev": "karma start --auto-watch --no-single-run --browsers safari --grep",
     "docs": "cd docs && npm install && npm run build",
     "lint-js": "eslint src/js/**/*.js test/*.js",
     "test": "mocha",
     "test-alt": "npm run lint-js && cross-env NODE_ENV=test karma start --auto-watch --single-run --coverage --grep",
     "typedoc": "npx typedoc",
-    "example": "node ../../server.js",
-    "example-production": "NODE_ENV=production node ../../server.js"
+    "example": "node server.js"
   },
   "repository": {
     "type": "git",
