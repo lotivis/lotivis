@@ -2,14 +2,14 @@
 
 ### Dataset Collection
 
-A dataset collection is basically an array of datasets. 
+A dataset collection is basically an array of datasets.
 
 ### Dataset
 
 | Property | Use |
 | ---- | ----- |
 | label: String | The name of the dataset. When doing a diachronic or diatopic search this is the search word. |
-| stack: String | The stack / group of the dataset. Useful to combine datasets when presented. |
+| stack: String | The stack / group of the dataset. Useful to datasetCombine datasets when presented. |
 | data: [Item] | The actual data of the dataset. |
 
 ### Data

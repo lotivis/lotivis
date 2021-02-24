@@ -1,9 +1,10 @@
 import {Component} from '../components/component';
 import {GeoJson} from '../geojson/geojson';
 import {Color, colorsForStack} from '../shared/colors';
-import { combine, flattenDatasets } from '../data/dataset-functions';
+import { combine } from '../data-juggle/combine';
 import {log_debug} from "../shared/debug";
 import {formatNumber} from "../shared/format";
+import {flatDatasets} from "../data-juggle/dataset-flat";
 
 /**
  * A component which renders a geo json with d3.
@@ -48,7 +49,7 @@ export class MapChart extends Component {
     this.backgroundOpacity = 0.2;
 
     this.isDrawsBackground = true;
-    this.isZoomable = true;
+    // this.isZoomable = true;
     this.isShowLabels = true;
 
     this.datasets = [];
@@ -205,7 +206,7 @@ export class MapChart extends Component {
           return `${propertyName}: ${properties[propertyName]}`;
         });
 
-        let flatData = flattenDatasets(thisReference.datasets);
+        let flatData = flatDatasets(thisReference.datasets);
         let data = flatData.filter(item => +item.location === +code);
 
         if (data) {
@@ -448,7 +449,7 @@ export class MapChart extends Component {
 
   calculateAuxiliaryData() {
     this.stackNames = this.getStackNames();
-    this.flatData = flattenDatasets(this.datasets);
+    this.flatData = flatDatasets(this.datasets);
     this.combinedData = combine(this.flatData);
     log_debug('this.stackNames', this.stackNames);
     log_debug('this.flatData', this.flatData);

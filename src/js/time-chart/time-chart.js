@@ -2,8 +2,8 @@ import {Component} from "../components/component";
 import {Color, colorsForStack} from "../shared/colors";
 import {URLParameters} from "../shared/url-parameters";
 import {TestData} from "../shared/test-data";
-import {flattenDatasets} from "../data/dataset-functions";
 import {log_debug} from "../shared/debug";
+import {flatDatasets} from "../data-juggle/dataset-flat";
 
 /**
  *
@@ -49,11 +49,11 @@ export class TimeChart extends Component {
 
     this.datasets = [];
     this.presentedDatasetGroups = [];
-    this.presentedStacks = [];
+    // this.presentedStacks = [];
 
     this.labelColor = new Color(155, 155, 155).rgbString();
     this.type = TimeChart.ChartType.Bar;
-    this.valueType = 'relative';
+    // this.valueType = 'relative';
 
     this.isShowLabels = false;
     this.isCombineStacks = false;
@@ -129,7 +129,6 @@ export class TimeChart extends Component {
    *
    */
   configureChart() {
-    this.renderMethod = this.type === 'Bar' ? this.renderBars : this.renderLine;
     let margin = this.margin;
     this.graphWidth = this.width - margin.left - margin.right;
     this.graphHeight = this.height - margin.top - margin.bottom;
@@ -149,7 +148,7 @@ export class TimeChart extends Component {
     let datasetRef = this.presentedDatasets;
     let datasetsPerYearRef = this.presentedDatasetsPerYear;
 
-    this.datasetStacks = this.listOfStacks.map(function (stackName, index) {
+    this.datasetStacks = this.listOfStacks.map(function (stackName) {
 
       let stackCandidates = datasetRef.filter(dataset => dataset.stack === stackName);
       let candidatesNames = stackCandidates.map(stackCandidate => stackCandidate.label);
@@ -191,11 +190,11 @@ export class TimeChart extends Component {
   calculateListOfStacks() {
     let temporaryMap = d3.map(this.presentedDatasets, dataset => dataset.stack || dataset.label);
     this.listOfStacks = Array.from(new Set(temporaryMap));
-    log_debug('this.listOfStacks', this.listOfStacks)
+    log_debug('this.listOfStacks', this.listOfStacks);
 
     let temporaryMap2 = d3.map(this._datasets, dataset => dataset.stack || dataset.label);
     this.listOfAllStacks = Array.from(new Set(temporaryMap2));
-    log_debug('this.listOfAllStacks', this.listOfAllStacks)
+    log_debug('this.listOfAllStacks', this.listOfAllStacks);
   }
 
   /**s
@@ -203,7 +202,7 @@ export class TimeChart extends Component {
    */
   calculateListOfYears() {
 
-    let flat = flattenDatasets(this._datasets);
+    let flat = flatDatasets(this._datasets);
     log_debug('flat', flat);
 
     if (this.presentedDatasets.length > 0) {
@@ -314,7 +313,7 @@ export class TimeChart extends Component {
       .attr("viewBox", `0 0 ${this.width} ${this.height}`)
       .attr('id', TimeChart.svgID);
 
-    let image = new Image;
+    // let image = new Image;
 
     // let aspect = this.width / this.height;
     // d3.select(window)
@@ -545,7 +544,7 @@ export class TimeChart extends Component {
    */
   createLine() {
     if (this.datasetGroups.length === 0) {
-      return debug('no datasets given to render lines.');
+      return log_debug('no datasets given to render lines.');
     }
     for (let i = 0; i < this.presentedDatasetGroups.length; i++) {
       let dataset = this.presentedDatasetGroups[i];
@@ -568,7 +567,7 @@ export class TimeChart extends Component {
       .attr("stroke", dataset.color.rgbString())
       .attr("stroke-width", 3.5)
       .attr("d", d3.line()
-        .x((item) => this.x0(item.year))
+        .x((item) => this.x0(item.date))
         .y((item) => this.y0(item.value))
         .curve(d3.curveMonotoneX));
 
@@ -578,7 +577,7 @@ export class TimeChart extends Component {
       .enter()
       .append("circle")
       .attr("r", 6)
-      .attr("cx", (item) => this.x0(item.year))
+      .attr("cx", (item) => this.x0(item.date))
       .attr("cy", (item) => this.y0(item.value))
       .attr("fill", dataset.color.rgbString());
 
