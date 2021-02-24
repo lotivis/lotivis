@@ -33,6 +33,12 @@ export function extractLocations(datasets) {
   return toSet(flatData.map(item => item.location || "unknown"));
 }
 
+/**
+ * Return an array containing each equal item of the given array only once.
+ *
+ * @param array The array to create a set of.
+ * @returns {any[]} The set version of the array.
+ */
 function toSet(array) {
   return Array.from(new Set(array));
 }

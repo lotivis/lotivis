@@ -12,7 +12,7 @@ import {RadioGroup} from "./js/components/radio-group";
 import {Option} from "./js/components/option";
 import {Application} from "./js/application";
 import {flatDataset, flatDatasets} from "./js/data-juggle/dataset-flat";
-import {combine, combineByDate, combineByLocation, combineByStacks} from "./js/data-juggle/combine";
+import {combine, combineByDate, combineByLocation, combineByStacks} from "./js/data-juggle/dataset-combine";
 import {extractDates, extractLocations, extractStacks} from "./js/data-juggle/dataset-extract";
 
 export default Application;

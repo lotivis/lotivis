@@ -1,7 +1,7 @@
 import {Component} from '../components/component';
 import {GeoJson} from '../geojson/geojson';
 import {Color, colorsForStack} from '../shared/colors';
-import { combine } from '../data-juggle/combine';
+import { combine } from '../data-juggle/dataset-combine';
 import {log_debug} from "../shared/debug";
 import {formatNumber} from "../shared/format";
 import {flatDatasets} from "../data-juggle/dataset-flat";
