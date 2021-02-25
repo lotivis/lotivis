@@ -328,20 +328,6 @@ export class SearchPage extends Page {
       tracks: tracks
     };
   }
-
-  applyMapData(mapData) {
-    let color = randomColor();
-    for (let i = 0; i < mapData.length; i++) {
-      const entry = mapData[i];
-      const departementNumber = entry.departementNumber;
-      const numberOfLyrics = entry.value;
-      if (numberOfLyrics === 0) {
-        continue;
-      }
-      const departement = this.application.getDepartementForNumber(departementNumber);
-      this.mapChart.drawDepartement(departement, color, "" + numberOfLyrics);
-    }
-  }
 }
 
 SearchPage.viewModeKey = 'de.beuth.frc-visualization.SearchPageViewMode';

@@ -45,7 +45,7 @@
   let chart = timeChartCard.chart;
 
   d3
-    .json('/assets/grouped-datasets.json')
+    .json('/assets/example-datasets-location-time-grouped.json')
     .then(function (json) {
       let string = JSON.stringify(json, null, 4);
       let element = document.getElementById('data');

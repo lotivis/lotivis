@@ -1,6 +1,6 @@
 import {Component} from '../components/component';
 import {GeoJson} from '../geojson/geojson';
-import {Color, colorsForStack} from '../shared/colors';
+import {Color} from '../shared/colors';
 import { combine } from '../data-juggle/dataset-combine';
 import {log_debug} from "../shared/debug";
 import {formatNumber} from "../shared/format";
@@ -309,7 +309,7 @@ export class MapChart extends Component {
       let dataForStack = combinedData.filter(data => data.stack === stackName);
       log_debug('dataForStack', dataForStack);
       let max = d3.max(dataForStack, item => item.value);
-      let color = colorsForStack(index, 1)[0];
+      let color = Color.colorsForStack(index)[0];
 
       for (let index = 0; index < dataForStack.length; index++) {
         let datasetEntry = dataForStack[index];

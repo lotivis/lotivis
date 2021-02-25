@@ -75,9 +75,9 @@ export class TimeChartCard extends ChartCard {
   /**
    *
    */
-  presentSettingsPopup() {
+  presentSettingsPopupAction() {
     let bodyElement = d3.select('body');
-    let button = document.getElementById(this.moreActionButton.selector);
+    let button = document.getElementById(this.moreButton.selector);
     let settingsPopup = new TimeChartSettingsPopup(bodyElement);
     settingsPopup.diachronicChart = this.chart;
     settingsPopup.showUnder(button, 'right');

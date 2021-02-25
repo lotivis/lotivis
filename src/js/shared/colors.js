@@ -1,10 +1,3 @@
-export function randomColor() {
-  return "rgb(" +
-    (Math.random() * 255) + ", " +
-    (Math.random() * 255) + "," +
-    (Math.random() * 255) + ")";
-}
-
 export class Color {
   constructor(r, g, b) {
     this.r = Math.round(r);
@@ -20,6 +13,42 @@ export class Color {
     return new Color(this.r + r, this.g + g, this.b + b);
   }
 }
+
+Color.randomColor = function () {
+  return "rgb(" +
+    (Math.random() * 255) + ", " +
+    (Math.random() * 255) + "," +
+    (Math.random() * 255) + ")";
+};
+
+Color.colorsForStack = function (stack, amount = 1) {
+  if (!Number.isInteger(stack)) {
+    return [Color.stackColors[0]];
+  }
+
+  let usedAmount = Math.max(amount, 5);
+  let stackColors = Color.stackColors[stack % Color.stackColors.length];
+
+  let highColor = stackColors[0];
+  let lowColor = stackColors[1];
+
+  let redDiff = lowColor.r - highColor.r;
+  let greenDiff = lowColor.g - highColor.g;
+  let blueDiff = lowColor.b - highColor.b;
+
+  let redStep = redDiff / usedAmount;
+  let greenStep = greenDiff / usedAmount;
+  let blueStep = blueDiff / usedAmount;
+
+  let colors = [];
+
+  for (let i = 0; i < amount; i++) {
+    let newColor = highColor.colorAdding(redStep * i, greenStep * i, blueStep * i);
+    colors.push(newColor);
+  }
+
+  return colors;
+};
 
 Color.defaultTint = new Color(0, 122, 255);
 Color.organgeLow = new Color(250, 211, 144);
@@ -40,30 +69,6 @@ Color.stackColors = [
   [Color.organgeHigh, Color.organgeLow],
   [Color.lightBlueHight, Color.lightBlueLow],
 ];
-// Returns a collection of colors with the given amount.
-//
-export function colorsForStack(stack, amount) {
 
-  if (!Number.isInteger(stack)) {
-    return [Color.stackColors[0]];
-  }
 
-  let usedAmount = Math.max(amount, 5);
-  let stackColors = Color.stackColors[stack % Color.stackColors.length];
-  let highColor = stackColors[0];
-  let lowColor = stackColors[1];
-  let redDiff = lowColor.r - highColor.r;
-  let greenDiff = lowColor.g - highColor.g;
-  let blueDiff = lowColor.b - highColor.b;
-  let redStep = redDiff / usedAmount;
-  let greenStep = greenDiff / usedAmount;
-  let blueStep = blueDiff / usedAmount;
-  let colors = [];
 
-  for (let i = 0; i < amount; i++) {
-    let newColor = highColor.colorAdding(redStep * i, greenStep * i, blueStep * i);
-    colors.push(newColor);
-  }
-
-  return colors;
-}

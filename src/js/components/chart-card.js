@@ -9,6 +9,7 @@ import {Option} from "./option";
  * @extends Card
  */
 export class ChartCard extends Card {
+  chart;
 
   /**
    * Creates a new instance of ChartCard.
@@ -30,13 +31,17 @@ export class ChartCard extends Card {
     this.screenshotButton.setText('Screenshot');
     this.screenshotButton.element.classed('simple-button', true);
     this.screenshotButton.setFontAwesomeImage('camera');
-    this.screenshotButton.onClick = this.screenshotButtonAction.bind(this);
+    this.screenshotButton.onClick = function (event) {
+      this.screenshotButtonAction(event);
+    }.bind(this);
 
     this.moreButton = new Button(this.headerRightComponent);
     this.moreButton.setText('More');
     this.moreButton.element.classed('simple-button', true);
     this.moreButton.setFontAwesomeImage('ellipsis-h');
-    this.moreButton.onClick = this.presentSettingsPopupAction.bind(this);
+    this.moreButton.onClick = function (event) {
+      this.presentSettingsPopupAction(event);
+    }.bind(this);
   }
 
   /**
@@ -78,6 +83,7 @@ export class ChartCard extends Card {
   }
 
   setDataset(dataset) {
+    if (!this.chart) return;
     this.chart.datasets = [dataset];
     this.chart.update();
     if (this.onSelectedDatasetChanged) {
@@ -87,6 +93,8 @@ export class ChartCard extends Card {
 
   /**
    * Triggered when the screenshot button is pushed.
+   *
+   * Should be overridden by subclasses.
    */
   screenshotButtonAction() {
     // empty
@@ -101,9 +109,11 @@ export class ChartCard extends Card {
     // empty
   }
 
-
-  // Empty Functions (for definition)
-
+  /**
+   * Triggered for a change of the radio group.
+   *
+   * Should be overridden by subclasses.
+   */
   onSelectedDatasetChanged() {
     // empty
   }
