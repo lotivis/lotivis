@@ -15,7 +15,7 @@ import {PlotChartSettingsPopup} from "./plot-chart-settings-popup";
 export class PlotChartCard extends ChartCard {
 
   /**
-   *
+   * Creates a new instance of PlotChartCard.
    *
    * @param selector The selector
    * @param name
@@ -32,7 +32,7 @@ export class PlotChartCard extends ChartCard {
   }
 
   /**
-   *
+   * Injects the plot chart in the body of the card.
    */
   injectChart() {
     this.chart = new PlotChart(this.body);
@@ -41,7 +41,7 @@ export class PlotChartCard extends ChartCard {
   }
 
   /**
-   *
+   * Injects the radio group in the top.
    */
   injectRadioGroup() {
     this.radioGroup = new RadioGroup(this.headerCenterComponent);
@@ -52,7 +52,7 @@ export class PlotChartCard extends ChartCard {
   }
 
   /**
-   *
+   * Updates the button in the radio group.
    */
   updateRadioGroup() {
     if (!this.datasets) return;

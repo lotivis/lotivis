@@ -9,6 +9,10 @@ export class Color {
     return `rgb(${this.r},${this.g},${this.b})`;
   }
 
+  toString() {
+    return this.rgbString();
+  }
+
   colorAdding(r, g, b) {
     return new Color(this.r + r, this.g + g, this.b + b);
   }

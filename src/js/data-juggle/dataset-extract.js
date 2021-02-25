@@ -103,6 +103,17 @@ export function extractEarliestDate(flatData) {
 }
 
 /**
+ * Returns the earliest date occurring in the flat array of items.
+ *
+ * @param flatData The flat data array.
+ * @returns {*} The earliest date.
+ */
+export function extractEarliestDateWithValue(flatData) {
+  let withValue = flatData.filter(item => (item.value || 0) > 0);
+  return extractDatesFromFlatData(withValue).shift();
+}
+
+/**
  * Returns the latest date occurring in the flat array of items.
  *
  * @param flatData The flat data array.
@@ -110,4 +121,15 @@ export function extractEarliestDate(flatData) {
  */
 export function extractLatestDate(flatData) {
   return extractDatesFromFlatData(flatData).pop();
+}
+
+/**
+ * Returns the latest date occurring in the flat array of items.
+ *
+ * @param flatData The flat data array.
+ * @returns {*} The latest date.
+ */
+export function extractLatestDateWithValue(flatData) {
+  let withValue = flatData.filter(item => (item.value || 0) > 0);
+  return extractDatesFromFlatData(withValue).pop();
 }

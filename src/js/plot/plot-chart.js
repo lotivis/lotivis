@@ -1,8 +1,13 @@
 import {Component} from "../components/component";
-import {Color} from "../shared/colors";
 import {log_debug} from "../shared/debug";
 import {TimeChart} from "../time/time-chart";
-import {extractDatesFromDatasets, extractLabelsFromDatasets} from "../data-juggle/dataset-extract";
+import {
+  extractDatesFromDatasets,
+  extractEarliestDateWithValue,
+  extractLabelsFromDatasets,
+  extractLatestDateWithValue
+} from "../data-juggle/dataset-extract";
+import {Color} from "../shared/colors";
 
 /**
  *
@@ -69,6 +74,7 @@ export class PlotChart extends Component {
     this.createScales();
     this.renderAxis();
     this.renderGrid();
+    this.renderBars();
   }
 
   /**
@@ -115,20 +121,18 @@ export class PlotChart extends Component {
    */
   createScales() {
     let listOfDates = extractDatesFromDatasets(this.workingDatasets);
-    let datasetsCount = (this.workingDatasets || []).length;
     let listOfLabels = extractLabelsFromDatasets(this.workingDatasets);
 
     this.xChart = d3
       .scaleBand()
       .domain(listOfDates)
-      .rangeRound([this.margin.left, this.width - this.margin.right])
+      .rangeRound([this.margin.left, this.width - this.margin.right]);
 
     this.yChart = d3
       .scaleBand()
-      //.domain([0, datasetsCount])
       .domain(listOfLabels)
-      // .nice()
-      .rangeRound([this.height - this.margin.bottom, this.margin.top]);
+      .rangeRound([this.height - this.margin.bottom, this.margin.top])
+      .padding(0.05);
 
     this.xAxisGrid = d3
       .axisBottom(this.xChart)
@@ -138,13 +142,9 @@ export class PlotChart extends Component {
     this.yAxisGrid = d3
       .axisLeft(this.yChart)
       .tickSize(-this.graphWidth)
-      .tickFormat('')
-      .ticks(datasetsCount);
+      .tickFormat('');
 
   }
-
-
-  // MARK: - Render
 
   /**
    *
@@ -163,11 +163,8 @@ export class PlotChart extends Component {
 
   }
 
-
-  // MARK: - Grid
-
   /**
-   *
+   * Adds a grid to the chart.
    */
   renderGrid() {
     let color = 'lightgray';
@@ -191,39 +188,44 @@ export class PlotChart extends Component {
       .attr('stroke-width', width)
       .attr("opacity", opacity)
       .call(this.yAxisGrid);
+
   }
 
   /**
    *
-   * @param stack
-   * @param stackIndex
    */
-  renderBars(stack, stackIndex) {
-    log_debug('stack', Object.getOwnPropertyNames(stack));
-    log_debug('stackIndex', stackIndex);
-    //
-    // this.svg.append("g")
-    //   .selectAll("g")
-    //   .data(stack)
-    //   .enter()
-    //   .append("g")
-    //   .attr("fill", function (dataset, index) {
-    //     log_debug('dataset', dataset);
-    //     if (this.isCombineStacks) {
-    //       return Color.colorsForStack(stackIndex)[0].rgbString();
-    //     } else {
-    //       return stack.colors[index].rgbString();
-    //     }
-    //   }.bind(this))
-    //   .selectAll("rect")
-    //   .data((data) => data)
-    //   .enter()
-    //   .append("rect")
-    //   .attr("rx", this.isCombineStacks ? 0 : 4)
-    //   .attr("x", (d) => this.xChart(d.data.date) + this.xStack(stack.label))
-    //   .attr("y", (d) => this.yChart(d[1]))
-    //   .attr("height", (d) => this.yChart(d[0] || 0) - this.yChart(d[1] || 0))
-    //   .attr("width", this.xStack.bandwidth());
+  renderBars() {
+
+    let datasets = this.workingDatasets.map(function (dataset) {
+      let data = dataset.data;
+      return {
+        label: dataset.label,
+        earliestDate: extractEarliestDateWithValue(data),
+        latestDate: extractLatestDateWithValue(data),
+        data: data
+      };
+    });
+
+    log_debug('datasets', datasets);
+    let radius = 6;
+    this.svg.append("g")
+      .selectAll("g")
+      .data(datasets)
+      .enter()
+      .append("rect")
+      .attr('transform', `translate(${this.xChart.bandwidth() / 2},0)`)
+      .attr("fill", Color.defaultTint)
+      .attr("rx", radius)
+      .attr("ry", radius)
+      .attr("x", (d) => this.xChart(d.earliestDate))
+      .attr("y", (d) => this.yChart(d.label))
+      .attr("height", this.yChart.bandwidth())
+      .attr("width", function (item) {
+        let start = this.xChart(item.earliestDate);
+        let end = this.xChart(item.latestDate);
+        return end - start;
+      }.bind(this));
+
   }
 
   /**

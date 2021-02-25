@@ -14,9 +14,9 @@ import {Application} from "./js/application";
 import {flatDataset, flatDatasets} from "./js/data-juggle/dataset-flat";
 import {combine, combineByDate, combineByLocation, combineByStacks} from "./js/data-juggle/dataset-combine";
 import {
-  extractDatesFromDatasets, extractDatesFromFlatData, extractEarliestDate,
+  extractDatesFromDatasets, extractDatesFromFlatData, extractEarliestDate, extractEarliestDateWithValue,
   extractLabelsFromDatasets,
-  extractLabelsFromFlatData, extractLatestDate,
+  extractLabelsFromFlatData, extractLatestDate, extractLatestDateWithValue,
   extractLocationsFromDatasets, extractLocationsFromFlatData,
   extractStacksFromDatasets,
   extractStacksFromFlatData
@@ -59,7 +59,9 @@ exports.extractDatesFromFlatData = extractDatesFromFlatData;
 exports.extractLocationsFromDatasets = extractLocationsFromDatasets;
 exports.extractLocationsFromFlatData = extractLocationsFromFlatData;
 exports.extractEarliestDate = extractEarliestDate;
+exports.extractEarliestDateWithValue = extractEarliestDateWithValue;
 exports.extractLatestDate = extractLatestDate;
+exports.extractLatestDateWithValue = extractLatestDateWithValue;
 exports.sumOfDataset = sumOfDataset;
 exports.sumOfStack = sumOfStack;
 exports.dateToItemsRelations = dateToItemsRelation;
