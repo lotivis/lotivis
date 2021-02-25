@@ -1,5 +1,5 @@
 import {Component} from './component';
-import {createUUID} from '../shared/uuid';
+import {createID} from '../shared/selector';
 import {Card} from './card';
 import {Button} from './button';
 import {Language} from '../language/language';
@@ -44,7 +44,7 @@ export class Popup extends Component {
      * @param parent The parental element.
      */
     renderUnderground(parent) {
-        this.modalBackgroundId = createUUID();
+        this.modalBackgroundId = createID();
         this.modalBackground = parent
             .append('div')
             .classed('popup-underground fade-in', true)
@@ -55,7 +55,7 @@ export class Popup extends Component {
      *
      */
     renderContainer() {
-        this.elementId = createUUID();
+        this.elementId = createID();
         this.element = this.modalBackground
             .append('div')
             .classed('popup', true)

@@ -1,5 +1,3 @@
-import {Application} from "../application";
-
 /**
  *
  * @class URLParameters

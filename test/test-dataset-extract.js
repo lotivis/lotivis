@@ -36,4 +36,16 @@ describe('dataset extract', function() {
     assert.strictEqual(locations[0], 1);
     assert.strictEqual(locations[1], 2);
   });
+
+  it('extracts the correct earliest date', function() {
+    let flatData = lotivis.flatDatasets(datasets);
+    let earliestDate = lotivis.extractEarliestDate(flatData);
+    assert.strictEqual(earliestDate, 2000);
+  });
+
+  it('extracts the correct latest date', function() {
+    let flatData = lotivis.flatDatasets(datasets);
+    let earliestDate = lotivis.extractLatestDate(flatData);
+    assert.strictEqual(earliestDate, 2004);
+  });
 });

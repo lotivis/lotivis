@@ -2,8 +2,6 @@ import {Popup} from "../components/popup";
 import {Language} from "../language/language";
 import {Checkbox} from "../components/checkbox";
 import {URLParameters} from "../shared/url-parameters";
-import {RadioGroup} from "../components/radio-group";
-import {Option} from "../components/option";
 
 /**
  *

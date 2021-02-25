@@ -91,3 +91,23 @@ export function extractLocationsFromFlatData(flatData) {
 function toSet(array) {
   return Array.from(new Set(array)).sort();
 }
+
+/**
+ * Returns the earliest date occurring in the flat array of items.
+ *
+ * @param flatData The flat data array.
+ * @returns {*} The earliest date.
+ */
+export function extractEarliestDate(flatData) {
+  return extractDatesFromFlatData(flatData).shift();
+}
+
+/**
+ * Returns the latest date occurring in the flat array of items.
+ *
+ * @param flatData The flat data array.
+ * @returns {*} The latest date.
+ */
+export function extractLatestDate(flatData) {
+  return extractDatesFromFlatData(flatData).pop();
+}

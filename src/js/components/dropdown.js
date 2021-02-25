@@ -1,5 +1,5 @@
 import {Component} from "./component";
-import {createUUID} from "../shared/uuid";
+import {createID} from "../shared/selector";
 
 /**
  *
@@ -11,11 +11,11 @@ export class Dropdown extends Component {
     constructor(parent) {
         super(parent);
         this.inputElements = [];
-        this.selector = createUUID();
+        this.selector = createID();
         this.element = parent
             .append('div')
             .classed('dropdown-container', true);
-        this.selectId = createUUID();
+        this.selectId = createID();
         this.renderLabel();
         this.renderSelect();
     }

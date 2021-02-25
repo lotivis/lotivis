@@ -1,25 +1,23 @@
 import {Card} from "../components/card";
-import {Button} from "../components/button";
-import {TimeChart} from "./time-chart";
-import {createUUID} from "../shared/uuid";
-import {TimeChartSettingsPopup} from "./time-chart-settings-popup";
 import {URLParameters} from "../shared/url-parameters";
-import {screenshotElement} from "../shared/screenshot";
 import {RadioGroup} from "../components/radio-group";
 import {Option} from "../components/option";
 import {ChartCard} from "../components/chart-card";
+import {PlotChart} from "./plot-chart";
+import {PlotChartSettingsPopup} from "./plot-chart-settings-popup";
 
 /**
  *
  *
- * @class TimeChartCard
+ * @class PlotChartCard
  * @extends Card
  */
-export class TimeChartCard extends ChartCard {
+export class PlotChartCard extends ChartCard {
 
   /**
    *
-   * @param selector
+   *
+   * @param selector The selector
    * @param name
    */
   constructor(selector, name) {
@@ -28,21 +26,24 @@ export class TimeChartCard extends ChartCard {
     this.selector = selector;
     this.name = selector;
     this.datasets = [];
-    this.renderChart();
-    this.renderRadioGroup();
+    this.injectChart();
+    this.injectRadioGroup();
     this.applyURLParameters();
   }
 
   /**
    *
    */
-  renderChart() {
-    this.chart = new TimeChart(this.body);
-    this.chart.margin.left = 50;
+  injectChart() {
+    this.chart = new PlotChart(this.body);
+    this.chart.margin.left = 80;
     this.chart.margin.right = 50;
   }
 
-  renderRadioGroup() {
+  /**
+   *
+   */
+  injectRadioGroup() {
     this.radioGroup = new RadioGroup(this.headerCenterComponent);
     this.radioGroup.onChange = function (value) {
       let dataset = this.datasets.find(dataset => dataset.label === value);
@@ -50,6 +51,9 @@ export class TimeChartCard extends ChartCard {
     }.bind(this);
   }
 
+  /**
+   *
+   */
   updateRadioGroup() {
     if (!this.datasets) return;
     let names = this.datasets.map(dataset => dataset.label);
@@ -61,16 +65,11 @@ export class TimeChartCard extends ChartCard {
    *
    */
   applyURLParameters() {
-    this.chart.type = URLParameters.getInstance()
-      .getString(URLParameters.chartType, 'bar');
-    this.chart.isShowLabels = URLParameters.getInstance()
-      .getBoolean(URLParameters.chartShowLabels, false);
-    this.chart.isCombineStacks = URLParameters.getInstance()
-      .getBoolean(URLParameters.chartCombineStacks, false);
+    let instance = URLParameters.getInstance();
+    this.chart.type = instance.getString(URLParameters.chartType, 'bar');
+    this.chart.isShowLabels = instance.getBoolean(URLParameters.chartShowLabels, false);
+    this.chart.isCombineStacks = instance.getBoolean(URLParameters.chartCombineStacks, false);
   }
-
-
-  // MARK: - Settings Popup
 
   /**
    *
@@ -78,7 +77,7 @@ export class TimeChartCard extends ChartCard {
   presentSettingsPopupAction() {
     let bodyElement = d3.select('body');
     let button = document.getElementById(this.moreButton.selector);
-    let settingsPopup = new TimeChartSettingsPopup(bodyElement);
+    let settingsPopup = new PlotChartSettingsPopup(bodyElement);
     settingsPopup.diachronicChart = this.chart;
     settingsPopup.showUnder(button, 'right');
   }

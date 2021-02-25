@@ -1,5 +1,5 @@
 import {Page} from './page';
-import {TimeChartCard} from "../time-chart/time-chart-card";
+import {TimeChartCard} from "../time/time-chart-card";
 import {RadioGroup} from "../components/radio-group";
 import {Language} from "../language/language";
 import {URLParameters} from "../shared/url-parameters";

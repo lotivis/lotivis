@@ -1,4 +1,5 @@
-import {createUUID} from "../shared/uuid";
+import {createID} from "../shared/selector";
+import {log_debug} from "../shared/debug";
 
 /**
  *
@@ -25,7 +26,7 @@ export class Component {
   }
 
   initializeFromParent(parent) {
-    this.selector = createUUID();
+    this.selector = createID();
     this.parent = parent;
   }
 

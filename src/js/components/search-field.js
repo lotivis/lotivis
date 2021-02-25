@@ -1,5 +1,5 @@
 import {Component} from "./component";
-import {createUUID} from "../shared/uuid";
+import {createID} from "../shared/selector";
 import {RecentSearches} from "../shared/recent-searches";
 
 export class SearchField extends Component {
@@ -10,7 +10,7 @@ export class SearchField extends Component {
             throw 'No parent specified.';
         }
         this.parent = parent;
-        this.datalistId = createUUID();
+        this.datalistId = createID();
         this.element = parent
             .append('input')
             .classed('form-control form-control-sm', true)

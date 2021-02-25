@@ -1,5 +1,5 @@
 import {Component} from "./component";
-import {createUUID} from "../shared/uuid";
+import {createID} from "../shared/selector";
 
 /**
  * Displays a loading status.
@@ -22,14 +22,14 @@ export class ProgressBar extends Component {
    * Adds the bar to the parent.
    */
   renderBar() {
-    this.barContainerSelector = createUUID();
+    this.barContainerSelector = createID();
     this.barContainer = this.parent
       .append('div')
       .attr('id', this.barContainerSelector)
       .attr('class', 'progress-bar-container');
     this.element = this.barContainer;
 
-    this.barSelector = createUUID();
+    this.barSelector = createID();
     this.bar = this.barContainer
       .append('div')
       .attr('id', this.barSelector)
@@ -49,7 +49,7 @@ export class ProgressBar extends Component {
 
   get value() {
     let totalWidth = document.getElementById(this.barContainerSelector).style.width;
-    let barWidth = document.getElementById(this.barSelector).style.width;
+    // let barWidth = document.getElementById(this.barSelector).style.width;
     console.log('totalWidth: ' + totalWidth);
   }
 }

@@ -58,8 +58,8 @@ export class ModalPopup extends Popup {
     }
 
     /**
-     *
-     * @returns {{width: number, height: number}}
+     * Returns the preferred size. The default is 800, 600.
+     * @returns {{width: number, height: number}} The preferred size.
      */
     preferredSize() {
         return {

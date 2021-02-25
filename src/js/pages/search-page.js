@@ -1,13 +1,13 @@
 import {Page} from './page';
 import {Button} from "../components/button";
 import {SearchPageSettingsPopup} from "./search-page-settings-popup";
-import {TimeChartCard} from "../time-chart/time-chart-card";
+import {TimeChartCard} from "../time/time-chart-card";
 import {SearchCard} from "./search-card";
 import {RecentSearches} from "../shared/recent-searches";
 import {URLParameters} from "../shared/url-parameters";
 import {Language} from "../language/language";
 import {randomColor} from "../shared/colors";
-import {MapChartCard} from "../map-chart/map-chart-card";
+import {MapChartCard} from "../map/map-chart-card";
 import {WordAboutCard} from "./word-about-card";
 import {DatasetCollection} from "../data/dataset-collection";
 

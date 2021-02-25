@@ -1,6 +1,6 @@
 import {Page} from "./page";
 import {Language} from "../language/language";
-import {MapChartCard} from "../map-chart/map-chart-card";
+import {MapChartCard} from "../map/map-chart-card";
 import {URLParameters} from "../shared/url-parameters";
 
 /**
