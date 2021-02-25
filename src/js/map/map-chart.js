@@ -545,20 +545,6 @@ export class MapChart extends Component {
 
   // MARK: - Auxiliary
 
-  getElementEffectiveSize() {
-    let width = this.element.style('width').replace('px', '');
-    let height = this.element.style('height').replace('px', '');
-    return [Number(width), Number(height)];
-  }
-
-  getElementPosition() {
-    let element = document.getElementById(this.selector);
-    let rect = element.getBoundingClientRect();
-    let xPosition = rect.x + window.scrollX;
-    let yPosition = rect.y + window.scrollY;
-    return [xPosition, yPosition];
-  }
-
   removeExcludedFeatures() {
     if (!this.geoJSON) return;
     let excludedFeatureCodes = this.excludedFeatureCodes;

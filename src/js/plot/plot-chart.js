@@ -4,10 +4,10 @@ import {TimeChart} from "../time/time-chart";
 import {
   extractDatesFromDatasets,
   extractEarliestDateWithValue,
-  extractLabelsFromDatasets,
   extractLatestDateWithValue
 } from "../data-juggle/dataset-extract";
 import {Color} from "../shared/colors";
+import {combineByDate} from "../data-juggle/dataset-combine";
 
 /**
  *
@@ -30,6 +30,7 @@ export class PlotChart extends Component {
       this.element = d3.select('#' + parent);
     } else {
       this.element = parent;
+      this.element.attr('id', this.selector);
     }
 
     this.initialize();
@@ -43,7 +44,7 @@ export class PlotChart extends Component {
     this.width = 1000;
     this.height = 600;
     this.defaultMargin = 60;
-    this.lineHeight = 44;
+    this.lineHeight = 28;
     this.margin = {
       top: this.defaultMargin,
       right: this.defaultMargin,
@@ -52,6 +53,7 @@ export class PlotChart extends Component {
     };
 
     this.datasets = [];
+    this.renderTooltipContainer();
   }
 
   /**
@@ -121,7 +123,9 @@ export class PlotChart extends Component {
    */
   createScales() {
     let listOfDates = extractDatesFromDatasets(this.workingDatasets);
-    let listOfLabels = extractLabelsFromDatasets(this.workingDatasets);
+    let listOfLabels = this.workingDatasets
+      .map(dataset => dataset.label)
+      .reverse();
 
     this.xChart = d3
       .scaleBand()
@@ -131,8 +135,7 @@ export class PlotChart extends Component {
     this.yChart = d3
       .scaleBand()
       .domain(listOfLabels)
-      .rangeRound([this.height - this.margin.bottom, this.margin.top])
-      .padding(0.05);
+      .rangeRound([this.height - this.margin.bottom, this.margin.top]);
 
     this.xAxisGrid = d3
       .axisBottom(this.xChart)
@@ -143,13 +146,17 @@ export class PlotChart extends Component {
       .axisLeft(this.yChart)
       .tickSize(-this.graphWidth)
       .tickFormat('');
-
   }
 
   /**
    *
    */
   renderAxis() {
+
+    this.svg
+      .append("g")
+      .call(d3.axisTop(this.xChart))
+      .attr("transform", () => `translate(0,${this.margin.top})`);
 
     this.svg
       .append("g")
@@ -206,26 +213,120 @@ export class PlotChart extends Component {
       };
     });
 
-    log_debug('datasets', datasets);
+    let tooltip = this.tooltip;
     let radius = 6;
-    this.svg.append("g")
+
+    this.barsData = this.svg
+      .append("g")
       .selectAll("g")
       .data(datasets)
-      .enter()
+      .enter();
+
+    this.bars = this.barsData
       .append("rect")
-      .attr('transform', `translate(${this.xChart.bandwidth() / 2},0)`)
       .attr("fill", Color.defaultTint)
       .attr("rx", radius)
       .attr("ry", radius)
       .attr("x", (d) => this.xChart(d.earliestDate))
       .attr("y", (d) => this.yChart(d.label))
-      .attr("height", this.yChart.bandwidth())
-      .attr("width", function (item) {
-        let start = this.xChart(item.earliestDate);
-        let end = this.xChart(item.latestDate);
-        return end - start;
-      }.bind(this));
+      .attr("width", (d) => this.xChart(d.latestDate) - this.xChart(d.earliestDate) + this.xChart.bandwidth())
+      .attr("height", this.yChart.bandwidth() - 2)
+      .on('mouseenter', this.showTooltip.bind(this))
+      .on('mouseout', this.hideTooltip.bind(this));
 
+    this.bars
+      .append();
+
+    this.labels = this.barsData
+      .append('g')
+      .attr('transform', `translate(0,${(this.yChart.bandwidth() / 2) + 5})`)
+      .attr("fill", 'white')
+      // .selectAll('text')
+      // .data((dataset) => dataset.data)
+      // .enter()
+      .append('text')
+      .attr('text-anchor', 'end')
+      .attr("x", function (d) {
+        let rectX = this.xChart(d.earliestDate);
+        let rectX2 = this.xChart(d.latestDate);
+        let width = rectX2 - rectX;
+        let offset = this.xChart.bandwidth();
+        return rectX + (width / 2) + offset;
+      }.bind(this))
+      .attr("y", (d) => this.yChart(d.label))
+      .attr("width", (d) => this.xChart(d.latestDate) - this.xChart(d.earliestDate) + this.xChart.bandwidth())
+      .text('hello');
+
+  }
+
+  showTooltip(event, dataset) {
+    let tooltip = this.tooltip;
+    let components = [];
+
+    components.push('Label: ' + dataset.label);
+    components.push('');
+    components.push('Start: ' + dataset.earliestDate);
+    components.push('End: ' + dataset.latestDate);
+    components.push('');
+    components.push('Items: ' + dataset.data.map(item => item.value).reduce((acc, next) => acc + next, 0));
+    components.push('');
+
+    for (let index = 0; index < dataset.data.length; index++) {
+      let entry = dataset.data[index];
+      components.push(`${entry.date}: ${entry.value}`);
+    }
+    tooltip.html(components.join('<br/>'));
+
+    // position tooltip
+    let tooltipWidth = Number(tooltip.style('width').replace('px', '') || 200);
+    let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
+
+    let rectX = this.xChart(dataset.earliestDate);
+    let rectX2 = this.xChart(dataset.latestDate);
+    let width = rectX2 - rectX;
+
+    let factor = this.getElementEffectiveSize()[0] / this.width;
+    let offset = this.getElementPosition();
+    let top = this.yChart(dataset.label);
+
+    top *= factor;
+    top -= tooltipHeight;
+    top += offset[1];
+    top -= this.lineHeight;
+
+    let left = this.xChart(dataset.earliestDate);
+    left += width / 2;
+    left += this.xChart.bandwidth() / 2;
+    left *= factor;
+    left -= tooltipWidth / 2;
+    left += offset[0];
+
+    tooltip
+      .style('opacity', 1)
+      .style('left', left + 'px')
+      .style('top', top + 'px');
+  }
+
+  hideTooltip() {
+    this.tooltip.style('opacity', 0);
+  }
+
+  /**
+   * Appends a division to the svg.
+   */
+  renderTooltipContainer() {
+    let color = Color.defaultTint;
+    this.tooltip = this.element
+      .append('div')
+      .attr('class', 'map-tooltip')
+      .attr('rx', 5) // corner radius
+      .attr('ry', 5)
+      .style('position', 'absolute')
+      .style('color', 'black')
+      .style('border', function () {
+        return `solid 1px ${color}`;
+      })
+      .style('opacity', 0);
   }
 
   /**
@@ -234,7 +335,14 @@ export class PlotChart extends Component {
    */
   set datasets(datasets) {
     this.originalDatasets = datasets;
-    this.workingDatasets = datasets;
+    this.workingDatasets = datasets
+      .sort((set1, set2) => set1.label > set2.label);
+    this.workingDatasets.forEach(function (dataset) {
+      let data = dataset.data;
+      data.forEach(item => item.label = dataset.label);
+      dataset.data = combineByDate(data);
+    });
+
     this.datasetsDidChange();
   }
 

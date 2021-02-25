@@ -1,5 +1,4 @@
 import {createID} from "../shared/selector";
-import {log_debug} from "../shared/debug";
 
 /**
  *
@@ -45,5 +44,20 @@ export class Component {
   get isVisible() {
     if (!this.element) return false;
     return this.element.style('display') !== 'none';
+  }
+
+  getElementEffectiveSize() {
+    let width = this.element.style('width').replace('px', '');
+    let height = this.element.style('height').replace('px', '');
+    return [Number(width), Number(height)];
+  }
+
+  getElementPosition() {
+    let element = document.getElementById(this.selector);
+    if (!element) return [0, 0];
+    let rect = element.getBoundingClientRect();
+    let xPosition = rect.x + window.scrollX;
+    let yPosition = rect.y + window.scrollY;
+    return [xPosition, yPosition];
   }
 }
