@@ -47,7 +47,10 @@
   d3
     .json('/assets/grouped-datasets.json')
     .then(function (json) {
-      console.log(json);
+      let string = JSON.stringify(json, null, 4);
+      let element = document.getElementById('data');
+      element.innerHTML = string;
+
       chart.datasets = json;
       chart.update();
     });

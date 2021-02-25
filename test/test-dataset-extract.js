@@ -24,7 +24,6 @@ describe('dataset extract', function() {
 
   it('extracts the correct locations', function() {
     let locations = lotivis.extractLocations(datasets);
-    console.log(locations);
     assert.strictEqual(locations.length, 2);
     assert.strictEqual(locations[0], 1);
     assert.strictEqual(locations[1], 2);
