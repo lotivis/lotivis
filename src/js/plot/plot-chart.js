@@ -1,13 +1,13 @@
 import {Component} from "../components/component";
-import {log_debug} from "../shared/debug";
 import {TimeChart} from "../time/time-chart";
 import {
   extractDatesFromDatasets,
   extractEarliestDateWithValue,
   extractLatestDateWithValue
 } from "../data-juggle/dataset-extract";
-import {Color} from "../shared/colors";
 import {combineByDate} from "../data-juggle/dataset-combine";
+import {hashCode} from "../shared/hash";
+import {sumOfLabel} from "../data-juggle/dataset-sum";
 
 /**
  *
@@ -16,6 +16,12 @@ import {combineByDate} from "../data-juggle/dataset-combine";
  */
 export class PlotChart extends Component {
   radius = 23;
+  isShowLabels = true;
+  configuration = {
+    lowColor: 'rgb(184, 233, 148)',
+    highColor: 'rgb(0, 122, 255)'
+  };
+  sort = PlotChartSort.duration
 
   /**
    * Creates an instance of DiachronicChart.
@@ -53,6 +59,8 @@ export class PlotChart extends Component {
       left: this.defaultMargin + 100
     };
 
+    this.isShowLabels = true;
+
     this.datasets = [];
     this.injectTooltipContainer();
   }
@@ -84,8 +92,8 @@ export class PlotChart extends Component {
    * Update the chart.
    */
   update() {
+    this.sortDatasets();
     this.configureChart();
-    this.datasetsDidChange();
     this.drawChart();
   }
 
@@ -116,7 +124,7 @@ export class PlotChart extends Component {
       .append('g')
       .attr('width', this.graphWidth)
       .attr('height', this.graphHeight)
-      .attr('transform', `translate(${this.margin.left}, ${this.margin.top})`);
+      .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
   }
 
   /**
@@ -143,10 +151,10 @@ export class PlotChart extends Component {
       .tickSize(-this.graphHeight)
       .tickFormat('');
 
-    this.yAxisGrid = d3
-      .axisLeft(this.yChart)
-      .tickSize(-this.graphWidth)
-      .tickFormat('');
+    // this.yAxisGrid = d3
+    //   .axisLeft(this.yChart)
+    //   .tickSize(-this.graphWidth)
+    //   .tickFormat('');
 
   }
 
@@ -189,14 +197,14 @@ export class PlotChart extends Component {
       .attr("opacity", opacity)
       .call(this.xAxisGrid);
 
-    this.svg
-      .append('g')
-      .attr('class', 'y axis-grid')
-      .attr('transform', `translate(${this.margin.left},0)`)
-      .attr('stroke', color)
-      .attr('stroke-width', width)
-      .attr("opacity", opacity)
-      .call(this.yAxisGrid);
+    // this.svg
+    //   .append('g')
+    //   .attr('class', 'y axis-grid')
+    //   .attr('transform', `translate(${this.margin.left},0)`)
+    //   .attr('stroke', color)
+    //   .attr('stroke-width', width)
+    //   .attr("opacity", opacity)
+    //   .call(this.yAxisGrid);
 
   }
 
@@ -204,16 +212,7 @@ export class PlotChart extends Component {
    *
    */
   renderBars() {
-
-    let datasets = this.workingDatasets.map(function (dataset) {
-      let data = dataset.data;
-      return {
-        label: dataset.label,
-        earliestDate: extractEarliestDateWithValue(data),
-        latestDate: extractLatestDateWithValue(data),
-        data: data.sort((left, right) => left.date > right.date)
-      };
-    });
+    let datasets = this.workingDatasets;
 
     this.max = d3.max(datasets, function (dataset) {
       return d3.max(dataset.data, function (item) {
@@ -238,14 +237,18 @@ export class PlotChart extends Component {
     this.bars = this.barsData
       .append("rect")
       .attr("fill", (d) => `url(#${this.createIDFromDataset(d)})`)
+      .style("stroke", 'gray')
+      .style("stroke-width", 0.4)
       .attr("rx", radius)
       .attr("ry", radius)
       .attr("x", (d) => this.xChart(d.earliestDate))
       .attr("y", (d) => this.yChart(d.label) + 1)
-      .attr("width", (d) => this.xChart(d.latestDate) - this.xChart(d.earliestDate) + this.xChart.bandwidth())
       .attr("height", this.yChart.bandwidth() - 2)
+      .attr("id", (d) => 'rect-' + hashCode(d.label))
       .on('mouseenter', this.showTooltip.bind(this))
-      .on('mouseout', this.hideTooltip.bind(this));
+      .on('mouseout', this.hideTooltip.bind(this))
+      .transition()
+      .attr("width", (d) => this.xChart(d.latestDate) - this.xChart(d.earliestDate) + this.xChart.bandwidth());
 
     this.labels = this.barsData
       .append('g')
@@ -262,8 +265,8 @@ export class PlotChart extends Component {
         return rectX + (width / 2) + offset;
       }.bind(this))
       .attr("y", (d) => this.yChart(d.label))
-      .attr("width", (d) => this.xChart(d.latestDate) - this.xChart(d.earliestDate) + this.xChart.bandwidth())
-      // .text((d) => d.label);
+      .attr("width", (d) => this.xChart(d.latestDate) - this.xChart(d.earliestDate) + this.xChart.bandwidth());
+    // .text((d) => d.label);
 
   }
 
@@ -282,7 +285,10 @@ export class PlotChart extends Component {
     let firstDate = dataset.earliestDate;
     let lastDate = dataset.latestDate;
     let timespan = lastDate - firstDate;
-    let colorInterpolator = d3.interpolateRgb('rgb(184, 233, 148)', 'rgb(0, 122, 255)');
+    let colorInterpolator = d3.interpolateRgb(
+      this.configuration.lowColor,
+      this.configuration.highColor
+    );
 
     if (firstDate === lastDate) {
 
@@ -316,17 +322,7 @@ export class PlotChart extends Component {
   }
 
   createIDFromDataset(dataset) {
-    return this.hashCode(dataset.label);
-  }
-
-  hashCode(str) {
-    let hash = 0, i, chr;
-    for (i = 0; i < str.length; i++) {
-      chr = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + chr;
-      hash |= 0; // Convert to 32bit integer
-    }
-    return hash;
+    return hashCode(dataset.label);
   }
 
   /**
@@ -354,55 +350,92 @@ export class PlotChart extends Component {
     tooltip.html(components.join('<br/>'));
 
     // position tooltip
-    let tooltipWidth = Number(tooltip.style('width').replace('px', '') || 200);
     let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
-
-    let rectX = this.xChart(dataset.earliestDate);
-    let rectX2 = this.xChart(dataset.latestDate);
-    let width = rectX2 - rectX;
-
     let factor = this.getElementEffectiveSize()[0] / this.width;
     let offset = this.getElementPosition();
     let top = this.yChart(dataset.label);
-
     top *= factor;
-    top -= tooltipHeight;
+
+    let displayUnder = (top - this.margin.top) <= tooltipHeight;
     top += offset[1];
-    top -= this.lineHeight;
+
+    if (displayUnder) {
+      top += this.lineHeight + 10;
+    } else {
+      top -= tooltipHeight;
+      top -= this.lineHeight;
+    }
 
     let left = this.xChart(dataset.earliestDate);
-    left += width / 2;
-    left += this.xChart.bandwidth() / 2;
     left *= factor;
-    left -= tooltipWidth / 2;
     left += offset[0];
 
     tooltip
-      .style('opacity', 1)
       .style('left', left + 'px')
-      .style('top', top + 'px');
+      .style('top', top + 'px')
+      .transition()
+      .style('opacity', 1);
+
+    let id = 'rect-' + hashCode(dataset.label);
+
+    this.svg
+      .selectAll('rect')
+      .transition()
+      .attr('opacity', 0.15);
+
+    this.svg
+      .select(`#${id}`)
+      .transition()
+      .attr('opacity', 1);
   }
 
   hideTooltip() {
     this.tooltip.style('opacity', 0);
+    this.svg
+      .selectAll('rect')
+      .transition()
+      .attr('opacity', 1);
   }
 
   /**
    * Appends a division to the svg.
    */
   injectTooltipContainer() {
-    let color = Color.defaultTint;
     this.tooltip = this.element
       .append('div')
-      .attr('class', 'map-tooltip')
+      .attr('class', 'chart-tooltip')
       .attr('rx', 5) // corner radius
       .attr('ry', 5)
       .style('position', 'absolute')
       .style('color', 'black')
       .style('border', function () {
-        return `solid 1px ${color}`;
+        return `solid 1px grey`;
       })
       .style('opacity', 0);
+  }
+
+  sortDatasets() {
+    this.workingDatasets = this.workingDatasets.reverse();
+    switch (this.sort) {
+      case PlotChartSort.alphabetically:
+        this.workingDatasets = this.workingDatasets
+          .sort((set1, set2) => set1.label > set2.label);
+        break;
+      case PlotChartSort.duration:
+        this.workingDatasets = this.workingDatasets
+          .sort((set1, set2) => set1.duration < set2.duration);
+        break;
+      case PlotChartSort.intensity:
+        this.workingDatasets = this.workingDatasets
+          .sort((set1, set2) => set1.sum < set2.sum);
+        break;
+      case PlotChartSort.firstDate:
+        this.workingDatasets = this.workingDatasets
+          .sort((set1, set2) => set1.earliestDate > set2.earliestDate);
+        break;
+      default:
+        break
+    }
   }
 
   /**
@@ -411,15 +444,22 @@ export class PlotChart extends Component {
    */
   set datasets(datasets) {
     this.originalDatasets = datasets;
-    this.workingDatasets = datasets
-      .sort((set1, set2) => set1.label > set2.label);
+
+    this.workingDatasets = datasets;
     this.workingDatasets.forEach(function (dataset) {
       let data = dataset.data;
+      let firstDate = extractEarliestDateWithValue(data);
+      let lastDate = extractLatestDateWithValue(data);
+      let duration = lastDate - firstDate;
       data.forEach(item => item.label = dataset.label);
+      data = data.sort((left, right) => left.date > right.date);
+      dataset.earliestDate = firstDate;
+      dataset.latestDate = lastDate;
+      dataset.duration = duration;
       dataset.data = combineByDate(data);
+      dataset.sum = sumOfLabel(data, dataset.label);
     });
-
-    this.datasetsDidChange();
+    this.sortDatasets();
   }
 
   /**
@@ -430,11 +470,21 @@ export class PlotChart extends Component {
     return this.originalDatasets;
   }
 
-  /**
-   * Tells this chart that it's datasets has changed.
-   */
-  datasetsDidChange() {
-    log_debug('this.workingDatasets', this.workingDatasets);
+  set showLabels(newValue) {
+    this.isShowLabels = newValue;
+  }
+
+  get showLabels() {
+    return this.isShowLabels;
   }
 }
 
+/**
+ * Enumeration of sorts available in the plot chart.
+ */
+export const PlotChartSort = {
+  alphabetically: 'alphabetically',
+  duration: 'duration',
+  intensity: 'intensity',
+  firstDate: 'firstDate'
+}

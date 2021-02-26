@@ -78,7 +78,7 @@ export class PlotChartCard extends ChartCard {
     let bodyElement = d3.select('body');
     let button = document.getElementById(this.moreButton.selector);
     let settingsPopup = new PlotChartSettingsPopup(bodyElement);
-    settingsPopup.diachronicChart = this.chart;
+    settingsPopup.chart = this.chart;
     settingsPopup.showUnder(button, 'right');
   }
 }

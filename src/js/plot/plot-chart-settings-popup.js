@@ -1,9 +1,11 @@
 import {Popup} from "../components/popup";
 import {Checkbox} from "../components/checkbox";
-import {RadioGroup} from "../components/radio-group";
 import {URLParameters} from "../shared/url-parameters";
 import {Language} from "../language/language";
+import {log_debug} from "../shared/debug";
+import {Dropdown} from "../components/dropdown";
 import {Option} from "../components/option";
+import {PlotChartSort} from "./plot-chart";
 
 /**
  *
@@ -11,62 +13,49 @@ import {Option} from "../components/option";
  * @extends Popup
  */
 export class PlotChartSettingsPopup extends Popup {
+  chart;
 
+  /**
+   *
+   */
   render() {
-    this.card
-      .headerRow
-      .append('h3')
-      .text(Language.translate('Settings'));
-    // this.card
-    //     .header
-    //     .style('display', 'none');
-
-    this.row = this.card.body
-      .append('div')
-      .classed('row', true);
-
+    this.card.headerRow.append('h3').text('Settings');
+    this.row = this.card.body.append('div').classed('row', true);
     this.renderShowLabelsCheckbox();
-    this.renderCombineStacksCheckbox();
-    this.renderRadios();
   }
 
+  /**
+   *
+   */
   renderShowLabelsCheckbox() {
     let container = this.row.append('div').classed('col-12 margin-top', true);
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText(Language.translate('Labels'));
     this.showLabelsCheckbox.onClick = function (checked) {
-      this.diachronicChart.isShowLabels = checked;
-      this.diachronicChart.update();
+      this.chart.showLabels = checked;
+      this.chart.update();
       URLParameters.getInstance().set(URLParameters.chartShowLabels, checked);
     }.bind(this);
+
+    let dropdownContainer = this.row.append('div').classed('col-12', true);
+    this.sortDropdown = new Dropdown(dropdownContainer);
+    this.sortDropdown.setLabelText('Sort');
+    this.sortDropdown.setOptions([
+      new Option(PlotChartSort.alphabetically),
+      new Option(PlotChartSort.duration),
+      new Option(PlotChartSort.intensity),
+      new Option(PlotChartSort.firstDate)
+    ])
+    this.sortDropdown.setOnChange(function (value) {
+      this.chart.sort = value;
+      this.chart.update();
+    }.bind(this));
   }
 
-  renderCombineStacksCheckbox() {
-    let container = this.row.append('div').classed('col-12', true);
-    this.combineStacksCheckbox = new Checkbox(container);
-    this.combineStacksCheckbox.setText(Language.translate('Combine Stacks'));
-    this.combineStacksCheckbox.onClick = function (checked) {
-      this.diachronicChart.isCombineStacks = checked;
-      this.diachronicChart.update();
-      URLParameters.getInstance().set(URLParameters.chartCombineStacks, checked);
-    }.bind(this);
-  }
-
-  renderRadios() {
-    let container = this.row.append('div').classed('col-12', true);
-    this.typeRadioGroup = new RadioGroup(container);
-    this.typeRadioGroup.setOptions([
-      new Option('bar', 'Bar'),
-      new Option('line', 'Line')
-    ]);
-
-    this.typeRadioGroup.onChange = function (value) {
-      this.diachronicChart.type = value;
-      this.diachronicChart.update();
-      URLParameters.getInstance().set(URLParameters.chartType, value);
-    }.bind(this);
-  }
-
+  /**
+   * Returns the preferred size of the popup.
+   * @returns {{width: number, height: number}}
+   */
   preferredSize() {
     return {
       width: 240,
@@ -74,11 +63,14 @@ export class PlotChartSettingsPopup extends Popup {
     };
   }
 
+  /**
+   *
+   */
   willShow() {
-    this.loadValues();
+    log_debug('this.chart.showLabels', this.chart.showLabels);
+    this.showLabelsCheckbox.setChecked(this.chart.showLabels);
+    this.sortDropdown.setSelectedOption(this.chart.sort);
   }
 
-  loadValues() {
-
-  }
+  labels = {};
 }

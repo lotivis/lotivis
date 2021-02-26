@@ -20,7 +20,7 @@
   "scripts": {
     "develop": "rollup -c -w",
     "build:js": "rollup -c",
-    "build:css:sass": "sass src/scss/main.scss > dist/lotivis.css",
+    "build:css:sass": "sass src/main.scss > dist/lotivis.css",
     "dev-alt": "karma start --auto-watch --no-single-run --browsers safari --grep",
     "lint-js": "eslint src/js/**/*.js test/*.js",
     "test": "mocha",
