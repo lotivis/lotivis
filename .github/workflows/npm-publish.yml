@@ -18,6 +18,7 @@ jobs:
           node-version: 12
       - run: npm ci
       - run: npm run build:js --if-present
+      - run: npm run build:css:sass --if-present
       - run: npm test
 
   publish-npm:
