@@ -11,6 +11,7 @@
   ],
   "unpkg": "dist/lotivis.js",
   "main": "dist/lotivis.js",
+  "file": "dist/lotivis.js",
   "files": [
     "dist/lotivis.css",
     "dist/lotivis.js",
