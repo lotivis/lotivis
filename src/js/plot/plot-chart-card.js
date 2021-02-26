@@ -36,7 +36,7 @@ export class PlotChartCard extends ChartCard {
    */
   injectChart() {
     this.chart = new PlotChart(this.body);
-    this.chart.margin.left = 80;
+    this.chart.margin.left = 120;
     this.chart.margin.right = 50;
   }
 

@@ -15,6 +15,7 @@ import {combineByDate} from "../data-juggle/dataset-combine";
  * @extends Component
  */
 export class PlotChart extends Component {
+  radius = 23;
 
   /**
    * Creates an instance of DiachronicChart.
@@ -49,11 +50,11 @@ export class PlotChart extends Component {
       top: this.defaultMargin,
       right: this.defaultMargin,
       bottom: this.defaultMargin,
-      left: this.defaultMargin
+      left: this.defaultMargin + 100
     };
 
     this.datasets = [];
-    this.renderTooltipContainer();
+    this.injectTooltipContainer();
   }
 
   /**
@@ -146,6 +147,7 @@ export class PlotChart extends Component {
       .axisLeft(this.yChart)
       .tickSize(-this.graphWidth)
       .tickFormat('');
+
   }
 
   /**
@@ -209,11 +211,22 @@ export class PlotChart extends Component {
         label: dataset.label,
         earliestDate: extractEarliestDateWithValue(data),
         latestDate: extractLatestDateWithValue(data),
-        data: data
+        data: data.sort((left, right) => left.date > right.date)
       };
     });
 
-    let tooltip = this.tooltip;
+    this.max = d3.max(datasets, function (dataset) {
+      return d3.max(dataset.data, function (item) {
+        return item.value;
+      });
+    });
+
+    this.defs = this.svg.append("defs");
+    for (let index = 0; index < datasets.length; index++) {
+      let dataset = datasets[index];
+      this.createGradient(dataset);
+    }
+
     let radius = 6;
 
     this.barsData = this.svg
@@ -224,41 +237,104 @@ export class PlotChart extends Component {
 
     this.bars = this.barsData
       .append("rect")
-      .attr("fill", Color.defaultTint)
+      .attr("fill", (d) => `url(#${this.createIDFromDataset(d)})`)
       .attr("rx", radius)
       .attr("ry", radius)
       .attr("x", (d) => this.xChart(d.earliestDate))
-      .attr("y", (d) => this.yChart(d.label))
+      .attr("y", (d) => this.yChart(d.label) + 1)
       .attr("width", (d) => this.xChart(d.latestDate) - this.xChart(d.earliestDate) + this.xChart.bandwidth())
       .attr("height", this.yChart.bandwidth() - 2)
       .on('mouseenter', this.showTooltip.bind(this))
       .on('mouseout', this.hideTooltip.bind(this));
 
-    this.bars
-      .append();
-
     this.labels = this.barsData
       .append('g')
       .attr('transform', `translate(0,${(this.yChart.bandwidth() / 2) + 5})`)
       .attr("fill", 'white')
-      // .selectAll('text')
-      // .data((dataset) => dataset.data)
-      // .enter()
       .append('text')
-      .attr('text-anchor', 'end')
+      .attr('text-anchor', 'middle')
+      .attr('class', 'map-label')
       .attr("x", function (d) {
         let rectX = this.xChart(d.earliestDate);
         let rectX2 = this.xChart(d.latestDate);
         let width = rectX2 - rectX;
-        let offset = this.xChart.bandwidth();
+        let offset = this.xChart.bandwidth() / 2;
         return rectX + (width / 2) + offset;
       }.bind(this))
       .attr("y", (d) => this.yChart(d.label))
       .attr("width", (d) => this.xChart(d.latestDate) - this.xChart(d.earliestDate) + this.xChart.bandwidth())
-      .text('hello');
+      // .text((d) => d.label);
 
   }
 
+  createGradient(dataset) {
+
+    let gradient = this.defs
+      .append("linearGradient")
+      .attr("id", this.createIDFromDataset(dataset))
+      .attr("x1", "0%")
+      .attr("x2", "100%")
+      .attr("y1", "0%")
+      .attr("y2", "0%");
+
+    let data = dataset.data;
+    let count = data.length;
+    let firstDate = dataset.earliestDate;
+    let lastDate = dataset.latestDate;
+    let timespan = lastDate - firstDate;
+    let colorInterpolator = d3.interpolateRgb('rgb(184, 233, 148)', 'rgb(0, 122, 255)');
+
+    if (firstDate === lastDate) {
+
+      let item = data[0];
+      let value = item.value;
+      let opacity = value / this.max;
+
+      gradient
+        .append("stop")
+        .attr("offset", `100%`)
+        .attr("stop-color", colorInterpolator(opacity));
+
+    } else {
+
+      for (let index = 0; index < count; index++) {
+
+        let item = data[index];
+        let date = item.date;
+        let opacity = item.value / this.max;
+
+        let dateDifference = lastDate - date;
+        let datePercentage = (1 - (dateDifference / timespan)) * 100;
+
+        gradient
+          .append("stop")
+          .attr("offset", `${datePercentage}%`)
+          .attr("stop-color", colorInterpolator(opacity));
+
+      }
+    }
+  }
+
+  createIDFromDataset(dataset) {
+    return this.hashCode(dataset.label);
+  }
+
+  hashCode(str) {
+    let hash = 0, i, chr;
+    for (i = 0; i < str.length; i++) {
+      chr = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + chr;
+      hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+  }
+
+  /**
+   * Presents the tooltip for the given dataset.
+   *
+   * @param event The mouse event.
+   * @param dataset The dataset.
+   */
   showTooltip(event, dataset) {
     let tooltip = this.tooltip;
     let components = [];
@@ -314,7 +390,7 @@ export class PlotChart extends Component {
   /**
    * Appends a division to the svg.
    */
-  renderTooltipContainer() {
+  injectTooltipContainer() {
     let color = Color.defaultTint;
     this.tooltip = this.element
       .append('div')
