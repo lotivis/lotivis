@@ -21,7 +21,7 @@ export class PlotChart extends Component {
     lowColor: 'rgb(184, 233, 148)',
     highColor: 'rgb(0, 122, 255)'
   };
-  sort = PlotChartSort.duration
+  sort = PlotChartSort.duration;
 
   /**
    * Creates an instance of DiachronicChart.
@@ -252,22 +252,24 @@ export class PlotChart extends Component {
 
     this.labels = this.barsData
       .append('g')
-      .attr('transform', `translate(0,${(this.yChart.bandwidth() / 2) + 5})`)
-      .attr("fill", 'white')
+      .attr('transform', `translate(0,${(this.yChart.bandwidth() / 2) + 4})`)
       .append('text')
-      .attr('text-anchor', 'middle')
+      .attr("id", (d) => 'rect-' + hashCode(d.label))
+      .attr("fill", 'black')
+      .attr('text-anchor', 'start')
+      .attr('font-size', '12px')
       .attr('class', 'map-label')
+      .attr('opacity', this.isShowLabels ? 1 : 0)
       .attr("x", function (d) {
         let rectX = this.xChart(d.earliestDate);
-        let rectX2 = this.xChart(d.latestDate);
-        let width = rectX2 - rectX;
         let offset = this.xChart.bandwidth() / 2;
-        return rectX + (width / 2) + offset;
+        return rectX + offset;
       }.bind(this))
       .attr("y", (d) => this.yChart(d.label))
-      .attr("width", (d) => this.xChart(d.latestDate) - this.xChart(d.earliestDate) + this.xChart.bandwidth());
-    // .text((d) => d.label);
-
+      .attr("width", (d) => this.xChart(d.latestDate) - this.xChart(d.earliestDate) + this.xChart.bandwidth())
+      .text(function (dataset) {
+        return `${dataset.duration} years, ${dataset.sum} items`;
+      });
   }
 
   createGradient(dataset) {
@@ -383,10 +385,20 @@ export class PlotChart extends Component {
       .transition()
       .attr('opacity', 0.15);
 
+    this.labels
+      .transition()
+      .attr('opacity', this.isShowLabels ? 0.15 : 0);
+
     this.svg
-      .select(`#${id}`)
+      .selectAll(`#${id}`)
       .transition()
       .attr('opacity', 1);
+
+    this.labels
+      .selectAll(`#${id}`)
+      .transition()
+      .attr('opacity', 1);
+
   }
 
   hideTooltip() {
@@ -395,6 +407,9 @@ export class PlotChart extends Component {
       .selectAll('rect')
       .transition()
       .attr('opacity', 1);
+    this.labels
+      .transition()
+      .attr('opacity', this.isShowLabels ? 1 : 0);
   }
 
   /**
@@ -434,7 +449,7 @@ export class PlotChart extends Component {
           .sort((set1, set2) => set1.earliestDate > set2.earliestDate);
         break;
       default:
-        break
+        break;
     }
   }
 
@@ -487,4 +502,4 @@ export const PlotChartSort = {
   duration: 'duration',
   intensity: 'intensity',
   firstDate: 'firstDate'
-}
+};
