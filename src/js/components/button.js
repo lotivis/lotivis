@@ -1,6 +1,8 @@
 import {Component} from "./component";
 
 /**
+ * A button
+ *
  * @class Button
  * @extends Component
  */
@@ -18,7 +20,6 @@ export class Button extends Component {
     let thisRef = this;
     this.element = parent
       .append('button')
-      // .classed('button', true)
       .attr('id', this.selector)
       .on('click', function (event) {
         if (!thisRef.onClick) return;

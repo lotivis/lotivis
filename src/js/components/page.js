@@ -1,9 +1,8 @@
-import {Button} from '../components/button';
+import {Button} from './button';
 import {URLParameters} from "../shared/url-parameters";
-import {Language} from "../language/language";
-import {RadioGroup} from "../components/radio-group";
+import {RadioGroup} from "./radio-group";
 import {Application} from "../application";
-import {ModalPopup} from "../components/modal-popup";
+import {ModalPopup} from "./modal-popup";
 
 export class Page {
 
@@ -17,7 +16,7 @@ export class Page {
     this.renderHeader();
     this.renderBody();
     this.renderFooter();
-    application.makeContainerNormal();
+
     document.title = 'FRC-Visualization - ' + this.title;
   }
 
@@ -117,7 +116,7 @@ export class Page {
   }
 
   presentModalPopup(contentURL) {
-    let parent = window.frcvApp.element;
+    let parent = this.application.element;
     let impressPopup = new ModalPopup(parent);
     impressPopup.loadContent(contentURL);
     impressPopup.showBigModal();

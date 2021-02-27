@@ -1,5 +1,7 @@
-import {Language} from "../language/language";
-
+/**
+ *
+ * @class Option
+ */
 export class Option {
 
     constructor(id, title) {
@@ -8,6 +10,6 @@ export class Option {
     }
 
     get translatedTitle() {
-        return Language.translate(this.title);
+        return this.title
     }
 }

@@ -1,5 +1,5 @@
 import {Popup} from "../components/popup";
-import {Language} from "../language/language";
+import {Language} from "../../../../frc-visualization/src/language/language";
 import {Checkbox} from "../components/checkbox";
 import {URLParameters} from "../shared/url-parameters";
 

@@ -3,7 +3,7 @@ import {RadioGroup} from "../components/radio-group";
 import {Option} from "../components/option";
 import {SearchPage} from "./search-page";
 import {URLParameters} from "../shared/url-parameters";
-import {Language} from "../language/language";
+import {Language} from "../../../../frc-visualization/src/language/language";
 import {Checkbox} from "../components/checkbox";
 
 /**

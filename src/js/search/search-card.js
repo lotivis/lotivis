@@ -3,10 +3,10 @@ import {SearchField} from "../components/search-field";
 import {Dropdown} from "../components/dropdown";
 import {RadioGroup} from "../components/radio-group";
 import {Button} from "../components/button";
-import {Language} from "../language/language";
+import {Language} from "../../../../frc-visualization/src/language/language";
 import {URLParameters} from "../shared/url-parameters";
 import {Option} from "../components/option";
-import {InnovationListPopup} from "./innovation-list-popup";
+import {InnovationListPopup} from "../../../../frc-visualization/src/innovation-list-popup";
 import {Application} from "../application";
 
 /**

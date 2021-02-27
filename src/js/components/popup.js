@@ -2,7 +2,6 @@ import {Component} from './component';
 import {createID} from '../shared/selector';
 import {Card} from './card';
 import {Button} from './button';
-import {Language} from '../language/language';
 
 /**
  *
@@ -76,7 +75,7 @@ export class Popup extends Component {
     renderCloseButton() {
         this.closeButton = new Button(this.card.headerRightComponent);
         this.closeButton.element.classed('button-small', true);
-        this.closeButton.setText(Language.translate('Close'));
+        this.closeButton.setText('Close');
     }
 
     /**

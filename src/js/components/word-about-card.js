@@ -1,5 +1,5 @@
-import {Card} from "../components/card";
-import {TrackPopup} from "./track-popup";
+import {Card} from "./card";
+import {TrackPopup} from "../../../../frc-visualization/src/track-popup";
 
 /**
  *
@@ -63,6 +63,7 @@ export class WordAboutCard extends Card {
         popup.track = item;
         popup.update();
         popup.showBigModal();
+
       });
   }
 }
