@@ -1,7 +1,6 @@
 import {Popup} from "../components/popup";
 import {Checkbox} from "../components/checkbox";
 import {URLParameters} from "../shared/url-parameters";
-import {Language} from "../../../../frc-visualization/src/language/language";
 import {log_debug} from "../shared/debug";
 import {Dropdown} from "../components/dropdown";
 import {Option} from "../components/option";
@@ -30,7 +29,7 @@ export class PlotChartSettingsPopup extends Popup {
   renderShowLabelsCheckbox() {
     let container = this.row.append('div').classed('col-12 margin-top', true);
     this.showLabelsCheckbox = new Checkbox(container);
-    this.showLabelsCheckbox.setText(Language.translate('Labels'));
+    this.showLabelsCheckbox.setText('Labels');
     this.showLabelsCheckbox.onClick = function (checked) {
       this.chart.showLabels = checked;
       this.chart.update();

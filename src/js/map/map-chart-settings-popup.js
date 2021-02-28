@@ -1,5 +1,4 @@
 import {Popup} from "../components/popup";
-import {Language} from "../../../../frc-visualization/src/language/language";
 import {Checkbox} from "../components/checkbox";
 import {URLParameters} from "../shared/url-parameters";
 
@@ -17,7 +16,7 @@ export class MapChartSettingsPopup extends Popup {
     this.card
       .headerRow
       .append('h3')
-      .text(Language.translate('Settings'));
+      .text('Settings');
 
     this.row = this.card.body
       .append('div')
@@ -32,7 +31,7 @@ export class MapChartSettingsPopup extends Popup {
   renderShowLabelsCheckbox() {
     let container = this.row.append('div').classed('col-12 margin-top', true);
     this.showLabelsCheckbox = new Checkbox(container);
-    this.showLabelsCheckbox.setText(Language.translate('Labels'));
+    this.showLabelsCheckbox.setText('Labels');
     this.showLabelsCheckbox.onClick = function (checked) {
       this.mapChart.isShowLabels = checked;
       this.mapChart.update();

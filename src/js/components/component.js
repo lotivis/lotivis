@@ -5,6 +5,7 @@ import {createID} from "../shared/selector";
  * @class Component
  */
 export class Component {
+  element;
 
   /**
    *
