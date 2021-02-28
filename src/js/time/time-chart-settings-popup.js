@@ -32,7 +32,7 @@ export class TimeChartSettingsPopup extends Popup {
   renderShowLabelsCheckbox() {
     let container = this.row.append('div').classed('col-12 margin-top', true);
     this.showLabelsCheckbox = new Checkbox(container);
-    this.showLabelsCheckbox.setText(Language.translate('Labels'));
+    this.showLabelsCheckbox.setText('Labels');
     this.showLabelsCheckbox.onClick = function (checked) {
       this.diachronicChart.isShowLabels = checked;
       this.diachronicChart.update();
@@ -43,7 +43,7 @@ export class TimeChartSettingsPopup extends Popup {
   renderCombineStacksCheckbox() {
     let container = this.row.append('div').classed('col-12', true);
     this.combineStacksCheckbox = new Checkbox(container);
-    this.combineStacksCheckbox.setText(Language.translate('Combine Stacks'));
+    this.combineStacksCheckbox.setText('Combine Stacks');
     this.combineStacksCheckbox.onClick = function (checked) {
       this.diachronicChart.isCombineStacks = checked;
       this.diachronicChart.update();

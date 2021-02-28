@@ -4,8 +4,7 @@
     "data": [
       {
         "location": 1,
-        "date": 2000,
-        "value": 0
+        "date": 2000
       },
       {
         "location": 1,
@@ -115,27 +114,26 @@
       {
         "location": 1,
         "date": 2000,
-        "value": 5
-      },
-      {
-        "location": 1,
-        "date": 2001,
         "value": 4
       },
       {
         "location": 1,
-        "date": 2002,
+        "date": 2001,
         "value": 3
       },
       {
         "location": 1,
-        "date": 2003,
+        "date": 2002,
         "value": 2
       },
       {
         "location": 1,
-        "date": 2004,
+        "date": 2003,
         "value": 1
+      },
+      {
+        "location": 1,
+        "date": 2004
       },
       {
         "location": 2,

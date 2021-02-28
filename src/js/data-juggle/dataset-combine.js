@@ -16,7 +16,7 @@ export function combine(flattenList) {
         && entryItem.date === listItem.date;
     });
     if (entry) {
-      entry.value += listItem.value;
+      entry.value += (listItem.value + 0);
     } else {
       let entry = {};
       if (listItem.label) entry.label = listItem.label;
@@ -27,7 +27,7 @@ export function combine(flattenList) {
       if (listItem.date) entry.date = listItem.date;
       if (listItem.dateTotal) entry.dateTotal = listItem.dateTotal;
       if (listItem.locationName) entry.locationName = listItem.locationName;
-      entry.value = listItem.value;
+      entry.value = (listItem.value || 0);
       combined.push(entry);
     }
   }
@@ -51,7 +51,7 @@ export function combineByStacks(flattenList) {
         && entryItem.date === listItem.date;
     });
     if (entry) {
-      entry.value += listItem.value;
+      entry.value += (listItem.value + 0);
     } else {
       let entry = {};
       if (listItem.label) entry.label = listItem.label;
@@ -61,7 +61,7 @@ export function combineByStacks(flattenList) {
       if (listItem.date) entry.date = listItem.date;
       if (listItem.dateTotal) entry.dateTotal = listItem.dateTotal;
       if (listItem.locationName) entry.locationName = listItem.locationName;
-      entry.value = listItem.value;
+      entry.value = (listItem.value || 0);
       combined.push(entry);
     }
   }
@@ -84,7 +84,7 @@ export function combineByDate(flatData) {
         && entryItem.date === listItem.date;
     });
     if (entry) {
-      entry.value += listItem.value;
+      entry.value += (listItem.value + 0);
     } else {
       let entry = {};
       if (listItem.label) entry.label = listItem.label;
@@ -93,7 +93,7 @@ export function combineByDate(flatData) {
       if (listItem.date) entry.date = listItem.date;
       if (listItem.dateTotal) entry.dateTotal = listItem.dateTotal;
       if (listItem.locationName) entry.locationName = listItem.locationName;
-      entry.value = listItem.value;
+      entry.value = (listItem.value || 0);
       combined.push(entry);
     }
   }
