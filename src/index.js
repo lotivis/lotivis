@@ -22,6 +22,7 @@ import {
 } from "./js/data-juggle/dataset-extract";
 import {sumOfDataset, sumOfStack} from "./js/data-juggle/dataset-sum";
 import {dateToItemsRelation} from "./js/data-juggle/dataset-relations";
+import {URLParameters} from "./js/shared/url-parameters";
 
 
 
@@ -42,6 +43,9 @@ exports.PlotChartCard = PlotChartCard;
 exports.Dataset = Dataset;
 exports.Item = Item;
 
+exports.URLParameters = URLParameters;
+
+// data juggling
 exports.flatDataset = flatDataset;
 exports.flatDatasets = flatDatasets;
 exports.combine = combine;
