@@ -394,7 +394,7 @@ export class MapChart extends Component {
       let dataForStack = combinedData.filter(data => data.stack === stackName);
       let max = d3.max(dataForStack, item => item.value);
       let offset = index * 80;
-      let color = colorsForStack(index, 1)[0];
+      let color = Color.colorsForStack(index, 1)[0];
 
       let steps = 4;
       let data = [0, 1, 2, 3, 4];
