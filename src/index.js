@@ -10,7 +10,6 @@ import {Item} from "./js/data/item";
 import {GeoJson} from "./js/geojson/geojson";
 import {RadioGroup} from "./js/components/radio-group";
 import {Option} from "./js/components/option";
-import {Application} from "./js/application";
 import {flatDataset, flatDatasets} from "./js/data-juggle/dataset-flat";
 import {combine, combineByDate, combineByLocation, combineByStacks} from "./js/data-juggle/dataset-combine";
 import {
@@ -24,7 +23,6 @@ import {
 import {sumOfDataset, sumOfStack} from "./js/data-juggle/dataset-sum";
 import {dateToItemsRelation} from "./js/data-juggle/dataset-relations";
 
-export default Application;
 
 
 exports.Component = Component;
@@ -65,3 +63,5 @@ exports.extractLatestDateWithValue = extractLatestDateWithValue;
 exports.sumOfDataset = sumOfDataset;
 exports.sumOfStack = sumOfStack;
 exports.dateToItemsRelations = dateToItemsRelation;
+
+export default exports;

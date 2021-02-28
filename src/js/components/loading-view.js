@@ -1,5 +1,4 @@
 import {Component} from "./component";
-import {Language} from "../../../../frc-visualization/src/language/language";
 
 /**
  *
