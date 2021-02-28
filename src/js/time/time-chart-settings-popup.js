@@ -2,7 +2,6 @@ import {Popup} from "../components/popup";
 import {Checkbox} from "../components/checkbox";
 import {RadioGroup} from "../components/radio-group";
 import {URLParameters} from "../shared/url-parameters";
-import {Language} from "../../../../frc-visualization/src/language/language";
 import {Option} from "../components/option";
 
 /**
