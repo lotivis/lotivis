@@ -1,19 +1,30 @@
-import {extractDatesFromFlatData} from "./dataset-extract";
+import {extractDatesFromFlatData, extractLabelsFromDatasets, extractLabelsFromFlatData} from "./dataset-extract";
 
 /**
  *
  * @param flatData The array of item.
  */
-export function dateToItemsRelation(flatData) {
+export function dateToItemsRelation(datasets, flatData) {
   let listOfDates = extractDatesFromFlatData(flatData);
+  let listOfLabels = extractLabelsFromDatasets(datasets);
+
   return listOfDates.map(function (date) {
-    let datesetDate = { date: date };
+    let datasetDate = { date: date };
     flatData
       .filter(item => item.date === date)
       .forEach(function (entry) {
-        datesetDate[entry.dataset] = entry.value;
-        datesetDate.total = entry.dateTotal;
+        datasetDate[entry.dataset] = entry.value;
+        datasetDate.total = entry.dateTotal;
       });
-    return datesetDate;
+
+    // add zero values for empty datasets
+    for (let index = 0; index < listOfLabels.length; index++) {
+      let label = listOfLabels[index];
+      if (!datasetDate[label]) {
+        datasetDate[label] = 0;
+      }
+    }
+
+    return datasetDate;
   });
 }

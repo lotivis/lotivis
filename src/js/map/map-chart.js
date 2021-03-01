@@ -1,10 +1,11 @@
 import {Component} from '../components/component';
-import {GeoJson} from '../geojson/geojson';
 import {Color} from '../shared/colors';
-import { combine } from '../data-juggle/dataset-combine';
+import {combine, combineByDate, combineByLocation, combineByStacks} from '../data-juggle/dataset-combine';
 import {log_debug} from "../shared/debug";
 import {formatNumber} from "../shared/format";
 import {flatDatasets} from "../data-juggle/dataset-flat";
+import {removeFeatures} from "../geojson/remove-features";
+import {extractStacksFromDatasets} from "../data-juggle/dataset-extract";
 
 /**
  * A component which renders a geo json with d3.
@@ -49,7 +50,6 @@ export class MapChart extends Component {
     this.backgroundOpacity = 0.2;
 
     this.isDrawsBackground = true;
-    // this.isZoomable = true;
     this.isShowLabels = true;
 
     this.datasets = [];
@@ -72,8 +72,13 @@ export class MapChart extends Component {
     this.path = d3.geoPath().projection(this.projection);
   }
 
-
-  // MARK: - Inject
+  /**
+   * Tells the receiving map chart to update its view.
+   */
+  update() {
+    this.geoJSONDidChange();
+    this.datasetsDidChange();
+  }
 
   /**
    *
@@ -153,7 +158,7 @@ export class MapChart extends Component {
    * Renders the `geoJSON` property.
    */
   renderGeoJson() {
-    let geoJSON = this.geoJSON;
+    let geoJSON = this.presentedGeoJSON;
     let projection = this.projection;
 
     // precalculate the center of each feature
@@ -190,6 +195,7 @@ export class MapChart extends Component {
         // this.zoomTo(feature);
       }.bind(this))
       .on('mouseenter', function (event, feature) {
+
         d3.select(this)
           .attr('stroke', () => tintColor)
           .attr('stroke-width', '2')
@@ -207,13 +213,16 @@ export class MapChart extends Component {
         });
 
         let flatData = flatDatasets(thisReference.datasets);
-        let data = flatData.filter(item => +item.location === +code);
+        let combined = combineByLocation(flatData);
+        let data = combined.filter(item => +item.location === +code);
 
         if (data) {
           components.push('');
           for (let index = 0; index < data.length; index++) {
             let item = data[index];
-            components.push(item.stack + ': ' + item.value);
+            log_debug('item', item);
+            let label = (item.label || item.dataset || item.stack)
+            components.push(label + ': ' + item.value);
           }
         }
 
@@ -295,7 +304,7 @@ export class MapChart extends Component {
     if (!this.geoJSON) return;
     if (!this.datasets) return;
     this.calculateAuxiliaryData();
-    let stackNames = this.getStackNames();
+    let stackNames = extractStacksFromDatasets(this.datasets);
     let combinedData = this.combinedData;
 
     // reset colors
@@ -307,7 +316,7 @@ export class MapChart extends Component {
     for (let index = 0; index < stackNames.length; index++) {
       let stackName = stackNames[index];
       let dataForStack = combinedData.filter(data => data.stack === stackName);
-      log_debug('dataForStack', dataForStack);
+      // log_debug('dataForStack', dataForStack);
       let max = d3.max(dataForStack, item => item.value);
       let color = Color.colorsForStack(index)[0];
 
@@ -334,8 +343,6 @@ export class MapChart extends Component {
    * Appends labels from datasets.
    */
   renderDatasetLabels() {
-    log_debug('renderDatasetLabels');
-    log_debug(this.geoJSON);
     if (!this.geoJSON) return log_debug('no geoJSON');
     if (!this.datasets) return log_debug('no datasets');
 
@@ -382,7 +389,7 @@ export class MapChart extends Component {
     if (!this.combinedData) {
       this.calculateAuxiliaryData();
     }
-    let stackNames = this.getStackNames();
+    let stackNames = extractStacksFromDatasets(this.datasets);
     let combinedData = this.combinedData;
 
     this.legend.raise();
@@ -448,12 +455,9 @@ export class MapChart extends Component {
   }
 
   calculateAuxiliaryData() {
-    this.stackNames = this.getStackNames();
     this.flatData = flatDatasets(this.datasets);
-    this.combinedData = combine(this.flatData);
-    log_debug('this.stackNames', this.stackNames);
-    log_debug('this.flatData', this.flatData);
-    log_debug('this.combinedData', this.combinedData);
+    this.combinedByStack = combineByStacks(this.flatData);
+    this.combinedData = combineByLocation(this.combinedByStack);
   }
 
   /**
@@ -466,48 +470,26 @@ export class MapChart extends Component {
   }
 
   /**
-   * Returns an array of strings containing the names of stacks in the datasets.
-   *
-   * @returns {string[]}
-   */
-  getStackNames() {
-    if (!this.datasets) return [];
-    let stackNames = this.datasets.map(dataset => String(dataset.stack));
-    return Array.from(new Set(stackNames));
-  }
-
-  /**
-   * Tells the receiving map chart to update its view.
-   */
-  update() {
-    this.geoJSONDidChange();
-    this.datasetsDidChange();
-  }
-
-
-  // MARK: - Load JSON
-
-  /**
-   * Loads the geo json at the given url into the map.
-   */
-  loadGeoJSON(geoJSONURL) {
-    d3.json(geoJSONURL)
-      .then(function (rawJSON) {
-        this.setGeoJSON(new GeoJson(rawJSON));
-      }.bind(this))
-      .catch(function (error) {
-        console.log(error);
-      }.bind(this));
-  }
-
-  /**
    *
    * @param newGeoJSON
    */
   setGeoJSON(newGeoJSON) {
     this.geoJSON = newGeoJSON;
+    this.presentedGeoJSON = newGeoJSON;
     this.geoJSONDidChange();
     this.tooltip.raise();
+    this.bounds.raise();
+  }
+
+  /**
+   * Tells the receiving map chart that its `geoJSON` property did change.
+   */
+  geoJSONDidChange() {
+    if (!this.geoJSON) return;
+    this.presentedGeoJSON = removeFeatures(this.geoJSON, this.excludedFeatureCodes);
+    this.zoomTo(this.geoJSON);
+    this.renderGeoJson();
+    this.datasetsDidChange();
   }
 
   /**
@@ -522,17 +504,6 @@ export class MapChart extends Component {
   }
 
   /**
-   * Tells the receiving map chart that its `geoJSON` property did change.
-   */
-  geoJSONDidChange() {
-    if (!this.geoJSON) return;
-    this.removeExcludedFeatures();
-    this.zoomTo(this.geoJSON);
-    this.renderGeoJson();
-    this.renderDatasets();
-  }
-
-  /**
    * Tells the receiving map chartt that its `datasets` property did change.
    */
   datasetsDidChange() {
@@ -541,21 +512,4 @@ export class MapChart extends Component {
     this.renderDatasetLabels();
     this.renderDatasetsLegend();
   }
-
-
-  // MARK: - Auxiliary
-
-  removeExcludedFeatures() {
-    if (!this.geoJSON) return;
-    let excludedFeatureCodes = this.excludedFeatureCodes;
-    for (let index = 0; index < excludedFeatureCodes.length; index++) {
-      let code = excludedFeatureCodes[index];
-      let candidate = this.geoJSON.features.find(feature => feature.properties.code === code);
-      if (!candidate) return;
-      let candidateIndex = this.geoJSON.features.indexOf(candidate);
-      if (candidateIndex < 0) return;
-      this.geoJSON.features.splice(candidateIndex, 1);
-    }
-  }
 }
-

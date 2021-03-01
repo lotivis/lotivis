@@ -289,8 +289,7 @@ export class TimeChart extends Component {
       .data(stack)
       .enter()
       .append("g")
-      .attr("fill", function (dataset, index) {
-        log_debug('dataset', dataset);
+      .attr("fill", function (stackData, index) {
         if (this.isCombineStacks) {
           return Color.colorsForStack(stackIndex)[0].rgbString();
         } else {
@@ -304,8 +303,20 @@ export class TimeChart extends Component {
       .attr("rx", this.isCombineStacks ? 0 : 4)
       .attr("x", (d) => this.xChart(d.data.date) + this.xStack(stack.label))
       .attr("y", (d) => this.yChart(d[1]))
-      .attr("height", (d) => this.yChart(d[0] || 0) - this.yChart(d[1] || 0))
-      .attr("width", this.xStack.bandwidth());
+      .attr("width", this.xStack.bandwidth())
+      .transition()
+      .attr("height", function (d) {
+        let value1 = d[0];
+        let value2 = d[1];
+        // if (!value1 || !value2) {
+        //   log_debug('value1', value1);
+        //   log_debug('value2', value2);
+        //   return 0;
+        // }
+
+        return this.yChart(value1) - this.yChart(value2);
+      }.bind(this));
+
   }
 
   /**
@@ -623,6 +634,9 @@ export class TimeChart extends Component {
       let candidatesNames = stackCandidates.map(stackCandidate => stackCandidate.label);
       let candidatesColors = stackCandidates.map(stackCandidate => stackCandidate.color);
 
+      log_debug('candidatesNames', candidatesNames);
+      log_debug('dateToItemsRelation', dateToItemsRelation);
+
       let stack = d3.stack()
         .keys(candidatesNames)
         (dateToItemsRelation);
@@ -640,8 +654,9 @@ export class TimeChart extends Component {
    * @param datasets
    */
   set datasets(datasets) {
-    this.originalDatasets = datasets;
-    this.workingDatasets = datasets;
+    let newDatasets = datasets;
+    this.originalDatasets = newDatasets;
+    this.workingDatasets = newDatasets.reverse(); // copy sets
     this.workingDatasets.forEach(dataset => dataset.isEnabled = true);
     this.datasetsDidChange();
   }
@@ -658,7 +673,11 @@ export class TimeChart extends Component {
    *
    */
   datasetsDidChange() {
-    this.presentedDatasets = this.workingDatasets.filter(dataset => dataset.isEnabled);
+    this.workingDatasets = this.workingDatasets
+      .sort((left, right) => left.label > right.label);
+    this.presentedDatasets = this.workingDatasets
+      .filter(dataset => dataset.isEnabled);
+
     this.flatData = combineByDate(flatDatasets(this.workingDatasets));
     this.flatDataPresented = combineByDate(flatDatasets(this.presentedDatasets));
 
@@ -676,34 +695,35 @@ export class TimeChart extends Component {
 
     this.listOfLabels = extractLabelsFromDatasets(this.workingDatasets);
     this.listOfLabelsPresented = extractLabelsFromDatasets(this.presentedDatasets);
+
     this.listOfStacks = extractStacksFromDatasets(this.workingDatasets);
     this.listOfStacksPresented = extractStacksFromDatasets(this.presentedDatasets);
 
     this.listOfDates = extractDatesFromDatasets(this.workingDatasets);
     this.listOfDatesPresented = extractDatesFromDatasets(this.presentedDatasets);
 
-    this.dateToItemsRelation = dateToItemsRelation(this.flatData);
-    this.dateToItemsRelationPresented = dateToItemsRelation(this.flatDataPresented);
+    this.dateToItemsRelation = dateToItemsRelation(this.workingDatasets, this.flatData);
+    this.dateToItemsRelationPresented = dateToItemsRelation(this.presentedDatasets, this.flatDataPresented);
 
     this.calculateColors();
 
     this.datasetStacks = this.createStackModel(this.workingDatasets, this.dateToItemsRelation);
     this.datasetStacksPresented = this.createStackModel(this.presentedDatasets, this.dateToItemsRelationPresented);
 
-    log_debug('this.workingDatasets', this.workingDatasets);
-    log_debug('this.presentedDatasets', this.presentedDatasets);
-    log_debug('this.flatData', this.flatData);
-    log_debug('this.flatDataPresented', this.flatDataPresented);
-    log_debug('this.listOfLabels', this.listOfLabels);
-    log_debug('this.listOfLabelsPresented', this.listOfLabelsPresented);
-    log_debug('this.listOfStacks', this.listOfStacks);
-    log_debug('this.listOfStacksPresented', this.listOfStacksPresented);
-    log_debug('this.listOfDates', this.listOfDates);
-    log_debug('this.listOfDatesPresented', this.listOfDatesPresented);
-    log_debug('this.dateToItemsRelation', this.dateToItemsRelation);
-    log_debug('this.dateToItemsRelationPresented', this.dateToItemsRelationPresented);
-    log_debug('this.datasetStacks', this.datasetStacks);
-    log_debug('this.datasetStacksPresented', this.datasetStacksPresented);
+    // log_debug('this.workingDatasets', this.workingDatasets);
+    // log_debug('this.presentedDatasets', this.presentedDatasets);
+    // log_debug('this.flatData', this.flatData);
+    // log_debug('this.flatDataPresented', this.flatDataPresented);
+    // log_debug('this.listOfLabels', this.listOfLabels);
+    // log_debug('this.listOfLabelsPresented', this.listOfLabelsPresented);
+    // log_debug('this.listOfStacks', this.listOfStacks);
+    // log_debug('this.listOfStacksPresented', this.listOfStacksPresented);
+    // log_debug('this.listOfDates', this.listOfDates);
+    // log_debug('this.listOfDatesPresented', this.listOfDatesPresented);
+    // log_debug('this.dateToItemsRelation', this.dateToItemsRelation);
+    // log_debug('this.dateToItemsRelationPresented', this.dateToItemsRelationPresented);
+    // log_debug('this.datasetStacks', this.datasetStacks);
+    // log_debug('this.datasetStacksPresented', this.datasetStacksPresented);
 
   }
 

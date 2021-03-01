@@ -15,7 +15,7 @@ export class TimeChartSettingsPopup extends Popup {
     this.card
       .headerRow
       .append('h3')
-      .text(Language.translate('Settings'));
+      .text('Settings');
     // this.card
     //     .header
     //     .style('display', 'none');

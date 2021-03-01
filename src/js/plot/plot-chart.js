@@ -8,6 +8,7 @@ import {
 import {combineByDate} from "../data-juggle/dataset-combine";
 import {hashCode} from "../shared/hash";
 import {sumOfLabel} from "../data-juggle/dataset-sum";
+import {log_debug} from "../shared/debug";
 
 /**
  *
@@ -89,7 +90,7 @@ export class PlotChart extends Component {
   }
 
   /**
-   * Update the chart.
+   * Updates the plot chart.
    */
   update() {
     this.sortDatasets();
@@ -151,10 +152,10 @@ export class PlotChart extends Component {
       .tickSize(-this.graphHeight)
       .tickFormat('');
 
-    // this.yAxisGrid = d3
-    //   .axisLeft(this.yChart)
-    //   .tickSize(-this.graphWidth)
-    //   .tickFormat('');
+    this.yAxisGrid = d3
+      .axisLeft(this.yChart)
+      .tickSize(-this.graphWidth)
+      .tickFormat('');
 
   }
 
@@ -163,16 +164,19 @@ export class PlotChart extends Component {
    */
   renderAxis() {
 
+    // top axis
     this.svg
       .append("g")
       .call(d3.axisTop(this.xChart))
       .attr("transform", () => `translate(0,${this.margin.top})`);
 
+    // bottom axis
     this.svg
       .append("g")
       .call(d3.axisBottom(this.xChart))
       .attr("transform", () => `translate(0,${this.height - this.margin.bottom})`);
 
+    // left axis
     this.svg
       .append("g")
       .call(d3.axisLeft(this.yChart))
@@ -197,14 +201,14 @@ export class PlotChart extends Component {
       .attr("opacity", opacity)
       .call(this.xAxisGrid);
 
-    // this.svg
-    //   .append('g')
-    //   .attr('class', 'y axis-grid')
-    //   .attr('transform', `translate(${this.margin.left},0)`)
-    //   .attr('stroke', color)
-    //   .attr('stroke-width', width)
-    //   .attr("opacity", opacity)
-    //   .call(this.yAxisGrid);
+    this.svg
+      .append('g')
+      .attr('class', 'y axis-grid')
+      .attr('transform', `translate(${this.margin.left},0)`)
+      .attr('stroke', color)
+      .attr('stroke-width', width)
+      .attr("opacity", opacity)
+      .call(this.yAxisGrid);
 
   }
 
@@ -241,14 +245,17 @@ export class PlotChart extends Component {
       .style("stroke-width", 0.4)
       .attr("rx", radius)
       .attr("ry", radius)
-      .attr("x", (d) => this.xChart(d.earliestDate))
+      .attr("x", (d) => this.xChart(d.earliestDate || 0))
       .attr("y", (d) => this.yChart(d.label) + 1)
       .attr("height", this.yChart.bandwidth() - 2)
       .attr("id", (d) => 'rect-' + hashCode(d.label))
       .on('mouseenter', this.showTooltip.bind(this))
       .on('mouseout', this.hideTooltip.bind(this))
       .transition()
-      .attr("width", (d) => this.xChart(d.latestDate) - this.xChart(d.earliestDate) + this.xChart.bandwidth());
+      .attr("width", function (data) {
+        if (!data.earliestDate || !data.latestDate) return 0;
+        return this.xChart(data.latestDate) - this.xChart(data.earliestDate) + this.xChart.bandwidth()
+      }.bind(this));
 
     this.labels = this.barsData
       .append('g')
@@ -293,6 +300,10 @@ export class PlotChart extends Component {
     );
 
     if (firstDate === lastDate) {
+
+      if (!data || data.length === 0) {
+        return;
+      }
 
       let item = data[0];
       let value = item.value;
@@ -457,10 +468,9 @@ export class PlotChart extends Component {
    * Sets the datasets.
    * @param datasets The array of datasets.
    */
-  set datasets(datasets) {
-    this.originalDatasets = datasets;
-
-    this.workingDatasets = datasets;
+  set datasets(newDatasets) {
+    this.originalDatasets = newDatasets;
+    this.workingDatasets = newDatasets.reverse(); // copy sets
     this.workingDatasets.forEach(function (dataset) {
       let data = dataset.data;
       let firstDate = extractEarliestDateWithValue(data);

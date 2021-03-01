@@ -7,7 +7,7 @@ import {flatDatasets} from "./dataset-flat";
  * @returns {[]} The array containing the flat data.
  */
 export function extractLabelsFromDatasets(datasets) {
-  return extractLabelsFromFlatData(flatDatasets(datasets));
+  return toSet(datasets.map(dataset => dataset.label || 'unknown'));
 }
 
 /**
@@ -18,7 +18,7 @@ export function extractLabelsFromDatasets(datasets) {
  * @returns {[]} The array containing the flat data.
  */
 export function extractStacksFromDatasets(datasets) {
-  return extractStacksFromFlatData(flatDatasets(datasets));
+  return toSet(datasets.map(dataset => dataset.stack || 'unknown'));
 }
 
 /**
