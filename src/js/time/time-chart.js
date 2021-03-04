@@ -140,7 +140,7 @@ export class TimeChart extends Component {
       .attr('width', this.width)
       .attr('height', this.height)
       .attr('fill', 'white')
-      .attr('opacity', 0)
+      .attr('opacity', 0);
 
     // create a background rectangle for receiving mouse enter events
     // in order to reset the location data filter.
@@ -297,6 +297,7 @@ export class TimeChart extends Component {
    */
   createStackModel(datasets, dateToItemsRelation) {
     let listOfStacks = extractStacksFromDatasets(datasets);
+    log_debug('listOfStacks', listOfStacks);
     return listOfStacks.map(function (stackName) {
 
       let stackCandidates = datasets.filter(function (dataset) {
@@ -353,14 +354,17 @@ export class TimeChart extends Component {
     // log_debug('this.enabledDatasets', this.datasetController.enabledDatasets);
 
     let enabledDatasets = this.datasetController.enabledDatasets;
+    log_debug('enabledDatasets', enabledDatasets);
 
     this.dateToItemsRelation = dateToItemsRelation(this.datasetController.workingDatasets);
     this.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets);
+    log_debug('this.dateToItemsRelationPresented', this.dateToItemsRelationPresented);
 
     this.calculateColors();
 
     this.datasetStacks = this.createStackModel(this.datasetController.workingDatasets, this.dateToItemsRelation);
     this.datasetStacksPresented = this.createStackModel(enabledDatasets, this.dateToItemsRelationPresented);
+    log_debug('this.datasetStacks', this.datasetStacks);
 
   }
 }

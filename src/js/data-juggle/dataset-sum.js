@@ -39,6 +39,6 @@ export function sumOfStack(flatData, stack) {
  */
 function sumOfValues(flatData) {
   return flatData
-    .map(item => +item.value)
+    .map(item => +(item.value || 0))
     .reduce((acc, next) => acc + next, 0);
 }

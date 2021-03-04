@@ -18,7 +18,7 @@ export function extractLabelsFromDatasets(datasets) {
  * @returns {[]} The array containing the flat data.
  */
 export function extractStacksFromDatasets(datasets) {
-  return toSet(datasets.map(dataset => dataset.stack || 'unknown'));
+  return toSet(datasets.map(dataset => dataset.stack || dataset.label || 'unknown'));
 }
 
 /**

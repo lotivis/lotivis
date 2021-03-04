@@ -30,7 +30,10 @@ export class ChartLegendRenderer {
           return timeChart.graphHeight + labelMargin;
         }.bind(this))
         .style('cursor', 'pointer')
-        .style("fill", (item) => item.color.rgbString())
+        .style("fill", function (item) {
+          if (!item.color) return Color.defaultTint.rgbString();
+          return item.color.rgbString();
+        })
         .text((item) => `${item.label} (${controller.getSumOfDataset(item.label)})`)
         .on('click', function (event) {
           if (!event || !event.target) return;
@@ -52,9 +55,11 @@ export class ChartLegendRenderer {
         }.bind(this))
         .style('cursor', 'pointer')
         .style("stroke", function (item) {
+          if (!item.color) return Color.defaultTint.rgbString();
           return item.color.rgbString();
         }.bind(this))
         .style("fill", function (item) {
+          if (!item.color) return Color.defaultTint.rgbString();
           return item.isEnabled ? item.color.rgbString() : 'white';
         }.bind(this))
         .style("stroke-width", 2);

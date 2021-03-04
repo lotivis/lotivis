@@ -345,7 +345,7 @@ function extractLabelsFromDatasets(datasets) {
  * @returns {[]} The array containing the flat data.
  */
 function extractStacksFromDatasets(datasets) {
-  return toSet(datasets.map(dataset => dataset.stack || 'unknown'));
+  return toSet(datasets.map(dataset => dataset.stack || dataset.label || 'unknown'));
 }
 
 /**
@@ -777,7 +777,7 @@ function sumOfStack(flatData, stack) {
  */
 function sumOfValues(flatData) {
   return flatData
-    .map(item => +item.value)
+    .map(item => +(item.value || 0))
     .reduce((acc, next) => acc + next, 0);
 }
 
@@ -809,7 +809,10 @@ class ChartLegendRenderer {
           return timeChart.graphHeight + labelMargin;
         }.bind(this))
         .style('cursor', 'pointer')
-        .style("fill", (item) => item.color.rgbString())
+        .style("fill", function (item) {
+          if (!item.color) return Color.defaultTint.rgbString();
+          return item.color.rgbString();
+        })
         .text((item) => `${item.label} (${controller.getSumOfDataset(item.label)})`)
         .on('click', function (event) {
           if (!event || !event.target) return;
@@ -831,9 +834,11 @@ class ChartLegendRenderer {
         }.bind(this))
         .style('cursor', 'pointer')
         .style("stroke", function (item) {
+          if (!item.color) return Color.defaultTint.rgbString();
           return item.color.rgbString();
         }.bind(this))
         .style("fill", function (item) {
+          if (!item.color) return Color.defaultTint.rgbString();
           return item.isEnabled ? item.color.rgbString() : 'white';
         }.bind(this))
         .style("stroke-width", 2);
@@ -899,6 +904,8 @@ class ChartBarsRenderer {
      * @param stackIndex
      */
     this.renderBars = function (stack, stackIndex) {
+
+      log_debug('stack', stack);
 
       timeChart
         .svg
@@ -1428,6 +1435,7 @@ class TimeChart extends Component {
    */
   createStackModel(datasets, dateToItemsRelation) {
     let listOfStacks = extractStacksFromDatasets(datasets);
+    log_debug('listOfStacks', listOfStacks);
     return listOfStacks.map(function (stackName) {
 
       let stackCandidates = datasets.filter(function (dataset) {
@@ -1484,14 +1492,17 @@ class TimeChart extends Component {
     // log_debug('this.enabledDatasets', this.datasetController.enabledDatasets);
 
     let enabledDatasets = this.datasetController.enabledDatasets;
+    log_debug('enabledDatasets', enabledDatasets);
 
     this.dateToItemsRelation = dateToItemsRelation(this.datasetController.workingDatasets);
     this.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets);
+    log_debug('this.dateToItemsRelationPresented', this.dateToItemsRelationPresented);
 
     this.calculateColors();
 
     this.datasetStacks = this.createStackModel(this.datasetController.workingDatasets, this.dateToItemsRelation);
     this.datasetStacksPresented = this.createStackModel(enabledDatasets, this.dateToItemsRelationPresented);
+    log_debug('this.datasetStacks', this.datasetStacks);
 
   }
 }

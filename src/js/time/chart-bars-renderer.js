@@ -12,6 +12,8 @@ export class ChartBarsRenderer {
      */
     this.renderBars = function (stack, stackIndex) {
 
+      log_debug('stack', stack);
+
       timeChart
         .svg
         .append("g")
