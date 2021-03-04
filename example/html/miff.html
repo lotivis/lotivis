@@ -57,6 +57,7 @@
   let timeChartCard = new lotivis.TimeChartCard('time-chart-card');
   let mapChartCard = new lotivis.MapChartCard('map-chart-card');
   mapChartCard.chart.excludedFeatureCodes = ['2A', '2B'];
+
   let plotChartCard = new lotivis.PlotChartCard('plot-chart-card');
 
   d3.json('/assets/Departements.geojson')
@@ -73,14 +74,16 @@
       let element = document.getElementById('data');
       element.innerHTML = string;
 
-      timeChartCard.chart.datasets = json;
+      let controller = new lotivis.FilterableDatasetController(json);
+
+      timeChartCard.chart.setDatasetController(controller);
       timeChartCard.chart.update();
 
-      mapChartCard.chart.datasets = json;
+      mapChartCard.chart.setDatasetController(controller);
       mapChartCard.chart.update();
 
-      // plotChartCard.chart.datasets = json;
-      // plotChartCard.chart.update();
+      plotChartCard.chart.setDatasetController(controller);
+
     });
 
 </script>

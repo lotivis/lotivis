@@ -3,15 +3,15 @@ import {Color} from "../shared/colors";
 import {URLParameters} from "../shared/url-parameters";
 import {TestData} from "../shared/test-data";
 import {log_debug} from "../shared/debug";
-import {flatDatasets} from "../data-juggle/dataset-flat";
 import {
-  extractDatesFromDatasets,
-  extractLabelsFromDatasets,
   extractStacksFromDatasets
 } from "../data-juggle/dataset-extract";
-import {combineByDate} from "../data-juggle/dataset-combine";
 import {dateToItemsRelation} from "../data-juggle/dataset-relations";
-import {sumOfLabel, sumOfStack} from "../data-juggle/dataset-sum";
+import {ChartAxisRenderer} from "./chart-axis-renderer";
+import {ChartLabelRenderer} from "./chart-label-renderer";
+import {ChartLegendRenderer} from "./chart-legend-renderer";
+import {ChartBarsRenderer} from "./chart-bars-renderer";
+import {FilterableDatasetController} from "../data/filterable-dataset-controller";
 
 /**
  *
@@ -73,16 +73,13 @@ export class TimeChart extends Component {
     }
   }
 
-
-  // MARK: - Life Cycle
-
   /**
    * Updates the receiver by calling the draw chart chain: `beforeDrawChart()`,
    * `drawChart()` and `afterDrawChart()`.
    */
   update() {
     this.configureChart();
-    // this.calculateColors();
+    this.datasetsDidChange();
     this.drawChart();
   }
 
@@ -94,15 +91,12 @@ export class TimeChart extends Component {
     if (!this.datasetStacks || this.datasetStacks.length === 0) return;
     this.createGraph();
     this.createScales();
-    this.createAxis();
-    this.renderAxis();
-    this.renderGrid();
+    this.axisRenderer.createAxis();
+    this.axisRenderer.renderAxis();
+    this.axisRenderer.renderGrid();
     this.renderStacks();
     this.renderLegend();
   }
-
-
-  // MARK: - Calculate Data
 
   /**
    *
@@ -112,8 +106,6 @@ export class TimeChart extends Component {
     this.graphWidth = this.width - margin.left - margin.right;
     this.graphHeight = this.height - margin.top - margin.bottom;
   }
-
-  // MARK: - SVG
 
   /**
    * Removes all `svg`s from the parental element.
@@ -131,14 +123,16 @@ export class TimeChart extends Component {
     this.removeSVG();
     this.svg = this.element
       .append('svg')
-      // .attr('width', this.width)
-      // .attr('height', this.height)
       .attr('preserveAspectRatio', 'xMidYMid meet')
       .attr("viewBox", `0 0 ${this.width} ${this.height}`)
       .attr('id', TimeChart.svgID);
 
-    // let image = new Image;
+    this.axisRenderer = new ChartAxisRenderer(this);
+    this.labelRenderer = new ChartLabelRenderer(this);
+    this.legendRenderer = new ChartLegendRenderer(this);
+    this.barsRenderer = new ChartBarsRenderer(this);
 
+    // let image = new Image;
     // let aspect = this.width / this.height;
     // d3.select(window)
     //     .on("resize", function () {
@@ -167,24 +161,25 @@ export class TimeChart extends Component {
    * Creates scales which are used to calculate the x and y positions of bars or circles.
    */
   createScales() {
-    this.max = d3.max(this.datasetStacks, function (stack) {
+
+
+    this.max = d3.max(this.datasetStacksPresented, function (stack) {
       return d3.max(stack, function (serie) {
-        let values = serie.map(item => item['1']);
-        return d3.max(values);
+        return d3.max(serie.map(item => item['1']));
       });
     });
 
-    log_debug('this.max', this.max);
+    // log_debug('this.max', this.max);
 
     this.xChart = d3
       .scaleBand()
-      .domain(this.listOfDates)
+      .domain(this.datasetController.dates)
       .rangeRound([this.margin.left, this.width - this.margin.right])
       .paddingInner(0.1);
 
     this.xStack = d3
       .scaleBand()
-      .domain(this.listOfStacksPresented)
+      .domain(this.datasetController.enabledStacks)
       .rangeRound([0, this.xChart.bandwidth()])
       .padding(0.05);
 
@@ -198,381 +193,24 @@ export class TimeChart extends Component {
   /**
    *
    */
-  createAxis() {
-    this.xAxisGrid = d3
-      .axisBottom(this.xChart)
-      .tickSize(-this.graphHeight)
-      .tickFormat('');
-
-    this.yAxisGrid = d3
-      .axisLeft(this.yChart)
-      .tickSize(-this.graphWidth)
-      .tickFormat('')
-      .ticks(20);
-  }
-
-
-  // MARK: - Render
-
-  /**
-   *
-   */
-  renderAxis() {
-    this.svg
-      .append("g")
-      .call(d3.axisBottom(this.xChart))
-      .attr("transform", () => `translate(0,${this.height - this.margin.bottom})`);
-    this.svg
-      .append("g")
-      .call(d3.axisLeft(this.yChart))
-      .attr("transform", () => `translate(${this.margin.left},0)`);
-  }
-
-
-  // MARK: - Grid
-
-  /**
-   *
-   */
-  renderGrid() {
-    let color = 'lightgray';
-    let width = '0.5';
-    let opacity = 0.3;
-    this.svg
-      .append('g')
-      .attr('class', 'x axis-grid')
-      .attr('transform', 'translate(0,' + (this.height - this.margin.bottom) + ')')
-      .attr('stroke', color)
-      .attr('stroke-width', width)
-      .attr("opacity", opacity)
-      .call(this.xAxisGrid);
-    this.svg
-      .append('g')
-      .attr('class', 'y axis-grid')
-      .attr('transform', `translate(${this.margin.left},0)`)
-      .attr('stroke', color)
-      .attr('stroke-width', width)
-      .attr("opacity", opacity)
-      .call(this.yAxisGrid);
-  }
-
-  /**
-   *
-   */
   renderStacks() {
     for (let index = 0; index < this.datasetStacksPresented.length; index++) {
       let stack = this.datasetStacksPresented[index];
-      this.renderBars(stack, index);
-    }
-
-    if (this.isShowLabels === false) return;
-    for (let index = 0; index < this.datasetStacks.length; index++) {
-      let stack = this.datasetStacks[index];
-      this.renderBarLabels(stack, index);
+      this.barsRenderer.renderBars(stack, index);
+      if (this.isShowLabels === false) continue;
+      this.labelRenderer.renderBarLabels(stack, index);
     }
   }
-
-
-  // MARK: - Bars
-
-  /**
-   *
-   * @param stack
-   * @param stackIndex
-   */
-  renderBars(stack, stackIndex) {
-    log_debug('stack', Object.getOwnPropertyNames(stack));
-    log_debug('stackIndex', stackIndex);
-
-    this.svg.append("g")
-      .selectAll("g")
-      .data(stack)
-      .enter()
-      .append("g")
-      .attr("fill", function (stackData, index) {
-        if (this.isCombineStacks) {
-          return Color.colorsForStack(stackIndex)[0].rgbString();
-        } else {
-          return stack.colors[index].rgbString();
-        }
-      }.bind(this))
-      .selectAll("rect")
-      .data((data) => data)
-      .enter()
-      .append("rect")
-      .attr("rx", this.isCombineStacks ? 0 : 4)
-      .attr("x", (d) => this.xChart(d.data.date) + this.xStack(stack.label))
-      .attr("y", (d) => this.yChart(d[1]))
-      .attr("width", this.xStack.bandwidth())
-      .transition()
-      .attr("height", function (d) {
-        let value1 = d[0];
-        let value2 = d[1];
-        // if (!value1 || !value2) {
-        //   log_debug('value1', value1);
-        //   log_debug('value2', value2);
-        //   return 0;
-        // }
-
-        return this.yChart(value1) - this.yChart(value2);
-      }.bind(this));
-
-  }
-
-  /**
-   *
-   * @param stack
-   * @param index
-   */
-  renderBarLabels(stack, index) {
-    let xChartRef = this.xChart;
-    let yChartRef = this.yChart;
-    let xStackRef = this.xStack;
-    let numberFormat = this.numberFormat;
-    let labelColor = this.labelColor;
-    let numberOfSeries = stack.length;
-    let serieIndex = 0;
-
-    this.svg.append("g")
-      .selectAll('g')
-      .data(stack)
-      .enter()
-      .append('g')
-      .attr('fill', labelColor)
-      .selectAll('.text')
-      .data(function (dataset) {
-        return dataset;
-      })
-      .enter()
-      .append('text')
-      .attr("transform", function (item) {
-        let x = xChartRef(item.data.date) + xStackRef(stack.label) + (xStackRef.bandwidth() / 2);
-        let y = yChartRef(item[1]) - 5;
-        return `translate(${x},${y})rotate(-60)`;
-      })
-      .attr("font-size", 13)
-      .text(function (item, index) {
-        if (index === 0) serieIndex += 1;
-        if (serieIndex !== numberOfSeries) return;
-        let value = item[1];
-        return value === 0 ? '' : numberFormat.format(value);
-      });
-  }
-
-  // MARK: - Line
-
-  /**
-   *
-   * @returns {*}
-   */
-  // createLine() {
-  //   for (let i = 0; i < this.presentedDatasetGroups.length; i++) {
-  //     let dataset = this.presentedDatasetGroups[i];
-  //     dataset.color = colorsForStack(i, 1)[0];
-  //     this.renderLine(dataset);
-  //   }
-  // }
-
-  /**
-   *
-   * @param dataset
-   * @param index
-   */
-  renderLine(dataset, index) {
-    this.graph
-      .append("path")
-      .datum(dataset.data)
-      .attr("fill", "none")
-      .attr("stroke", dataset.color.rgbString())
-      .attr("stroke-width", 3.5)
-      .attr("d", d3.line()
-        // .x((item) => this.x0(item.date))
-        // .y((item) => this.y0(item.value))
-        .curve(d3.curveMonotoneX));
-
-    let dots = this.graph
-      .selectAll(".dot")
-      .data(dataset.data.filter((item) => item.value > 0))
-      .enter()
-      .append("circle")
-      .attr("r", 6)
-      // .attr("cx", (item) => this.x0(item.date))
-      // .attr("cy", (item) => this.y0(item.value))
-      .attr("fill", dataset.color.rgbString());
-
-    let tooltip = this.element
-      .append("div")
-      .attr("class", "toolTip")
-      .style('z-index', '9999');
-
-    dots
-      .on("mousemove", function (event, item) {
-        let text = "<b>" + item.searchText + "</b>"
-          + " in "
-          + "<b>" + item.date + "</b>"
-          + "<br>Abs.: <b>" + item.value + "</b>"
-          // + "<br>Rel.: <b>" + item.relativeValue + "</b>"
-          + "<br>Total Date: <b>" + item.dateTotal + "</b>";
-        tooltip
-          .style("left", event.pageX - 20 + "px")
-          .style("top", event.pageY - 160 + "px")
-          .style("padding", "10px")
-          .style("background", "none repeat scroll 0 0 #ffffff")
-          .style("position", "absolute")
-          .style("border", "1px solid " + dataset.color.rgbString())
-          .style("display", "inline-block")
-          .html(text);
-      })
-      .on("mouseout", function () {
-        tooltip.style("display", "none");
-      });
-
-    if (this.isShowLabels === true) {
-      this.renderLineLabels(dataset);
-    }
-  }
-
-  /**
-   *
-   * @param dataset
-   */
-  renderLineLabels(dataset) {
-    this.graph
-      .selectAll(".text")
-      .data(dataset.data.filter((item) => item.value > 0))
-      .enter()
-      .append('text')
-      // .attr("x", (item) => this.x0(item.date))
-      // .attr("y", (item) => this.y0(item.value))
-      .attr('dy', '-10')
-      .attr('text-anchor', 'middle')
-      .attr("font-size", 15)
-      .attr('fill', 'gray')
-      .text((item) => this.numberFormat.format(item.value || 0));
-  }
-
-  // MARK: - Render Legend
 
   /**
    *
    */
   renderLegend() {
     if (this.isCombineStacks) {
-      this.renderCombinedStacksLegend();
+      this.legendRenderer.renderCombinedStacksLegend();
     } else {
-      this.renderNormalLegend();
+      this.legendRenderer.renderNormalLegend();
     }
-  }
-
-  renderNormalLegend() {
-    let datasets = this.workingDatasets;
-    let datasetNames = datasets.map(dataset => dataset.label);
-    let circleRadius = 6;
-    let labelMargin = 50;
-
-    let xLegend = d3.scaleBand()
-      .domain(datasetNames)
-      .rangeRound([this.margin.left, this.width - this.margin.right]);
-
-    let legends = this.graph
-      .selectAll('.legend')
-      .data(datasets)
-      .enter();
-
-    legends
-      .append('text')
-      .attr("font-size", 13)
-      .attr("x", function (item) {
-        return xLegend(item.label) - 30;
-      })
-      .attr("y", function () {
-        return this.graphHeight + labelMargin;
-      }.bind(this))
-      .style('cursor', 'pointer')
-      .style("fill", function (item) {
-        return item.color.rgbString();
-      }.bind(this))
-      .text(function (item) {
-        return `${item.label} (${sumOfLabel(this.flatData, item.label)})`;
-      }.bind(this))
-      .on('click', function (event) {
-        if (!event || !event.target) return;
-        if (!event.target.innerHTML) return;
-        let components = event.target.innerHTML.split(' (');
-        components.pop();
-        let label = components.join(" (");
-        this.toggleDataset(label);
-      }.bind(this));
-
-    legends
-      .append("circle")
-      .attr("r", circleRadius)
-      .attr("cx", function (item) {
-        return xLegend(item.label) - (circleRadius * 2) - 30;
-      }.bind(this))
-      .attr("cy", function () {
-        return this.graphHeight + labelMargin - circleRadius + 2;
-      }.bind(this))
-      .style('cursor', 'pointer')
-      .style("stroke", function (item) {
-        return item.color.rgbString();
-      }.bind(this))
-      .style("fill", function (item) {
-        return item.isEnabled ? item.color.rgbString() : 'white';
-      }.bind(this))
-      .style("stroke-width", 2);
-
-  }
-
-  renderCombinedStacksLegend() {
-    let stackNames = this.listOfStacks;
-    let circleRadius = 6;
-    let labelMargin = 50;
-
-    let xLegend = d3.scaleBand()
-      .domain(stackNames)
-      .rangeRound([this.margin.left, this.width - this.margin.right]);
-
-    let legends = this.graph
-      .selectAll('.legend')
-      .data(stackNames)
-      .enter();
-
-    legends
-      .append('text')
-      .attr("font-size", 13)
-      .attr("x", function (item) {
-        return xLegend(item) - 30;
-      })
-      .attr("y", function () {
-        return this.graphHeight + labelMargin;
-      }.bind(this))
-      .style('cursor', 'pointer')
-      .style("fill", function (item, index) {
-        return Color.colorsForStack(index)[0].rgbString();
-      }.bind(this))
-      .text(function (item) {
-        return `${item} (${sumOfStack(this.flatData, item)})`;
-      }.bind(this));
-
-    legends
-      .append("circle")
-      .attr("r", circleRadius)
-      .attr("cx", function (item) {
-        return xLegend(item) - (circleRadius * 2) - 30;
-      }.bind(this))
-      .attr("cy", function () {
-        return this.graphHeight + labelMargin - circleRadius + 2;
-      }.bind(this))
-      .style('cursor', 'pointer')
-      .style("stroke", function (item, index) {
-        return Color.colorsForStack(index)[0].rgbString();
-      }.bind(this))
-      .style("fill", function (item, index) {
-        return item.isEnabled ? Color.colorsForStack(index)[0].rgbString() : 'white';
-      }.bind(this))
-      .style("stroke-width", 2);
-
   }
 
   /**
@@ -580,20 +218,19 @@ export class TimeChart extends Component {
    * @param label
    */
   toggleDataset(label) {
-    let dataset = this.workingDatasets.find(dataset => dataset.label === label);
-    if (!dataset) return;
-    dataset.isEnabled = !dataset.isEnabled;
-    this.datasetsDidChange();
-    this.update();
+    this.datasetController.toggleDataset(label);
   }
 
   /**
    *
    */
   calculateColors() {
-    for (let index = 0; index < this.listOfStacks.length; index++) {
-      let stackName = this.listOfStacks[index];
-      let datasets = this.workingDatasets.filter(function (dataset) {
+    let stacks = this.datasetController.stacks;
+
+    for (let index = 0; index < stacks.length; index++) {
+
+      let stackName = stacks[index];
+      let datasets = this.datasetController.workingDatasets.filter(function (dataset) {
         return dataset.stack === stackName
           || dataset.label === stackName;
       });
@@ -606,9 +243,10 @@ export class TimeChart extends Component {
       }
     }
 
-    for (let index = 0; index < this.listOfStacks.length; index++) {
-      let stackName = this.listOfStacks[index];
-      let datasets = this.presentedDatasets.filter(function (dataset) {
+    for (let index = 0; index < stacks.length; index++) {
+
+      let stackName = stacks[index];
+      let datasets = this.datasetController.enabledDatasets.filter(function (dataset) {
         return dataset.stack === stackName
           || dataset.label === stackName;
       });
@@ -622,6 +260,12 @@ export class TimeChart extends Component {
     }
   }
 
+  /**
+   *
+   * @param datasets
+   * @param dateToItemsRelation
+   * @returns {*[]}
+   */
   createStackModel(datasets, dateToItemsRelation) {
     let listOfStacks = extractStacksFromDatasets(datasets);
     return listOfStacks.map(function (stackName) {
@@ -634,10 +278,8 @@ export class TimeChart extends Component {
       let candidatesNames = stackCandidates.map(stackCandidate => stackCandidate.label);
       let candidatesColors = stackCandidates.map(stackCandidate => stackCandidate.color);
 
-      log_debug('candidatesNames', candidatesNames);
-      log_debug('dateToItemsRelation', dateToItemsRelation);
-
-      let stack = d3.stack()
+      let stack = d3
+        .stack()
         .keys(candidatesNames)
         (dateToItemsRelation);
 
@@ -649,93 +291,50 @@ export class TimeChart extends Component {
     });
   }
 
-  /**
-   *
-   * @param datasets
-   */
-  set datasets(datasets) {
-    let newDatasets = datasets;
-    this.originalDatasets = newDatasets;
-    this.workingDatasets = newDatasets.reverse(); // copy sets
-    this.workingDatasets.forEach(dataset => dataset.isEnabled = true);
+  setDatasetController(newController) {
+    this.datasetController = newController;
+    this.datasetController.addListener(this);
     this.datasetsDidChange();
   }
 
   /**
-   * Returns the presentes datasets.
+   *
+   * @param newDatasets
+   */
+  set datasets(newDatasets) {
+    this.setDatasetController(new FilterableDatasetController(newDatasets));
+  }
+
+  /**
+   *
    * @returns {*}
    */
   get datasets() {
-    return this.originalDatasets;
+    return this.datasetController ? this.datasetController.datasets || [] : [];
   }
 
   /**
-   *
+   * Tells the receiving map chart that its `datasets` property did change.
    */
   datasetsDidChange() {
-    this.workingDatasets = this.workingDatasets
-      .sort((left, right) => left.label > right.label);
-    this.presentedDatasets = this.workingDatasets
-      .filter(dataset => dataset.isEnabled);
+    // log_debug('this', this);
+    if (!this.datasets) return;
 
-    this.flatData = combineByDate(flatDatasets(this.workingDatasets));
-    this.flatDataPresented = combineByDate(flatDatasets(this.presentedDatasets));
+    // log_debug('this.datasetController', this.datasetController);
+    // log_debug('this.enabledDatasets', this.datasetController.enabledDatasets);
 
-    this.flatData.forEach(function (item) {
-      item.label = item.dataset;
-      item.key = item.stack;
-      item.isEnabled = true;
-    });
+    let enabledDatasets = this.datasetController.enabledDatasets;
 
-    this.flatDataPresented.forEach(function (item) {
-      item.label = item.dataset;
-      item.key = item.stack;
-      item.isEnabled = true;
-    });
-
-    this.listOfLabels = extractLabelsFromDatasets(this.workingDatasets);
-    this.listOfLabelsPresented = extractLabelsFromDatasets(this.presentedDatasets);
-
-    this.listOfStacks = extractStacksFromDatasets(this.workingDatasets);
-    this.listOfStacksPresented = extractStacksFromDatasets(this.presentedDatasets);
-
-    this.listOfDates = extractDatesFromDatasets(this.workingDatasets);
-    this.listOfDatesPresented = extractDatesFromDatasets(this.presentedDatasets);
-
-    this.dateToItemsRelation = dateToItemsRelation(this.workingDatasets, this.flatData);
-    this.dateToItemsRelationPresented = dateToItemsRelation(this.presentedDatasets, this.flatDataPresented);
+    this.dateToItemsRelation = dateToItemsRelation(this.datasetController.workingDatasets);
+    this.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets);
 
     this.calculateColors();
 
-    this.datasetStacks = this.createStackModel(this.workingDatasets, this.dateToItemsRelation);
-    this.datasetStacksPresented = this.createStackModel(this.presentedDatasets, this.dateToItemsRelationPresented);
-
-    // log_debug('this.workingDatasets', this.workingDatasets);
-    // log_debug('this.presentedDatasets', this.presentedDatasets);
-    // log_debug('this.flatData', this.flatData);
-    // log_debug('this.flatDataPresented', this.flatDataPresented);
-    // log_debug('this.listOfLabels', this.listOfLabels);
-    // log_debug('this.listOfLabelsPresented', this.listOfLabelsPresented);
-    // log_debug('this.listOfStacks', this.listOfStacks);
-    // log_debug('this.listOfStacksPresented', this.listOfStacksPresented);
-    // log_debug('this.listOfDates', this.listOfDates);
-    // log_debug('this.listOfDatesPresented', this.listOfDatesPresented);
-    // log_debug('this.dateToItemsRelation', this.dateToItemsRelation);
-    // log_debug('this.dateToItemsRelationPresented', this.dateToItemsRelationPresented);
-    // log_debug('this.datasetStacks', this.datasetStacks);
-    // log_debug('this.datasetStacksPresented', this.datasetStacksPresented);
+    this.datasetStacks = this.createStackModel(this.datasetController.workingDatasets, this.dateToItemsRelation);
+    this.datasetStacksPresented = this.createStackModel(enabledDatasets, this.dateToItemsRelationPresented);
 
   }
-
-  /**
-   *
-   */
-  // presentedDatasetsDidChange() {
-  //
-  // }
 }
-
-// MARK: - Statics
 
 TimeChart.svgID = 'chart-svg';
 

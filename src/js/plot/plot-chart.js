@@ -8,7 +8,10 @@ import {
 import {combineByDate} from "../data-juggle/dataset-combine";
 import {hashCode} from "../shared/hash";
 import {sumOfLabel} from "../data-juggle/dataset-sum";
-import {log_debug} from "../shared/debug";
+import {PlotAxisRenderer} from "./plot-axis-renderer";
+import {copy} from "../shared/copy";
+import {DatasetController} from "../data/dataset-controller";
+import {FilterableDatasetController} from "../data/filterable-dataset-controller";
 
 /**
  *
@@ -64,6 +67,8 @@ export class PlotChart extends Component {
 
     this.datasets = [];
     this.injectTooltipContainer();
+
+    this.axisRenderer = new PlotAxisRenderer(this);
   }
 
   /**
@@ -84,8 +89,8 @@ export class PlotChart extends Component {
     this.createSVG();
     this.createGraph();
     this.createScales();
-    this.renderAxis();
-    this.renderGrid();
+    this.axisRenderer.renderAxis();
+    this.axisRenderer.renderGrid();
     this.renderBars();
   }
 
@@ -93,6 +98,7 @@ export class PlotChart extends Component {
    * Updates the plot chart.
    */
   update() {
+    this.datasetsDidChange();
     this.sortDatasets();
     this.configureChart();
     this.drawChart();
@@ -159,58 +165,7 @@ export class PlotChart extends Component {
 
   }
 
-  /**
-   *
-   */
-  renderAxis() {
 
-    // top axis
-    this.svg
-      .append("g")
-      .call(d3.axisTop(this.xChart))
-      .attr("transform", () => `translate(0,${this.margin.top})`);
-
-    // bottom axis
-    this.svg
-      .append("g")
-      .call(d3.axisBottom(this.xChart))
-      .attr("transform", () => `translate(0,${this.height - this.margin.bottom})`);
-
-    // left axis
-    this.svg
-      .append("g")
-      .call(d3.axisLeft(this.yChart))
-      .attr("transform", () => `translate(${this.margin.left},0)`);
-
-  }
-
-  /**
-   * Adds a grid to the chart.
-   */
-  renderGrid() {
-    let color = 'lightgray';
-    let width = '0.5';
-    let opacity = 0.3;
-
-    this.svg
-      .append('g')
-      .attr('class', 'x axis-grid')
-      .attr('transform', 'translate(0,' + (this.height - this.margin.bottom) + ')')
-      .attr('stroke', color)
-      .attr('stroke-width', width)
-      .attr("opacity", opacity)
-      .call(this.xAxisGrid);
-
-    this.svg
-      .append('g')
-      .attr('class', 'y axis-grid')
-      .attr('transform', `translate(${this.margin.left},0)`)
-      .attr('stroke', color)
-      .attr('stroke-width', width)
-      .attr("opacity", opacity)
-      .call(this.yAxisGrid);
-
-  }
 
   /**
    *
@@ -251,7 +206,7 @@ export class PlotChart extends Component {
       .attr("id", (d) => 'rect-' + hashCode(d.label))
       .on('mouseenter', this.showTooltip.bind(this))
       .on('mouseout', this.hideTooltip.bind(this))
-      .transition()
+      .on('click', this.onClick.bind(this))
       .attr("width", function (data) {
         if (!data.earliestDate || !data.latestDate) return 0;
         return this.xChart(data.latestDate) - this.xChart(data.earliestDate) + this.xChart.bandwidth()
@@ -440,6 +395,16 @@ export class PlotChart extends Component {
       .style('opacity', 0);
   }
 
+  onClick(event, dataset) {
+    console.log('event', event);
+    console.log('this.datasetController', this.datasetController);
+    console.log('dataset', dataset.label);
+    console.log('this', this);
+    let label = dataset.label;
+    this.datasetController.setDatasetsFilter([label]);
+
+  }
+
   sortDatasets() {
     this.workingDatasets = this.workingDatasets.reverse();
     switch (this.sort) {
@@ -464,13 +429,37 @@ export class PlotChart extends Component {
     }
   }
 
+  set showLabels(newValue) {
+    this.isShowLabels = newValue;
+  }
+
+  get showLabels() {
+    return this.isShowLabels;
+  }
+
   /**
    * Sets the datasets.
    * @param datasets The array of datasets.
    */
   set datasets(newDatasets) {
-    this.originalDatasets = newDatasets;
-    this.workingDatasets = newDatasets.reverse(); // copy sets
+    this.setDatasetController(new FilterableDatasetController(newDatasets));
+  }
+
+  /**
+   * Returns the presented datasets.
+   * @returns {*}
+   */
+  get datasets() {
+    return this.datasetController.datasets;
+  }
+
+  /**
+   *
+   */
+  datasetsDidChange() {
+    if (!this.datasetController) return;
+    let datasets = this.datasetController.enabledDatasets;
+    this.workingDatasets = copy(datasets);
     this.workingDatasets.forEach(function (dataset) {
       let data = dataset.data;
       let firstDate = extractEarliestDateWithValue(data);
@@ -488,19 +477,14 @@ export class PlotChart extends Component {
   }
 
   /**
-   * Returns the presented datasets.
-   * @returns {*}
+   *
+   * @param newController
    */
-  get datasets() {
-    return this.originalDatasets;
-  }
-
-  set showLabels(newValue) {
-    this.isShowLabels = newValue;
-  }
-
-  get showLabels() {
-    return this.isShowLabels;
+  setDatasetController(newController) {
+    this.datasetController = newController;
+    this.datasetController.addListener(this);
+    this.datasetsDidChange();
+    this.update();
   }
 }
 

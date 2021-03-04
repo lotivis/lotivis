@@ -1,11 +1,20 @@
-import {extractDatesFromFlatData, extractLabelsFromDatasets, extractLabelsFromFlatData} from "./dataset-extract";
+import {
+  extractDatesFromDatasets,
+  extractLabelsFromDatasets
+} from "./dataset-extract";
+import {flatDatasets} from "./dataset-flat";
+import {combineByDate} from "./dataset-combine";
 
 /**
  *
  * @param flatData The array of item.
  */
-export function dateToItemsRelation(datasets, flatData) {
-  let listOfDates = extractDatesFromFlatData(flatData);
+export function dateToItemsRelation(datasets) {
+
+  let flatData = flatDatasets(datasets);
+  flatData = combineByDate(flatData);
+
+  let listOfDates = extractDatesFromDatasets(datasets);
   let listOfLabels = extractLabelsFromDatasets(datasets);
 
   return listOfDates.map(function (date) {
