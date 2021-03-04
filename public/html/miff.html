@@ -6,7 +6,7 @@
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../dist/lotivis.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <title>FRCV - mif, mif', miff, miff', miffs, mifs, mille-f, mi-f, mi-f', 'mif'</title>
+  <title>Lotivis - mif, mif', miff, miff', miffs, mifs, mille-f, mi-f, mi-f', 'mif'</title>
 </head>
 <body>
 
@@ -67,8 +67,6 @@
       return d3.json('/assets/miff.json');
     })
     .then(function (json) {
-
-      console.log('json', json);
 
       let string = JSON.stringify(json, null, 4);
       let element = document.getElementById('data');

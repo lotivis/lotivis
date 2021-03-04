@@ -7,7 +7,6 @@ import {MapLegendRenderer} from "./map-legend-renderer";
 import {MapLabelRenderer} from "./map-label-renderer";
 import {MapDatasetRenderer} from "./map-dataset-renderer";
 import {FilterableDatasetController} from "../data/filterable-dataset-controller";
-import {log_debug} from "../shared/debug";
 import {MapGeoJsonRenderer} from "./map-geojson-renderer";
 
 /**
@@ -79,19 +78,20 @@ export class MapChart extends Component {
       .append('rect')
       .attr('width', this.width)
       .attr('height', this.height)
-      .attr('fill', 'white')
+      .attr('fill', 'white');
 
     // create a background rectangle for receiving mouse enter events
     // in order to reset the location data filter.
     this.background
-      .on('mouseenter', function (event) {
+      .on('mouseenter', function () {
         let controller = this.datasetController;
+        if (!controller) return;
         let filters = controller.locationFilters;
         if (!filters || filters.length === 0) return;
         this.updateSensible = false;
-        controller.setLocationsFilter([])
+        controller.setLocationsFilter([]);
         this.updateSensible = true;
-      }.bind(this))
+      }.bind(this));
   }
 
   /**
@@ -110,6 +110,7 @@ export class MapChart extends Component {
    */
   onSelectFeature(event, feature) {
     if (!feature || !feature.properties) return;
+    if (!this.datasetController) return;
     let locationID = feature.properties.code;
     this.updateSensible = false;
     this.datasetController.setLocationsFilter([locationID]);
@@ -166,7 +167,7 @@ export class MapChart extends Component {
     this.combinedData = combineByLocation(combinedByStack);
     this.legendRenderer.renderDatasetsLegend();
     this.datasetRenderer.renderDatasets();
-    this.labelRenderer.renderDatasetLabels()
+    this.labelRenderer.renderDatasetLabels();
     this.tooltipRenderer.raise();
   }
 

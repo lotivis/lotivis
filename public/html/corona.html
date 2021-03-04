@@ -5,12 +5,11 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../dist/lotivis.css"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <title>Lotivis - Time Chart Grouped</title>
+  <title>Lotivis - Corona-Zahlen Zeitverlauf</title>
 </head>
 <body>
 
-<div class="container">
+<div class="container" style="overflow: scroll; overflow-scrolling: auto;">
   <div class="row">
     <div class="col-2">
       <a href="../index.html">
@@ -20,7 +19,7 @@
       </a>
     </div>
     <div class="col-8 text-center">
-      <h1>Time Chart Grouped</h1>
+      <h1>Corona-Zahlen Zeitverlauf</h1>
     </div>
     <div class="col-12">
       <div id="time-chart-card">
@@ -36,23 +35,21 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@nidi/html2canvas@1.0.0-rc.13/dist/html2canvas.min.js"></script>
 <script src="../dist/lotivis.js"></script>
 
 <script>
 
   let timeChartCard = new lotivis.TimeChartCard('time-chart-card');
-  let chart = timeChartCard.chart;
+  timeChartCard.chart.margin.top = 20;
 
-  d3
-    .json('/assets/example-datasets-location-time-grouped.json')
-    .then(function (json) {
-      let string = JSON.stringify(json, null, 4);
-      let element = document.getElementById('data');
-      element.innerHTML = string;
-
-      chart.datasets = json;
-      chart.update();
+  let url = 'https://phpefi.schleswig-holstein.de/corona/data202011/cvd_sh_verlauf.csv';
+  let dataset = lotivis
+    .parseCSV(url, function (components) {
+      return {date: components[0], value: components[1]};
+    })
+    .then(function (dataset) {
+      timeChartCard.chart.datasets = [dataset];
+      timeChartCard.chart.update();
     });
 
 </script>

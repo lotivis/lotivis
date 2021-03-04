@@ -26,9 +26,7 @@ export class ChartLabelRenderer {
         .append('g')
         .attr('fill', labelColor)
         .selectAll('.text')
-        .data(function (dataset) {
-          return dataset;
-        })
+        .data(dataset => dataset)
         .enter()
         .append('text')
         .attr("transform", function (item) {
@@ -43,6 +41,6 @@ export class ChartLabelRenderer {
           let value = item[1];
           return value === 0 ? '' : numberFormat.format(value);
         });
-    }
+    };
   }
 }

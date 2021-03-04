@@ -717,9 +717,7 @@ class ChartLabelRenderer {
         .append('g')
         .attr('fill', labelColor)
         .selectAll('.text')
-        .data(function (dataset) {
-          return dataset;
-        })
+        .data(dataset => dataset)
         .enter()
         .append('text')
         .attr("transform", function (item) {
@@ -779,7 +777,7 @@ function sumOfStack(flatData, stack) {
  */
 function sumOfValues(flatData) {
   return flatData
-    .map(item => item.value)
+    .map(item => +item.value)
     .reduce((acc, next) => acc + next, 0);
 }
 
@@ -806,9 +804,7 @@ class ChartLegendRenderer {
       legends
         .append('text')
         .attr("font-size", 13)
-        .attr("x", function (item) {
-          return xLegend(item.label) - 30;
-        })
+        .attr("x", (item) => xLegend(item.label) - 30)
         .attr("y", function () {
           return timeChart.graphHeight + labelMargin;
         }.bind(this))
@@ -1107,15 +1103,21 @@ class ChartGhostBarsRenderer {
         .attr("opacity", 0);
     };
 
+    function createID(date) {
+      return `#ghost-rect-${String(date).replaceAll('.', '-')}`;
+    }
+
     this.onMouseEnter = function (event, date) {
       this.hideAll();
       let controller = timeChart.datasetController;
+      let id = createID(date);
+
       timeChart.updateSensible = false;
       controller.setDatesFilter([date]);
       timeChart.updateSensible = true;
       timeChart
         .svg
-        .select(`#ghost-rect-${date}`)
+        .select(id)
         .transition()
         .attr("opacity", 0.5);
     }.bind(this);
@@ -1130,7 +1132,7 @@ class ChartGhostBarsRenderer {
         .enter()
         .append("rect")
         .attr("class", 'ghost-rect')
-        .attr("id", date => `ghost-rect-${date}`)
+        .attr("id", date => createID(date))
         .attr("fill", 'gray')
         .attr("opacity", 0)
         .attr("x", (date) => timeChart.xChart(date))
@@ -1235,6 +1237,8 @@ class TimeChart extends Component {
    *
    */
   configureChart() {
+    this.datasetController.dates;
+    // this.width = listOfDates.length * 20;
     let margin = this.margin;
     this.graphWidth = this.width - margin.left - margin.right;
     this.graphHeight = this.height - margin.top - margin.bottom;
@@ -1256,6 +1260,8 @@ class TimeChart extends Component {
     this.removeSVG();
     this.svg = this.element
       .append('svg')
+      // .attr('width', this.width)
+      // .attr('height', this.height)
       .attr('preserveAspectRatio', 'xMidYMid meet')
       .attr("viewBox", `0 0 ${this.width} ${this.height}`)
       .attr('id', TimeChart.svgID);
@@ -2637,11 +2643,11 @@ class MapDatasetRenderer {
 
         for (let index = 0; index < dataForStack.length; index++) {
           let datasetEntry = dataForStack[index];
-          let id = +datasetEntry.location;
+          let id = datasetEntry.location;
 
           mapChart.svg
             .selectAll('path')
-            .filter(item => +item.properties.code === id)
+            .filter(item => String(item.properties.code) === String(id))
             .attr('fill', color.rgbString())
             .attr('fill-opacity', datasetEntry.value / max);
 
@@ -2758,8 +2764,9 @@ class MapChart extends Component {
     // create a background rectangle for receiving mouse enter events
     // in order to reset the location data filter.
     this.background
-      .on('mouseenter', function (event) {
+      .on('mouseenter', function () {
         let controller = this.datasetController;
+        if (!controller) return;
         let filters = controller.locationFilters;
         if (!filters || filters.length === 0) return;
         this.updateSensible = false;
@@ -2784,6 +2791,7 @@ class MapChart extends Component {
    */
   onSelectFeature(event, feature) {
     if (!feature || !feature.properties) return;
+    if (!this.datasetController) return;
     let locationID = feature.properties.code;
     this.updateSensible = false;
     this.datasetController.setLocationsFilter([locationID]);
@@ -3824,58 +3832,6 @@ class PlotChartCard extends ChartCard {
   }
 }
 
-/**
- *
- * @class Item
- */
-class Item {
-
-  constructor(rawJSON) {
-    if (!rawJSON.label) {
-      throw `Invalid item format. Missing 'value' property.`;
-    }
-    this.label = rawJSON.label;
-    if (!rawJSON.value) {
-      throw `Invalid item format. Missing 'label' property.`;
-    }
-    this.value = rawJSON.value;
-
-    if (rawJSON.datum) {
-      this.datum = rawJSON.datum;
-    }
-    if (rawJSON.datumTotal) {
-      this.datum = rawJSON.datumTotal;
-    }
-    if (rawJSON.location) {
-      this.datum = rawJSON.location;
-    }
-    if (rawJSON.locationTotal) {
-      this.datum = rawJSON.locationTotal;
-    }
-  }
-}
-
-/**
- *
- * @class Dataset
- */
-class Dataset {
-
-  constructor(rawJSON) {
-    this.label = rawJSON.label;
-    this.stack = rawJSON.stack;
-    this.data = [];
-
-    if (!rawJSON.data || rawJSON.data.length) {
-      throw `Invalid dataset format. Missing 'data' property.`;
-    }
-
-    for (let index = 0; index < rawJSON.data.length; index++) {
-      this.data.push(new Item(rawJSON.data[index]));
-    }
-  }
-}
-
 class Geometry {
   constructor(source) {
     this.type = source.type;
@@ -3998,6 +3954,112 @@ class GeoJson {
   }
 }
 
+/**
+ *
+ * @param datasets
+ */
+function renderCSV(datasets) {
+  let flatData = flatDatasets(datasets);
+  let csvContent = 'label,value,date,location\n';
+  for (let index = 0; index < flatData.length; index++) {
+    let data = flatData[index];
+    csvContent += `${data.dataset || 'Unknown'},${data.value || '0'},`;
+    csvContent += `${data.date || ''},${data.location || ''}\n`;
+  }
+  return csvContent;
+}
+
+async function parseCSV(
+  url,
+  extractItemBlock = function (components) {
+    return {date: components[0], value: components[1]};
+  }) {
+
+  let name = getFilename(url);
+  let dataset = {
+    label: name,
+    stack: name,
+    data: []
+  };
+
+  return fetch(url)
+    .then(function (response) {
+      return response.text();
+    })
+    .then(function (text) {
+      let lines = text.split('\n');
+
+      // drop first line
+      lines.shift();
+      dataset.data = lines
+        .map(line => line.split(',').map(word => trimByChar(word, '"')))
+        .filter(components => components.length > 0)
+        .map(components => extractItemBlock(components))
+        .filter(item => item.value && item.date);
+
+      return dataset;
+    });
+}
+
+function trimByChar(string, character) {
+  const first = [...string].findIndex(char => char !== character);
+  const last = [...string].reverse().findIndex(char => char !== character);
+  return string.substring(first, string.length - last);
+}
+
+function getFilename(url) {
+  return url.substring(url.lastIndexOf('/') + 1);
+}
+
+function createGeoJSON(datasets) {
+  let locations = extractLocationsFromDatasets(datasets);
+  let rowsCount = Math.ceil(locations.length / 5);
+  let latSpan = 0.1;
+  let lngSpan = 0.1;
+  let features = [];
+
+  loop1: for (let rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
+    for (let itemIndex = 0; itemIndex < 5; itemIndex++) {
+      if (locations.length === 0) break loop1;
+      let location = locations.shift();
+
+      let lat = (itemIndex + 1) * latSpan;
+      let lng = (rowIndex + 1) * -lngSpan;
+
+      let coordinates = [];
+
+      coordinates.push([lat, lng]);
+      coordinates.push([lat, lng + lngSpan]);
+      coordinates.push([lat + latSpan, lng + lngSpan]);
+      coordinates.push([lat + latSpan, lng]);
+      coordinates.push([0, 0]);
+
+      let feature = {
+        type: 'Feature',
+        id: location,
+        properties: {
+          id: location,
+          code: location,
+          location: location,
+        },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            coordinates
+          ]
+        }
+      };
+
+      features.push(feature);
+    }
+  }
+
+  return {
+    type: "FeatureCollection",
+    features: features
+  };
+}
+
 exports.Component = Component;
 exports.GeoJson = GeoJson;
 exports.RadioGroup = RadioGroup;
@@ -4012,13 +4074,15 @@ exports.MapChartCard = MapChartCard;
 exports.PlotChart = PlotChart;
 exports.PlotChartCard = PlotChartCard;
 
-exports.Dataset = Dataset;
-exports.Item = Item;
-
 exports.DatasetController = DatasetController;
 exports.FilterableDatasetController = FilterableDatasetController;
 
 exports.URLParameters = URLParameters;
+
+exports.renderCSV = renderCSV;
+exports.parseCSV = parseCSV;
+
+exports.createGeoJSON = createGeoJSON;
 
 // data juggling
 exports.flatDataset = flatDataset;

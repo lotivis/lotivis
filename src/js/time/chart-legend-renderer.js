@@ -25,9 +25,7 @@ export class ChartLegendRenderer {
       legends
         .append('text')
         .attr("font-size", 13)
-        .attr("x", function (item) {
-          return xLegend(item.label) - 30;
-        })
+        .attr("x", (item) => xLegend(item.label) - 30)
         .attr("y", function () {
           return timeChart.graphHeight + labelMargin;
         }.bind(this))

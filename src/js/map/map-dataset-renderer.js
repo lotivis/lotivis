@@ -31,11 +31,11 @@ export class MapDatasetRenderer {
 
         for (let index = 0; index < dataForStack.length; index++) {
           let datasetEntry = dataForStack[index];
-          let id = +datasetEntry.location;
+          let id = datasetEntry.location;
 
           mapChart.svg
             .selectAll('path')
-            .filter(item => +item.properties.code === id)
+            .filter(item => String(item.properties.code) === String(id))
             .attr('fill', color.rgbString())
             .attr('fill-opacity', datasetEntry.value / max);
 

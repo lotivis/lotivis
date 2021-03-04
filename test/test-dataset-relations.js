@@ -7,8 +7,6 @@ describe('dataset relations', function () {
   it('calcs the correct date to items relation', function () {
     let flatData = lotivis.flatDatasets(datasets);
     let dateToItemsRelation = lotivis.dateToItemsRelations(datasets, flatData);
-    console.log(dateToItemsRelation);
-
     let sumOfDataset1 = lotivis.sumOfDataset(flatData, 'dataset_1');
     let sumOfDataset2 = lotivis.sumOfDataset(flatData, 'dataset_2');
     let sumOfDataset3 = lotivis.sumOfDataset(flatData, 'dataset_3');

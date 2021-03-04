@@ -9,17 +9,23 @@ export class ChartGhostBarsRenderer {
         .selectAll('.ghost-rect')
         .transition()
         .attr("opacity", 0);
+    };
+
+    function createID(date) {
+      return `#ghost-rect-${String(date).replaceAll('.', '-')}`;
     }
 
     this.onMouseEnter = function (event, date) {
       this.hideAll();
       let controller = timeChart.datasetController;
+      let id = createID(date);
+
       timeChart.updateSensible = false;
       controller.setDatesFilter([date]);
       timeChart.updateSensible = true;
       timeChart
         .svg
-        .select(`#ghost-rect-${date}`)
+        .select(id)
         .transition()
         .attr("opacity", 0.5);
     }.bind(this);
@@ -34,7 +40,7 @@ export class ChartGhostBarsRenderer {
         .enter()
         .append("rect")
         .attr("class", 'ghost-rect')
-        .attr("id", date => `ghost-rect-${date}`)
+        .attr("id", date => createID(date))
         .attr("fill", 'gray')
         .attr("opacity", 0)
         .attr("x", (date) => timeChart.xChart(date))

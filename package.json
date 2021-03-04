@@ -53,6 +53,7 @@
     "karma-safari-launcher": "^1.0.0",
     "lint": "^0.7.0",
     "mocha": "^8.3.0",
+    "node-fetch": "^2.6.1",
     "rollup": "^2.39.0",
     "rollup-plugin-cleanup": "^3.2.1",
     "rollup-plugin-postcss": "^4.0.0",

@@ -5,8 +5,6 @@ import {MapChart} from "./js/map/map-chart";
 import {MapChartCard} from "./js/map/map-chart-card";
 import {PlotChart} from "./js/plot/plot-chart";
 import {PlotChartCard} from "./js/plot/plot-chart-card";
-import {Dataset} from "./js/data/dataset";
-import {Item} from "./js/data/item";
 import {GeoJson} from "./js/geojson/geojson";
 import {RadioGroup} from "./js/components/radio-group";
 import {Option} from "./js/components/option";
@@ -44,6 +42,9 @@ import {
 import {URLParameters} from "./js/shared/url-parameters";
 import {DatasetController} from "./js/data/dataset-controller";
 import {FilterableDatasetController} from "./js/data/filterable-dataset-controller";
+import {renderCSV} from "./js/parse/render-csv";
+import {parseCSV} from "./js/parse/parse-csv";
+import {createGeoJSON} from "./js/geojson/create-geojson";
 
 
 exports.Component = Component;
@@ -60,13 +61,15 @@ exports.MapChartCard = MapChartCard;
 exports.PlotChart = PlotChart;
 exports.PlotChartCard = PlotChartCard;
 
-exports.Dataset = Dataset;
-exports.Item = Item;
-
 exports.DatasetController = DatasetController;
 exports.FilterableDatasetController = FilterableDatasetController;
 
 exports.URLParameters = URLParameters;
+
+exports.renderCSV = renderCSV;
+exports.parseCSV = parseCSV;
+
+exports.createGeoJSON = createGeoJSON;
 
 // data juggling
 exports.flatDataset = flatDataset;

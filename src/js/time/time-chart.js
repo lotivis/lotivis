@@ -106,6 +106,8 @@ export class TimeChart extends Component {
    *
    */
   configureChart() {
+    let listOfDates = this.datasetController.dates;
+    // this.width = listOfDates.length * 20;
     let margin = this.margin;
     this.graphWidth = this.width - margin.left - margin.right;
     this.graphHeight = this.height - margin.top - margin.bottom;
@@ -127,6 +129,8 @@ export class TimeChart extends Component {
     this.removeSVG();
     this.svg = this.element
       .append('svg')
+      // .attr('width', this.width)
+      // .attr('height', this.height)
       .attr('preserveAspectRatio', 'xMidYMid meet')
       .attr("viewBox", `0 0 ${this.width} ${this.height}`)
       .attr('id', TimeChart.svgID);
