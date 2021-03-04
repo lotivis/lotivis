@@ -10,9 +10,10 @@ const version = require('./package.json').version;
 const port = process.env.PORT || 80;
 
 app.use('/', express.static(__dirname + '/public'));
+
 app.use('/dist', express.static(__dirname + '/dist'));
 
-app.use('./info', function (req,res) {
+app.use('/version', function (req,res) {
   res.json({version});
   res.end();
 });

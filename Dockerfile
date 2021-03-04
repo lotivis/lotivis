@@ -13,9 +13,7 @@ COPY server.js .
 
 RUN npm install
 
-RUN npm run build:js
-RUN npm run build:css:sass
-#RUN mv ./dist ./public
+RUN npm run build
 
 RUN rm -rf ./src
 RUN rm -rf ./rollup.config.js
