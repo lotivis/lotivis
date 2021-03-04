@@ -19,13 +19,12 @@
   ],
   "scripts": {
     "develop": "rollup -c -w",
+    "build": "npm run build:js && npm run build:css:sass",
     "build:js": "rollup -c",
     "build:css:sass": "sass src/main.scss > dist/lotivis.css",
-    "dev-alt": "karma start --auto-watch --no-single-run --browsers safari --grep",
     "lint-js": "eslint src/js/**/*.js test/*.js",
     "test": "mocha",
-    "test-alt": "npm run lint-js && cross-env NODE_ENV=test karma start --auto-watch --single-run --coverage --grep",
-    "example": "npm run build:js && npm run build:css:sass && node server.js"
+    "serve:example": "node server.js"
   },
   "repository": {
     "type": "git",
