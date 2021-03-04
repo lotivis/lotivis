@@ -2,10 +2,11 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
-  <link rel="stylesheet" href="../../dist/lotivis.css"/>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
+  <link rel="stylesheet" href="../dist/lotivis.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <title>Plot Data Example</title>
+  <title>Time Chart Grouped Stacked</title>
 </head>
 <body>
 
@@ -19,12 +20,14 @@
       </a>
     </div>
     <div class="col-8 text-center">
-      <h1>Plot Data</h1>
+      <h1>Time Chart Grouped Stacked</h1>
     </div>
     <div class="col-12">
-      <div id="plot-chart-card">
-        <!-- Plot Chart Here -->
+      <div id="time-chart-card">
+        <!-- Time Chart Code Here -->
       </div>
+    </div>
+    <div class="col-12">
       <samp id="data">
         <!-- Data Here -->
       </samp>
@@ -34,20 +37,19 @@
 
 <script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@nidi/html2canvas@1.0.0-rc.13/dist/html2canvas.min.js"></script>
-<script src="../../dist/lotivis.js"></script>
+<script src="../dist/lotivis.js"></script>
 
 <script>
 
-  let plotChartCard = new lotivis.PlotChartCard('plot-chart-card');
-  let chart = plotChartCard.chart;
+  let timeChartCard = new lotivis.TimeChartCard('time-chart-card');
+  let chart = timeChartCard.chart;
 
   d3
-    .json('/assets/example-datasets-plot-2.json')
+    .json('/assets/example-datasets-location-time-grouped-stacked.json')
     .then(function (json) {
-
-      // let string = JSON.stringify(json, null, 4);
-      // let element = document.getElementById('data');
-      // element.innerHTML = string;
+      let string = JSON.stringify(json, null, 4);
+      let element = document.getElementById('data');
+      element.innerHTML = string;
 
       chart.datasets = json;
       chart.update();

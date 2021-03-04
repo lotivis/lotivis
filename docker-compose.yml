@@ -1,0 +1,10 @@
+version: '3.7'
+services:
+  lotivis:
+    build: .
+    container_name: lotivis
+    restart: always
+    ports:
+      - 80:80
+    environment:
+      - NODE_ENV=production

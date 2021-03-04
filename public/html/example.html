@@ -4,9 +4,9 @@
   <meta charset="utf-8"/>
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
-  <link rel="stylesheet" href="../../dist/lotivis.css"/>
+  <link rel="stylesheet" href="../dist/lotivis.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <title>Time Chart Grouped Stacked</title>
+  <title>FRCV - Interactive Example</title>
 </head>
 <body>
 
@@ -20,12 +20,23 @@
       </a>
     </div>
     <div class="col-8 text-center">
-      <h1>Time Chart Grouped Stacked</h1>
+      <h1>Example</h1>
     </div>
-    <div class="col-12">
+    <div class="col-6">
       <div id="time-chart-card">
         <!-- Time Chart Code Here -->
       </div>
+      <div id="plot-chart-card">
+        <!-- Plot Chart Code Here -->
+      </div>
+    </div>
+    <div class="col-6">
+      <div id="map-chart-card">
+        <!-- Map Chart Code Here -->
+      </div>
+    </div>
+    <div class="col-6">
+
     </div>
     <div class="col-12">
       <samp id="data">
@@ -37,22 +48,36 @@
 
 <script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@nidi/html2canvas@1.0.0-rc.13/dist/html2canvas.min.js"></script>
-<script src="../../dist/lotivis.js"></script>
+<script src="../dist/lotivis.js"></script>
 
 <script>
 
   let timeChartCard = new lotivis.TimeChartCard('time-chart-card');
-  let chart = timeChartCard.chart;
+  let mapChartCard = new lotivis.MapChartCard('map-chart-card');
+  mapChartCard.chart.excludedFeatureCodes = ['2A', '2B'];
+  let plotChartCard = new lotivis.PlotChartCard('plot-chart-card');
 
-  d3
-    .json('/assets/example-datasets-location-time-grouped-stacked.json')
+  d3.json('/assets/Departements.geojson')
     .then(function (json) {
+      mapChartCard.chart.setGeoJSON(json);
+
+      return d3.json('/assets/interactive-example.json');
+    })
+    .then(function (json) {
+
       let string = JSON.stringify(json, null, 4);
       let element = document.getElementById('data');
       element.innerHTML = string;
 
-      chart.datasets = json;
-      chart.update();
+      timeChartCard.chart.datasets = json;
+      timeChartCard.chart.update();
+
+      mapChartCard.setDatasets(json);
+      // mapChartCard.chart.datasets = json;
+      // mapChartCard.chart.update();
+
+      plotChartCard.chart.datasets = json;
+      plotChartCard.chart.update();
     });
 
 </script>

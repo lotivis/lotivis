@@ -1,6 +1,6 @@
 const assert = require('assert');
 const datasets = require('./test-data/test-datasets-location-time.json');
-const lotivis = require('../dist/lotivis');
+const lotivis = require('../public/dist/lotivis');
 
 describe('dataset sum', function() {
 
