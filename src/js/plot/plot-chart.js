@@ -12,6 +12,9 @@ import {PlotAxisRenderer} from "./plot-axis-renderer";
 import {copy} from "../shared/copy";
 import {DatasetController} from "../data/dataset-controller";
 import {FilterableDatasetController} from "../data/filterable-dataset-controller";
+import {PlotBarsRenderer} from "./plot-bars-renderer";
+import {PlotTooltipRenderer} from "./plot-tooltip-renderer";
+import {log_debug} from "../shared/debug";
 
 /**
  *
@@ -64,11 +67,13 @@ export class PlotChart extends Component {
     };
 
     this.isShowLabels = true;
+    this.updateSensible = true;
 
     this.datasets = [];
-    this.injectTooltipContainer();
 
     this.axisRenderer = new PlotAxisRenderer(this);
+    this.barsRenderer = new PlotBarsRenderer(this);
+    this.tooltipRenderer = new PlotTooltipRenderer(this);
   }
 
   /**
@@ -91,13 +96,15 @@ export class PlotChart extends Component {
     this.createScales();
     this.axisRenderer.renderAxis();
     this.axisRenderer.renderGrid();
-    this.renderBars();
+    this.barsRenderer.renderBars();
   }
 
   /**
    * Updates the plot chart.
    */
-  update() {
+  update(controller, reason) {
+    if (!this.updateSensible) return;
+    if (reason === 'dates-filter') return;
     this.datasetsDidChange();
     this.sortDatasets();
     this.configureChart();
@@ -121,6 +128,22 @@ export class PlotChart extends Component {
       .attr('preserveAspectRatio', 'xMidYMid meet')
       .attr("viewBox", `0 0 ${this.width} ${this.height}`)
       .attr('id', TimeChart.svgID);
+
+    this.background = this.svg
+      .append('rect')
+      .attr('width', this.width)
+      .attr('height', this.height)
+      .attr('fill', 'white')
+      .on('mouseout', function () {
+        this.tooltipRenderer.hideTooltip();
+      }.bind(this))
+      .on('mouseenter', function (event) {
+        this.tooltipRenderer.hideTooltip();
+        let controller = this.datasetController;
+        let filters = controller.datasetFilters;
+        if (!filters || filters.length === 0) return;
+        controller.setDatasetsFilter([])
+      }.bind(this))
   }
 
   /**
@@ -165,236 +188,6 @@ export class PlotChart extends Component {
 
   }
 
-
-
-  /**
-   *
-   */
-  renderBars() {
-    let datasets = this.workingDatasets;
-
-    this.max = d3.max(datasets, function (dataset) {
-      return d3.max(dataset.data, function (item) {
-        return item.value;
-      });
-    });
-
-    this.defs = this.svg.append("defs");
-    for (let index = 0; index < datasets.length; index++) {
-      let dataset = datasets[index];
-      this.createGradient(dataset);
-    }
-
-    let radius = 6;
-
-    this.barsData = this.svg
-      .append("g")
-      .selectAll("g")
-      .data(datasets)
-      .enter();
-
-    this.bars = this.barsData
-      .append("rect")
-      .attr("fill", (d) => `url(#${this.createIDFromDataset(d)})`)
-      .style("stroke", 'gray')
-      .style("stroke-width", 0.4)
-      .attr("rx", radius)
-      .attr("ry", radius)
-      .attr("x", (d) => this.xChart(d.earliestDate || 0))
-      .attr("y", (d) => this.yChart(d.label) + 1)
-      .attr("height", this.yChart.bandwidth() - 2)
-      .attr("id", (d) => 'rect-' + hashCode(d.label))
-      .on('mouseenter', this.showTooltip.bind(this))
-      .on('mouseout', this.hideTooltip.bind(this))
-      .on('click', this.onClick.bind(this))
-      .attr("width", function (data) {
-        if (!data.earliestDate || !data.latestDate) return 0;
-        return this.xChart(data.latestDate) - this.xChart(data.earliestDate) + this.xChart.bandwidth()
-      }.bind(this));
-
-    this.labels = this.barsData
-      .append('g')
-      .attr('transform', `translate(0,${(this.yChart.bandwidth() / 2) + 4})`)
-      .append('text')
-      .attr("id", (d) => 'rect-' + hashCode(d.label))
-      .attr("fill", 'black')
-      .attr('text-anchor', 'start')
-      .attr('font-size', '12px')
-      .attr('class', 'map-label')
-      .attr('opacity', this.isShowLabels ? 1 : 0)
-      .attr("x", function (d) {
-        let rectX = this.xChart(d.earliestDate);
-        let offset = this.xChart.bandwidth() / 2;
-        return rectX + offset;
-      }.bind(this))
-      .attr("y", (d) => this.yChart(d.label))
-      .attr("width", (d) => this.xChart(d.latestDate) - this.xChart(d.earliestDate) + this.xChart.bandwidth())
-      .text(function (dataset) {
-        return `${dataset.duration} years, ${dataset.sum} items`;
-      });
-  }
-
-  createGradient(dataset) {
-
-    let gradient = this.defs
-      .append("linearGradient")
-      .attr("id", this.createIDFromDataset(dataset))
-      .attr("x1", "0%")
-      .attr("x2", "100%")
-      .attr("y1", "0%")
-      .attr("y2", "0%");
-
-    let data = dataset.data;
-    let count = data.length;
-    let firstDate = dataset.earliestDate;
-    let lastDate = dataset.latestDate;
-    let timespan = lastDate - firstDate;
-    let colorInterpolator = d3.interpolateRgb(
-      this.configuration.lowColor,
-      this.configuration.highColor
-    );
-
-    if (firstDate === lastDate) {
-
-      if (!data || data.length === 0) {
-        return;
-      }
-
-      let item = data[0];
-      let value = item.value;
-      let opacity = value / this.max;
-
-      gradient
-        .append("stop")
-        .attr("offset", `100%`)
-        .attr("stop-color", colorInterpolator(opacity));
-
-    } else {
-
-      for (let index = 0; index < count; index++) {
-
-        let item = data[index];
-        let date = item.date;
-        let opacity = item.value / this.max;
-
-        let dateDifference = lastDate - date;
-        let datePercentage = (1 - (dateDifference / timespan)) * 100;
-
-        gradient
-          .append("stop")
-          .attr("offset", `${datePercentage}%`)
-          .attr("stop-color", colorInterpolator(opacity));
-
-      }
-    }
-  }
-
-  createIDFromDataset(dataset) {
-    return hashCode(dataset.label);
-  }
-
-  /**
-   * Presents the tooltip for the given dataset.
-   *
-   * @param event The mouse event.
-   * @param dataset The dataset.
-   */
-  showTooltip(event, dataset) {
-    let tooltip = this.tooltip;
-    let components = [];
-
-    components.push('Label: ' + dataset.label);
-    components.push('');
-    components.push('Start: ' + dataset.earliestDate);
-    components.push('End: ' + dataset.latestDate);
-    components.push('');
-    components.push('Items: ' + dataset.data.map(item => item.value).reduce((acc, next) => acc + next, 0));
-    components.push('');
-
-    for (let index = 0; index < dataset.data.length; index++) {
-      let entry = dataset.data[index];
-      components.push(`${entry.date}: ${entry.value}`);
-    }
-    tooltip.html(components.join('<br/>'));
-
-    // position tooltip
-    let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
-    let factor = this.getElementEffectiveSize()[0] / this.width;
-    let offset = this.getElementPosition();
-    let top = this.yChart(dataset.label);
-    top *= factor;
-
-    let displayUnder = (top - this.margin.top) <= tooltipHeight;
-    top += offset[1];
-
-    if (displayUnder) {
-      top += this.lineHeight + 10;
-    } else {
-      top -= tooltipHeight;
-      top -= this.lineHeight;
-    }
-
-    let left = this.xChart(dataset.earliestDate);
-    left *= factor;
-    left += offset[0];
-
-    tooltip
-      .style('left', left + 'px')
-      .style('top', top + 'px')
-      .transition()
-      .style('opacity', 1);
-
-    let id = 'rect-' + hashCode(dataset.label);
-
-    this.svg
-      .selectAll('rect')
-      .transition()
-      .attr('opacity', 0.15);
-
-    this.labels
-      .transition()
-      .attr('opacity', this.isShowLabels ? 0.15 : 0);
-
-    this.svg
-      .selectAll(`#${id}`)
-      .transition()
-      .attr('opacity', 1);
-
-    this.labels
-      .selectAll(`#${id}`)
-      .transition()
-      .attr('opacity', 1);
-
-  }
-
-  hideTooltip() {
-    this.tooltip.style('opacity', 0);
-    this.svg
-      .selectAll('rect')
-      .transition()
-      .attr('opacity', 1);
-    this.labels
-      .transition()
-      .attr('opacity', this.isShowLabels ? 1 : 0);
-  }
-
-  /**
-   * Appends a division to the svg.
-   */
-  injectTooltipContainer() {
-    this.tooltip = this.element
-      .append('div')
-      .attr('class', 'chart-tooltip')
-      .attr('rx', 5) // corner radius
-      .attr('ry', 5)
-      .style('position', 'absolute')
-      .style('color', 'black')
-      .style('border', function () {
-        return `solid 1px grey`;
-      })
-      .style('opacity', 0);
-  }
-
   onClick(event, dataset) {
     console.log('event', event);
     console.log('this.datasetController', this.datasetController);
@@ -402,7 +195,19 @@ export class PlotChart extends Component {
     console.log('this', this);
     let label = dataset.label;
     this.datasetController.setDatasetsFilter([label]);
+  }
 
+  /**
+   *
+   * @param event
+   * @param dataset
+   */
+  onSelectDataset(event, dataset) {
+    if (!dataset || !dataset.label) return;
+    let label = dataset.label;
+    this.updateSensible = false;
+    this.datasetController.setDatasetsFilter([label]);
+    this.updateSensible = true;
   }
 
   sortDatasets() {

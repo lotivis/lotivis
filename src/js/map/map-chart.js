@@ -49,6 +49,7 @@ export class MapChart extends Component {
     this.geoJSON = null;
     this.departmentsData = [];
     this.excludedFeatureCodes = [];
+    this.updateSensible = true;
 
     this.projection = d3.geoMercator();
     this.path = d3.geoPath().projection(this.projection);
@@ -80,23 +81,17 @@ export class MapChart extends Component {
       .attr('height', this.height)
       .attr('fill', 'white')
 
+    // create a background rectangle for receiving mouse enter events
+    // in order to reset the location data filter.
     this.background
       .on('mouseenter', function (event) {
         let controller = this.datasetController;
-        let filters = controller.locationFilters
+        let filters = controller.locationFilters;
         if (!filters || filters.length === 0) return;
-        controller.setLocationsFilter([]);
-        log_debug('mouseenter', controller);
+        this.updateSensible = false;
+        controller.setLocationsFilter([])
+        this.updateSensible = true;
       }.bind(this))
-      // .on('mouseout', function (event) {
-      //   log_debug('mouseout', event);
-      // });
-
-    // .call(d3.zoom().on('zoom', function (event) {
-    //     if (!this.isZoomable) return;
-    //     this.svg.selectAll('path').attr('transform', event.transform);
-    //     this.svg.selectAll('text').attr('transform', event.transform);
-    // }.bind(this)));
   }
 
   /**

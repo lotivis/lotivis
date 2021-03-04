@@ -23,17 +23,17 @@ export class FilterableDatasetController extends DatasetController {
 
   setLocationsFilter(locations) {
     this.locationFilters = locations.map(location => String(location));
-    this.notifyListeners();
+    this.notifyListeners('location-filter');
   }
 
   setDatesFilter(dates) {
     this.dateFilters = dates.map(date => String(date));
-    this.notifyListeners();
+    this.notifyListeners('dates-filter');
   }
 
   setDatasetsFilter(datasets) {
     this.datasetFilters = datasets.map(dataset => String(dataset));
-    this.notifyListeners();
+    this.notifyListeners('dataset-filter');
   }
 
   toggleDataset(label) {
@@ -42,13 +42,14 @@ export class FilterableDatasetController extends DatasetController {
         dataset.isEnabled = !dataset.isEnabled;
       }
     })
-    this.notifyListeners();
+    this.notifyListeners('dataset-toggle');
   }
 
   enableAllDatasets() {
     this.workingDatasets.forEach(function (dataset) {
       dataset.isEnabled = true;
     })
+    this.notifyListeners('dataset-enable-all');
   }
 
   get enabledDatasets() {
@@ -71,11 +72,11 @@ export class FilterableDatasetController extends DatasetController {
       })
     }
 
-    if (this.datasetFilters && this.datasetFilters.length > 0) {
-      let datasetFilters = this.datasetFilters;
+    if (this.dateFilters && this.dateFilters.length > 0) {
+      let dateFilters = this.dateFilters;
       enabled = enabled.map(function (dataset) {
         dataset.data = dataset.data
-          .filter(data => datasetFilters.includes(String(data.date))) || [];
+          .filter(data => dateFilters.includes(String(data.date))) || [];
         return dataset;
       })
     }
@@ -109,11 +110,11 @@ export class FilterableDatasetController extends DatasetController {
     this.listeners = this.listeners.splice(index, 1);
   }
 
-  notifyListeners() {
+  notifyListeners(reason = 'none') {
     for (let index = 0; index < this.listeners.length; index++) {
       let listener = this.listeners[index];
       if (!listener.update) continue;
-      listener.update(this);
+      listener.update(this, reason);
     }
   }
 }

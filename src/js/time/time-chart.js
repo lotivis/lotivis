@@ -12,6 +12,7 @@ import {ChartLabelRenderer} from "./chart-label-renderer";
 import {ChartLegendRenderer} from "./chart-legend-renderer";
 import {ChartBarsRenderer} from "./chart-bars-renderer";
 import {FilterableDatasetController} from "../data/filterable-dataset-controller";
+import {ChartGhostBarsRenderer} from "./chart-ghost-bars-renderer";
 
 /**
  *
@@ -63,6 +64,7 @@ export class TimeChart extends Component {
 
     this.isShowLabels = false;
     this.isCombineStacks = false;
+    this.updateSensible = true;
 
     this.numberFormat = new Intl.NumberFormat('de-DE', {
       maximumFractionDigits: 3
@@ -78,6 +80,7 @@ export class TimeChart extends Component {
    * `drawChart()` and `afterDrawChart()`.
    */
   update() {
+    if (!this.updateSensible) return;
     this.configureChart();
     this.datasetsDidChange();
     this.drawChart();
@@ -96,6 +99,7 @@ export class TimeChart extends Component {
     this.axisRenderer.renderGrid();
     this.renderStacks();
     this.renderLegend();
+    this.ghostBarsRenderer.renderGhostBars();
   }
 
   /**
@@ -127,10 +131,31 @@ export class TimeChart extends Component {
       .attr("viewBox", `0 0 ${this.width} ${this.height}`)
       .attr('id', TimeChart.svgID);
 
+    this.background = this.svg
+      .append('rect')
+      .attr('width', this.width)
+      .attr('height', this.height)
+      .attr('fill', 'white')
+      .attr('opacity', 0)
+
+    // create a background rectangle for receiving mouse enter events
+    // in order to reset the location data filter.
+    this.background
+      .on('mouseenter', function () {
+        let controller = this.datasetController;
+        let filters = controller.dateFilters;
+        if (!filters || filters.length === 0) return;
+        this.updateSensible = false;
+        controller.setDatesFilter([]);
+        this.updateSensible = true;
+        this.ghostBarsRenderer.hideAll();
+      }.bind(this));
+
     this.axisRenderer = new ChartAxisRenderer(this);
     this.labelRenderer = new ChartLabelRenderer(this);
     this.legendRenderer = new ChartLegendRenderer(this);
     this.barsRenderer = new ChartBarsRenderer(this);
+    this.ghostBarsRenderer = new ChartGhostBarsRenderer(this);
 
     // let image = new Image;
     // let aspect = this.width / this.height;
