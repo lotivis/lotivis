@@ -14,3 +14,14 @@ You can run these examples as:
 $ npm run serve:example
 ```
 
+## Development
+
+
+
+## Dependency
+
++ [D3.js](https://github.com/mbostock/d3) `^5.0.0`
+
+## License
+
+MIT
