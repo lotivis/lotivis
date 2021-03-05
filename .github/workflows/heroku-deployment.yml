@@ -1,4 +1,4 @@
-name: Heroku Deployment (Stage)
+name: Examples Deployment (Heroku)
 
 on: [push]
 
