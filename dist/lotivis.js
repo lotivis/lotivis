@@ -1111,10 +1111,12 @@ class ChartGhostBarsRenderer {
     };
 
     function createID(date) {
-      return `#ghost-rect-${String(date).replaceAll('.', '-')}`;
+      return `ghost-rect-${String(date).replaceAll('.', '-')}`;
     }
 
     this.onMouseEnter = function (event, date) {
+      log_debug('onMouseEnter');
+
       this.hideAll();
       let controller = timeChart.datasetController;
       let id = createID(date);
@@ -1124,9 +1126,10 @@ class ChartGhostBarsRenderer {
       timeChart.updateSensible = true;
       timeChart
         .svg
-        .select(id)
+        .select(`#${id}`)
         .transition()
         .attr("opacity", 0.5);
+
     }.bind(this);
 
     this.renderGhostBars = function () {
@@ -2133,7 +2136,7 @@ class TimeChartSettingsPopup extends Popup {
  * @extends Card
  */
 class ChartCard extends Card {
-  chart;
+  chart
 
   /**
    * Creates a new instance of ChartCard.
