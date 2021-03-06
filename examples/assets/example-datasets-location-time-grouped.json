@@ -2,20 +2,9 @@
   {
     "label": "dataset_1",
     "data": [
-      {
-        "location": 1,
-        "date": 2000
-      },
-      {
-        "location": 1,
-        "date": 2001,
-        "value": 1
-      },
-      {
-        "location": 1,
-        "date": 2002,
-        "value": 2
-      },
+      {"location": 1, "date": 2000},
+      {"location": 1, "date": 2001, "value": 1},
+      {"location": 1, "date": 2002, "value": 2},
       {
         "location": 1,
         "date": 2003,

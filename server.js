@@ -9,7 +9,7 @@ const app = express();
 const version = require('./package.json').version;
 const port = process.env.PORT || 80;
 
-app.use('/', express.static(__dirname + '/public'));
+app.use('/', express.static(__dirname + '/examples'));
 
 app.use('/dist', express.static(__dirname + '/dist'));
 
@@ -19,6 +19,6 @@ app.use('/version', function (req,res) {
 });
 
 app.listen(port, function() {
-    console.log("start lotivis public " + version);
+    console.log("start lotivis examples " + version);
     console.log("listening on port: " + port);
 });

@@ -9,7 +9,7 @@ import {Option} from "./option";
  * @extends Card
  */
 export class ChartCard extends Card {
-  chart;
+  chart
 
   /**
    * Creates a new instance of ChartCard.

@@ -1,5 +1,5 @@
 /*!
- * lotivis.js v1.0.29
+ * lotivis.js v1.0.32
  * https://github.com/lukasdanckwerth/lotivis#readme
  * (c) 2021 lotivis.js Lukas Danckwerth
  * Released under the MIT License
