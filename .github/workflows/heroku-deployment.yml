@@ -1,6 +1,6 @@
 name: Examples Deployment (Heroku)
 
-on: [push]
+on: [ push ]
 
 jobs:
   deploy:
