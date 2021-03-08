@@ -45,10 +45,21 @@ import {FilterableDatasetController} from "./js/data/filterable-dataset-controll
 import {renderCSV} from "./js/parse/render-csv";
 import {parseCSV} from "./js/parse/parse-csv";
 import {createGeoJSON} from "./js/geojson/create-geojson";
+import {Card} from "./js/components/card";
+import {Checkbox} from "./js/components/checkbox";
+import {ModalPopup} from "./js/components/modal-popup";
+import {ChartCard} from "./js/components/chart-card";
+import {Dropdown} from "./js/components/dropdown";
+import {Popup} from "./js/components/popup";
 
 
 exports.Component = Component;
-exports.GeoJson = GeoJson;
+exports.Card = Card;
+exports.ChartCard = ChartCard;
+exports.Checkbox = Checkbox;
+exports.Dropdown = Dropdown;
+exports.ModalPopup = ModalPopup;
+exports.Popup = Popup;
 exports.RadioGroup = RadioGroup;
 exports.Option = Option;
 
@@ -65,6 +76,8 @@ exports.DatasetController = DatasetController;
 exports.FilterableDatasetController = FilterableDatasetController;
 
 exports.URLParameters = URLParameters;
+
+exports.GeoJson = GeoJson;
 
 exports.renderCSV = renderCSV;
 exports.parseCSV = parseCSV;
