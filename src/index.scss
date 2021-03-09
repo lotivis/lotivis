@@ -15,37 +15,23 @@ $radius: 8px;
 // MARK: - Colors
 $primary-text-color: #333;
 $secondary-text-color: #888;
-
 $tint-color: #1E4659;
-
 $background: #f0f0f1;
 $darkGray: #464845;
 $lightGray: #919191;
-$textBrown1: #563B3C;
-$textBrown2: #99877B;
-$lilac: #806C91;
-$red: #BF5450;
-$blue: #306E91;
-$yellow: #EEDA8D;
-$green: #627D66;
 
-$orange: #B78C76;
-$deepBlue: #1E4659;
+body {
+  text-decoration: none;
+  font-style: normal;
+  font-family: sans-serif;
+}
 
-
-@import "scss/reset";
-@import "scss/classes";
-@import "scss/card";
-@import "scss/chart-label";
-@import "scss/grid";
-@import "scss/style";
 @import "scss/button";
+@import "scss/card";
+@import "scss/classes";
+@import "scss/date";
 @import "scss/input";
-@import "scss/menu";
-@import "scss/modal";
+@import "scss/layout";
+@import "scss/map";
+@import "scss/plot";
 @import "scss/popup";
-@import "scss/tooltip";
-@import "scss/footer";
-@import "scss/custom";
-@import "scss/map-tooltip";
-@import "scss/progress-bar";

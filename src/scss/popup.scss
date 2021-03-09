@@ -53,3 +53,117 @@
     0% {opacity:0;}
     100% {opacity:1;}
 }
+
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  line-height: 1.2;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 220px;
+  background-color: $background;
+  color: $primary-text-color;
+  text-align: center;
+  border-radius: 6px;
+  padding: 10px 20px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -110px - 20px;
+  opacity: 0;
+  transition: opacity 0.3s;
+  box-shadow: rgba(0, 0, 0, 0.5) 0 0 30px 0;
+}
+
+.tooltip .tooltiptext::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -10px;
+  border-width: 10px;
+  border-style: solid;
+  border-color: $background transparent transparent transparent;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+
+
+
+
+.underground {
+  display: none;
+  position: fixed;
+  z-index: 99991;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+
+  .card {
+    background-color: $background;
+    box-shadow: rgba(0, 0, 0, 0.3) 0 0 60px 0;
+  }
+}
+
+.popup-underground {
+  @extend .underground;
+
+  background-color: rgb(255,255,255);
+  background-color: rgba(255,255,255,0.15);
+
+}
+
+.modal-underground {
+  @extend .underground;
+
+  background-color: rgb(255,255,255);
+  background-color: rgba(255,255,255,0.9);
+}
+
+.popup {
+
+}
+
+.fade-in {
+  animation: fadeIn ease 0.3s;
+  -webkit-animation: fadeIn ease 0.3s;
+  -moz-animation: fadeIn ease 0.3s;
+  -o-animation: fadeIn ease 0.3s;
+  -ms-animation: fadeIn ease 0.3s;
+}
+
+@keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-moz-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-webkit-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-o-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-ms-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+

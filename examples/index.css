@@ -1,0 +1,79 @@
+h1, h2, h3, h4, h5 {
+  color: black;
+  font-weight: bold;
+}
+
+h1 {
+  font-size: 36px;
+}
+
+h2 {
+  font-size: 24px;
+  color: #333333;
+}
+
+p {
+  margin-bottom: 30px;
+}
+
+a, a:hover, a:visited {
+  text-decoration: none;
+  transition: 0.36s;
+}
+
+samp {
+  font-family: "Lucida Console", "Courier New", monospace;
+  white-space: pre-wrap;
+  font-size: 18px;
+  font-weight: normal;
+  color: slategray;
+}
+
+i {
+  font-style: normal;
+  font-family: FontAwesome, serif;
+}
+
+label {
+  font-size: 15px;
+}
+
+.loading-container {
+  width: 100%;
+  padding: 100px 0;
+}
+
+.loading-card {
+  margin: auto;
+  padding: 20px 0;
+  width: 300px;
+  color: #919191;
+  font-size: 30px;
+  text-align: center;
+  font-family: "Lucida Console", "Courier New", monospace;
+}
+
+.label {
+  margin-top: 7px;
+}
+
+div {
+  font-size: 22px;
+  color: darkgray;
+  bottom: 0;
+}
+
+a {
+  display: block;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 2;
+  color: dodgerblue;
+}
+
+a::after {
+  content: '\2192';
+  margin: 0 0 0 5px ;
+  text-decoration: none;
+}
+

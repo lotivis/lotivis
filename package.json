@@ -21,7 +21,7 @@
     "develop": "rollup -c -w",
     "build": "npm run build:js && npm run build:css:sass",
     "build:js": "rollup -c",
-    "build:css:sass": "sass src/main.scss > dist/lotivis.css",
+    "build:css:sass": "sass src/index.scss > dist/lotivis.css",
     "lint-js": "eslint src/js/**/*.js test/*.js",
     "test": "mocha",
     "serve:example": "node server.js"

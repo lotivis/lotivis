@@ -5,79 +5,76 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="dist/lotivis.css"/>
+  <link rel="stylesheet" href="index.css"/>
   <title>Lotivis Examples</title>
 </head>
 
 <body>
 
 <div class="container">
-  <div class="row">
+  <div class="row menu">
     <div class="col-12 text-center">
       <h1>
         Lotivis Examples
-        <samp id="version">0</samp>
+        <a id="version-link" style="display: inline;">
+          <samp id="version">
+            0
+          </samp>
+        </a>
       </h1>
     </div>
-    <div class="col-4 menu">
-
+    <div class="col-4">
       <h2>Chart</h2>
-      <a href="html/timechart.html">Chart</a>
-      <a href="html/timechart-stacked.html">Chart Stacked</a>
-      <a href="html/timechart-grouped.html">Chart Grouped</a>
-      <a href="html/timechart-grouped-stacked.html">Chart Grouped Stacked</a>
-
+      <ul>
+        <li><a href="html/timechart.html">Chart</a></li>
+        <li><a href="html/timechart-stacked.html">Chart Stacked</a></li>
+        <li><a href="html/timechart-grouped.html">Chart Grouped</a></li>
+        <li><a href="html/timechart-grouped-stacked.html">Chart Grouped Stacked</a></li>
+      </ul>
     </div>
-
-    <div class="col-4 menu">
-
+    <div class="col-4">
       <h2>Map</h2>
-      <a href="html/map-empty.html">Map Empty</a>
-      <a href="html/map-germany.html">Map Germany (Bundesländer)</a>
-      <a href="html/map-france.html">Map France (Département)</a>
-
+      <ul>
+        <li><a href="html/map-empty.html">Map Empty</a></li>
+        <li><a href="html/map-germany.html">Map Germany (Bundesländer)</a></li>
+        <li><a href="html/map-france.html">Map France (Département)</a></a></li>
+      </ul>
     </div>
-
-    <div class="col-4 menu">
-
+    <div class="col-4">
       <h2>Plot</h2>
-      <a href="html/plot.html">Plot Data</a>
-
+      <ul>
+        <li><a href="html/plot.html">Plot Data</a></li>
+      </ul>
     </div>
-
-    <div class="col-4 menu">
-
+    <div class="col-4">
       <h2>Interactive</h2>
-      <a href="html/miff.html">mif, mif', miff, miff', miffs, mifs, mille-f, mi-f, mi-f', 'mif'</a>
-
-
-
+      <ul>
+        <li><a href="html/miff.html">mif, mif', miff, miff', miffs, mifs, mille-f, mi-f, mi-f', 'mif'</a></li>
+      </ul>
     </div>
-
-    <div class="col-4 menu">
-
+    <div class="col-4">
       <h2>Real World Examples</h2>
-      <a href="html/corona.html">Corona-Zahlen Zeitverlauf</a>
-
+      <ul>
+        <li><a href="html/corona.html">Corona-Zahlen Zeitverlauf</a></li>
+      </ul>
     </div>
-
-    <div class="col-4 menu">
+    <div class="col-4">
       <h2>Customs</h2>
-      <a href="html/upload.html">Upload Custom Data</a>
+      <ul>
+        <li><a href="html/upload.html">Upload Custom Data</a></li>
+      </ul>
     </div>
-
   </div>
 </div>
 
 <script>
-
   fetch('/version')
-    .then(function (response) {
-      return response.json();
-    })
+    .then((response) => response.json())
     .then(function (json) {
+      let url = `https://github.com/lukasdanckwerth/lotivis/releases/tag/v${json.version}`;
+      document.getElementById('version-link').href = url;
       document.getElementById('version').innerText = json.version;
     });
-
 </script>
 
 </body>
