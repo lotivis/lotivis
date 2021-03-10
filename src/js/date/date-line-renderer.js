@@ -1,5 +1,5 @@
 
-export class ChartLineRenderer {
+export class DateLineRenderer {
   constructor(timeChart) {
 
     /**

@@ -12,7 +12,7 @@
 <body>
 
 <div class="container">
-  <div class="row menu">
+  <div class="row">
     <div class="col-12 text-center">
       <h1>
         Lotivis Examples
@@ -23,7 +23,7 @@
         </a>
       </h1>
     </div>
-    <div class="col-4">
+    <div class="col-4 menu">
       <h2>Chart</h2>
       <ul>
         <li><a href="html/timechart.html">Chart</a></li>
@@ -32,7 +32,7 @@
         <li><a href="html/timechart-grouped-stacked.html">Chart Grouped Stacked</a></li>
       </ul>
     </div>
-    <div class="col-4">
+    <div class="col-4 menu">
       <h2>Map</h2>
       <ul>
         <li><a href="html/map-empty.html">Map Empty</a></li>
@@ -40,25 +40,25 @@
         <li><a href="html/map-france.html">Map France (Département)</a></a></li>
       </ul>
     </div>
-    <div class="col-4">
+    <div class="col-4 menu">
       <h2>Plot</h2>
       <ul>
         <li><a href="html/plot.html">Plot Data</a></li>
       </ul>
     </div>
-    <div class="col-4">
+    <div class="col-4 menu">
       <h2>Interactive</h2>
       <ul>
         <li><a href="html/miff.html">mif, mif', miff, miff', miffs, mifs, mille-f, mi-f, mi-f', 'mif'</a></li>
       </ul>
     </div>
-    <div class="col-4">
+    <div class="col-4 menu">
       <h2>Real World Examples</h2>
       <ul>
         <li><a href="html/corona.html">Corona-Zahlen Zeitverlauf</a></li>
       </ul>
     </div>
-    <div class="col-4">
+    <div class="col-4 menu">
       <h2>Customs</h2>
       <ul>
         <li><a href="html/upload.html">Upload Custom Data</a></li>
@@ -69,9 +69,12 @@
 
 <script>
   fetch('/version')
-    .then((response) => response.json())
+    .then(function (response) {
+      return response.json();
+    })
     .then(function (json) {
-      let url = `https://github.com/lukasdanckwerth/lotivis/releases/tag/v${json.version}`;
+      let urlBase = 'https://github.com/lukasdanckwerth/lotivis/releases/tag/v';
+      let url = `${urlBase}${json.version}`;
       document.getElementById('version-link').href = url;
       document.getElementById('version').innerText = json.version;
     });

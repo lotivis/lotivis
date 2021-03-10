@@ -1,7 +1,7 @@
 import {log_debug} from "../shared/debug";
 import {Color} from "../shared/colors";
 
-export class ChartBarsRenderer {
+export class DateBarsRenderer {
 
   constructor(timeChart) {
 
@@ -11,9 +11,6 @@ export class ChartBarsRenderer {
      * @param stackIndex
      */
     this.renderBars = function (stack, stackIndex) {
-
-      log_debug('stack', stack);
-
       timeChart
         .svg
         .append("g")
@@ -32,6 +29,7 @@ export class ChartBarsRenderer {
         .data((data) => data)
         .enter()
         .append("rect")
+        .attr('class', 'lotivis-date-chart-bar')
         .attr("rx", timeChart.isCombineStacks ? 0 : 4)
         .attr("x", (d) => timeChart.xChart(d.data.date) + timeChart.xStack(stack.label))
         .attr("y", (d) => timeChart.yChart(d[1]))

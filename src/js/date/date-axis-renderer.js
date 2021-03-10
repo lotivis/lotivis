@@ -1,4 +1,4 @@
-export class ChartAxisRenderer {
+export class DateAxisRenderer {
 
   constructor(timeChart) {
 

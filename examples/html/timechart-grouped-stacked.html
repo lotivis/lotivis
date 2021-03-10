@@ -4,10 +4,12 @@
   <meta charset="utf-8"/>
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
-  <link rel="stylesheet" href="../dist/lotivis.css"/>
+  <link rel="stylesheet" href="/dist/lotivis.css"/>
+  <link rel="stylesheet" href="../examples.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <title>Lotivis - Time Chart Grouped Stacked</title>
 </head>
+
 <body>
 
 <div class="container">
@@ -27,7 +29,7 @@
         <!-- Time Chart Code Here -->
       </div>
     </div>
-    <div class="col-12">
+    <div class="col-12 data">
       <samp id="data">
         <!-- Data Here -->
       </samp>
@@ -36,26 +38,70 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@nidi/html2canvas@1.0.0-rc.13/dist/html2canvas.min.js"></script>
-<script src="../dist/lotivis.js"></script>
+<script src="/dist/lotivis.js"></script>
 
 <script>
 
+  let datasets = [
+    {
+      "label": "dataset_1",
+      "stack": "dataset_1",
+      "data": [
+        {"location": 1, "date": 2000, "value": 0},
+        {"location": 1, "date": 2001, "value": 1},
+        {"location": 1, "date": 2002, "value": 2},
+        {"location": 1, "date": 2003, "value": 3},
+        {"location": 1, "date": 2004, "value": 4},
+        {"location": 2, "date": 2000, "value": 2},
+        {"location": 2, "date": 2001, "value": 3},
+        {"location": 2, "date": 2002, "value": 4},
+        {"location": 2, "date": 2003, "value": 5},
+        {"location": 2, "date": 2004, "value": 6}
+      ]
+    },
+    {
+      "label": "dataset_2",
+      "stack": "dataset_2, dataset_3",
+      "data": [
+        {"location": 1, "date": 2000, "value": 5},
+        {"location": 1, "date": 2001, "value": 5},
+        {"location": 1, "date": 2002, "value": 5},
+        {"location": 1, "date": 2003, "value": 5},
+        {"location": 1, "date": 2004, "value": 5},
+        {"location": 2, "date": 2000, "value": 8},
+        {"location": 2, "date": 2001, "value": 7},
+        {"location": 2, "date": 2002, "value": 6},
+        {"location": 2, "date": 2003, "value": 5},
+        {"location": 2, "date": 2004, "value": 4}
+      ]
+    },
+    {
+      "label": "dataset_3",
+      "stack": "dataset_2, dataset_3",
+      "data": [
+        {"location": 1, "date": 2000, "value": 5},
+        {"location": 1, "date": 2001, "value": 4},
+        {"location": 1, "date": 2002, "value": 3},
+        {"location": 1, "date": 2003, "value": 2},
+        {"location": 1, "date": 2004, "value": 1},
+        {"location": 2, "date": 2000, "value": 5},
+        {"location": 2, "date": 2001, "value": 6},
+        {"location": 2, "date": 2002, "value": 7},
+        {"location": 2, "date": 2003, "value": 8},
+        {"location": 2, "date": 2004, "value": 9}
+      ]
+    }
+  ];
+
+  let string = JSON.stringify(datasets, null, 2);
+  document.getElementById('data').innerHTML = string;
+
   let timeChartCard = new lotivis.TimeChartCard('time-chart-card');
-  let chart = timeChartCard.chart;
-
-  d3
-    .json('/assets/example-datasets-location-time-grouped-stacked.json')
-    .then(function (json) {
-      let string = JSON.stringify(json, null, 4);
-      let element = document.getElementById('data');
-      element.innerHTML = string;
-
-      chart.datasets = json;
-      chart.update();
-    });
+  timeChartCard.chart.datasets = datasets;
+  timeChartCard.chart.update();
 
 </script>
 
 </body>
+
 </html>

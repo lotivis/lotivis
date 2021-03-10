@@ -1,6 +1,6 @@
 import {Component} from "./js/components/component";
-import {TimeChart} from "./js/time/time-chart";
-import {TimeChartCard} from "./js/time/time-chart-card";
+import {DateChart} from "./js/date/date-chart";
+import {DateChartCard} from "./js/date/date-chart-card";
 import {MapChart} from "./js/map/map-chart";
 import {MapChartCard} from "./js/map/map-chart-card";
 import {PlotChart} from "./js/plot/plot-chart";
@@ -63,8 +63,8 @@ exports.Popup = Popup;
 exports.RadioGroup = RadioGroup;
 exports.Option = Option;
 
-exports.TimeChart = TimeChart;
-exports.TimeChartCard = TimeChartCard;
+exports.TimeChart = DateChart;
+exports.TimeChartCard = DateChartCard;
 
 exports.MapChart = MapChart;
 exports.MapChartCard = MapChartCard;

@@ -1,5 +1,5 @@
 import {Component} from "../components/component";
-import {TimeChart} from "../time/time-chart";
+import {DateChart} from "../date/date-chart";
 import {
   extractDatesFromDatasets,
   extractEarliestDateWithValue,
@@ -127,7 +127,7 @@ export class PlotChart extends Component {
       .append('svg')
       .attr('preserveAspectRatio', 'xMidYMid meet')
       .attr("viewBox", `0 0 ${this.width} ${this.height}`)
-      .attr('id', TimeChart.svgID);
+      .attr('id', DateChart.svgID);
 
     this.background = this.svg
       .append('rect')

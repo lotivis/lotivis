@@ -1,8 +1,7 @@
-import {sumOfLabel, sumOfStack} from "../data-juggle/dataset-sum";
+import {sumOfStack} from "../data-juggle/dataset-sum";
 import {Color} from "../shared/colors";
-import {log_debug} from "../shared/debug";
 
-export class ChartLegendRenderer {
+export class DateLegendRenderer {
 
   constructor(timeChart) {
 

@@ -1,6 +1,6 @@
 import {Card} from "../components/card";
-import {TimeChart} from "./time-chart";
-import {TimeChartSettingsPopup} from "./time-chart-settings-popup";
+import {DateChart} from "./date-chart";
+import {DateChartSettingsPopup} from "./date-chart-settings-popup";
 import {URLParameters} from "../shared/url-parameters";
 import {RadioGroup} from "../components/radio-group";
 import {Option} from "../components/option";
@@ -9,10 +9,10 @@ import {ChartCard} from "../components/chart-card";
 /**
  *
  *
- * @class TimeChartCard
+ * @class DateChartCard
  * @extends Card
  */
-export class TimeChartCard extends ChartCard {
+export class DateChartCard extends ChartCard {
 
   /**
    *
@@ -34,11 +34,14 @@ export class TimeChartCard extends ChartCard {
    *
    */
   renderChart() {
-    this.chart = new TimeChart(this.body);
+    this.chart = new DateChart(this.body);
     this.chart.margin.left = 50;
     this.chart.margin.right = 50;
   }
 
+  /**
+   *
+   */
   renderRadioGroup() {
     this.radioGroup = new RadioGroup(this.headerCenterComponent);
     this.radioGroup.onChange = function (value) {
@@ -47,6 +50,9 @@ export class TimeChartCard extends ChartCard {
     }.bind(this);
   }
 
+  /**
+   *
+   */
   updateRadioGroup() {
     if (!this.datasets) return;
     let names = this.datasets.map(dataset => dataset.label);
@@ -66,16 +72,13 @@ export class TimeChartCard extends ChartCard {
       .getBoolean(URLParameters.chartCombineStacks, false);
   }
 
-
-  // MARK: - Settings Popup
-
   /**
    *
    */
   presentSettingsPopupAction() {
     let bodyElement = d3.select('body');
     let button = document.getElementById(this.moreButton.selector);
-    let settingsPopup = new TimeChartSettingsPopup(bodyElement);
+    let settingsPopup = new DateChartSettingsPopup(bodyElement);
     settingsPopup.diachronicChart = this.chart;
     settingsPopup.showUnder(button, 'right');
   }

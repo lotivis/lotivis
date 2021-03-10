@@ -71,9 +71,8 @@ a {
   color: dodgerblue;
 }
 
-a::after {
+.menu a::after {
   content: '\2192';
   margin: 0 0 0 5px ;
   text-decoration: none;
 }
-
