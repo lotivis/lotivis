@@ -1,5 +1,4 @@
 const assert = require('assert');
-const fetch = require("node-fetch");
 const lotivis = require('../dist/lotivis');
 
 describe('parse csv', function () {
