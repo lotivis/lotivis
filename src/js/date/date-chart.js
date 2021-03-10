@@ -3,7 +3,7 @@ import {DateAxisRenderer} from "./date-axis-renderer";
 import {DateLabelRenderer} from "./date-label-renderer";
 import {DateLegendRenderer} from "./date-legend-renderer";
 import {DateBarsRenderer} from "./date-bars-renderer";
-import {FilterableDatasetController} from "../data/filterable-dataset-controller";
+import {FilterableDatasetsController} from "../data/filterable-datasets-controller";
 import {DateGhostBarsRenderer} from "./date-ghost-bars-renderer";
 import {DateTooltipRenderer} from "./date-tooltip-renderer";
 import {Chart} from "../components/chart";
@@ -214,7 +214,7 @@ export class DateChart extends Chart {
    * @param newDatasets
    */
   set datasets(newDatasets) {
-    this.setDatasetController(new FilterableDatasetController(newDatasets));
+    this.setDatasetController(new FilterableDatasetsController(newDatasets));
   }
 
   /**

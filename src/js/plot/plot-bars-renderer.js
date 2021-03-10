@@ -10,21 +10,15 @@ export class PlotBarsRenderer {
     this.renderBars = function () {
       let datasets = plotChart.workingDatasets;
 
-      this.max = d3.max(datasets, function (dataset) {
-        return d3.max(dataset.data, function (item) {
-          return item.value;
-        });
-      });
-
       this.defs = plotChart.svg.append("defs");
       for (let index = 0; index < datasets.length; index++) {
-        let dataset = datasets[index];
-        this.createGradient(dataset);
+        this.createGradient(datasets[index]);
       }
 
       let radius = 6;
 
-      plotChart.barsData = plotChart.svg
+      plotChart.barsData = plotChart
+        .svg
         .append("g")
         .selectAll("g")
         .data(datasets)
@@ -43,36 +37,14 @@ export class PlotBarsRenderer {
         .attr("id", (d) => 'rect-' + hashCode(d.label))
         .on('mouseenter', plotChart.tooltipRenderer.showTooltip.bind(plotChart))
         .on('mouseout', plotChart.tooltipRenderer.hideTooltip.bind(plotChart))
-        .on('click', plotChart.onClick.bind(this))
         .attr("width", function (data) {
           if (!data.earliestDate || !data.latestDate) return 0;
           return plotChart.xChart(data.latestDate) - plotChart.xChart(data.earliestDate) + plotChart.xChart.bandwidth();
         }.bind(this));
-
-      plotChart.labels = plotChart.barsData
-        .append('g')
-        .attr('transform', `translate(0,${(plotChart.yChart.bandwidth() / 2) + 4})`)
-        .append('text')
-        .attr("id", (d) => 'rect-' + hashCode(d.label))
-        .attr("fill", 'black')
-        .attr('text-anchor', 'start')
-        .attr('font-size', '12px')
-        .attr('class', 'map-label')
-        .attr('opacity', plotChart.isShowLabels ? 1 : 0)
-        .attr("x", function (d) {
-          let rectX = plotChart.xChart(d.earliestDate);
-          let offset = plotChart.xChart.bandwidth() / 2;
-          return rectX + offset;
-        })
-        .attr("y", (d) => plotChart.yChart(d.label))
-        .attr("width", (d) => plotChart.xChart(d.latestDate) - plotChart.xChart(d.earliestDate) + plotChart.xChart.bandwidth())
-        .text(function (dataset) {
-          return `${dataset.duration} years, ${dataset.sum} items`;
-        });
     };
 
     this.createGradient = function (dataset) {
-
+      let max = plotChart.datasetController.getMax();
       let gradient = this.defs
         .append("linearGradient")
         .attr("id", this.createIDFromDataset(dataset))
@@ -92,14 +64,10 @@ export class PlotBarsRenderer {
       );
 
       if (firstDate === lastDate) {
-
-        if (!data || data.length === 0) {
-          return;
-        }
-
+        if (!data || data.length === 0) return;
         let item = data[0];
         let value = item.value;
-        let opacity = value / this.max;
+        let opacity = value / max;
 
         gradient
           .append("stop")
@@ -112,7 +80,7 @@ export class PlotBarsRenderer {
 
           let item = data[index];
           let date = item.date;
-          let opacity = item.value / this.max;
+          let opacity = item.value / max;
 
           let dateDifference = lastDate - date;
           let datePercentage = (1 - (dateDifference / timespan)) * 100;

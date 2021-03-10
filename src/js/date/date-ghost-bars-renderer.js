@@ -58,7 +58,7 @@ export class DateGhostBarsRenderer {
         .attr("rx", Constants.barRadius)
         .attr("ry", Constants.barRadius)
         .attr("x", (date) => dateChart.xChart(date))
-        .attr("y", dateChart.margin.bottom)
+        .attr("y", dateChart.margin.top)
         .attr("width", dateChart.xChart.bandwidth())
         .attr("height", dateChart.height - dateChart.margin.bottom - dateChart.margin.top)
         .on('mouseenter', onMouseEnter.bind(this))

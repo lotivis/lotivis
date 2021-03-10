@@ -9,9 +9,10 @@ import {combineByDate} from "../data-juggle/dataset-combine";
 import {sumOfLabel} from "../data-juggle/dataset-sum";
 import {PlotAxisRenderer} from "./plot-axis-renderer";
 import {copy} from "../shared/copy";
-import {FilterableDatasetController} from "../data/filterable-dataset-controller";
+import {FilterableDatasetsController} from "../data/filterable-datasets-controller";
 import {PlotBarsRenderer} from "./plot-bars-renderer";
 import {PlotTooltipRenderer} from "./plot-tooltip-renderer";
+import {PlotLabelRenderer} from "./plot-label-renderer";
 
 /**
  *
@@ -70,6 +71,7 @@ export class PlotChart extends Component {
 
     this.axisRenderer = new PlotAxisRenderer(this);
     this.barsRenderer = new PlotBarsRenderer(this);
+    this.labelsRenderer = new PlotLabelRenderer(this);
     this.tooltipRenderer = new PlotTooltipRenderer(this);
   }
 
@@ -94,6 +96,7 @@ export class PlotChart extends Component {
     this.axisRenderer.renderAxis();
     this.axisRenderer.renderGrid();
     this.barsRenderer.renderBars();
+    this.labelsRenderer.renderLabels();
   }
 
   /**
@@ -132,15 +135,11 @@ export class PlotChart extends Component {
       .attr('height', this.height)
       .attr('fill', 'white')
       .on('mouseout', function () {
-        this.tooltipRenderer.hideTooltip();
+        // this.tooltipRenderer.hideTooltip();
       }.bind(this))
-      .on('mouseenter', function (event) {
-        this.tooltipRenderer.hideTooltip();
-        let controller = this.datasetController;
-        let filters = controller.datasetFilters;
-        if (!filters || filters.length === 0) return;
-        controller.setDatasetsFilter([])
-      }.bind(this))
+      .on('mouseenter', function () {
+        // this.tooltipRenderer.hideTooltip();
+      }.bind(this));
   }
 
   /**
@@ -183,15 +182,6 @@ export class PlotChart extends Component {
       .tickSize(-this.graphWidth)
       .tickFormat('');
 
-  }
-
-  onClick(event, dataset) {
-    console.log('event', event);
-    console.log('this.datasetController', this.datasetController);
-    console.log('dataset', dataset.label);
-    console.log('this', this);
-    let label = dataset.label;
-    this.datasetController.setDatasetsFilter([label]);
   }
 
   /**
@@ -241,10 +231,10 @@ export class PlotChart extends Component {
 
   /**
    * Sets the datasets.
-   * @param datasets The array of datasets.
+   * @param newDatasets The array of datasets.
    */
   set datasets(newDatasets) {
-    this.setDatasetController(new FilterableDatasetController(newDatasets));
+    this.setDatasetController(new FilterableDatasetsController(newDatasets));
   }
 
   /**
@@ -268,7 +258,7 @@ export class PlotChart extends Component {
       let lastDate = extractLatestDateWithValue(data);
       let duration = lastDate - firstDate;
       data.forEach(item => item.label = dataset.label);
-      data = data.sort((left, right) => left.date > right.date);
+      data = data.sort((left, right) => left.date - right.date);
       dataset.earliestDate = firstDate;
       dataset.latestDate = lastDate;
       dataset.duration = duration;

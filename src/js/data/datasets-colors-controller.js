@@ -32,8 +32,6 @@ export class DatasetsColorsController {
       for (let dIndex = 0; dIndex < filtered.length; dIndex++) {
         labelToColor[filtered[dIndex].label] = colors[dIndex];
       }
-
-      log_debug('stackToColors', stackToColors);
     }
 
     this.colorForDataset = function (label) {
@@ -45,7 +43,6 @@ export class DatasetsColorsController {
     };
 
     this.colorsForStack = function (stack) {
-      log_debug('stack', stack);
       return stackToColors[stack] || [];
     };
   }

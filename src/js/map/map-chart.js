@@ -6,7 +6,7 @@ import {MapTooltipRenderer} from "./map-tooltip-renderer";
 import {MapLegendRenderer} from "./map-legend-renderer";
 import {MapLabelRenderer} from "./map-label-renderer";
 import {MapDatasetRenderer} from "./map-dataset-renderer";
-import {FilterableDatasetController} from "../data/filterable-dataset-controller";
+import {FilterableDatasetsController} from "../data/filterable-datasets-controller";
 import {MapGeoJsonRenderer} from "./map-geojson-renderer";
 
 /**
@@ -146,7 +146,7 @@ export class MapChart extends Component {
    * @param newDatasets
    */
   set datasets(newDatasets) {
-    this.setDatasetController(new FilterableDatasetController(newDatasets));
+    this.setDatasetController(new FilterableDatasetsController(newDatasets));
   }
 
   /**

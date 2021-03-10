@@ -1,4 +1,6 @@
 import {hashCode} from "../shared/hash";
+import {Constants} from "../shared/constants";
+import {log_debug} from "../shared/debug";
 
 export class PlotTooltipRenderer {
 
@@ -29,8 +31,9 @@ export class PlotTooltipRenderer {
       components.push('Items: ' + dataset.data.map(item => item.value).reduce((acc, next) => acc + next, 0));
       components.push('');
 
-      for (let index = 0; index < dataset.data.length; index++) {
-        let entry = dataset.data[index];
+      let filtered = dataset.data.filter(item => item.value !== 0);
+      for (let index = 0; index < filtered.length; index++) {
+        let entry = filtered[index];
         components.push(`${entry.date}: ${entry.value}`);
       }
       tooltip.html(components.join('<br/>'));
@@ -39,17 +42,16 @@ export class PlotTooltipRenderer {
       let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
       let factor = plotChart.getElementEffectiveSize()[0] / plotChart.width;
       let offset = plotChart.getElementPosition();
+
       let top = plotChart.yChart(dataset.label);
       top *= factor;
-
-      let displayUnder = (top - plotChart.margin.top) <= tooltipHeight;
       top += offset[1];
 
-      if (displayUnder) {
-        top += plotChart.lineHeight + 10;
+      if ((plotChart.yChart(dataset.label) - plotChart.margin.top) <= (plotChart.graphHeight / 2)) {
+        top += (plotChart.lineHeight * factor) + Constants.tooltipOffset;
       } else {
-        top -= tooltipHeight;
-        top -= plotChart.lineHeight;
+        top -= tooltipHeight + 20; // subtract padding
+        top -= Constants.tooltipOffset;
       }
 
       let left = plotChart.xChart(dataset.earliestDate);
@@ -64,44 +66,51 @@ export class PlotTooltipRenderer {
 
       let id = 'rect-' + hashCode(dataset.label);
 
-      plotChart
-        .svg
-        .selectAll('rect')
-        .transition()
-        .attr('opacity', 0.15);
+      // plotChart
+      //   .svg
+      //   .selectAll('rect')
+      //   .transition()
+      //   .attr('opacity', 0.15);
 
-      plotChart
-        .labels
-        .transition()
-        .attr('opacity', plotChart.isShowLabels ? 0.15 : 0);
+      // plotChart
+      //   .labels
+      //   .transition()
+      //   .attr('opacity', plotChart.isShowLabels ? 0.15 : 0);
 
-      plotChart
-        .svg
-        .selectAll(`#${id}`)
-        .transition()
-        .attr('opacity', 1);
-
-      plotChart
-        .labels
-        .selectAll(`#${id}`)
-        .transition()
-        .attr('opacity', 1);
+      // plotChart
+      //   .svg
+      //   .selectAll(`#${id}`)
+      //   .transition()
+      //   .attr('opacity', 1);
+      //
+      // plotChart
+      //   .labels
+      //   .selectAll(`#${id}`)
+      //   .transition()
+      //   .attr('opacity', 1);
 
       plotChart.onSelectDataset(event, dataset);
     };
 
     this.hideTooltip = function () {
+      let controller = plotChart.datasetController;
+      let filters = controller.datasetFilters;
+
+      if (filters && filters.length !== 0) {
+        controller.resetFilters();
+      }
+
       if (+tooltip.style('opacity') === 0) return;
       tooltip.style('opacity', 0);
-      plotChart
-        .svg
-        .selectAll('rect')
-        .transition()
-        .attr('opacity', 1);
-      plotChart
-        .labels
-        .transition()
-        .attr('opacity', plotChart.isShowLabels ? 1 : 0);
+      // plotChart
+      //   .svg
+      //   .selectAll('rect')
+      //   .transition()
+      //   .attr('opacity', 1);
+      // plotChart
+      //   .labels
+      //   .transition()
+      //   .attr('opacity', plotChart.isShowLabels ? 1 : 0);
     };
   }
 }

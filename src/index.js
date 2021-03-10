@@ -40,8 +40,8 @@ import {
   dateToItemsRelation
 } from "./js/data-juggle/dataset-relations";
 import {URLParameters} from "./js/shared/url-parameters";
-import {DatasetController} from "./js/data/dataset-controller";
-import {FilterableDatasetController} from "./js/data/filterable-dataset-controller";
+import {DatasetsController} from "./js/data/datasets-controller";
+import {FilterableDatasetsController} from "./js/data/filterable-datasets-controller";
 import {renderCSV} from "./js/parse/render-csv";
 import {parseCSV} from "./js/parse/parse-csv";
 import {createGeoJSON} from "./js/geojson/create-geojson";
@@ -72,8 +72,8 @@ exports.MapChartCard = MapChartCard;
 exports.PlotChart = PlotChart;
 exports.PlotChartCard = PlotChartCard;
 
-exports.DatasetController = DatasetController;
-exports.FilterableDatasetController = FilterableDatasetController;
+exports.DatasetController = DatasetsController;
+exports.FilterableDatasetController = FilterableDatasetsController;
 
 exports.URLParameters = URLParameters;
 

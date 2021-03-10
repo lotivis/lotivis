@@ -3,14 +3,14 @@ import {
   extractLabelsFromDatasets,
   extractStacksFromDatasets
 } from "../data-juggle/dataset-extract";
-import {DatasetController} from "./dataset-controller";
+import {DatasetsController} from "./datasets-controller";
 import {flatDatasets} from "../data-juggle/dataset-flat";
 import {copy} from "../shared/copy";
 
 /**
  *
  */
-export class FilterableDatasetController extends DatasetController {
+export class FilterableDatasetsController extends DatasetsController {
 
   constructor(datasets) {
     super(datasets);
@@ -24,6 +24,7 @@ export class FilterableDatasetController extends DatasetController {
     this.locationFilters = [];
     this.dateFilters = [];
     this.datasetFilters = [];
+    this.notifyListeners('reset-filters');
   }
 
   setLocationsFilter(locations) {

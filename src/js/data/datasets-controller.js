@@ -12,9 +12,9 @@ import {DatasetsColorsController} from "./datasets-colors-controller";
 
 /**
  *
- * @class DatasetController
+ * @class DatasetsController
  */
-export class DatasetController {
+export class DatasetsController {
 
   constructor(datasets) {
     this.datasets = copy(datasets);
@@ -52,6 +52,16 @@ export class DatasetController {
   getSumOfStack(stack) {
     return sumOfStack(this.flatData, stack);
   }
+
+  getMax() {
+    return d3.max(this.workingDatasets, function (dataset) {
+      return d3.max(dataset.data, function (item) {
+        return item.value;
+      });
+    });
+  }
+
+  // MARK: - Colors
 
   getColorForDataset(label) {
     return this.datasetsColorsController.colorForDataset(label);
