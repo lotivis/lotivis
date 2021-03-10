@@ -97,8 +97,6 @@ export class DateChart extends Chart {
       });
     });
 
-    // log_debug('this.max', this.max);
-
     this.xChart = d3
       .scaleBand()
       .domain(this.datasetController.dates)
@@ -173,16 +171,16 @@ export class DateChart extends Chart {
 
     // create a background rectangle for receiving mouse enter events
     // in order to reset the location data filter.
-    this.background
-      .on('mouseenter', function () {
-        let controller = this.datasetController;
-        let filters = controller.dateFilters;
-        if (!filters || filters.length === 0) return;
-        this.makeUpdateInsensible();
-        controller.setDatesFilter([]);
-        this.makeUpdateSensible();
-        this.ghostBarsRenderer.hideAll();
-      }.bind(this));
+    // this.background
+    //   .on('mouseenter', function () {
+    //     let controller = this.datasetController;
+    //     let filters = controller.dateFilters;
+    //     if (!filters || filters.length === 0) return;
+    //     this.makeUpdateInsensible();
+    //     controller.setDatesFilter([]);
+    //     this.makeUpdateSensible();
+    //     this.ghostBarsRenderer.hideAll();
+    //   }.bind(this));
 
     this.graph = this.svg
       .append('g')

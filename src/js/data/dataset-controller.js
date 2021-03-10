@@ -1,13 +1,14 @@
 import {
   extractDatesFromDatasets,
   extractLabelsFromDatasets,
-  extractLocationsFromDatasets, extractStacksFromDatasets
+  extractLocationsFromDatasets,
+  extractStacksFromDatasets
 } from "../data-juggle/dataset-extract";
 import {flatDatasets} from "../data-juggle/dataset-flat";
 import {copy} from "../shared/copy";
 import {combineByDate, combineByLocation, combineByStacks} from "../data-juggle/dataset-combine";
 import {sumOfDataset, sumOfLabel, sumOfStack} from "../data-juggle/dataset-sum";
-import {log_debug} from "../shared/debug";
+import {DatasetsColorsController} from "./datasets-colors-controller";
 
 /**
  *
@@ -25,6 +26,7 @@ export class DatasetController {
     this.stacks = extractStacksFromDatasets(datasets);
     this.dates = extractDatesFromDatasets(datasets);
     this.locations = extractLocationsFromDatasets(datasets);
+    this.datasetsColorsController = new DatasetsColorsController(this);
   }
 
   get flatDataCombinedStacks() {
@@ -49,5 +51,17 @@ export class DatasetController {
 
   getSumOfStack(stack) {
     return sumOfStack(this.flatData, stack);
+  }
+
+  getColorForDataset(label) {
+    return this.datasetsColorsController.colorForDataset(label);
+  }
+
+  getColorForStack(stack) {
+    return this.datasetsColorsController.colorForStack(stack);
+  }
+
+  getColorsForStack(stack) {
+    return this.datasetsColorsController.colorsForStack(stack);
   }
 }

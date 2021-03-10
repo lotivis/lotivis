@@ -20,7 +20,9 @@ export class DateLabelRenderer {
       let seriesIndex = 0;
       let bandwidth = xStackRef.bandwidth() / 2;
 
-      timeChart.svg.append("g")
+      timeChart
+        .svg
+        .append("g")
         .selectAll('g')
         .data(stack)
         .enter()

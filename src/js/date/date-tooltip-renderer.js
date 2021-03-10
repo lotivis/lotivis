@@ -1,6 +1,11 @@
-import {log_debug} from "../shared/debug";
 import {combineByDate} from "../data-juggle/dataset-combine";
+import {Constants} from "../shared/constants";
 
+/**
+ * Injects and presents a tooltip on a date chart.
+ *
+ * @class DateTooltipRenderer
+ */
 export class DateTooltipRenderer {
 
   /**
@@ -13,65 +18,123 @@ export class DateTooltipRenderer {
     const tooltip = dateChart
       .element
       .append('div')
-      .attr('class', 'chart-tooltip')
+      .attr('class', 'lotivis-tooltip')
       .attr('rx', 5) // corner radius
       .attr('ry', 5)
-      .style('position', 'absolute')
-      .style('color', 'black')
-      .style('border', function () {
-        return `solid 1px grey`;
-      })
       .style('opacity', 0);
 
-    this.showTooltip = function (event, date) {
+    /**
+     * Returns the size [width, height] of the tooltip.
+     * @returns {number[]}
+     */
+    function getTooltipSize() {
+      let tooltipWidth = Number(tooltip.style('width').replace('px', ''));
+      let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
+      return [tooltipWidth, tooltipHeight];
+    }
 
+    /**
+     * Calculates and returns the top pixel position for the tooltip.
+     * @param factor The size factor of the chart.
+     * @param offset The offset of the chart.
+     * @param tooltipSize The size of the tooltip.
+     * @returns {number}
+     */
+    function getTop(factor, offset, tooltipSize) {
+      let top = dateChart.margin.top * factor;
+      top += (((dateChart.graphHeight * factor) - tooltipSize[1]) / 2);
+      top += offset[1] - 10;
+      return top;
+    }
+
+    /**
+     * Calculates the x offset to position the tooltip on the left side
+     * of a bar.
+     *
+     * @param date The presented date of selected bar.
+     * @param factor The size factor of the chart.
+     * @param offset The offset of the chart.
+     * @param tooltipSize The size of the tooltip.
+     * @returns {number} The x offset for the tooltip.
+     */
+    function getXLeft(date, factor, offset, tooltipSize) {
+      let x = dateChart.xChart(date) * factor;
+      return x + offset[0] - tooltipSize[0] - 22 - Constants.tooltipOffset;
+    }
+
+    /**
+     * Calculates the x offset to position the tooltip on the right side
+     * of a bar.
+     *
+     * @param date The presented date of selected bar.
+     * @param factor The size factor of the chart.
+     * @param offset The offset of the chart.
+     * @returns {number} The x offset for the tooltip.
+     */
+    function getXRight(date, factor, offset) {
+      let x = dateChart.xChart(date) + dateChart.xChart.bandwidth();
+      x *= factor;
+      x += offset[0] + Constants.tooltipOffset;
+      return x;
+    }
+
+    /**
+     * Returns the HTML content for the given date.
+     *
+     * @param date The date to get the HTML content for.
+     * @returns {string} Return the rendered HTML content.
+     */
+    function getHTMLForDate(date) {
       let flatData = dateChart.datasetController
         .enabledFlatData
         .filter(item => item.date === date);
-      let combined = combineByDate(flatData)
-        .filter(item => item.value > 0);
-      let dataHTML = combined.map(function (item) {
-        return `${item.dataset}: <b>${item.value}</b>`;
-      }).join('<br>');
 
-      let html = `<b>${date}</b>`;
-      html += '<br>';
-      html += dataHTML;
+      let dataHTML = combineByDate(flatData)
+        .filter(item => item.value > 0)
+        .map(item => `${item.dataset}: <b>${item.value}</b>`)
+        .join('<br>');
 
-      tooltip.html(html);
+      return `<b>${date}</b><br>${dataHTML}`;
+    }
+
+    /**
+     * Presents the tooltip next to bar presenting the given date.
+     *
+     * @param event The mouse event.
+     * @param date The date which is presented.
+     */
+    this.showTooltip = function (event, date) {
+
+      // set html content before positioning the tooltip cause the size is
+      // calculated based on the size
+      tooltip.html(getHTMLForDate(date));
 
       // position tooltip
-      let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
-      let tooltipWidth = Number(tooltip.style('width').replace('px', ''));
+      let tooltipSize = getTooltipSize();
       let factor = dateChart.getElementEffectiveSize()[0] / dateChart.width;
       let offset = dateChart.getElementPosition();
-      let x = dateChart.xChart(date);
+      let top = getTop(factor, offset, tooltipSize);
+      let left = dateChart.xChart(date);
 
-      let displayLeft = x > (dateChart.width / 2);
-      if (!displayLeft) {
-        x += dateChart.xChart.bandwidth();
-      }
-      x *= factor;
-      x += offset[0];
-      if (displayLeft) {
-        x -= tooltipWidth + 22;
+      // differ tooltip position on bar position
+      if (left > (dateChart.width / 2)) {
+        left = getXLeft(date, factor, offset, tooltipSize);
+      } else {
+        left = getXRight(date, factor, offset);
       }
 
-      let y = dateChart.graphHeight / 2;
-      y += dateChart.margin.top;
-      y *= factor;
-      y += offset[1];
-      y -= tooltipHeight / 2;
-
+      // update position and opacity of tooltip
       tooltip
-        .style('left', x + 'px')
-        .style('top', y + 'px')
+        .style('left', `${left}px`)
+        .style('top', `${top}px`)
         .transition()
         .style('opacity', 1);
-
     };
 
-    this.hideTooltip = function (event, iwas) {
+    /**
+     * Hides the tooltip.
+     */
+    this.hideTooltip = function () {
       if (+tooltip.style('opacity') === 0) return;
       tooltip.transition().style('opacity', 0);
     };

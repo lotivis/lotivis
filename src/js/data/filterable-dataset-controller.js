@@ -20,17 +20,26 @@ export class FilterableDatasetController extends DatasetController {
     this.datasetFilters = [];
   }
 
+  resetFilters() {
+    this.locationFilters = [];
+    this.dateFilters = [];
+    this.datasetFilters = [];
+  }
+
   setLocationsFilter(locations) {
+    this.resetFilters();
     this.locationFilters = locations.map(location => String(location));
     this.notifyListeners('location-filter');
   }
 
   setDatesFilter(dates) {
+    this.resetFilters();
     this.dateFilters = dates.map(date => String(date));
     this.notifyListeners('dates-filter');
   }
 
   setDatasetsFilter(datasets) {
+    this.resetFilters();
     this.datasetFilters = datasets.map(dataset => String(dataset));
     this.notifyListeners('dataset-filter');
   }

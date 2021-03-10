@@ -1,4 +1,5 @@
 import {log_debug} from "../shared/debug";
+import {Constants} from "../shared/constants";
 
 /**
  *
@@ -14,7 +15,7 @@ export class DateGhostBarsRenderer {
 
     this.hideAll = function () {
       dateChart.svg
-        .selectAll('.ghost-rect')
+        .selectAll('.lotivis-selection-rect')
         .transition()
         .attr("opacity", 0);
     };
@@ -31,13 +32,15 @@ export class DateGhostBarsRenderer {
         .svg
         .select(`#${id}`)
         .transition()
-        .attr("opacity", 0.5);
+        .attr("opacity", 0.3);
 
       dateChart.tooltipRenderer.showTooltip(event, date);
     }
 
     function onMouserOut(event, date) {
+      this.hideAll();
       dateChart.tooltipRenderer.hideTooltip(event, date);
+      dateChart.datasetController.resetFilters();
     }
 
     this.renderGhostBars = function () {
@@ -49,10 +52,11 @@ export class DateGhostBarsRenderer {
         .data(dates)
         .enter()
         .append("rect")
-        .attr("class", 'ghost-rect')
+        .attr("class", 'lotivis-selection-rect')
         .attr("id", date => createID(date))
-        .attr("fill", 'gray')
         .attr("opacity", 0)
+        .attr("rx", Constants.barRadius)
+        .attr("ry", Constants.barRadius)
         .attr("x", (date) => dateChart.xChart(date))
         .attr("y", dateChart.margin.bottom)
         .attr("width", dateChart.xChart.bandwidth())

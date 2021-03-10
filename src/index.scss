@@ -15,7 +15,7 @@ $radius: 8px;
 // MARK: - Colors
 $primary-text-color: #333;
 $secondary-text-color: #888;
-$tint-color: #1E4659;
+$tint-color: dodgerblue;
 $background: #f0f0f1;
 $darkGray: #464845;
 $lightGray: #919191;
@@ -35,3 +35,4 @@ body {
 @import "scss/map";
 @import "scss/plot";
 @import "scss/popup";
+@import "scss/tooltip";

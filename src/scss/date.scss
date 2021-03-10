@@ -8,14 +8,7 @@
   pointer-events: none;
 }
 
-/* Style for Custom Tooltip */
-.chart-tooltip {
-  position: absolute;
-  padding: $small-border;
-  background: white;
-  font: 12px sans-serif;
-  stroke-width: 2;
-  border-radius: $radius;
-  pointer-events: none;
-  line-height: 1.4;
+.lotivis-selection-rect {
+  border-radius: 10px;
+  fill: $tint-color;
 }

@@ -1,0 +1,13 @@
+
+.lotivis-tooltip {
+  position: absolute;
+  padding: 10px;
+  background: white;
+  font: 12px sans-serif;
+  stroke-width: 2;
+  border-radius: $radius;
+  border: solid 1px $tint-color;
+  pointer-events: none;
+  line-height: 1.4;
+  box-shadow: rgba(0, 0, 0, 0.1) 0 0 10px 0;
+}

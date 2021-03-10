@@ -6,15 +6,12 @@ import {
   extractLatestDateWithValue
 } from "../data-juggle/dataset-extract";
 import {combineByDate} from "../data-juggle/dataset-combine";
-import {hashCode} from "../shared/hash";
 import {sumOfLabel} from "../data-juggle/dataset-sum";
 import {PlotAxisRenderer} from "./plot-axis-renderer";
 import {copy} from "../shared/copy";
-import {DatasetController} from "../data/dataset-controller";
 import {FilterableDatasetController} from "../data/filterable-dataset-controller";
 import {PlotBarsRenderer} from "./plot-bars-renderer";
 import {PlotTooltipRenderer} from "./plot-tooltip-renderer";
-import {log_debug} from "../shared/debug";
 
 /**
  *

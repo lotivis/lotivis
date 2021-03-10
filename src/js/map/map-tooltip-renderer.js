@@ -1,6 +1,5 @@
 import {combineByLocation} from "../data-juggle/dataset-combine";
 import {Color} from "../shared/colors";
-import {log_debug} from "../shared/debug";
 
 export class MapTooltipRenderer {
 
@@ -11,14 +10,14 @@ export class MapTooltipRenderer {
     let tooltip = mapChart
       .element
       .append('div')
-      .attr('class', 'map-tooltip')
+      .attr('class', 'lotivis-tooltip')
       .attr('rx', 5) // corner radius
       .attr('ry', 5)
       .style('position', 'absolute')
       .style('color', 'black')
-      .style('border', function () {
-        return `solid 1px ${color}`;
-      })
+      // .style('border', function () {
+      //   return `solid 1px ${color}`;
+      // })
       .style('opacity', 0);
 
     let bounds = mapChart.svg

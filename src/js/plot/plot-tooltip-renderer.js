@@ -7,14 +7,9 @@ export class PlotTooltipRenderer {
     const tooltip = plotChart
       .element
       .append('div')
-      .attr('class', 'chart-tooltip')
+      .attr('class', 'lotivis-tooltip')
       .attr('rx', 5) // corner radius
       .attr('ry', 5)
-      .style('position', 'absolute')
-      .style('color', 'black')
-      .style('border', function () {
-        return `solid 1px grey`;
-      })
       .style('opacity', 0);
 
     /**
