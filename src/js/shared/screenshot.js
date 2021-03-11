@@ -4,13 +4,20 @@
  * @param selector The id of the svg element.
  * @param filename The name of file which is downloaded.
  */
+import {log_debug} from "./debug";
+
 export function downloadImage(selector, filename) {
   let svgElement = d3.select('#' + selector);
   let size = getOriginalSizeOfSVG(document.getElementById(selector));
   let node = svgElement.node();
   let svgString = getSVGString(node);
-  svgString2Image(svgString, 2 * size[0], 2 * size[1], function (dataBlob) {
-    downloadData(dataBlob, filename);
+  svgString2Image(svgString, 2 * size[0], 2 * size[1], function (dataURL) {
+    log_debug('dataURL', dataURL);
+    fetch(dataURL)
+      .then(res => res.blob())
+      .then(function (dataBlob) {
+        downloadData(dataBlob, filename);
+      });
   });
 }
 
@@ -120,7 +127,7 @@ function svgString2Image(svgString, width, height, callback) {
  */
 function downloadData(data, filename) {
   let anchor = document.createElement("a");
-  anchor.href = data;
+  anchor.href = URL.createObjectURL(data);
   anchor.download = appendPNGIfNeeded(filename);
   document.body.appendChild(anchor);
   anchor.click();
