@@ -16,7 +16,7 @@ export class DateGhostBarsRenderer {
     this.hideAll = function () {
       dateChart.svg
         .selectAll('.lotivis-selection-rect')
-        .transition()
+        // .transition()
         .attr("opacity", 0);
     };
 
@@ -31,7 +31,7 @@ export class DateGhostBarsRenderer {
       dateChart
         .svg
         .select(`#${id}`)
-        .transition()
+        // .transition()
         .attr("opacity", 0.3);
 
       dateChart.tooltipRenderer.showTooltip(event, date);

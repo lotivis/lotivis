@@ -2,8 +2,18 @@ import {hashCode} from "../shared/hash";
 import {Constants} from "../shared/constants";
 import {log_debug} from "../shared/debug";
 
+/**
+ *
+ * @class PlotTooltipRenderer
+ */
 export class PlotTooltipRenderer {
 
+  /**
+   * Creates a new instance of PlotTooltipRenderer.
+   *
+   * @constructor
+   * @param plotChart
+   */
   constructor(plotChart) {
 
     const tooltip = plotChart
@@ -15,12 +25,10 @@ export class PlotTooltipRenderer {
       .style('opacity', 0);
 
     /**
-     * Presents the tooltip for the given dataset.
      *
-     * @param event The mouse event.
-     * @param dataset The dataset.
+     * @param dataset
      */
-    this.showTooltip = function (event, dataset) {
+    function getHTMLContentForDataset(dataset) {
       let components = [];
 
       components.push('Label: ' + dataset.label);
@@ -36,7 +44,26 @@ export class PlotTooltipRenderer {
         let entry = filtered[index];
         components.push(`${entry.date}: ${entry.value}`);
       }
-      tooltip.html(components.join('<br/>'));
+
+      return components.join('<br/>');
+    }
+
+    function getTooltipLeftForDataset(dataset, factor, offset) {
+      let left = plotChart.xChart(dataset.earliestDate);
+      left *= factor;
+      left += offset[0];
+      return left;
+    }
+
+    /**
+     * Presents the tooltip for the given dataset.
+     *
+     * @param event The mouse event.
+     * @param dataset The dataset.
+     */
+    this.showTooltip = function (event, dataset) {
+
+      tooltip.html(getHTMLContentForDataset(dataset));
 
       // position tooltip
       let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
@@ -54,17 +81,15 @@ export class PlotTooltipRenderer {
         top -= Constants.tooltipOffset;
       }
 
-      let left = plotChart.xChart(dataset.earliestDate);
-      left *= factor;
-      left += offset[0];
+      let left = getTooltipLeftForDataset(dataset, factor, offset);
 
       tooltip
         .style('left', left + 'px')
         .style('top', top + 'px')
-        .transition()
+        // .transition()
         .style('opacity', 1);
 
-      let id = 'rect-' + hashCode(dataset.label);
+      // let id = 'rect-' + hashCode(dataset.label);
 
       // plotChart
       //   .svg
@@ -92,6 +117,9 @@ export class PlotTooltipRenderer {
       plotChart.onSelectDataset(event, dataset);
     };
 
+    /**
+     *
+     */
     this.hideTooltip = function () {
       let controller = plotChart.datasetController;
       let filters = controller.datasetFilters;
