@@ -1,7 +1,7 @@
 import {MapChart} from "./map-chart";
-import {screenshotElement} from "../shared/screenshot";
 import {MapChartSettingsPopup} from "./map-chart-settings-popup";
 import {ChartCard} from "../components/chart-card";
+import {downloadImage} from "../shared/screenshot";
 
 /**
  *
@@ -27,12 +27,13 @@ export class MapChartCard extends ChartCard {
   }
 
   /**
-   * Triggered when the screenshot button is pushed.
+   * Creates and downloads a screenshot from the chart.
+   * @override
    */
   screenshotButtonAction() {
-    let name = 'my_image.jpg';
-    let chartID = this.chart.selector;
-    screenshotElement("#" + chartID, name);
+    let labels = this.chart.datasetController.labels;
+    let name = labels.join(',') + '-map-chart';
+    downloadImage(this.chart.svgSelector, name);
   }
 
   /**

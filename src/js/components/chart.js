@@ -1,4 +1,5 @@
 import {Component} from "./component";
+import {createID} from "../shared/selector";
 
 /**
  *
@@ -24,6 +25,7 @@ export class Chart extends Component {
       this.element.attr('id', this.selector);
     }
 
+    this.svgSelector = createID();
     this.updateSensible = true;
     this.initialize();
     this.update();

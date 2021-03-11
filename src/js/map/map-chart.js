@@ -1,4 +1,4 @@
-import {Component} from '../components/component';
+import {Chart} from '../components/chart';
 import {Color} from '../shared/colors';
 import {combineByLocation, combineByStacks} from '../data-juggle/dataset-combine';
 import {removeFeatures} from "../geojson/remove-features";
@@ -13,9 +13,9 @@ import {MapGeoJsonRenderer} from "./map-geojson-renderer";
  * A component which renders a geo json with d3.
  *
  * @class MapChart
- * @extends Component
+ * @extends Chart
  */
-export class MapChart extends Component {
+export class MapChart extends Chart {
 
   /**
    * Creates a new instance of MapChart.
@@ -70,7 +70,7 @@ export class MapChart extends Component {
     this.svg = d3
       .select(`#${this.selector}`)
       .append('svg')
-      .attr('id', 'map')
+      .attr('id', this.svgSelector)
       .classed('map', true)
       .attr('viewBox', `0 0 ${this.width} ${this.height}`);
 

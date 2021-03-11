@@ -40,7 +40,7 @@ export class DateChart extends Chart {
     this.datasets = [];
 
     this.labelColor = new Color(155, 155, 155).rgbString();
-    this.type = DateChart.ChartType.Bar;
+    this.type = 'bar'; // DateChart.ChartType.Bar;
     // this.valueType = 'relative';
 
     this.isShowLabels = false;
@@ -159,7 +159,7 @@ export class DateChart extends Chart {
       // .attr('height', this.height)
       .attr('preserveAspectRatio', 'xMidYMid meet')
       .attr("viewBox", `0 0 ${this.width} ${this.height}`)
-      .attr('id', DateChart.svgID);
+      .attr('id', this.svgSelector);
 
     this.background = this.svg
       .append('rect')
@@ -224,17 +224,3 @@ export class DateChart extends Chart {
     return this.datasetController ? this.datasetController.datasets || [] : [];
   }
 }
-
-DateChart.svgID = 'chart-svg';
-
-/**
- * @enum
- * Enumeration of available chart types.
- */
-DateChart.ChartType = {
-  /** Case for bar chart type. */
-  Bar: 'Bar',
-  /** Case for line chart type. */
-  Line: 'Line'
-};
-

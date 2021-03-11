@@ -1,5 +1,4 @@
-import {Component} from "../components/component";
-import {DateChart} from "../date/date-chart";
+import {Chart} from "../components/chart";
 import {
   extractDatesFromDatasets,
   extractEarliestDateWithValue,
@@ -19,7 +18,7 @@ import {PlotLabelRenderer} from "./plot-label-renderer";
  * @class PlotChart
  * @extends Component
  */
-export class PlotChart extends Component {
+export class PlotChart extends Chart {
   radius = 23;
   isShowLabels = true;
   configuration = {
@@ -125,9 +124,9 @@ export class PlotChart extends Component {
     this.removeSVG();
     this.svg = this.element
       .append('svg')
+      .attr('id', this.svgSelector)
       .attr('preserveAspectRatio', 'xMidYMid meet')
-      .attr("viewBox", `0 0 ${this.width} ${this.height}`)
-      .attr('id', DateChart.svgID);
+      .attr("viewBox", `0 0 ${this.width} ${this.height}`);
 
     this.background = this.svg
       .append('rect')

@@ -5,6 +5,8 @@ import {URLParameters} from "../shared/url-parameters";
 import {RadioGroup} from "../components/radio-group";
 import {Option} from "../components/option";
 import {ChartCard} from "../components/chart-card";
+import {log_debug} from "../shared/debug";
+import {downloadImage} from "../shared/screenshot";
 
 /**
  *
@@ -81,5 +83,15 @@ export class DateChartCard extends ChartCard {
     let settingsPopup = new DateChartSettingsPopup(bodyElement);
     settingsPopup.diachronicChart = this.chart;
     settingsPopup.showUnder(button, 'right');
+  }
+
+  /**
+   * Creates and downloads a screenshot from the chart.
+   * @override
+   */
+  screenshotButtonAction() {
+    let labels = this.chart.datasetController.labels;
+    let name = labels.join(',') + '-date-chart';
+    downloadImage(this.chart.svgSelector, name);
   }
 }
