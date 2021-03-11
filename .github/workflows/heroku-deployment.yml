@@ -1,6 +1,9 @@
 name: Examples Deployment (Heroku)
 
-on: [ push ]
+on:
+  push:
+    tags:
+      - 'v*'
 
 jobs:
   deploy:

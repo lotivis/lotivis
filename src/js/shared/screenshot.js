@@ -1,59 +1,115 @@
-import {log_debug} from "./debug";
-
-// Heavily inspired by:
-// https://stackoverflow.com/questions/5433806/convert-embedded-svg-to-png-in-place
-// https://stackoverflow.com/questions/23218174/how-do-i-save-export-an-svg-file-after-creating-an-svg-with-d3-js-ie-safari-an
-
 /**
  * Creates an PNG image from the given svg element and initiates a download of the PNG image.
  *
  * @param selector The id of the svg element.
  * @param filename The name of file which is downloaded.
- * @param size The original size of the svg.
  */
 export function downloadImage(selector, filename) {
-  let correctFilename = appendPNGIfNeeded(filename);
-  let svgElement = document.getElementById(selector);
-  let size = getOriginalSizeOfSVG(svgElement);
-  let data = svgToPNGData(svgElement, size);
-  downloadData(data, correctFilename);
+  let svgElement = d3.select('#' + selector);
+  let size = getOriginalSizeOfSVG(document.getElementById(selector));
+  let node = svgElement.node();
+  let svgString = getSVGString(node);
+  svgString2Image(svgString, 2 * size[0], 2 * size[1], function (dataBlob) {
+    downloadData(dataBlob, filename);
+  });
 }
 
-/**
- * Creates an PNG image from the given svg.
- *
- * @param target The target svg element.
- * @param size The preferred size of the element.
- * @returns {string} Returns the PNG data.
- */
-function svgToPNGData(target, size) {
-  let width = size[0];
-  let height = size[1];
+// http://bl.ocks.org/Rokotyan/0556f8facbaf344507cdc45dc3622177
 
-  // Flatten CSS styles into the SVG
-  for (let i = 0; i < target.childNodes.length; i++) {
-    let child = target.childNodes[i];
-    let cssStyle = window.getComputedStyle(child);
-    if (cssStyle) child.style.cssText = cssStyle.cssText;
+// Below are the functions that handle actual exporting:
+// getSVGString ( svgNode ) and svgString2Image( svgString, width, height, format, callback )
+function getSVGString(svgNode) {
+
+  svgNode.setAttribute('xlink', 'http://www.w3.org/1999/xlink');
+  let cssStyleText = getCSSStyles(svgNode);
+  appendCSS(cssStyleText, svgNode);
+
+  let serializer = new XMLSerializer();
+  let svgString = serializer.serializeToString(svgNode);
+  svgString = svgString.replace(/(\w+)?:?xlink=/g, 'xmlns:xlink='); // Fix root xlink without namespace
+  svgString = svgString.replace(/NS\d+:href/g, 'xlink:href'); // Safari NS namespace fix
+
+  return svgString;
+
+  function getCSSStyles(parentElement) {
+    let selectorTextArr = [];
+
+    // Add Parent element Id and Classes to the list
+    selectorTextArr.push('#' + parentElement.id);
+    for (let c = 0; c < parentElement.classList.length; c++)
+      if (!contains('.' + parentElement.classList[c], selectorTextArr))
+        selectorTextArr.push('.' + parentElement.classList[c]);
+
+    // Add Children element Ids and Classes to the list
+    let nodes = parentElement.getElementsByTagName("*");
+    for (let i = 0; i < nodes.length; i++) {
+      let id = nodes[i].id;
+      if (!contains('#' + id, selectorTextArr))
+        selectorTextArr.push('#' + id);
+
+      let classes = nodes[i].classList;
+      for (let c = 0; c < classes.length; c++)
+        if (!contains('.' + classes[c], selectorTextArr))
+          selectorTextArr.push('.' + classes[c]);
+    }
+
+    // Extract CSS Rules
+    let extractedCSSText = "";
+    for (let i = 0; i < document.styleSheets.length; i++) {
+      let s = document.styleSheets[i];
+
+      try {
+        if (!s.cssRules) continue;
+      } catch (e) {
+        if (e.name !== 'SecurityError') throw e; // for Firefox
+        continue;
+      }
+
+      let cssRules = s.cssRules;
+      for (let r = 0; r < cssRules.length; r++) {
+        if (contains(cssRules[r].selectorText, selectorTextArr))
+          extractedCSSText += cssRules[r].cssText;
+      }
+    }
+
+
+    return extractedCSSText;
+
+    function contains(str, arr) {
+      return arr.indexOf(str) !== -1;
+    }
   }
 
-  // construct an SVG image
-  let svgData = '<svg xmlns="http://www.w3.org/2000/svg" width="' + width +
-    '" height="' + height + '">' + target.innerHTML + '</svg>';
-  let img = new Image();
-  img.src = "data:image/svg+xml," + encodeURIComponent(svgData);
+  function appendCSS(cssText, element) {
+    let styleElement = document.createElement("style");
+    styleElement.setAttribute("type", "text/css");
+    styleElement.innerHTML = cssText;
+    let refNode = element.hasChildNodes() ? element.children[0] : null;
+    element.insertBefore(styleElement, refNode);
+  }
+}
 
-  // draw the SVG image to a canvas
-  let canvas = document.createElement('canvas');
+
+function svgString2Image(svgString, width, height, callback) {
+
+  // Convert SVG string to data URL
+  let imageSource = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+
+  let canvas = document.createElement("canvas");
   canvas.width = width;
   canvas.height = height;
 
-  // draw canvas on contex
   let context = canvas.getContext("2d");
-  context.drawImage(img, 0, 0);
+  let image = new Image();
+  image.onload = function () {
+    context.clearRect(0, 0, width, height);
+    context.drawImage(image, 0, 0, width, height);
 
-  // return the canvas's data
-  return canvas.toDataURL("image/png");
+    let data = canvas.toDataURL("image/png");
+    if (callback) callback(data);
+  };
+
+  image.src = imageSource;
 }
 
 /**
@@ -65,7 +121,7 @@ function svgToPNGData(target, size) {
 function downloadData(data, filename) {
   let anchor = document.createElement("a");
   anchor.href = data;
-  anchor.download = filename;
+  anchor.download = appendPNGIfNeeded(filename);
   document.body.appendChild(anchor);
   anchor.click();
   document.body.removeChild(anchor);
