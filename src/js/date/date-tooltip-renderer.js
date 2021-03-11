@@ -25,6 +25,7 @@ export class DateTooltipRenderer {
 
     /**
      * Returns the size [width, height] of the tooltip.
+     *
      * @returns {number[]}
      */
     function getTooltipSize() {
@@ -35,6 +36,7 @@ export class DateTooltipRenderer {
 
     /**
      * Calculates and returns the top pixel position for the tooltip.
+     *
      * @param factor The size factor of the chart.
      * @param offset The offset of the chart.
      * @param tooltipSize The size of the tooltip.
@@ -91,7 +93,11 @@ export class DateTooltipRenderer {
 
       let dataHTML = combineByDate(flatData)
         .filter(item => item.value > 0)
-        .map(item => `${item.dataset}: <b>${item.value}</b>`)
+        .map(function (item) {
+          let color = dateChart.datasetController.getColorForDataset(item.dataset);
+          let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
+          return `${divHTML} ${item.dataset}: <b>${item.value}</b>`;
+        })
         .join('<br>');
 
       return `<b>${date}</b><br>${dataHTML}`;
@@ -127,7 +133,6 @@ export class DateTooltipRenderer {
       tooltip
         .style('left', `${left}px`)
         .style('top', `${top}px`)
-        .transition()
         .style('opacity', 1);
     };
 
@@ -136,7 +141,7 @@ export class DateTooltipRenderer {
      */
     this.hideTooltip = function () {
       if (+tooltip.style('opacity') === 0) return;
-      tooltip.transition().style('opacity', 0);
+      tooltip.style('opacity', 0);
     };
   }
 }

@@ -8,7 +8,7 @@ import {DateGhostBarsRenderer} from "./date-ghost-bars-renderer";
 import {DateTooltipRenderer} from "./date-tooltip-renderer";
 import {Chart} from "../components/chart";
 import {dateToItemsRelation} from "../data-juggle/dataset-relations";
-import {calculateColors, createStackModel} from "./date-datasets-helper";
+import {createStackModel} from "./date-datasets-helper";
 
 /**
  *
@@ -81,9 +81,8 @@ export class DateChart extends Chart {
     let enabledDatasets = this.datasetController.enabledDatasets;
     this.dateToItemsRelation = dateToItemsRelation(this.datasetController.workingDatasets);
     this.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets);
-    calculateColors(this.datasetController);
-    this.datasetStacks = createStackModel(this.datasetController.workingDatasets, this.dateToItemsRelation);
-    this.datasetStacksPresented = createStackModel(enabledDatasets, this.dateToItemsRelationPresented);
+    this.datasetStacks = createStackModel(this.datasetController, this.datasetController.workingDatasets, this.dateToItemsRelation);
+    this.datasetStacksPresented = createStackModel(this.datasetController, enabledDatasets, this.dateToItemsRelationPresented);
   }
 
   /**

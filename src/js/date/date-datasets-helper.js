@@ -7,7 +7,7 @@ import {Color} from "../shared/colors";
  * @param dateToItemsRelation
  * @returns {*[]}
  */
-export function createStackModel(datasets, dateToItemsRelation) {
+export function createStackModel(controller, datasets, dateToItemsRelation) {
   let listOfStacks = extractStacksFromDatasets(datasets);
 
   return listOfStacks.map(function (stackName) {
@@ -18,7 +18,7 @@ export function createStackModel(datasets, dateToItemsRelation) {
     });
 
     let candidatesNames = stackCandidates.map(stackCandidate => stackCandidate.label);
-    let candidatesColors = stackCandidates.map(stackCandidate => stackCandidate.color);
+    let candidatesColors = stackCandidates.map(stackCandidate => controller.getColorForDataset(stackCandidate.label));
 
     let stack = d3
       .stack()
@@ -31,43 +31,4 @@ export function createStackModel(datasets, dateToItemsRelation) {
 
     return stack;
   });
-}
-
-/**
- *
- */
-export function calculateColors(datasetController) {
-  let stacks = datasetController.stacks;
-
-  for (let index = 0; index < stacks.length; index++) {
-
-    let stackName = stacks[index];
-    let datasets = datasetController.workingDatasets.filter(function (dataset) {
-      return dataset.stack === stackName
-        || dataset.label === stackName;
-    });
-
-    let numberOfDatasets = datasets.length;
-    let colors = Color.colorsForStack(index, numberOfDatasets);
-
-    for (let index = 0; index < colors.length; index++) {
-      datasets[index].color = colors[index];
-    }
-  }
-
-  for (let index = 0; index < stacks.length; index++) {
-
-    let stackName = stacks[index];
-    let datasets = datasetController.enabledDatasets.filter(function (dataset) {
-      return dataset.stack === stackName
-        || dataset.label === stackName;
-    });
-
-    let numberOfDatasets = datasets.length;
-    let colors = Color.colorsForStack(index, numberOfDatasets);
-
-    for (let index = 0; index < colors.length; index++) {
-      datasets[index].color = colors[index];
-    }
-  }
 }

@@ -25,13 +25,10 @@ export class DateLegendRenderer {
         .append('text')
         .attr("font-size", 13)
         .attr("x", (item) => xLegend(item.label) - 30)
-        .attr("y", function () {
-          return timeChart.graphHeight + labelMargin;
-        }.bind(this))
+        .attr("y", timeChart.graphHeight + labelMargin)
         .style('cursor', 'pointer')
         .style("fill", function (item) {
-          if (!item.color) return Color.defaultTint.rgbString();
-          return item.color.rgbString();
+          return controller.getColorForDataset(item.label);
         })
         .text((item) => `${item.label} (${controller.getSumOfDataset(item.label)})`)
         .on('click', function (event) {
@@ -54,12 +51,10 @@ export class DateLegendRenderer {
         }.bind(this))
         .style('cursor', 'pointer')
         .style("stroke", function (item) {
-          if (!item.color) return Color.defaultTint.rgbString();
-          return item.color.rgbString();
+          return controller.getColorForDataset(item.label).rgbString();
         }.bind(this))
         .style("fill", function (item) {
-          if (!item.color) return Color.defaultTint.rgbString();
-          return item.isEnabled ? item.color.rgbString() : 'white';
+          return item.isEnabled ? controller.getColorForDataset(item.label).rgbString() : 'white';
         }.bind(this))
         .style("stroke-width", 2);
 

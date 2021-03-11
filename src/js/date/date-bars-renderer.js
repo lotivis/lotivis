@@ -24,7 +24,7 @@ export class DateBarsRenderer {
           if (timeChart.isCombineStacks) {
             return colors[0].rgbString();
           } else {
-            return colors[index].rgbString();
+            return stack.colors[index].rgbString();
           }
         })
         .selectAll("rect")
