@@ -1,5 +1,9 @@
 import {hashCode} from "../shared/hash";
 
+/**
+ *
+ * @class
+ */
 export class PlotLabelRenderer {
 
   constructor(plotChart) {
@@ -7,7 +11,8 @@ export class PlotLabelRenderer {
     this.renderLabels = function () {
       let xBandwidth = plotChart.yChart.bandwidth();
       let xChart = plotChart.xChart;
-      plotChart.labels = plotChart.barsData
+      plotChart.labels = plotChart
+        .barsData
         .append('g')
         .attr('transform', `translate(0,${(xBandwidth / 2) + 4})`)
         .append('text')

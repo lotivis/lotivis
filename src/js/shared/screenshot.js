@@ -6,25 +6,14 @@
  */
 import {log_debug} from "./debug";
 
-export function downloadImage(selector, filename) {
-  let svgElement = d3.select('#' + selector);
-  let size = getOriginalSizeOfSVG(document.getElementById(selector));
-  let node = svgElement.node();
-  let svgString = getSVGString(node);
-  svgString2Image(svgString, 2 * size[0], 2 * size[1], function (dataURL) {
-    log_debug('dataURL', dataURL);
-    fetch(dataURL)
-      .then(res => res.blob())
-      .then(function (dataBlob) {
-        downloadData(dataBlob, filename);
-      });
-  });
-}
-
 // http://bl.ocks.org/Rokotyan/0556f8facbaf344507cdc45dc3622177
 
-// Below are the functions that handle actual exporting:
-// getSVGString ( svgNode ) and svgString2Image( svgString, width, height, format, callback )
+/**
+ * Parses a String from the given (D3.js) SVG node.
+ *
+ * @param svgNode The node of the SVG.
+ * @returns {string} The parsed String.
+ */
 function getSVGString(svgNode) {
 
   svgNode.setAttribute('xlink', 'http://www.w3.org/1999/xlink');
@@ -33,8 +22,18 @@ function getSVGString(svgNode) {
 
   let serializer = new XMLSerializer();
   let svgString = serializer.serializeToString(svgNode);
-  svgString = svgString.replace(/(\w+)?:?xlink=/g, 'xmlns:xlink='); // Fix root xlink without namespace
-  svgString = svgString.replace(/NS\d+:href/g, 'xlink:href'); // Safari NS namespace fix
+
+  // Fix root xlink without namespace
+  svgString = svgString.replace(
+    /(\w+)?:?xlink=/g,
+    'xmlns:xlink='
+  );
+
+  // Safari NS namespace fix
+  svgString = svgString.replace(
+    /NS\d+:href/g,
+    'xlink:href'
+  );
 
   return svgString;
 
@@ -43,21 +42,26 @@ function getSVGString(svgNode) {
 
     // Add Parent element Id and Classes to the list
     selectorTextArr.push('#' + parentElement.id);
-    for (let c = 0; c < parentElement.classList.length; c++)
-      if (!contains('.' + parentElement.classList[c], selectorTextArr))
+    for (let c = 0; c < parentElement.classList.length; c++) {
+      if (!contains('.' + parentElement.classList[c], selectorTextArr)) {
         selectorTextArr.push('.' + parentElement.classList[c]);
+      }
+    }
 
     // Add Children element Ids and Classes to the list
     let nodes = parentElement.getElementsByTagName("*");
     for (let i = 0; i < nodes.length; i++) {
       let id = nodes[i].id;
-      if (!contains('#' + id, selectorTextArr))
+      if (!contains('#' + id, selectorTextArr)) {
         selectorTextArr.push('#' + id);
+      }
 
       let classes = nodes[i].classList;
-      for (let c = 0; c < classes.length; c++)
-        if (!contains('.' + classes[c], selectorTextArr))
+      for (let c = 0; c < classes.length; c++) {
+        if (!contains('.' + classes[c], selectorTextArr)) {
           selectorTextArr.push('.' + classes[c]);
+        }
+      }
     }
 
     // Extract CSS Rules
@@ -74,11 +78,11 @@ function getSVGString(svgNode) {
 
       let cssRules = s.cssRules;
       for (let r = 0; r < cssRules.length; r++) {
-        if (contains(cssRules[r].selectorText, selectorTextArr))
+        if (contains(cssRules[r].selectorText, selectorTextArr)) {
           extractedCSSText += cssRules[r].cssText;
+        }
       }
     }
-
 
     return extractedCSSText;
 
@@ -96,7 +100,13 @@ function getSVGString(svgNode) {
   }
 }
 
-
+/**
+ *
+ * @param svgString
+ * @param width
+ * @param height
+ * @param callback
+ */
 function svgString2Image(svgString, width, height, callback) {
 
   // Convert SVG string to data URL
@@ -132,6 +142,16 @@ function downloadData(data, filename) {
   document.body.appendChild(anchor);
   anchor.click();
   document.body.removeChild(anchor);
+
+  /**
+   * Appends '.png' to the given string if the given string not already has this extension.
+   *
+   * @param filename The filename with or without the '.png' extension.
+   * @returns {*|string} The filename with a '.png' extension.
+   */
+  function appendPNGIfNeeded(filename) {
+    return filename.endsWith('.png') ? filename : `${filename}.png`;
+  }
 }
 
 /**
@@ -156,11 +176,21 @@ function getOriginalSizeOfSVG(svgElement) {
 }
 
 /**
- * Appends '.png' to the given string if the given string not already has this extension.
+ * Initiates a download of the PNG image of the SVG with the given selector (id).
  *
- * @param filename The filename with or without the '.png' extension.
- * @returns {*|string} The filename with a '.png' extension.
+ * @param selector The id of the SVG element to create the image of.
+ * @param filename The name of the file which is been downloaded.
  */
-function appendPNGIfNeeded(filename) {
-  return filename.endsWith('.png') ? filename : `${filename}.png`;
+export function downloadImage(selector, filename) {
+  let svgElement = d3.select('#' + selector);
+  let node = svgElement.node();
+  let size = getOriginalSizeOfSVG(node);
+  let svgString = getSVGString(node);
+  svgString2Image(svgString, 2 * size[0], 2 * size[1], function (dataURL) {
+    fetch(dataURL)
+      .then(res => res.blob())
+      .then(function (dataBlob) {
+        downloadData(dataBlob, filename);
+      });
+  });
 }
