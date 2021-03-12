@@ -1,6 +1,6 @@
 import {Component} from "./component";
 import {createID} from "../shared/selector";
-import {RecentSearches} from "../shared/recent-searches";
+import {RecentSearches} from "../../../../frc-visualization/src/shared/recent-searches";
 
 export class SearchField extends Component {
 

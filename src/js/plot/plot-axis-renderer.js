@@ -1,5 +1,12 @@
+/**
+ * @class PlotAxisRenderer
+ */
 export class PlotAxisRenderer {
 
+  /**
+   * @constructor
+   * @param plotChart
+   */
   constructor(plotChart) {
 
     /**
