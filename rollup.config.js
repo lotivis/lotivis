@@ -1,6 +1,7 @@
 /* eslint-env es6 */
 const resolve = require('@rollup/plugin-node-resolve').default;
 const pkg = require('./package.json');
+const postcss = require('rollup-plugin-postcss');
 
 const banner = `/*!
  * lotivis.js v${pkg.version}
@@ -23,6 +24,19 @@ module.exports = [
       esModule: false,
       exports: "named",
       indent: false,
+    },
+  },
+  {
+    input: 'src/index.scss',
+    plugins: [
+      postcss({
+        extract: true,
+        use: ['sass'],
+      }),
+    ],
+    output: {
+      name: 'lotivis',
+      file: 'dist/lotivis.css',
     },
   }
 ];
