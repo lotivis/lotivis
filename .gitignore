@@ -1,7 +1,7 @@
 # Deployment
 /coverage
 /custom
-/examples/dist
+/docs/dist
 /dist
 /gh-pages
 
