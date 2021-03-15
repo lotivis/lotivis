@@ -1,8 +1,4 @@
 # Deployment
-/coverage
-/custom
-/docs/dist
-/dist
 /gh-pages
 
 # Node.js
