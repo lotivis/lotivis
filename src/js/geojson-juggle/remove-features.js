@@ -1,4 +1,9 @@
-
+/**
+ *
+ * @param geoJSON
+ * @param removeCandidates
+ * @returns {*}
+ */
 export function removeFeatures(geoJSON, removeCandidates) {
   let newGeoJSON = geoJSON;
   for (let index = 0; index < removeCandidates.length; index++) {

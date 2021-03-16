@@ -6,6 +6,7 @@ import {MapChartCard} from "./js/map/map-chart-card";
 import {PlotChart} from "./js/plot/plot-chart";
 import {PlotChartCard} from "./js/plot/plot-chart-card";
 import {GeoJson} from "./js/geojson/geojson";
+import {Feature} from "./js/geojson/feature";
 import {RadioGroup} from "./js/components/radio-group";
 import {Option} from "./js/components/option";
 import {
@@ -44,13 +45,14 @@ import {DatasetsController} from "./js/data/datasets-controller";
 import {FilterableDatasetsController} from "./js/data/filterable-datasets-controller";
 import {renderCSV} from "./js/parse/render-csv";
 import {parseCSV} from "./js/parse/parse-csv";
-import {createGeoJSON} from "./js/geojson/create-geojson";
+import {createGeoJSON} from "./js/geojson-juggle/create-geojson";
 import {Card} from "./js/components/card";
 import {Checkbox} from "./js/components/checkbox";
 import {ModalPopup} from "./js/components/modal-popup";
 import {ChartCard} from "./js/components/chart-card";
 import {Dropdown} from "./js/components/dropdown";
 import {Popup} from "./js/components/popup";
+import {joinFeatures} from "./js/geojson-juggle/join-features";
 
 
 exports.Component = Component;
@@ -78,6 +80,8 @@ exports.FilterableDatasetController = FilterableDatasetsController;
 exports.URLParameters = URLParameters;
 
 exports.GeoJson = GeoJson;
+exports.Feature = Feature;
+exports.joinFeatures = joinFeatures;
 
 exports.renderCSV = renderCSV;
 exports.parseCSV = parseCSV;

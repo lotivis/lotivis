@@ -1,4 +1,14 @@
 
-.map-label {
+.lotivis-map-exterior-borders {
   pointer-events: none;
+  fill: white;
+  fill-opacity: 0;
+  stroke: black;
+  stroke-width: 1;
+}
+
+.lotivis-map-label {
+  pointer-events: none;
+  text-anchor: middle;
+  font-size: 12px;
 }

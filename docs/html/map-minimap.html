@@ -36,39 +36,23 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-server@3.0.1/dist/topojson-server.min.js"></script>
 <script src="../js/lotivis.js"></script>
 
 <script>
 
-  const geoJsonURL = '/assets/Departements.geojson';
-  const geoJsonURLGermany = '/assets/Germany.geojson';
-
   const mapChartCard = new lotivis.MapChartCard('map-chart-card');
-  const chart = mapChartCard.chart;
+  mapChartCard.chart.excludedFeatureCodes = ['2A', '2B'];
 
-  chart.excludedFeatureCodes = ['2A', '2B'];
+  d3.json('../assets/Departements.geojson')
+    .then(function (rawGeoJSON) {
 
-  mapChartCard.onSelectedDatasetChanged = function (value) {
-    let dataset = mapChartCard.datasets.find(dataset => dataset.stack === value);
-    let string = JSON.stringify(dataset, null, 4);
-    let element = document.getElementById('data');
-    element.innerHTML = string;
-  };
+      let geoJSON = new lotivis.GeoJson(rawGeoJSON);
+      // let newGeoJSON = lotivis.joinFeatures(geoJSON, geoJSON.features);
 
-  Promise
-    .all([
-      d3.json('/assets/tracks-per-departement.json'),
-      d3.json('/assets/words-per-departement.json'),
-      d3.json('/assets/words-per-departement-relative.json'),
-      d3.json('/assets/types-per-departement.json'),
-      d3.json('/assets/types-per-departement-relative.json'),
-      d3.json(geoJsonURL)
-    ])
-    .then(function (datasetsAndGeoJSON) {
-      let rawGeoJSON = datasetsAndGeoJSON.pop();
-      let datasets = datasetsAndGeoJSON;
-      chart.setGeoJSON(new lotivis.GeoJson(rawGeoJSON));
-      mapChartCard.setDatasets(datasets);
+      mapChartCard.chart.setGeoJSON(geoJSON);
+
     });
 
 </script>

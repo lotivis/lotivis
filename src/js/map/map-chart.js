@@ -1,13 +1,14 @@
 import {Chart} from '../components/chart';
 import {Color} from '../shared/colors';
 import {combineByLocation, combineByStacks} from '../data-juggle/dataset-combine';
-import {removeFeatures} from "../geojson/remove-features";
+import {removeFeatures} from "../geojson-juggle/remove-features";
 import {MapTooltipRenderer} from "./map-tooltip-renderer";
 import {MapLegendRenderer} from "./map-legend-renderer";
 import {MapLabelRenderer} from "./map-label-renderer";
 import {MapDatasetRenderer} from "./map-dataset-renderer";
 import {FilterableDatasetsController} from "../data/filterable-datasets-controller";
 import {MapGeoJsonRenderer} from "./map-geojson-renderer";
+import {MapExteriorBorderRenderer} from "./map-exterior-border-renderer";
 
 /**
  * A component which renders a geo json with d3.
@@ -33,7 +34,9 @@ export class MapChart extends Chart {
     this.labelRenderer = new MapLabelRenderer(this);
     this.legendRenderer = new MapLegendRenderer(this);
     this.tooltipRenderer = new MapTooltipRenderer(this);
+    this.geoJSONRenderer = new MapGeoJsonRenderer(this);
     this.datasetRenderer = new MapDatasetRenderer(this);
+    this.exteriorBorderRenderer = new MapExteriorBorderRenderer(this);
   }
 
   /**
@@ -49,6 +52,7 @@ export class MapChart extends Chart {
     this.departmentsData = [];
     this.excludedFeatureCodes = [];
     this.updateSensible = true;
+    this.drawRectangleAroundSelection = false;
 
     this.projection = d3.geoMercator();
     this.path = d3.geoPath().projection(this.projection);
@@ -137,7 +141,7 @@ export class MapChart extends Chart {
     this.geoJSON.features.forEach((feature) => feature.center = d3.geoCentroid(feature));
     this.presentedGeoJSON = removeFeatures(this.geoJSON, this.excludedFeatureCodes);
     this.zoomTo(this.geoJSON);
-    this.geoJSONRenderer = new MapGeoJsonRenderer(this);
+    this.exteriorBorderRenderer.render();
     this.geoJSONRenderer.renderGeoJson();
   }
 

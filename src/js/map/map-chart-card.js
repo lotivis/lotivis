@@ -31,7 +31,10 @@ export class MapChartCard extends ChartCard {
    * @override
    */
   screenshotButtonAction() {
-    let labels = this.chart.datasetController.labels;
+    let labels = ['unknown'];
+    if (this.chart.datasetController) {
+      labels = this.chart.datasetController.labels;
+    }
     let name = labels.join(',') + '-map-chart';
     downloadImage(this.chart.svgSelector, name);
   }

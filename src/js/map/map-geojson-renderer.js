@@ -1,8 +1,13 @@
 /**
- *
+ * @class MapGeoJsonRenderer
  */
 export class MapGeoJsonRenderer {
 
+  /**
+   * Creates a new instance of MapGeoJsonRenderer.
+   *
+   * @param mapChart The parental map chart.
+   */
   constructor(mapChart) {
 
     /**

@@ -1,5 +1,10 @@
 import {extractLocationsFromDatasets} from "../data-juggle/dataset-extract";
 
+/**
+ *
+ * @param datasets
+ * @returns {{features: [], type: string}}
+ */
 export function createGeoJSON(datasets) {
   let locations = extractLocationsFromDatasets(datasets);
   let rowsCount = Math.ceil(locations.length / 5);

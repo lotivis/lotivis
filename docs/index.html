@@ -16,11 +16,6 @@
     <div class="col-12 text-center">
       <h1>
         Lotivis Examples
-        <a id="version-link" style="display: inline;">
-          <samp id="version">
-            0
-          </samp>
-        </a>
       </h1>
     </div>
     <div class="col-4 menu">
@@ -37,7 +32,8 @@
       <ul>
         <li><a href="html/map-empty.html">Map Empty</a></li>
         <li><a href="html/map-germany.html">Map Germany (Bundesländer)</a></li>
-        <li><a href="html/map-france.html">Map France (Département)</a></a></li>
+        <li><a href="html/map-france.html">Map France (Département)</a></li>
+        <li><a href="html/map-minimap.html">Minimap</a></li>
       </ul>
     </div>
     <div class="col-4 menu">
@@ -67,17 +63,17 @@
   </div>
 </div>
 
-<script>
-  fetch('/version')
-    .then(function (response) {
-      return response.json();
-    })
-    .then(function (json) {
-      let urlBase = 'https://github.com/lukasdanckwerth/lotivis/releases/tag/v';
-      document.getElementById('version-link').href = `${urlBase}${json.version}`;
-      document.getElementById('version').innerText = json.version;
-    });
-</script>
+<!--<script>-->
+<!--  fetch('/version')-->
+<!--    .then(function (response) {-->
+<!--      return response.json();-->
+<!--    })-->
+<!--    .then(function (json) {-->
+<!--      let urlBase = 'https://github.com/lukasdanckwerth/lotivis/releases/tag/v';-->
+<!--      document.getElementById('version-link').href = `${urlBase}${json.version}`;-->
+<!--      document.getElementById('version').innerText = json.version;-->
+<!--    });-->
+<!--</script>-->
 
 </body>
 

@@ -1,9 +1,16 @@
 import {log_debug} from "../shared/debug";
 import {formatNumber} from "../shared/format";
-import {combineByLocation} from "../data-juggle/dataset-combine";
 
+/**
+ *
+ * @class MapLabelRenderer
+ */
 export class MapLabelRenderer {
 
+  /**
+   * Creates a new instance of MapLabelRenderer.
+   * @param mapChart The parental map chart.
+   */
   constructor(mapChart) {
 
     /**
@@ -16,14 +23,13 @@ export class MapLabelRenderer {
       let geoJSON = mapChart.geoJSON;
       let combinedData = mapChart.combinedData;
 
-      mapChart.svg.selectAll('.map-label').remove();
+      mapChart.svg.selectAll('.lotivis-map-label').remove();
       mapChart.svg
         .selectAll('text')
         .data(geoJSON.features)
         .enter()
         .append('text')
-        .attr('class', 'map-label')
-        .attr('text-anchor', 'middle')
+        .attr('class', 'lotivis-map-label')
         .attr('fill', mapChart.tintColor)
         .attr('font-size', 12)
         .attr('opacity', function () {

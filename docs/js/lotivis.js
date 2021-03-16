@@ -2663,6 +2663,12 @@ class DateChartCard extends ChartCard {
   }
 }
 
+/**
+ *
+ * @param geoJSON
+ * @param removeCandidates
+ * @returns {*}
+ */
 function removeFeatures(geoJSON, removeCandidates) {
   let newGeoJSON = geoJSON;
   for (let index = 0; index < removeCandidates.length; index++) {
@@ -2676,8 +2682,17 @@ function removeFeatures(geoJSON, removeCandidates) {
   return newGeoJSON;
 }
 
+/**
+ *
+ * @class MapTooltipRenderer
+ */
 class MapTooltipRenderer {
 
+  /**
+   * Creates a new instance of MapTooltipRenderer.
+   *
+   * @param mapChart
+   */
   constructor(mapChart) {
     this.mapChart = mapChart;
 
@@ -2705,8 +2720,12 @@ class MapTooltipRenderer {
       .style('stroke-width', '0.7px')
       .style('stroke-dasharray', '1,1');
 
+    /**
+     *
+     * @param event
+     * @param feature
+     */
     this.mouserEnter = function (event, feature) {
-      if (!mapChart.datasetController) return;
 
       d3.select(this)
         .attr('stroke', () => color)
@@ -2723,11 +2742,10 @@ class MapTooltipRenderer {
         return `${propertyName}: ${properties[propertyName]}`;
       });
 
-      let flatData = mapChart.datasetController.flatData;
-      let combined = combineByLocation(flatData);
-      let data = combined.filter(item => +item.location === +code);
-
-      if (data) {
+      if (mapChart.datasetController) {
+        let flatData = mapChart.datasetController.flatData;
+        let combined = combineByLocation(flatData);
+        let data = combined.filter(item => +item.location === +code);
         components.push('');
         for (let index = 0; index < data.length; index++) {
           let item = data[index];
@@ -2788,7 +2806,7 @@ class MapTooltipRenderer {
         .style('top', top + 'px');
 
       bounds
-        .style('opacity', 1)
+        .style('opacity', mapChart.drawRectangleAroundSelection ? 1 : 0)
         .style('width', featureBoundsWidth + 'px')
         .style('height', featureBoundsHeight + 'px')
         .style('x', featureLowerLeft[0])
@@ -2797,6 +2815,11 @@ class MapTooltipRenderer {
       mapChart.onSelectFeature(event, feature);
     };
 
+    /**
+     *
+     * @param event
+     * @param feature
+     */
     this.mouseOut = function (event, feature) {
       d3.select(this)
         .attr('stroke', 'black')
@@ -2808,6 +2831,9 @@ class MapTooltipRenderer {
       bounds.style('opacity', 0);
     };
 
+    /**
+     * Raises the tooltip and the rectangle which draws the bounds.
+     */
     this.raise = function () {
       tooltip.raise();
       bounds.raise();
@@ -2928,8 +2954,16 @@ class MapLegendRenderer {
   }
 }
 
+/**
+ *
+ * @class MapLabelRenderer
+ */
 class MapLabelRenderer {
 
+  /**
+   * Creates a new instance of MapLabelRenderer.
+   * @param mapChart The parental map chart.
+   */
   constructor(mapChart) {
 
     /**
@@ -2942,14 +2976,13 @@ class MapLabelRenderer {
       let geoJSON = mapChart.geoJSON;
       let combinedData = mapChart.combinedData;
 
-      mapChart.svg.selectAll('.map-label').remove();
+      mapChart.svg.selectAll('.lotivis-map-label').remove();
       mapChart.svg
         .selectAll('text')
         .data(geoJSON.features)
         .enter()
         .append('text')
-        .attr('class', 'map-label')
-        .attr('text-anchor', 'middle')
+        .attr('class', 'lotivis-map-label')
         .attr('fill', mapChart.tintColor)
         .attr('font-size', 12)
         .attr('opacity', function () {
@@ -3014,10 +3047,15 @@ class MapDatasetRenderer {
 }
 
 /**
- *
+ * @class MapGeoJsonRenderer
  */
 class MapGeoJsonRenderer {
 
+  /**
+   * Creates a new instance of MapGeoJsonRenderer.
+   *
+   * @param mapChart The parental map chart.
+   */
   constructor(mapChart) {
 
     /**
@@ -3047,6 +3085,75 @@ class MapGeoJsonRenderer {
 }
 
 /**
+ * Returns a new created instance of Feature combining the given Features.
+ * @param geoJSON
+ * @param features
+ */
+function joinFeatures(geoJSON) {
+  let topology = topojson.topology(geoJSON.features);
+  let objects = extractObjects(topology);
+
+  return {
+    "type": "FeatureCollection",
+    "features": [
+      {
+        type: "Feature",
+        geometry: topojson.merge(topology, objects),
+        properties: {
+          code: 1,
+          nom: "asdf"
+        }
+      }
+    ]
+  };
+}
+
+/**
+ *
+ * @param topology
+ * @returns {[]}
+ */
+function extractObjects(topology) {
+  let objects = [];
+  for (const topologyKey in topology.objects) {
+    if (topology.objects.hasOwnProperty(topologyKey)) {
+      objects.push(topology.objects[topologyKey]);
+    }
+  }
+  return objects;
+}
+
+/**
+ *
+ * @class MapExteriorBorderRenderer
+ */
+
+class MapExteriorBorderRenderer {
+
+  /**
+   * Creates a new instance of MapExteriorBorderRenderer.
+   *
+   * @property mapChart The parental map chart.
+   */
+  constructor(mapChart) {
+
+    /**
+     *
+     */
+    this.render = function () {
+      if (!self.topojson) return;
+      let geoJSON = mapChart.presentedGeoJSON;
+      let borders = joinFeatures(geoJSON);
+      mapChart.svg
+        .append('path')
+        .datum(borders)
+        .attr('d', mapChart.path)
+        .attr('class', 'lotivis-map-exterior-borders');
+    };
+  }
+}
+
+/**
  * A component which renders a geo json with d3.
  *
  * @class MapChart
@@ -3070,7 +3177,9 @@ class MapChart extends Chart {
     this.labelRenderer = new MapLabelRenderer(this);
     this.legendRenderer = new MapLegendRenderer(this);
     this.tooltipRenderer = new MapTooltipRenderer(this);
+    this.geoJSONRenderer = new MapGeoJsonRenderer(this);
     this.datasetRenderer = new MapDatasetRenderer(this);
+    this.exteriorBorderRenderer = new MapExteriorBorderRenderer(this);
   }
 
   /**
@@ -3086,6 +3195,7 @@ class MapChart extends Chart {
     this.departmentsData = [];
     this.excludedFeatureCodes = [];
     this.updateSensible = true;
+    this.drawRectangleAroundSelection = false;
 
     this.projection = d3.geoMercator();
     this.path = d3.geoPath().projection(this.projection);
@@ -3174,7 +3284,7 @@ class MapChart extends Chart {
     this.geoJSON.features.forEach((feature) => feature.center = d3.geoCentroid(feature));
     this.presentedGeoJSON = removeFeatures(this.geoJSON, this.excludedFeatureCodes);
     this.zoomTo(this.geoJSON);
-    this.geoJSONRenderer = new MapGeoJsonRenderer(this);
+    this.exteriorBorderRenderer.render();
     this.geoJSONRenderer.renderGeoJson();
   }
 
@@ -3268,12 +3378,12 @@ class MapChartSettingsPopup extends Popup {
   }
 
   /**
-   *
+   * Tells the popup that it is about to be presented.
+   * @override
    */
   willShow() {
     super.willShow();
     this.showLabelsCheckbox.setChecked(this.mapChart.isShowLabels);
-    console.log('this.mapChart.showLabels: ' + this.mapChart.isShowLabels);
   }
 }
 
@@ -3305,7 +3415,10 @@ class MapChartCard extends ChartCard {
    * @override
    */
   screenshotButtonAction() {
-    let labels = this.chart.datasetController.labels;
+    let labels = ['unknown'];
+    if (this.chart.datasetController) {
+      labels = this.chart.datasetController.labels;
+    }
     let name = labels.join(',') + '-map-chart';
     downloadImage(this.chart.svgSelector, name);
   }
@@ -4216,7 +4329,16 @@ class PlotChartCard extends ChartCard {
   }
 }
 
+/**
+ * @class Geometry
+ */
 class Geometry {
+
+  /**
+   * Creates a new instance of Geometry.
+   *
+   * @param source
+   */
   constructor(source) {
     this.type = source.type;
     this.coordinates = source.coordinates;
@@ -4395,6 +4517,11 @@ function getFilename(url) {
   return url.substring(url.lastIndexOf('/') + 1);
 }
 
+/**
+ *
+ * @param datasets
+ * @returns {{features: [], type: string}}
+ */
 function createGeoJSON(datasets) {
   let locations = extractLocationsFromDatasets(datasets);
   let rowsCount = Math.ceil(locations.length / 5);
@@ -4536,6 +4663,8 @@ exports.FilterableDatasetController = FilterableDatasetsController;
 exports.URLParameters = URLParameters;
 
 exports.GeoJson = GeoJson;
+exports.Feature = Feature;
+exports.joinFeatures = joinFeatures;
 
 exports.renderCSV = renderCSV;
 exports.parseCSV = parseCSV;

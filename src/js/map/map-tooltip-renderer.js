@@ -1,8 +1,17 @@
 import {combineByLocation} from "../data-juggle/dataset-combine";
 import {Color} from "../shared/colors";
 
+/**
+ *
+ * @class MapTooltipRenderer
+ */
 export class MapTooltipRenderer {
 
+  /**
+   * Creates a new instance of MapTooltipRenderer.
+   *
+   * @param mapChart
+   */
   constructor(mapChart) {
     this.mapChart = mapChart;
 
@@ -30,8 +39,24 @@ export class MapTooltipRenderer {
       .style('stroke-width', '0.7px')
       .style('stroke-dasharray', '1,1');
 
+    function getTooltipSize() {
+
+    }
+
+    function getTooltipLocationAbove() {
+
+    }
+
+    function getTooltipLocationUnder() {
+
+    }
+
+    /**
+     *
+     * @param event
+     * @param feature
+     */
     this.mouserEnter = function (event, feature) {
-      if (!mapChart.datasetController) return;
 
       d3.select(this)
         .attr('stroke', () => color)
@@ -48,11 +73,10 @@ export class MapTooltipRenderer {
         return `${propertyName}: ${properties[propertyName]}`;
       });
 
-      let flatData = mapChart.datasetController.flatData;
-      let combined = combineByLocation(flatData);
-      let data = combined.filter(item => +item.location === +code);
-
-      if (data) {
+      if (mapChart.datasetController) {
+        let flatData = mapChart.datasetController.flatData;
+        let combined = combineByLocation(flatData);
+        let data = combined.filter(item => +item.location === +code);
         components.push('');
         for (let index = 0; index < data.length; index++) {
           let item = data[index];
@@ -113,7 +137,7 @@ export class MapTooltipRenderer {
         .style('top', top + 'px');
 
       bounds
-        .style('opacity', 1)
+        .style('opacity', mapChart.drawRectangleAroundSelection ? 1 : 0)
         .style('width', featureBoundsWidth + 'px')
         .style('height', featureBoundsHeight + 'px')
         .style('x', featureLowerLeft[0])
@@ -122,6 +146,11 @@ export class MapTooltipRenderer {
       mapChart.onSelectFeature(event, feature);
     };
 
+    /**
+     *
+     * @param event
+     * @param feature
+     */
     this.mouseOut = function (event, feature) {
       d3.select(this)
         .attr('stroke', 'black')
@@ -133,6 +162,9 @@ export class MapTooltipRenderer {
       bounds.style('opacity', 0);
     };
 
+    /**
+     * Raises the tooltip and the rectangle which draws the bounds.
+     */
     this.raise = function () {
       tooltip.raise();
       bounds.raise();
