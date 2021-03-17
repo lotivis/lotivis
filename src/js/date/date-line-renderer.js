@@ -1,4 +1,3 @@
-
 export class DateLineRenderer {
   constructor(timeChart) {
 
@@ -59,7 +58,7 @@ export class DateLineRenderer {
       if (timeChart.isShowLabels === true) {
         this.renderLineLabels(dataset);
       }
-    }
+    };
 
     /**
      *
@@ -77,6 +76,6 @@ export class DateLineRenderer {
         .attr("font-size", 15)
         .attr('fill', 'gray')
         .text((item) => timeChart.numberFormat.format(item.value || 0));
-    }
+    };
   }
 }

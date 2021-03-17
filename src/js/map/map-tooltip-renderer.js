@@ -1,5 +1,6 @@
 import {combineByLocation} from "../data-juggle/dataset-combine";
 import {Color} from "../shared/colors";
+import {styleForCSSClass} from "../shared/style";
 
 /**
  *
@@ -29,8 +30,14 @@ export class MapTooltipRenderer {
       .attr('class', 'lotivis-map-selection-rect')
       .style('fill-opacity', 0);
 
+    /**
+     * Returns the size of the tooltip.
+     * @returns {number[]}
+     */
     function getTooltipSize() {
-
+      let tooltipWidth = Number(tooltip.style('width').replace('px', '') || 200);
+      let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
+      return [tooltipWidth += 20, tooltipHeight += 20];
     }
 
     function getTooltipLocationAbove() {
@@ -47,12 +54,14 @@ export class MapTooltipRenderer {
      * @param feature
      */
     this.mouserEnter = function (event, feature) {
-
-      d3.select(this)
+      let id = mapChart.featureIDAccessor(feature);
+      mapChart.svg
+        // .selectAll('path')
+        .selectAll(`#lotivis-map-area-${id}`)
         .raise() // bring element to top
-        .attr('stroke', () => color)
-        .attr('stroke-width', '2')
-        .attr('stroke-dasharray', '0');
+        .style('stroke', () => color)
+        .style('stroke-width', '2')
+        .style('stroke-dasharray', '0');
 
       // set tooltip content
       let properties = feature.properties;
@@ -79,11 +88,7 @@ export class MapTooltipRenderer {
       tooltip.html(components.join('<br>'));
 
       // position tooltip
-      let tooltipWidth = Number(tooltip.style('width').replace('px', '') || 200);
-      let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
-      tooltipWidth += 20;
-      tooltipHeight += 20;
-
+      let tooltipSize = getTooltipSize();
       let projection = mapChart.projection;
       let featureBounds = d3.geoBounds(feature);
       let featureLowerLeft = projection(featureBounds[0]);
@@ -106,11 +111,11 @@ export class MapTooltipRenderer {
       if ((featureLowerLeft[1] * heightFactor) > (effectiveSize[1] / 2)) {
         top += featureUpperRight[1];
         top *= factor;
-        top -= tooltipHeight;
+        top -= tooltipSize[1];
         top -= 5;
       } else {
         top += featureLowerLeft[1];
-        top *= factor; // Use width factor instead of heightFactor for propert using. Can't figure out why width factor works better.
+        top *= factor; // Use width factor instead of heightFactor for property using. Can't figure out why width factor works better.
         top += 5;
       }
 
@@ -120,7 +125,7 @@ export class MapTooltipRenderer {
       let centerBottom = featureLowerLeft[0];
       centerBottom += (featureBoundsWidth / 2);
       centerBottom *= factor;
-      centerBottom -= (Number(tooltipWidth) / 2);
+      centerBottom -= (Number(tooltipSize[0]) / 2);
       centerBottom += positionOffset[0];
 
       tooltip.style('opacity', 1)
@@ -143,10 +148,11 @@ export class MapTooltipRenderer {
      * @param feature
      */
     this.mouseOut = function (event, feature) {
+      let style = styleForCSSClass('.lotivis-map-area');
       d3.select(this)
-        .attr('stroke', 'black')
-        .attr('stroke-width', '0.7')
-        .attr('stroke-dasharray', function (feature) {
+        .style('stroke', style.stroke || 'black')
+        .style('stroke-width', style['stroke-width'] || '0.7')
+        .style('stroke-dasharray', function (feature) {
           return feature.departmentsData ? '0' : '1,4';
         });
       tooltip.style('opacity', 0);

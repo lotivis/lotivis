@@ -23,6 +23,7 @@ export class DateLegendRenderer {
 
       legends
         .append('text')
+        .attr('class', 'lotivis-date-chart-legend-label')
         .attr("font-size", 13)
         .attr("x", (item) => xLegend(item.label) - 30)
         .attr("y", timeChart.graphHeight + labelMargin)
@@ -42,22 +43,14 @@ export class DateLegendRenderer {
 
       legends
         .append("circle")
+        .attr('class', 'lotivis-date-chart-legend-circle')
         .attr("r", circleRadius)
-        .attr("cx", function (item) {
-          return xLegend(item.label) - (circleRadius * 2) - 30;
-        }.bind(this))
-        .attr("cy", function () {
-          return timeChart.graphHeight + labelMargin - circleRadius + 2;
-        }.bind(this))
-        .style('cursor', 'pointer')
-        .style("stroke", function (item) {
-          return controller.getColorForDataset(item.label).rgbString();
-        }.bind(this))
+        .attr("cx", (item) => xLegend(item.label) - (circleRadius * 2) - 30)
+        .attr("cy", timeChart.graphHeight + labelMargin - circleRadius + 2)
+        .style("stroke", (item) => controller.getColorForDataset(item.label))
         .style("fill", function (item) {
-          return item.isEnabled ? controller.getColorForDataset(item.label).rgbString() : 'white';
-        }.bind(this))
-        .style("stroke-width", 2);
-
+          return item.isEnabled ? controller.getColorForDataset(item.label) : 'white';
+        }.bind(this));
     };
 
     this.renderCombinedStacksLegend = function () {
@@ -72,13 +65,14 @@ export class DateLegendRenderer {
 
       let legends = timeChart
         .graph
-        .selectAll('.legend')
+        .selectAll('.lotivis-date-chart-legend-label')
         .data(stackNames)
         .enter();
 
       legends
         .append('text')
-        .attr("font-size", 13)
+        .attr('class', 'lotivis-date-chart-legend-label')
+        .attr("font-size", 23)
         .attr("x", (item) => xLegend(item) - 30)
         .attr("y", function () {
           return timeChart.graphHeight + labelMargin;

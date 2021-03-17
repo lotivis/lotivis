@@ -3,6 +3,7 @@ import {Checkbox} from "../components/checkbox";
 import {URLParameters} from "../shared/url-parameters";
 
 /**
+ * A popup presenting a settings panel for a map chart.
  *
  * @class MapChartSettingsPopup
  * @extends Popup
@@ -10,7 +11,8 @@ import {URLParameters} from "../shared/url-parameters";
 export class MapChartSettingsPopup extends Popup {
 
   /**
-   *
+   * Injects the elements of the settings panel.
+   * @override
    */
   render() {
     this.card
@@ -18,7 +20,9 @@ export class MapChartSettingsPopup extends Popup {
       .append('h3')
       .text('Settings');
 
-    this.row = this.card.body
+    this.row = this
+      .card
+      .body
       .append('div')
       .classed('row', true);
 
@@ -26,7 +30,7 @@ export class MapChartSettingsPopup extends Popup {
   }
 
   /**
-   *
+   * Injects a checkbox to toggle the visibility of the labels of the map chart.
    */
   renderShowLabelsCheckbox() {
     let container = this.row.append('div').classed('col-12 margin-top', true);
@@ -40,14 +44,12 @@ export class MapChartSettingsPopup extends Popup {
   }
 
   /**
-   *
+   * Returns the preferred size for this popup.
+   * @override
    * @returns {{width: number, height: number}}
    */
   preferredSize() {
-    return {
-      width: 240,
-      height: 600
-    };
+    return {width: 240, height: 600};
   }
 
   /**
@@ -55,7 +57,6 @@ export class MapChartSettingsPopup extends Popup {
    * @override
    */
   willShow() {
-    super.willShow();
     this.showLabelsCheckbox.setChecked(this.mapChart.isShowLabels);
   }
 }

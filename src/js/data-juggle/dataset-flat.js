@@ -20,6 +20,10 @@ export function flatDatasets(datasets) {
  */
 export function flatDataset(dataset) {
   let flatData = [];
+  if (!dataset.data) {
+    console.log('Lotivis: Flat data for dataset without data requested. Will return an empty array.');
+    return flatData;
+  }
   dataset.data.forEach(item => {
     item.dataset = dataset.label;
     item.stack = dataset.stack;

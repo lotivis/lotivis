@@ -14,16 +14,27 @@ export class MapLabelRenderer {
   constructor(mapChart) {
 
     /**
+     * Removes any old labels from the map.
+     */
+    function removeLabels() {
+      mapChart
+        .svg
+        .selectAll('.lotivis-map-label')
+        .remove();
+    }
+
+    /**
      * Appends labels from datasets.
      */
     this.render = function () {
       if (!mapChart.geoJSON) return log_debug('no geoJSON');
       if (!mapChart.datasetController) return log_debug('no datasetController');
 
+      removeLabels();
+      if (!mapChart.isShowLabels) return;
+
       let geoJSON = mapChart.geoJSON;
       let combinedData = mapChart.combinedData;
-
-      mapChart.svg.selectAll('.lotivis-map-label').remove();
       mapChart.svg
         .selectAll('text')
         .data(geoJSON.features)
@@ -31,9 +42,6 @@ export class MapLabelRenderer {
         .append('text')
         .attr('class', 'lotivis-map-label')
         .attr('fill', mapChart.tintColor)
-        .attr('opacity', function () {
-          return mapChart.isShowLabels ? 1 : 0;
-        }.bind(this))
         .text(function (feature) {
           let code = +feature.properties.code;
           let dataset = combinedData.find(dataset => +dataset.location === code);

@@ -4,5 +4,6 @@
  */
 export const Constants = {
   tooltipOffset: 7,
-  barRadius: 5
+  barRadius: 5,
+  debugLog: true
 };

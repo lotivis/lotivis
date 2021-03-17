@@ -1,7 +1,19 @@
 
-// disable pointer events on map labels and tooltip.
-.chart-label {
+.lotivis-date-chart {
+}
+
+.lotivis-date-chart-label {
   pointer-events: none;
+  font-size: 20px;
+}
+
+.lotivis-date-chart-legend-label {
+  font-size: 13px;
+}
+
+.lotivis-date-chart-legend-circle {
+  cursor: pointer;
+  stroke-width: 2;
 }
 
 .lotivis-date-chart-bar {

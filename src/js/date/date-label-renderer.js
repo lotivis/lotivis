@@ -3,6 +3,10 @@
  */
 export class DateLabelRenderer {
 
+  /**
+   *
+   * @param timeChart
+   */
   constructor(timeChart) {
 
     /**
@@ -32,12 +36,12 @@ export class DateLabelRenderer {
         .data(dataset => dataset)
         .enter()
         .append('text')
+        .attr('class', 'lotivis-date-chart-label')
         .attr("transform", function (item) {
           let x = xChartRef(item.data.date) + xStackRef(stack.label) + bandwidth;
           let y = yChartRef(item[1]) - 5;
           return `translate(${x},${y})rotate(-60)`;
         })
-        .attr("font-size", 13)
         .text(function (item, index) {
           if (index === 0) seriesIndex += 1;
           if (seriesIndex !== numberOfSeries) return;

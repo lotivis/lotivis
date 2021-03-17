@@ -1,43 +1,58 @@
-import {log_debug} from "../shared/debug";
+import {getFilename} from "../shared/filname";
+import {trimByChar} from "../shared/trim";
 
-export async function parseCSV(
+/**
+ *
+ * @param url
+ * @param extractItemBlock
+ * @returns {Promise<[]>}
+ */
+export function parseCSV(
   url,
   extractItemBlock = function (components) {
     return {date: components[0], value: components[1]};
   }) {
 
   let name = getFilename(url);
-  let dataset = {
-    label: name,
-    stack: name,
-    data: []
-  };
+  let datasets = [];
 
   return fetch(url)
     .then(function (response) {
       return response.text();
     })
     .then(function (text) {
+      datasets.csv = text;
       let lines = text.split('\n');
+      let headline = lines.shift();
+      let headlines = headline.split(',');
+      headlines.shift(); // drop first column
 
-      // drop first line
-      lines.shift();
-      dataset.data = lines
-        .map(line => line.split(',').map(word => trimByChar(word, '"')))
-        .filter(components => components.length > 0)
-        .map(components => extractItemBlock(components))
-        .filter(item => item.value && item.date);
+      for (let index = 0; index < headlines.length; index++) {
+        datasets.push({
+          label: trimByChar(headlines[index], "\""),
+          stack: trimByChar(headlines[index], "\""),
+          data: []
+        });
+      }
 
-      return dataset;
+      for (let index = 0; index < lines.length; index++) {
+        let line = String(lines[index]);
+        let components = line.split(',');
+        if (components.length < 2) continue;
+        let date = components.shift();
+
+        for (let componentIndex = 0; componentIndex < components.length; componentIndex++) {
+          let dataset = datasets[componentIndex];
+          let data = dataset.data;
+          data.push({
+            date: trimByChar(date, "\""),
+            value: Number(trimByChar(components[componentIndex], "\""))
+          });
+          dataset.data = data;
+          datasets[componentIndex] = dataset;
+        }
+      }
+
+      return datasets;
     });
-}
-
-function trimByChar(string, character) {
-  const first = [...string].findIndex(char => char !== character);
-  const last = [...string].reverse().findIndex(char => char !== character);
-  return string.substring(first, string.length - last);
-}
-
-function getFilename(url) {
-  return url.substring(url.lastIndexOf('/') + 1);
 }

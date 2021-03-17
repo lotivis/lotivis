@@ -226,6 +226,10 @@ class DateAxisRenderer {
  */
 class DateLabelRenderer {
 
+  /**
+   *
+   * @param timeChart
+   */
   constructor(timeChart) {
 
     /**
@@ -255,12 +259,12 @@ class DateLabelRenderer {
         .data(dataset => dataset)
         .enter()
         .append('text')
+        .attr('class', 'lotivis-date-chart-label')
         .attr("transform", function (item) {
           let x = xChartRef(item.data.date) + xStackRef(stack.label) + bandwidth;
           let y = yChartRef(item[1]) - 5;
           return `translate(${x},${y})rotate(-60)`;
         })
-        .attr("font-size", 13)
         .text(function (item, index) {
           if (index === 0) seriesIndex += 1;
           if (seriesIndex !== numberOfSeries) return;
@@ -338,6 +342,7 @@ class DateLegendRenderer {
 
       legends
         .append('text')
+        .attr('class', 'lotivis-date-chart-legend-label')
         .attr("font-size", 13)
         .attr("x", (item) => xLegend(item.label) - 30)
         .attr("y", timeChart.graphHeight + labelMargin)
@@ -357,22 +362,14 @@ class DateLegendRenderer {
 
       legends
         .append("circle")
+        .attr('class', 'lotivis-date-chart-legend-circle')
         .attr("r", circleRadius)
-        .attr("cx", function (item) {
-          return xLegend(item.label) - (circleRadius * 2) - 30;
-        }.bind(this))
-        .attr("cy", function () {
-          return timeChart.graphHeight + labelMargin - circleRadius + 2;
-        }.bind(this))
-        .style('cursor', 'pointer')
-        .style("stroke", function (item) {
-          return controller.getColorForDataset(item.label).rgbString();
-        }.bind(this))
+        .attr("cx", (item) => xLegend(item.label) - (circleRadius * 2) - 30)
+        .attr("cy", timeChart.graphHeight + labelMargin - circleRadius + 2)
+        .style("stroke", (item) => controller.getColorForDataset(item.label))
         .style("fill", function (item) {
-          return item.isEnabled ? controller.getColorForDataset(item.label).rgbString() : 'white';
-        }.bind(this))
-        .style("stroke-width", 2);
-
+          return item.isEnabled ? controller.getColorForDataset(item.label) : 'white';
+        }.bind(this));
     };
 
     this.renderCombinedStacksLegend = function () {
@@ -387,13 +384,14 @@ class DateLegendRenderer {
 
       let legends = timeChart
         .graph
-        .selectAll('.legend')
+        .selectAll('.lotivis-date-chart-legend-label')
         .data(stackNames)
         .enter();
 
       legends
         .append('text')
-        .attr("font-size", 13)
+        .attr('class', 'lotivis-date-chart-legend-label')
+        .attr("font-size", 23)
         .attr("x", (item) => xLegend(item) - 30)
         .attr("y", function () {
           return timeChart.graphHeight + labelMargin;
@@ -432,7 +430,8 @@ const log_debug = console.log;
  */
 const Constants = {
   tooltipOffset: 7,
-  barRadius: 5
+  barRadius: 5,
+  debugLog: true
 };
 
 class DateBarsRenderer {
@@ -497,6 +496,10 @@ function flatDatasets(datasets) {
  */
 function flatDataset(dataset) {
   let flatData = [];
+  if (!dataset.data) {
+    console.log('Lotivis: Flat data for dataset without data requested. Will return an empty array.');
+    return flatData;
+  }
   dataset.data.forEach(item => {
     item.dataset = dataset.label;
     item.stack = dataset.stack;
@@ -1024,6 +1027,10 @@ class DatasetsControllerFilter extends DatasetsController {
  */
 class DateGhostBarsRenderer {
 
+  /**
+   * Creates a new instance of DateGhostBarsRenderer.
+   * @param dateChart
+   */
   constructor(dateChart) {
 
     function createID(date) {
@@ -1221,7 +1228,7 @@ class DateTooltipRenderer {
     };
 
     /**
-     * Hides the tooltip.
+     * Hides the tooltip.  Does nothing if tooltips opacity is already 0.
      */
     this.hideTooltip = function () {
       if (+tooltip.style('opacity') === 0) return;
@@ -1502,6 +1509,7 @@ class DateChart extends Chart {
   renderSVG() {
     this.svg = this.element
       .append('svg')
+      .attr('class', 'lotivis-date-chart')
       // .attr('width', this.width)
       // .attr('height', this.height)
       .attr('preserveAspectRatio', 'xMidYMid meet')
@@ -2269,7 +2277,7 @@ class DateChartSettingsPopup extends Popup {
  * @extends Card
  */
 class ChartCard extends Card {
-  chart
+  chart;
 
   /**
    * Creates a new instance of ChartCard.
@@ -2510,6 +2518,27 @@ function svgString2Image(svgString, width, height, callback) {
 }
 
 /**
+ * Returns the size of the viewBox or the normal size of the given svg element.
+ *
+ * @param svgElement The svg element.
+ * @returns {number[]} The size [width, height].
+ */
+function getOriginalSizeOfSVG(svgElement) {
+  let viewBoxBaseValue = svgElement.viewBox.baseVal;
+  if (viewBoxBaseValue.width !== 0 && viewBoxBaseValue.height !== 0) {
+    return [
+      viewBoxBaseValue.width,
+      viewBoxBaseValue.height
+    ];
+  } else {
+    return [
+      svgElement.width.baseVal.value,
+      svgElement.height.baseVal.value,
+    ];
+  }
+}
+
+/**
  * Creates and appends an anchor linked to the given data which is then immediately clicked.
  *
  * @param data The data to be downloaded.
@@ -2531,27 +2560,6 @@ function downloadData(data, filename) {
    */
   function appendPNGIfNeeded(filename) {
     return filename.endsWith('.png') ? filename : `${filename}.png`;
-  }
-}
-
-/**
- * Returns the size of the viewBox or the normal size.
- *
- * @param svgElement The svg element.
- * @returns {number[]} The size [width, height].
- */
-function getOriginalSizeOfSVG(svgElement) {
-  let viewBoxBaseValue = svgElement.viewBox.baseVal;
-  if (viewBoxBaseValue.width !== 0 && viewBoxBaseValue.height !== 0) {
-    return [
-      viewBoxBaseValue.width,
-      viewBoxBaseValue.height
-    ];
-  } else {
-    return [
-      svgElement.width.baseVal.value,
-      svgElement.height.baseVal.value,
-    ];
   }
 }
 
@@ -2683,6 +2691,21 @@ function removeFeatures(geoJSON, removeCandidates) {
 }
 
 /**
+ * Returns the style of the given CSS class or an empty object.
+ *
+ * @param className The CSS class name.
+ * @returns {{}} The CSS style.
+ */
+function styleForCSSClass(className) {
+  let selector = className;
+  if (!selector.startsWith('.')) selector = '.' + selector;
+  let element = document.querySelector(selector);
+  if (!element) return {};
+  let style = getComputedStyle(element);
+  return style ? style : {};
+}
+
+/**
  *
  * @class MapTooltipRenderer
  */
@@ -2711,17 +2734,29 @@ class MapTooltipRenderer {
       .style('fill-opacity', 0);
 
     /**
+     * Returns the size of the tooltip.
+     * @returns {number[]}
+     */
+    function getTooltipSize() {
+      let tooltipWidth = Number(tooltip.style('width').replace('px', '') || 200);
+      let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
+      return [tooltipWidth += 20, tooltipHeight += 20];
+    }
+
+    /**
      *
      * @param event
      * @param feature
      */
     this.mouserEnter = function (event, feature) {
-
-      d3.select(this)
+      let id = mapChart.featureIDAccessor(feature);
+      mapChart.svg
+        // .selectAll('path')
+        .selectAll(`#lotivis-map-area-${id}`)
         .raise() // bring element to top
-        .attr('stroke', () => color)
-        .attr('stroke-width', '2')
-        .attr('stroke-dasharray', '0');
+        .style('stroke', () => color)
+        .style('stroke-width', '2')
+        .style('stroke-dasharray', '0');
 
       // set tooltip content
       let properties = feature.properties;
@@ -2748,11 +2783,7 @@ class MapTooltipRenderer {
       tooltip.html(components.join('<br>'));
 
       // position tooltip
-      let tooltipWidth = Number(tooltip.style('width').replace('px', '') || 200);
-      let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
-      tooltipWidth += 20;
-      tooltipHeight += 20;
-
+      let tooltipSize = getTooltipSize();
       let projection = mapChart.projection;
       let featureBounds = d3.geoBounds(feature);
       let featureLowerLeft = projection(featureBounds[0]);
@@ -2775,11 +2806,11 @@ class MapTooltipRenderer {
       if ((featureLowerLeft[1] * heightFactor) > (effectiveSize[1] / 2)) {
         top += featureUpperRight[1];
         top *= factor;
-        top -= tooltipHeight;
+        top -= tooltipSize[1];
         top -= 5;
       } else {
         top += featureLowerLeft[1];
-        top *= factor; // Use width factor instead of heightFactor for propert using. Can't figure out why width factor works better.
+        top *= factor; // Use width factor instead of heightFactor for property using. Can't figure out why width factor works better.
         top += 5;
       }
 
@@ -2789,7 +2820,7 @@ class MapTooltipRenderer {
       let centerBottom = featureLowerLeft[0];
       centerBottom += (featureBoundsWidth / 2);
       centerBottom *= factor;
-      centerBottom -= (Number(tooltipWidth) / 2);
+      centerBottom -= (Number(tooltipSize[0]) / 2);
       centerBottom += positionOffset[0];
 
       tooltip.style('opacity', 1)
@@ -2812,10 +2843,11 @@ class MapTooltipRenderer {
      * @param feature
      */
     this.mouseOut = function (event, feature) {
+      let style = styleForCSSClass('.lotivis-map-area');
       d3.select(this)
-        .attr('stroke', 'black')
-        .attr('stroke-width', '0.7')
-        .attr('stroke-dasharray', function (feature) {
+        .style('stroke', style.stroke || 'black')
+        .style('stroke-width', style['stroke-width'] || '0.7')
+        .style('stroke-dasharray', function (feature) {
           return feature.departmentsData ? '0' : '1,4';
         });
       tooltip.style('opacity', 0);
@@ -2958,16 +2990,27 @@ class MapLabelRenderer {
   constructor(mapChart) {
 
     /**
+     * Removes any old labels from the map.
+     */
+    function removeLabels() {
+      mapChart
+        .svg
+        .selectAll('.lotivis-map-label')
+        .remove();
+    }
+
+    /**
      * Appends labels from datasets.
      */
     this.render = function () {
       if (!mapChart.geoJSON) return log_debug('no geoJSON');
       if (!mapChart.datasetController) return log_debug('no datasetController');
 
+      removeLabels();
+      if (!mapChart.isShowLabels) return;
+
       let geoJSON = mapChart.geoJSON;
       let combinedData = mapChart.combinedData;
-
-      mapChart.svg.selectAll('.lotivis-map-label').remove();
       mapChart.svg
         .selectAll('text')
         .data(geoJSON.features)
@@ -2975,9 +3018,6 @@ class MapLabelRenderer {
         .append('text')
         .attr('class', 'lotivis-map-label')
         .attr('fill', mapChart.tintColor)
-        .attr('opacity', function () {
-          return mapChart.isShowLabels ? 1 : 0;
-        }.bind(this))
         .text(function (feature) {
           let code = +feature.properties.code;
           let dataset = combinedData.find(dataset => +dataset.location === code);
@@ -3006,6 +3046,14 @@ class MapDatasetRenderer {
    */
   constructor(mapChart) {
 
+    function resetAreas() {
+      let style = styleForCSSClass('lotivis-map-area');
+      mapChart.svg
+        .selectAll('.lotivis-map-area')
+        .attr('fill', style.fill || 'white')
+        .attr('fill-opacity', style.fill || 0);
+    }
+
     /**
      * Iterates the datasets per stack and draws them on svg.
      */
@@ -3016,11 +3064,7 @@ class MapDatasetRenderer {
       let stackNames = mapChart.datasetController.stacks;
       let combinedData = mapChart.combinedData;
 
-      // reset colors
-      mapChart.svg
-        .selectAll('path')
-        .attr('fill', 'white')
-        .attr('fill-opacity', '0');
+      resetAreas();
 
       for (let index = 0; index < stackNames.length; index++) {
 
@@ -3035,10 +3079,12 @@ class MapDatasetRenderer {
 
           mapChart.svg
             .selectAll('path')
-            .filter(item => String(item.properties.code) === String(id))
-            .attr('fill', color.rgbString())
-            .attr('fill-opacity', datasetEntry.value / max);
-
+            .filter(function (item) {
+              if (!item.properties) return false;
+              return String(item.properties.code) !== String(id);
+            })
+            .style('fill', color.rgbString())
+            .style('fill-opacity', datasetEntry.value / max);
         }
       }
     };
@@ -3062,6 +3108,7 @@ class MapGeoJsonRenderer {
      */
     this.renderGeoJson = function () {
       let geoJSON = mapChart.presentedGeoJSON;
+      let idAccessor = mapChart.featureIDAccessor;
 
       mapChart.svg
         .selectAll('path')
@@ -3069,13 +3116,9 @@ class MapGeoJsonRenderer {
         .enter()
         .append('path')
         .attr('d', mapChart.path)
-        .attr('id', feature => feature.properties.code)
-        .attr('fill', 'white')
-        .attr('fill-opacity', 0)
-        .attr('stroke', 'black')
-        .attr('stroke-width', '0.7')
-        .attr('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4')
-        .attr('cursor', 'pointer')
+        .attr('id', feature => `lotivis-map-area-${idAccessor(feature)}`)
+        .attr('class', 'lotivis-map-area')
+        .style('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4')
         .on('click', mapChart.onSelectFeature.bind(mapChart))
         .on('mouseenter', mapChart.tooltipRenderer.mouserEnter)
         .on('mouseout', mapChart.tooltipRenderer.mouseOut);
@@ -3126,7 +3169,6 @@ function extractObjects(topology) {
  *
  * @class MapExteriorBorderRenderer
  */
-
 class MapExteriorBorderRenderer {
 
   /**
@@ -3137,10 +3179,15 @@ class MapExteriorBorderRenderer {
   constructor(mapChart) {
 
     /**
-     *
+     * Renders the exterior border of the presented geo json.
      */
     this.render = function () {
-      if (!self.topojson) return;
+      if (!self.topojson) {
+        {
+          console.log('Can\'t find topojson lib.');
+        }
+        return;
+      }
       let geoJSON = mapChart.presentedGeoJSON;
       let borders = joinFeatures(geoJSON);
       mapChart.svg
@@ -3271,6 +3318,12 @@ class MapChart extends Chart {
     this.excludedFeatureCodes = [];
     this.updateSensible = true;
     this.drawRectangleAroundSelection = true;
+    this.featureIDAccessor = function (feature) {
+      if (feature.id) return feature.id;
+      if (feature.properties && feature.properties.id) return feature.properties.id;
+      if (feature.properties && feature.properties.code) return feature.properties.code;
+      return feature;
+    };
 
     this.projection = d3.geoMercator();
     this.path = d3.geoPath().projection(this.projection);
@@ -3293,7 +3346,9 @@ class MapChart extends Chart {
       .select(`#${this.selector}`)
       .append('svg')
       .attr('id', this.svgSelector)
-      .classed('map', true)
+      .attr('class', 'lotivis-map')
+      // .style('width', this.width)
+      // .style('height', this.height);
       .attr('viewBox', `0 0 ${this.width} ${this.height}`);
 
     this.background = this.svg
@@ -3388,10 +3443,15 @@ class MapChart extends Chart {
     const combinedByStack = combineByStacks(this.datasetController.enabledFlatData);
     this.combinedData = combineByLocation(combinedByStack);
 
+    this.svg.remove();
+    this.renderSVG();
+
     if (!this.geoJSON) {
       this.geoJSON = createGeoJSON(this.datasetController.workingDatasets);
-      this.geoJSONDidChange();
     }
+
+    this.exteriorBorderRenderer.render();
+    this.geoJSONRenderer.renderGeoJson();
     this.tooltipRenderer.raise();
     this.legendRenderer.render();
     this.datasetRenderer.render();
@@ -3412,6 +3472,7 @@ class MapChart extends Chart {
 }
 
 /**
+ * A popup presenting a settings panel for a map chart.
  *
  * @class MapChartSettingsPopup
  * @extends Popup
@@ -3419,7 +3480,8 @@ class MapChart extends Chart {
 class MapChartSettingsPopup extends Popup {
 
   /**
-   *
+   * Injects the elements of the settings panel.
+   * @override
    */
   render() {
     this.card
@@ -3427,7 +3489,9 @@ class MapChartSettingsPopup extends Popup {
       .append('h3')
       .text('Settings');
 
-    this.row = this.card.body
+    this.row = this
+      .card
+      .body
       .append('div')
       .classed('row', true);
 
@@ -3435,7 +3499,7 @@ class MapChartSettingsPopup extends Popup {
   }
 
   /**
-   *
+   * Injects a checkbox to toggle the visibility of the labels of the map chart.
    */
   renderShowLabelsCheckbox() {
     let container = this.row.append('div').classed('col-12 margin-top', true);
@@ -3449,14 +3513,12 @@ class MapChartSettingsPopup extends Popup {
   }
 
   /**
-   *
+   * Returns the preferred size for this popup.
+   * @override
    * @returns {{width: number, height: number}}
    */
   preferredSize() {
-    return {
-      width: 240,
-      height: 600
-    };
+    return {width: 240, height: 600};
   }
 
   /**
@@ -3464,7 +3526,6 @@ class MapChartSettingsPopup extends Popup {
    * @override
    */
   willShow() {
-    super.willShow();
     this.showLabelsCheckbox.setChecked(this.mapChart.isShowLabels);
   }
 }
@@ -3583,6 +3644,11 @@ class PlotAxisRenderer {
   }
 }
 
+/**
+ *
+ * @param str
+ * @returns {number}
+ */
 function hashCode(str) {
   let hash = 0, i, chr;
   for (i = 0; i < str.length; i++) {
@@ -4575,46 +4641,82 @@ function renderCSV(datasets) {
   return csvContent;
 }
 
-async function parseCSV(
+/**
+ * Returns the last path component of the given url.
+ * @param url The url with components.
+ * @returns {string} The last path component.
+ */
+function getFilename(url) {
+  return url.substring(url.lastIndexOf('/') + 1);
+}
+
+/**
+ * Returns a new version of the given string by trimming the given char from the beginning and the end of the string.
+ * @param string The string to be trimmed.
+ * @param character The character to trim.
+ * @returns {string} The trimmed version of the string.
+ */
+function trimByChar(string, character) {
+  const saveString = String(string);
+  const first = [...saveString].findIndex(char => char !== character);
+  const last = [...saveString].reverse().findIndex(char => char !== character);
+  return saveString.substring(first, string.length - last);
+}
+
+/**
+ *
+ * @param url
+ * @param extractItemBlock
+ * @returns {Promise<[]>}
+ */
+function parseCSV(
   url,
   extractItemBlock = function (components) {
     return {date: components[0], value: components[1]};
   }) {
 
-  let name = getFilename(url);
-  let dataset = {
-    label: name,
-    stack: name,
-    data: []
-  };
+  getFilename(url);
+  let datasets = [];
 
   return fetch(url)
     .then(function (response) {
       return response.text();
     })
     .then(function (text) {
+      datasets.csv = text;
       let lines = text.split('\n');
+      let headline = lines.shift();
+      let headlines = headline.split(',');
+      headlines.shift(); // drop first column
 
-      // drop first line
-      lines.shift();
-      dataset.data = lines
-        .map(line => line.split(',').map(word => trimByChar(word, '"')))
-        .filter(components => components.length > 0)
-        .map(components => extractItemBlock(components))
-        .filter(item => item.value && item.date);
+      for (let index = 0; index < headlines.length; index++) {
+        datasets.push({
+          label: trimByChar(headlines[index], "\""),
+          stack: trimByChar(headlines[index], "\""),
+          data: []
+        });
+      }
 
-      return dataset;
+      for (let index = 0; index < lines.length; index++) {
+        let line = String(lines[index]);
+        let components = line.split(',');
+        if (components.length < 2) continue;
+        let date = components.shift();
+
+        for (let componentIndex = 0; componentIndex < components.length; componentIndex++) {
+          let dataset = datasets[componentIndex];
+          let data = dataset.data;
+          data.push({
+            date: trimByChar(date, "\""),
+            value: Number(trimByChar(components[componentIndex], "\""))
+          });
+          dataset.data = data;
+          datasets[componentIndex] = dataset;
+        }
+      }
+
+      return datasets;
     });
-}
-
-function trimByChar(string, character) {
-  const first = [...string].findIndex(char => char !== character);
-  const last = [...string].reverse().findIndex(char => char !== character);
-  return string.substring(first, string.length - last);
-}
-
-function getFilename(url) {
-  return url.substring(url.lastIndexOf('/') + 1);
 }
 
 /**

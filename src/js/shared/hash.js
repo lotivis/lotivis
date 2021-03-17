@@ -1,3 +1,8 @@
+/**
+ *
+ * @param str
+ * @returns {number}
+ */
 export function hashCode(str) {
   let hash = 0, i, chr;
   for (i = 0; i < str.length; i++) {

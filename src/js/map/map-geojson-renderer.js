@@ -15,6 +15,7 @@ export class MapGeoJsonRenderer {
      */
     this.renderGeoJson = function () {
       let geoJSON = mapChart.presentedGeoJSON;
+      let idAccessor = mapChart.featureIDAccessor;
 
       mapChart.svg
         .selectAll('path')
@@ -22,13 +23,9 @@ export class MapGeoJsonRenderer {
         .enter()
         .append('path')
         .attr('d', mapChart.path)
-        .attr('id', feature => feature.properties.code)
-        .attr('fill', 'white')
-        .attr('fill-opacity', 0)
-        .attr('stroke', 'black')
-        .attr('stroke-width', '0.7')
-        .attr('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4')
-        .attr('cursor', 'pointer')
+        .attr('id', feature => `lotivis-map-area-${idAccessor(feature)}`)
+        .attr('class', 'lotivis-map-area')
+        .style('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4')
         .on('click', mapChart.onSelectFeature.bind(mapChart))
         .on('mouseenter', mapChart.tooltipRenderer.mouserEnter)
         .on('mouseout', mapChart.tooltipRenderer.mouseOut);

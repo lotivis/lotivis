@@ -7,6 +7,10 @@ import {Constants} from "../shared/constants";
  */
 export class DateGhostBarsRenderer {
 
+  /**
+   * Creates a new instance of DateGhostBarsRenderer.
+   * @param dateChart
+   */
   constructor(dateChart) {
 
     function createID(date) {

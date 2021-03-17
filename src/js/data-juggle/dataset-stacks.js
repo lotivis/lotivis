@@ -1,4 +1,4 @@
-import {extractStacksFromDatasets} from "../data-juggle/dataset-extract";
+import {extractStacksFromDatasets} from "./dataset-extract";
 import {Color} from "../shared/colors";
 
 /**

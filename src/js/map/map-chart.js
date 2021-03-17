@@ -56,6 +56,12 @@ export class MapChart extends Chart {
     this.excludedFeatureCodes = [];
     this.updateSensible = true;
     this.drawRectangleAroundSelection = true;
+    this.featureIDAccessor = function (feature) {
+      if (feature.id) return feature.id;
+      if (feature.properties && feature.properties.id) return feature.properties.id;
+      if (feature.properties && feature.properties.code) return feature.properties.code;
+      return feature;
+    };
 
     this.projection = d3.geoMercator();
     this.path = d3.geoPath().projection(this.projection);
@@ -78,7 +84,9 @@ export class MapChart extends Chart {
       .select(`#${this.selector}`)
       .append('svg')
       .attr('id', this.svgSelector)
-      .classed('map', true)
+      .attr('class', 'lotivis-map')
+      // .style('width', this.width)
+      // .style('height', this.height);
       .attr('viewBox', `0 0 ${this.width} ${this.height}`);
 
     this.background = this.svg
@@ -173,10 +181,15 @@ export class MapChart extends Chart {
     const combinedByStack = combineByStacks(this.datasetController.enabledFlatData);
     this.combinedData = combineByLocation(combinedByStack);
 
+    this.svg.remove();
+    this.renderSVG();
+
     if (!this.geoJSON) {
       this.geoJSON = createGeoJSON(this.datasetController.workingDatasets);
-      this.geoJSONDidChange();
     }
+
+    this.exteriorBorderRenderer.render();
+    this.geoJSONRenderer.renderGeoJson();
     this.tooltipRenderer.raise();
     this.legendRenderer.render();
     this.datasetRenderer.render();

@@ -8,7 +8,7 @@ import {DateGhostBarsRenderer} from "./date-ghost-bars-renderer";
 import {DateTooltipRenderer} from "./date-tooltip-renderer";
 import {Chart} from "../components/chart";
 import {dateToItemsRelation} from "../data-juggle/dataset-relations";
-import {createStackModel} from "./date-datasets-helper";
+import {createStackModel} from "../data-juggle/dataset-stacks";
 
 /**
  *
@@ -155,6 +155,7 @@ export class DateChart extends Chart {
   renderSVG() {
     this.svg = this.element
       .append('svg')
+      .attr('class', 'lotivis-date-chart')
       // .attr('width', this.width)
       // .attr('height', this.height)
       .attr('preserveAspectRatio', 'xMidYMid meet')

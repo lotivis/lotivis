@@ -1,4 +1,16 @@
 
+.lotivis-map {
+
+}
+
+.lotivis-map-area {
+  fill: white;
+  fill-opacity: 0;
+  stroke: black;
+  stroke-width: 1;
+  cursor: pointer;
+}
+
 .lotivis-map-exterior-borders {
   pointer-events: none;
   fill: white;

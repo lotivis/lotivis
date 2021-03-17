@@ -130,6 +130,27 @@ function svgString2Image(svgString, width, height, callback) {
 }
 
 /**
+ * Returns the size of the viewBox or the normal size of the given svg element.
+ *
+ * @param svgElement The svg element.
+ * @returns {number[]} The size [width, height].
+ */
+function getOriginalSizeOfSVG(svgElement) {
+  let viewBoxBaseValue = svgElement.viewBox.baseVal;
+  if (viewBoxBaseValue.width !== 0 && viewBoxBaseValue.height !== 0) {
+    return [
+      viewBoxBaseValue.width,
+      viewBoxBaseValue.height
+    ];
+  } else {
+    return [
+      svgElement.width.baseVal.value,
+      svgElement.height.baseVal.value,
+    ];
+  }
+}
+
+/**
  * Creates and appends an anchor linked to the given data which is then immediately clicked.
  *
  * @param data The data to be downloaded.
@@ -151,27 +172,6 @@ function downloadData(data, filename) {
    */
   function appendPNGIfNeeded(filename) {
     return filename.endsWith('.png') ? filename : `${filename}.png`;
-  }
-}
-
-/**
- * Returns the size of the viewBox or the normal size.
- *
- * @param svgElement The svg element.
- * @returns {number[]} The size [width, height].
- */
-function getOriginalSizeOfSVG(svgElement) {
-  let viewBoxBaseValue = svgElement.viewBox.baseVal;
-  if (viewBoxBaseValue.width !== 0 && viewBoxBaseValue.height !== 0) {
-    return [
-      viewBoxBaseValue.width,
-      viewBoxBaseValue.height
-    ];
-  } else {
-    return [
-      svgElement.width.baseVal.value,
-      svgElement.height.baseVal.value,
-    ];
   }
 }
 

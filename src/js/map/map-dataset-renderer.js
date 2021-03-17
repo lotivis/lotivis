@@ -1,4 +1,5 @@
 import {Color} from "../shared/colors";
+import {styleForCSSClass} from "../shared/style";
 
 /**
  *
@@ -13,6 +14,14 @@ export class MapDatasetRenderer {
    */
   constructor(mapChart) {
 
+    function resetAreas() {
+      let style = styleForCSSClass('lotivis-map-area');
+      mapChart.svg
+        .selectAll('.lotivis-map-area')
+        .attr('fill', style.fill || 'white')
+        .attr('fill-opacity', style.fill || 0);
+    }
+
     /**
      * Iterates the datasets per stack and draws them on svg.
      */
@@ -23,11 +32,7 @@ export class MapDatasetRenderer {
       let stackNames = mapChart.datasetController.stacks;
       let combinedData = mapChart.combinedData;
 
-      // reset colors
-      mapChart.svg
-        .selectAll('path')
-        .attr('fill', 'white')
-        .attr('fill-opacity', '0');
+      resetAreas();
 
       for (let index = 0; index < stackNames.length; index++) {
 
@@ -42,10 +47,12 @@ export class MapDatasetRenderer {
 
           mapChart.svg
             .selectAll('path')
-            .filter(item => String(item.properties.code) === String(id))
-            .attr('fill', color.rgbString())
-            .attr('fill-opacity', datasetEntry.value / max);
-
+            .filter(function (item) {
+              if (!item.properties) return false;
+              return String(item.properties.code) !== String(id);
+            })
+            .style('fill', color.rgbString())
+            .style('fill-opacity', datasetEntry.value / max);
         }
       }
     };

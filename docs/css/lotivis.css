@@ -92,6 +92,7 @@ button:active, a:active {
 
 .card-body {
   width: 100%;
+  overflow: scroll;
 }
 
 .card-footer {
@@ -146,8 +147,18 @@ button:active, a:active {
   color: red;
 }
 
-.chart-label {
+.lotivis-date-chart-label {
   pointer-events: none;
+  font-size: 20px;
+}
+
+.lotivis-date-chart-legend-label {
+  font-size: 13px;
+}
+
+.lotivis-date-chart-legend-circle {
+  cursor: pointer;
+  stroke-width: 2;
 }
 
 .lotivis-date-chart-bar {
@@ -272,6 +283,14 @@ input[type=checkbox] {
 .col-3,
 .col-2 {
   padding: 0 10px;
+}
+
+.lotivis-map-area {
+  fill: white;
+  fill-opacity: 0;
+  stroke: black;
+  stroke-width: 1;
+  cursor: pointer;
 }
 
 .lotivis-map-exterior-borders {

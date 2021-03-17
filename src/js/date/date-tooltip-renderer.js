@@ -137,7 +137,7 @@ export class DateTooltipRenderer {
     };
 
     /**
-     * Hides the tooltip.
+     * Hides the tooltip.  Does nothing if tooltips opacity is already 0.
      */
     this.hideTooltip = function () {
       if (+tooltip.style('opacity') === 0) return;
