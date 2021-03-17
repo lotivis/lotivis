@@ -56,10 +56,18 @@ export class MapChart extends Chart {
     this.excludedFeatureCodes = [];
     this.updateSensible = true;
     this.drawRectangleAroundSelection = true;
+
     this.featureIDAccessor = function (feature) {
       if (feature.id) return feature.id;
       if (feature.properties && feature.properties.id) return feature.properties.id;
       if (feature.properties && feature.properties.code) return feature.properties.code;
+      return feature;
+    };
+
+    this.featureNameAccessor = function (feature) {
+      if (feature.name) return feature.name;
+      if (feature.properties && feature.properties.name) return feature.properties.name;
+      if (feature.properties && feature.properties.nom) return feature.properties.nom;
       return feature;
     };
 

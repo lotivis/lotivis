@@ -1,6 +1,7 @@
 import {combineByLocation} from "../data-juggle/dataset-combine";
 import {Color} from "../shared/colors";
 import {styleForCSSClass} from "../shared/style";
+import {formatNumber} from "../shared/format";
 
 /**
  *
@@ -29,6 +30,10 @@ export class MapTooltipRenderer {
       .append('rect')
       .attr('class', 'lotivis-map-selection-rect')
       .style('fill-opacity', 0);
+
+    function html() {
+
+    }
 
     /**
      * Returns the size of the tooltip.
@@ -81,7 +86,7 @@ export class MapTooltipRenderer {
         for (let index = 0; index < data.length; index++) {
           let item = data[index];
           let label = (item.label || item.dataset || item.stack);
-          components.push(label + ': ' + item.value);
+          components.push(label + ': ' + formatNumber(item.value));
         }
       }
 

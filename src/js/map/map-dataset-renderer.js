@@ -15,11 +15,11 @@ export class MapDatasetRenderer {
   constructor(mapChart) {
 
     function resetAreas() {
-      let style = styleForCSSClass('lotivis-map-area');
+      let style = styleForCSSClass('.lotivis-map-area');
       mapChart.svg
         .selectAll('.lotivis-map-area')
-        .attr('fill', style.fill || 'white')
-        .attr('fill-opacity', style.fill || 0);
+        .style('fill', style.fill || 'green')
+        .style('fill-opacity', style.fill || 0.5);
     }
 
     /**
@@ -44,15 +44,17 @@ export class MapDatasetRenderer {
         for (let index = 0; index < dataForStack.length; index++) {
           let datasetEntry = dataForStack[index];
           let id = datasetEntry.location;
-
+          let opacitydf = datasetEntry.value / max;
+          console.log(opacitydf);
           mapChart.svg
-            .selectAll('path')
+            .selectAll('.lotivis-map-area')
             .filter(function (item) {
               if (!item.properties) return false;
               return String(item.properties.code) !== String(id);
             })
             .style('fill', color.rgbString())
-            .style('fill-opacity', datasetEntry.value / max);
+            .style('fill', 'red')
+            .attr('fill-opacity', 0 + opacitydf);
         }
       }
     };

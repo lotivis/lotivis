@@ -2706,6 +2706,26 @@ function styleForCSSClass(className) {
 }
 
 /**
+ * The default number format.
+ *
+ * @type {Intl.NumberFormat}
+ */
+const numberFormat = new Intl.NumberFormat('de-DE', {
+  maximumFractionDigits: 3
+});
+
+/**
+ * Returns the formatted version from the given number.
+ *
+ * @param number The number to format.
+ * @returns {string} The formatted version of the number.
+ */
+function formatNumber(number) {
+  if (typeof number !== 'number') return number;
+  return numberFormat.format(number);
+}
+
+/**
  *
  * @class MapTooltipRenderer
  */
@@ -2776,7 +2796,7 @@ class MapTooltipRenderer {
         for (let index = 0; index < data.length; index++) {
           let item = data[index];
           let label = (item.label || item.dataset || item.stack);
-          components.push(label + ': ' + item.value);
+          components.push(label + ': ' + formatNumber(item.value));
         }
       }
 
@@ -2865,46 +2885,28 @@ class MapTooltipRenderer {
 }
 
 /**
- * The default number format.
- *
- * @type {Intl.NumberFormat}
- */
-const numberFormat = new Intl.NumberFormat('de-DE', {
-  maximumFractionDigits: 3
-});
-
-/**
- * Returns the formatted version from the given number.
- *
- * @param number The number to format.
- * @returns {string} The formatted version of the number.
- */
-function formatNumber(number) {
-  if (typeof number !== 'number') return number;
-  return numberFormat.format(number);
-}
-
-/**
  *
  * @class MapLegendRenderer
  */
 class MapLegendRenderer {
 
   constructor(mapChart) {
+    let legend;
 
-    this.legend = mapChart.svg
-      .append('svg')
-      .attr('class', 'legend')
-      .attr('fill', 'red')
-      .attr('width', mapChart.width)
-      .attr('height', 200)
-      .attr('x', 0)
-      .attr('y', 0);
+    function appendLegend() {
+      legend = mapChart.svg
+        .append('svg')
+        .attr('class', 'lotivis-map-legend')
+        .attr('width', mapChart.width)
+        .attr('height', 200)
+        .attr('x', 0)
+        .attr('y', 0);
+    }
 
-    this.removeDatasetLegend = function () {
-      this.legend.selectAll('rect').remove();
-      this.legend.selectAll('text').remove();
-    };
+    function removeDatasetLegend() {
+      legend.selectAll('rect').remove();
+      legend.selectAll('text').remove();
+    }
 
     this.render = function () {
       if (!mapChart.datasetController) return;
@@ -2912,8 +2914,9 @@ class MapLegendRenderer {
       let stackNames = mapChart.datasetController.stacks;
       let combinedData = mapChart.combinedData;
 
-      this.legend.raise();
-      this.removeDatasetLegend();
+      appendLegend();
+      legend.raise();
+      removeDatasetLegend();
 
       for (let index = 0; index < stackNames.length; index++) {
 
@@ -2926,52 +2929,40 @@ class MapLegendRenderer {
         let steps = 4;
         let data = [0, 1, 2, 3, 4];
 
-        this.legend
+        legend
           .append('text')
-          .attr('x', offset + 20)
-          .attr('y', '14')
+          .attr('class', 'lotivis-map-legend-title')
+          .attr('x', offset + 10)
+          .attr('y', '20')
           .style('fill', color.rgbString())
           .text(stackName);
 
-        this.legend
+        legend
           .append("g")
           .selectAll("rect")
           .data(data)
           .enter()
           .append("rect")
+          .attr('class', 'lotivis-map-legend-rect')
           .style('fill', color.rgbString())
-          .attr('x', '20')
-          .attr('y', '20')
+          .attr('x', offset + 10)
+          .attr('y', (d, i) => (i * 20) + 30)
           .attr('width', 18)
           .attr('height', 18)
-          .attr('transform', function (d, i) {
-            return 'translate(' + offset + ',' + (i * 20) + ')';
-          })
           .style('stroke', 'black')
           .style('stroke-width', 1)
           .style('fill-opacity', (d, i) => i / steps);
 
-        this.legend
+        legend
           .append("g")
           .selectAll("text")
           .data(data)
           .enter()
           .append("text")
-          .style('fill', color.rgbString())
-          .attr('x', '40')
-          .attr('y', '35')
-          .attr('width', 18)
-          .attr('height', 18)
-          .attr('transform', function (d, i) {
-            return 'translate(' + offset + ',' + (i * 20) + ')';
-          })
-          .style('stroke', 'black')
-          .style('stroke-width', 1)
-          .style('fill-opacity', (d, i) => i / steps)
-          .text(function (d, i) {
-            return formatNumber((i / steps) * max);
-          }.bind(this));
-
+          .attr('class', 'lotivis-map-legend-text')
+          .attr('x', offset + 35)
+          .attr('y', (d, i) => (i * 20) + 44)
+          .text((d, i) => formatNumber((i / steps) * max));
       }
     };
   }
@@ -3047,11 +3038,11 @@ class MapDatasetRenderer {
   constructor(mapChart) {
 
     function resetAreas() {
-      let style = styleForCSSClass('lotivis-map-area');
+      let style = styleForCSSClass('.lotivis-map-area');
       mapChart.svg
         .selectAll('.lotivis-map-area')
-        .attr('fill', style.fill || 'white')
-        .attr('fill-opacity', style.fill || 0);
+        .style('fill', style.fill || 'green')
+        .style('fill-opacity', style.fill || 0.5);
     }
 
     /**
@@ -3076,15 +3067,17 @@ class MapDatasetRenderer {
         for (let index = 0; index < dataForStack.length; index++) {
           let datasetEntry = dataForStack[index];
           let id = datasetEntry.location;
-
+          let opacitydf = datasetEntry.value / max;
+          console.log(opacitydf);
           mapChart.svg
-            .selectAll('path')
+            .selectAll('.lotivis-map-area')
             .filter(function (item) {
               if (!item.properties) return false;
               return String(item.properties.code) !== String(id);
             })
             .style('fill', color.rgbString())
-            .style('fill-opacity', datasetEntry.value / max);
+            .style('fill', 'red')
+            .attr('fill-opacity', 0 + opacitydf);
         }
       }
     };
@@ -3318,10 +3311,18 @@ class MapChart extends Chart {
     this.excludedFeatureCodes = [];
     this.updateSensible = true;
     this.drawRectangleAroundSelection = true;
+
     this.featureIDAccessor = function (feature) {
       if (feature.id) return feature.id;
       if (feature.properties && feature.properties.id) return feature.properties.id;
       if (feature.properties && feature.properties.code) return feature.properties.code;
+      return feature;
+    };
+
+    this.featureNameAccessor = function (feature) {
+      if (feature.name) return feature.name;
+      if (feature.properties && feature.properties.name) return feature.properties.name;
+      if (feature.properties && feature.properties.nom) return feature.properties.nom;
       return feature;
     };
 

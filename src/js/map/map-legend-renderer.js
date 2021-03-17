@@ -8,20 +8,22 @@ import {formatNumber} from "../shared/format";
 export class MapLegendRenderer {
 
   constructor(mapChart) {
+    let legend;
 
-    this.legend = mapChart.svg
-      .append('svg')
-      .attr('class', 'legend')
-      .attr('fill', 'red')
-      .attr('width', mapChart.width)
-      .attr('height', 200)
-      .attr('x', 0)
-      .attr('y', 0);
+    function appendLegend() {
+      legend = mapChart.svg
+        .append('svg')
+        .attr('class', 'lotivis-map-legend')
+        .attr('width', mapChart.width)
+        .attr('height', 200)
+        .attr('x', 0)
+        .attr('y', 0);
+    }
 
-    this.removeDatasetLegend = function () {
-      this.legend.selectAll('rect').remove();
-      this.legend.selectAll('text').remove();
-    };
+    function removeDatasetLegend() {
+      legend.selectAll('rect').remove();
+      legend.selectAll('text').remove();
+    }
 
     this.render = function () {
       if (!mapChart.datasetController) return;
@@ -29,8 +31,9 @@ export class MapLegendRenderer {
       let stackNames = mapChart.datasetController.stacks;
       let combinedData = mapChart.combinedData;
 
-      this.legend.raise();
-      this.removeDatasetLegend();
+      appendLegend();
+      legend.raise();
+      removeDatasetLegend();
 
       for (let index = 0; index < stackNames.length; index++) {
 
@@ -43,52 +46,40 @@ export class MapLegendRenderer {
         let steps = 4;
         let data = [0, 1, 2, 3, 4];
 
-        this.legend
+        legend
           .append('text')
-          .attr('x', offset + 20)
-          .attr('y', '14')
+          .attr('class', 'lotivis-map-legend-title')
+          .attr('x', offset + 10)
+          .attr('y', '20')
           .style('fill', color.rgbString())
           .text(stackName);
 
-        this.legend
+        legend
           .append("g")
           .selectAll("rect")
           .data(data)
           .enter()
           .append("rect")
+          .attr('class', 'lotivis-map-legend-rect')
           .style('fill', color.rgbString())
-          .attr('x', '20')
-          .attr('y', '20')
+          .attr('x', offset + 10)
+          .attr('y', (d, i) => (i * 20) + 30)
           .attr('width', 18)
           .attr('height', 18)
-          .attr('transform', function (d, i) {
-            return 'translate(' + offset + ',' + (i * 20) + ')';
-          })
           .style('stroke', 'black')
           .style('stroke-width', 1)
           .style('fill-opacity', (d, i) => i / steps);
 
-        this.legend
+        legend
           .append("g")
           .selectAll("text")
           .data(data)
           .enter()
           .append("text")
-          .style('fill', color.rgbString())
-          .attr('x', '40')
-          .attr('y', '35')
-          .attr('width', 18)
-          .attr('height', 18)
-          .attr('transform', function (d, i) {
-            return 'translate(' + offset + ',' + (i * 20) + ')';
-          })
-          .style('stroke', 'black')
-          .style('stroke-width', 1)
-          .style('fill-opacity', (d, i) => i / steps)
-          .text(function (d, i) {
-            return formatNumber((i / steps) * max);
-          }.bind(this));
-
+          .attr('class', 'lotivis-map-legend-text')
+          .attr('x', offset + 35)
+          .attr('y', (d, i) => (i * 20) + 44)
+          .text((d, i) => formatNumber((i / steps) * max));
       }
     };
   }
