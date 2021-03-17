@@ -16,7 +16,7 @@ export class MapLabelRenderer {
     /**
      * Appends labels from datasets.
      */
-    this.renderDatasetLabels = function () {
+    this.render = function () {
       if (!mapChart.geoJSON) return log_debug('no geoJSON');
       if (!mapChart.datasetController) return log_debug('no datasetController');
 
@@ -31,7 +31,6 @@ export class MapLabelRenderer {
         .append('text')
         .attr('class', 'lotivis-map-label')
         .attr('fill', mapChart.tintColor)
-        .attr('font-size', 12)
         .attr('opacity', function () {
           return mapChart.isShowLabels ? 1 : 0;
         }.bind(this))

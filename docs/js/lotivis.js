@@ -1,5 +1,5 @@
 /*!
- * lotivis.js v1.0.45
+ * lotivis.js v1.0.46
  * https://github.com/lukasdanckwerth/lotivis#readme
  * (c) 2021 lotivis.js Lukas Danckwerth
  * Released under the MIT License
@@ -900,7 +900,7 @@ class DatasetsController {
 /**
  *
  */
-class FilterableDatasetsController extends DatasetsController {
+class DatasetsControllerFilter extends DatasetsController {
 
   constructor(datasets) {
     super(datasets);
@@ -999,23 +999,23 @@ class FilterableDatasetsController extends DatasetsController {
     return extractDatesFromDatasets(this.enabledDatasets);
   }
 
-  addListener(listener) {
-    this.listeners.push(listener);
-  }
-
-  removeListener(listener) {
-    let index = this.listeners.indexOf(listener);
-    if (index === -1) return;
-    this.listeners = this.listeners.splice(index, 1);
-  }
-
-  notifyListeners(reason = 'none') {
-    for (let index = 0; index < this.listeners.length; index++) {
-      let listener = this.listeners[index];
-      if (!listener.update) continue;
-      listener.update(this, reason);
-    }
-  }
+  // addListener(listener) {
+  //   this.listeners.push(listener);
+  // }
+  //
+  // removeListener(listener) {
+  //   let index = this.listeners.indexOf(listener);
+  //   if (index === -1) return;
+  //   this.listeners = this.listeners.splice(index, 1);
+  // }
+  //
+  // notifyListeners(reason = 'none') {
+  //   for (let index = 0; index < this.listeners.length; index++) {
+  //     let listener = this.listeners[index];
+  //     if (!listener.update) continue;
+  //     listener.update(this, reason);
+  //   }
+  // }
 }
 
 /**
@@ -1195,7 +1195,7 @@ class DateTooltipRenderer {
      */
     this.showTooltip = function (event, date) {
 
-      // set html content before positioning the tooltip cause the size is
+      // set examples content before positioning the tooltip cause the size is
       // calculated based on the size
       tooltip.html(getHTMLForDate(date));
 
@@ -1560,7 +1560,7 @@ class DateChart extends Chart {
    * @param newDatasets
    */
   set datasets(newDatasets) {
-    this.setDatasetController(new FilterableDatasetsController(newDatasets));
+    this.setDatasetController(new DatasetsControllerFilter(newDatasets));
   }
 
   /**
@@ -2703,22 +2703,12 @@ class MapTooltipRenderer {
       .attr('class', 'lotivis-tooltip')
       .attr('rx', 5) // corner radius
       .attr('ry', 5)
-      .style('position', 'absolute')
-      .style('color', 'black')
-      // .style('border', function () {
-      //   return `solid 1px ${color}`;
-      // })
       .style('opacity', 0);
 
     let bounds = mapChart.svg
       .append('rect')
-      .attr('class', 'bounds')
-      .style('position', 'absolute')
-      .style('pointer-events', 'none')
-      .style('fill-opacity', 0)
-      .style('stroke', 'red')
-      .style('stroke-width', '0.7px')
-      .style('stroke-dasharray', '1,1');
+      .attr('class', 'lotivis-map-selection-rect')
+      .style('fill-opacity', 0);
 
     /**
      *
@@ -2728,6 +2718,7 @@ class MapTooltipRenderer {
     this.mouserEnter = function (event, feature) {
 
       d3.select(this)
+        .raise() // bring element to top
         .attr('stroke', () => color)
         .attr('stroke-width', '2')
         .attr('stroke-dasharray', '0');
@@ -2883,7 +2874,7 @@ class MapLegendRenderer {
       this.legend.selectAll('text').remove();
     };
 
-    this.renderDatasetsLegend = function () {
+    this.render = function () {
       if (!mapChart.datasetController) return;
 
       let stackNames = mapChart.datasetController.stacks;
@@ -2969,7 +2960,7 @@ class MapLabelRenderer {
     /**
      * Appends labels from datasets.
      */
-    this.renderDatasetLabels = function () {
+    this.render = function () {
       if (!mapChart.geoJSON) return log_debug('no geoJSON');
       if (!mapChart.datasetController) return log_debug('no datasetController');
 
@@ -2984,7 +2975,6 @@ class MapLabelRenderer {
         .append('text')
         .attr('class', 'lotivis-map-label')
         .attr('fill', mapChart.tintColor)
-        .attr('font-size', 12)
         .attr('opacity', function () {
           return mapChart.isShowLabels ? 1 : 0;
         }.bind(this))
@@ -3003,14 +2993,23 @@ class MapLabelRenderer {
   }
 }
 
+/**
+ *
+ * @class MapDatasetRenderer
+ */
 class MapDatasetRenderer {
 
+  /**
+   * Creates a new instance of MapDatasetRenderer.
+   *
+   * @param mapChart The parental map chart.
+   */
   constructor(mapChart) {
 
     /**
      * Iterates the datasets per stack and draws them on svg.
      */
-    this.renderDatasets = function () {
+    this.render = function () {
       if (!mapChart.geoJSON) return;
       if (!mapChart.datasetController) return;
 
@@ -3021,7 +3020,7 @@ class MapDatasetRenderer {
       mapChart.svg
         .selectAll('path')
         .attr('fill', 'white')
-        .attr('fill-opacity', '.5');
+        .attr('fill-opacity', '0');
 
       for (let index = 0; index < stackNames.length; index++) {
 
@@ -3072,7 +3071,7 @@ class MapGeoJsonRenderer {
         .attr('d', mapChart.path)
         .attr('id', feature => feature.properties.code)
         .attr('fill', 'white')
-        .attr('fill-opacity', 0.5)
+        .attr('fill-opacity', 0)
         .attr('stroke', 'black')
         .attr('stroke-width', '0.7')
         .attr('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4')
@@ -3154,6 +3153,81 @@ class MapExteriorBorderRenderer {
 }
 
 /**
+ *
+ * @param datasets
+ * @returns {{features: [], type: string}}
+ */
+function createGeoJSON(datasets) {
+  let locations = extractLocationsFromDatasets(datasets);
+  let rowsCount = Math.ceil(locations.length / 5);
+  let latSpan = 0.1;
+  let lngSpan = 0.1;
+  let features = [];
+
+  loop1: for (let rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
+    for (let itemIndex = 0; itemIndex < 5; itemIndex++) {
+      if (locations.length === 0) break loop1;
+      let location = locations.shift();
+
+      let lat = (itemIndex + 1) * latSpan;
+      let lng = (rowIndex + 1) * -lngSpan;
+
+      let coordinates = [];
+
+      coordinates.push([lat, lng]);
+      coordinates.push([lat, lng + lngSpan]);
+      coordinates.push([lat + latSpan, lng + lngSpan]);
+      coordinates.push([lat + latSpan, lng]);
+      coordinates.push([0, 0]);
+
+      let feature = {
+        type: 'Feature',
+        id: location,
+        properties: {
+          id: location,
+          code: location,
+          location: location,
+        },
+        geometry: {
+          type: 'Polygon',
+          coordinates: [
+            coordinates
+          ]
+        }
+      };
+
+      features.push(feature);
+    }
+  }
+
+  return {
+    type: "FeatureCollection",
+    features: features
+  };
+}
+
+/**
+ *
+ * @class MapMinimapRenderer
+ */
+
+class MapMinimapRenderer {
+
+  /**
+   * Creates a new instance of MapMinimapRenderer.
+   *
+   * @param mapChart The parental map chart.
+   */
+  constructor(mapChart) {
+
+    this.render = function () {
+      let miniMapFeatures = mapChart.minimapFeatureCodes;
+      log_debug('miniMapFeatures', miniMapFeatures);
+    };
+  }
+}
+
+/**
  * A component which renders a geo json with d3.
  *
  * @class MapChart
@@ -3176,10 +3250,11 @@ class MapChart extends Chart {
     this.renderSVG();
     this.labelRenderer = new MapLabelRenderer(this);
     this.legendRenderer = new MapLegendRenderer(this);
-    this.tooltipRenderer = new MapTooltipRenderer(this);
     this.geoJSONRenderer = new MapGeoJsonRenderer(this);
     this.datasetRenderer = new MapDatasetRenderer(this);
     this.exteriorBorderRenderer = new MapExteriorBorderRenderer(this);
+    this.minimapRenderer = new MapMinimapRenderer(this);
+    this.tooltipRenderer = new MapTooltipRenderer(this);
   }
 
   /**
@@ -3195,7 +3270,7 @@ class MapChart extends Chart {
     this.departmentsData = [];
     this.excludedFeatureCodes = [];
     this.updateSensible = true;
-    this.drawRectangleAroundSelection = false;
+    this.drawRectangleAroundSelection = true;
 
     this.projection = d3.geoMercator();
     this.path = d3.geoPath().projection(this.projection);
@@ -3293,7 +3368,7 @@ class MapChart extends Chart {
    * @param newDatasets
    */
   set datasets(newDatasets) {
-    this.setDatasetController(new FilterableDatasetsController(newDatasets));
+    this.setDatasetController(new DatasetsControllerFilter(newDatasets));
   }
 
   /**
@@ -3312,9 +3387,16 @@ class MapChart extends Chart {
     if (!this.datasetController) return;
     const combinedByStack = combineByStacks(this.datasetController.enabledFlatData);
     this.combinedData = combineByLocation(combinedByStack);
-    this.legendRenderer.renderDatasetsLegend();
-    this.datasetRenderer.renderDatasets();
-    this.labelRenderer.renderDatasetLabels();
+
+    if (!this.geoJSON) {
+      this.geoJSON = createGeoJSON(this.datasetController.workingDatasets);
+      this.geoJSONDidChange();
+    }
+    this.tooltipRenderer.raise();
+    this.legendRenderer.render();
+    this.datasetRenderer.render();
+    this.labelRenderer.render();
+    this.minimapRenderer.render();
     this.tooltipRenderer.raise();
   }
 
@@ -4007,7 +4089,7 @@ class PlotChart extends Chart {
    * @param newDatasets The array of datasets.
    */
   set datasets(newDatasets) {
-    this.setDatasetController(new FilterableDatasetsController(newDatasets));
+    this.setDatasetController(new DatasetsControllerFilter(newDatasets));
   }
 
   /**
@@ -4460,6 +4542,24 @@ class GeoJson {
   }
 }
 
+DatasetsController.prototype.addListener = function(listener) {
+  this.listeners.push(listener);
+};
+
+DatasetsController.prototype.removeListener = function (listener) {
+  let index = this.listeners.indexOf(listener);
+  if (index === -1) return;
+  this.listeners = this.listeners.splice(index, 1);
+};
+
+DatasetsController.prototype.notifyListeners = function (reason = 'none') {
+  for (let index = 0; index < this.listeners.length; index++) {
+    let listener = this.listeners[index];
+    if (!listener.update) continue;
+    listener.update(this, reason);
+  }
+};
+
 /**
  *
  * @param datasets
@@ -4515,60 +4615,6 @@ function trimByChar(string, character) {
 
 function getFilename(url) {
   return url.substring(url.lastIndexOf('/') + 1);
-}
-
-/**
- *
- * @param datasets
- * @returns {{features: [], type: string}}
- */
-function createGeoJSON(datasets) {
-  let locations = extractLocationsFromDatasets(datasets);
-  let rowsCount = Math.ceil(locations.length / 5);
-  let latSpan = 0.1;
-  let lngSpan = 0.1;
-  let features = [];
-
-  loop1: for (let rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
-    for (let itemIndex = 0; itemIndex < 5; itemIndex++) {
-      if (locations.length === 0) break loop1;
-      let location = locations.shift();
-
-      let lat = (itemIndex + 1) * latSpan;
-      let lng = (rowIndex + 1) * -lngSpan;
-
-      let coordinates = [];
-
-      coordinates.push([lat, lng]);
-      coordinates.push([lat, lng + lngSpan]);
-      coordinates.push([lat + latSpan, lng + lngSpan]);
-      coordinates.push([lat + latSpan, lng]);
-      coordinates.push([0, 0]);
-
-      let feature = {
-        type: 'Feature',
-        id: location,
-        properties: {
-          id: location,
-          code: location,
-          location: location,
-        },
-        geometry: {
-          type: 'Polygon',
-          coordinates: [
-            coordinates
-          ]
-        }
-      };
-
-      features.push(feature);
-    }
-  }
-
-  return {
-    type: "FeatureCollection",
-    features: features
-  };
 }
 
 /**
@@ -4658,7 +4704,7 @@ exports.PlotChart = PlotChart;
 exports.PlotChartCard = PlotChartCard;
 
 exports.DatasetController = DatasetsController;
-exports.FilterableDatasetController = FilterableDatasetsController;
+exports.FilterableDatasetController = DatasetsControllerFilter;
 
 exports.URLParameters = URLParameters;
 

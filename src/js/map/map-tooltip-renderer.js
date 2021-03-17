@@ -22,22 +22,12 @@ export class MapTooltipRenderer {
       .attr('class', 'lotivis-tooltip')
       .attr('rx', 5) // corner radius
       .attr('ry', 5)
-      .style('position', 'absolute')
-      .style('color', 'black')
-      // .style('border', function () {
-      //   return `solid 1px ${color}`;
-      // })
       .style('opacity', 0);
 
     let bounds = mapChart.svg
       .append('rect')
-      .attr('class', 'bounds')
-      .style('position', 'absolute')
-      .style('pointer-events', 'none')
-      .style('fill-opacity', 0)
-      .style('stroke', 'red')
-      .style('stroke-width', '0.7px')
-      .style('stroke-dasharray', '1,1');
+      .attr('class', 'lotivis-map-selection-rect')
+      .style('fill-opacity', 0);
 
     function getTooltipSize() {
 
@@ -59,6 +49,7 @@ export class MapTooltipRenderer {
     this.mouserEnter = function (event, feature) {
 
       d3.select(this)
+        .raise() // bring element to top
         .attr('stroke', () => color)
         .attr('stroke-width', '2')
         .attr('stroke-dasharray', '0');

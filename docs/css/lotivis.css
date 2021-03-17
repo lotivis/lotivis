@@ -288,6 +288,16 @@ input[type=checkbox] {
   font-size: 12px;
 }
 
+.lotivis-map-selection-rect {
+  pointer-events: none;
+  position: absolute;
+  fill: white;
+  fill-opacity: 0;
+  stroke: red;
+  stroke-width: 1px;
+  stroke-dasharray: 1, 3;
+}
+
 .popup-underground {
   display: none;
   position: fixed;

@@ -23,7 +23,7 @@ export class MapLegendRenderer {
       this.legend.selectAll('text').remove();
     };
 
-    this.renderDatasetsLegend = function () {
+    this.render = function () {
       if (!mapChart.datasetController) return;
 
       let stackNames = mapChart.datasetController.stacks;

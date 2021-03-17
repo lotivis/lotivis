@@ -8,7 +8,7 @@ import {combineByDate} from "../data-juggle/dataset-combine";
 import {sumOfLabel} from "../data-juggle/dataset-sum";
 import {PlotAxisRenderer} from "./plot-axis-renderer";
 import {copy} from "../shared/copy";
-import {FilterableDatasetsController} from "../data/filterable-datasets-controller";
+import {DatasetsControllerFilter} from "../data/datasets.controller.filter";
 import {PlotBarsRenderer} from "./plot-bars-renderer";
 import {PlotTooltipRenderer} from "./plot-tooltip-renderer";
 import {PlotLabelRenderer} from "./plot-label-renderer";
@@ -233,7 +233,7 @@ export class PlotChart extends Chart {
    * @param newDatasets The array of datasets.
    */
   set datasets(newDatasets) {
-    this.setDatasetController(new FilterableDatasetsController(newDatasets));
+    this.setDatasetController(new DatasetsControllerFilter(newDatasets));
   }
 
   /**

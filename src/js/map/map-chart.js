@@ -6,9 +6,11 @@ import {MapTooltipRenderer} from "./map-tooltip-renderer";
 import {MapLegendRenderer} from "./map-legend-renderer";
 import {MapLabelRenderer} from "./map-label-renderer";
 import {MapDatasetRenderer} from "./map-dataset-renderer";
-import {FilterableDatasetsController} from "../data/filterable-datasets-controller";
+import {DatasetsControllerFilter} from "../data/datasets.controller.filter";
 import {MapGeoJsonRenderer} from "./map-geojson-renderer";
 import {MapExteriorBorderRenderer} from "./map-exterior-border-renderer";
+import {createGeoJSON} from "../geojson-juggle/create-geojson";
+import {MapMinimapRenderer} from "./map-minimap-renderer";
 
 /**
  * A component which renders a geo json with d3.
@@ -33,10 +35,11 @@ export class MapChart extends Chart {
     this.renderSVG();
     this.labelRenderer = new MapLabelRenderer(this);
     this.legendRenderer = new MapLegendRenderer(this);
-    this.tooltipRenderer = new MapTooltipRenderer(this);
     this.geoJSONRenderer = new MapGeoJsonRenderer(this);
     this.datasetRenderer = new MapDatasetRenderer(this);
     this.exteriorBorderRenderer = new MapExteriorBorderRenderer(this);
+    this.minimapRenderer = new MapMinimapRenderer(this);
+    this.tooltipRenderer = new MapTooltipRenderer(this);
   }
 
   /**
@@ -52,7 +55,7 @@ export class MapChart extends Chart {
     this.departmentsData = [];
     this.excludedFeatureCodes = [];
     this.updateSensible = true;
-    this.drawRectangleAroundSelection = false;
+    this.drawRectangleAroundSelection = true;
 
     this.projection = d3.geoMercator();
     this.path = d3.geoPath().projection(this.projection);
@@ -150,7 +153,7 @@ export class MapChart extends Chart {
    * @param newDatasets
    */
   set datasets(newDatasets) {
-    this.setDatasetController(new FilterableDatasetsController(newDatasets));
+    this.setDatasetController(new DatasetsControllerFilter(newDatasets));
   }
 
   /**
@@ -169,9 +172,16 @@ export class MapChart extends Chart {
     if (!this.datasetController) return;
     const combinedByStack = combineByStacks(this.datasetController.enabledFlatData);
     this.combinedData = combineByLocation(combinedByStack);
-    this.legendRenderer.renderDatasetsLegend();
-    this.datasetRenderer.renderDatasets();
-    this.labelRenderer.renderDatasetLabels();
+
+    if (!this.geoJSON) {
+      this.geoJSON = createGeoJSON(this.datasetController.workingDatasets);
+      this.geoJSONDidChange();
+    }
+    this.tooltipRenderer.raise();
+    this.legendRenderer.render();
+    this.datasetRenderer.render();
+    this.labelRenderer.render();
+    this.minimapRenderer.render();
     this.tooltipRenderer.raise();
   }
 

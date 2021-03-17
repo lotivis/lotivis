@@ -42,17 +42,35 @@
 
 <script>
 
+  const geoJsonURL = '/assets/Departements.geojson';
+  const geoJsonURLGermany = '/assets/Germany.geojson';
+
   const mapChartCard = new lotivis.MapChartCard('map-chart-card');
-  mapChartCard.chart.excludedFeatureCodes = ['2A', '2B'];
+  const chart = mapChartCard.chart;
 
-  d3.json('../assets/Departements.geojson')
-    .then(function (rawGeoJSON) {
+  chart.excludedFeatureCodes = ['2A', '2B'];
 
-      let geoJSON = new lotivis.GeoJson(rawGeoJSON);
-      // let newGeoJSON = lotivis.joinFeatures(geoJSON, geoJSON.features);
+  mapChartCard.onSelectedDatasetChanged = function (value) {
+    let dataset = mapChartCard.datasets.find(dataset => dataset.stack === value);
+    let string = JSON.stringify(dataset, null, 4);
+    let element = document.getElementById('data');
+    element.innerHTML = string;
+  };
 
-      mapChartCard.chart.setGeoJSON(geoJSON);
-
+  Promise
+    .all([
+      d3.json('/assets/tracks-per-departement.json'),
+      d3.json('/assets/words-per-departement.json'),
+      d3.json('/assets/words-per-departement-relative.json'),
+      d3.json('/assets/types-per-departement.json'),
+      d3.json('/assets/types-per-departement-relative.json'),
+      d3.json(geoJsonURL)
+    ])
+    .then(function (datasetsAndGeoJSON) {
+      let rawGeoJSON = datasetsAndGeoJSON.pop();
+      let datasets = datasetsAndGeoJSON;
+      chart.setGeoJSON(new lotivis.GeoJson(rawGeoJSON));
+      mapChartCard.setDatasets(datasets);
     });
 
 </script>

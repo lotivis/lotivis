@@ -1,15 +1,22 @@
 import {Color} from "../shared/colors";
-import {combineByLocation} from "../data-juggle/dataset-combine";
-import {log_debug} from "../shared/debug";
 
+/**
+ *
+ * @class MapDatasetRenderer
+ */
 export class MapDatasetRenderer {
 
+  /**
+   * Creates a new instance of MapDatasetRenderer.
+   *
+   * @param mapChart The parental map chart.
+   */
   constructor(mapChart) {
 
     /**
      * Iterates the datasets per stack and draws them on svg.
      */
-    this.renderDatasets = function () {
+    this.render = function () {
       if (!mapChart.geoJSON) return;
       if (!mapChart.datasetController) return;
 
@@ -20,7 +27,7 @@ export class MapDatasetRenderer {
       mapChart.svg
         .selectAll('path')
         .attr('fill', 'white')
-        .attr('fill-opacity', '.5');
+        .attr('fill-opacity', '0');
 
       for (let index = 0; index < stackNames.length; index++) {
 

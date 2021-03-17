@@ -111,7 +111,7 @@ export class DateTooltipRenderer {
      */
     this.showTooltip = function (event, date) {
 
-      // set html content before positioning the tooltip cause the size is
+      // set examples content before positioning the tooltip cause the size is
       // calculated based on the size
       tooltip.html(getHTMLForDate(date));
 

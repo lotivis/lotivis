@@ -24,7 +24,7 @@ export class MapGeoJsonRenderer {
         .attr('d', mapChart.path)
         .attr('id', feature => feature.properties.code)
         .attr('fill', 'white')
-        .attr('fill-opacity', 0.5)
+        .attr('fill-opacity', 0)
         .attr('stroke', 'black')
         .attr('stroke-width', '0.7')
         .attr('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4')

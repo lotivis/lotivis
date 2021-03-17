@@ -3,14 +3,14 @@ import {
   extractLabelsFromDatasets,
   extractStacksFromDatasets
 } from "../data-juggle/dataset-extract";
-import {DatasetsController} from "./datasets-controller";
+import {DatasetsController} from "./datasets.controller";
 import {flatDatasets} from "../data-juggle/dataset-flat";
 import {copy} from "../shared/copy";
 
 /**
  *
  */
-export class FilterableDatasetsController extends DatasetsController {
+export class DatasetsControllerFilter extends DatasetsController {
 
   constructor(datasets) {
     super(datasets);
@@ -109,21 +109,21 @@ export class FilterableDatasetsController extends DatasetsController {
     return extractDatesFromDatasets(this.enabledDatasets);
   }
 
-  addListener(listener) {
-    this.listeners.push(listener);
-  }
-
-  removeListener(listener) {
-    let index = this.listeners.indexOf(listener);
-    if (index === -1) return;
-    this.listeners = this.listeners.splice(index, 1);
-  }
-
-  notifyListeners(reason = 'none') {
-    for (let index = 0; index < this.listeners.length; index++) {
-      let listener = this.listeners[index];
-      if (!listener.update) continue;
-      listener.update(this, reason);
-    }
-  }
+  // addListener(listener) {
+  //   this.listeners.push(listener);
+  // }
+  //
+  // removeListener(listener) {
+  //   let index = this.listeners.indexOf(listener);
+  //   if (index === -1) return;
+  //   this.listeners = this.listeners.splice(index, 1);
+  // }
+  //
+  // notifyListeners(reason = 'none') {
+  //   for (let index = 0; index < this.listeners.length; index++) {
+  //     let listener = this.listeners[index];
+  //     if (!listener.update) continue;
+  //     listener.update(this, reason);
+  //   }
+  // }
 }
