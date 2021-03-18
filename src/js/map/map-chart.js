@@ -49,7 +49,7 @@ export class MapChart extends Chart {
    */
   initialize() {
     this.width = 1000;
-    this.height = 500;
+    this.height = 1000;
 
     this.isShowLabels = true;
     this.geoJSON = null;
@@ -135,7 +135,7 @@ export class MapChart extends Chart {
   onSelectFeature(event, feature) {
     if (!feature || !feature.properties) return;
     if (!this.datasetController) return;
-    let locationID = feature.properties.code;
+    let locationID = this.featureIDAccessor(feature);
     this.updateSensible = false;
     this.datasetController.setLocationsFilter([locationID]);
     this.updateSensible = true;

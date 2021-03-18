@@ -1,6 +1,7 @@
-import {Color} from "../shared/colors";
 import {styleForCSSClass} from "../shared/style";
 import {equals} from "../shared/equal";
+import {verbose_log} from "../shared/debug";
+import {Color} from "../shared/colors";
 
 /**
  *
@@ -15,6 +16,8 @@ export class MapDatasetRenderer {
    */
   constructor(mapChart) {
 
+    let generator = Color.colorGenerator(1);
+
     /**
      * Resets the `fill` and `fill-opacity` property of each area.
      */
@@ -22,8 +25,10 @@ export class MapDatasetRenderer {
       let style = styleForCSSClass('.lotivis-map-area');
       mapChart.svg
         .selectAll('.lotivis-map-area')
-        .style('fill', style.fill || 'white')
-        .style('fill-opacity', style['fill-opacity'] || 0);
+        .style('fill', 'whitesmoke')
+        .style('fill-opacity', 1);
+      // .style('fill', style.fill || 'white')
+      // .style('fill-opacity', style['fill-opacity'] || 0);
     }
 
     /**
@@ -43,17 +48,20 @@ export class MapDatasetRenderer {
         let stackName = stackNames[index];
         let dataForStack = combinedData.filter(data => data.stack === stackName);
         let max = d3.max(dataForStack, item => item.value);
-        let color = Color.colorsForStack(index)[0];
+        let color = mapChart.datasetController.getColorForStack(stackName);
 
         for (let index = 0; index < dataForStack.length; index++) {
+
           let datasetEntry = dataForStack[index];
-          let id = datasetEntry.location;
+          let locationID = datasetEntry.location;
           let opacity = Number(datasetEntry.value / max);
+
           mapChart.svg
             .selectAll('.lotivis-map-area')
-            .filter((item) => item.properties && equals(item.properties.code, id))
-            .style('fill', color.rgbString())
-            .style('fill-opacity', opacity);
+            .filter((item) => equals(mapChart.featureIDAccessor(item), locationID))
+            .style('fill', generator(opacity));
+          // .style('fill-opacity', opacity);
+
         }
       }
     };

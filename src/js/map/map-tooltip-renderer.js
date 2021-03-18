@@ -72,12 +72,19 @@ export class MapTooltipRenderer {
      */
     this.mouseEnter = function (event, feature) {
       let mapID = featureMapID(feature);
-      mapChart.svg
+      mapChart
+        .svg
         .selectAll(`#${mapID}`)
         .raise() // bring element to top
         .style('stroke', () => color)
         .style('stroke-width', '2')
         .style('stroke-dasharray', '0');
+
+      mapChart
+        .svg
+        .selectAll('.lotivis-map-label')
+        .raise();
+
 
       tooltip.html([htmlTitle(feature), htmlValues(feature)].join('<br>'));
 

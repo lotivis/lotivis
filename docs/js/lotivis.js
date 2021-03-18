@@ -178,6 +178,13 @@ Color.colorsForStack = function (stack, amount = 1) {
   return colors;
 };
 
+Color.colorGenerator = function (till) {
+  return d3
+    .scaleLinear()
+    .domain([0, 1 / 3 * till, 2 / 3 * till, till])
+    .range(['yellow', 'orange', 'red', 'purple']);
+};
+
 class DateAxisRenderer {
 
   constructor(timeChart) {
@@ -2802,12 +2809,19 @@ class MapTooltipRenderer {
      */
     this.mouseEnter = function (event, feature) {
       let mapID = featureMapID(feature);
-      mapChart.svg
+      mapChart
+        .svg
         .selectAll(`#${mapID}`)
         .raise() // bring element to top
         .style('stroke', () => color)
         .style('stroke-width', '2')
         .style('stroke-dasharray', '0');
+
+      mapChart
+        .svg
+        .selectAll('.lotivis-map-label')
+        .raise();
+
 
       tooltip.html([htmlTitle(feature), htmlValues(feature)].join('<br>'));
 
@@ -2949,7 +2963,8 @@ class MapLegendRenderer {
         let color = Color.colorsForStack(index, 1)[0];
 
         let steps = 4;
-        let data = [0, 1, 2, 3, 4];
+        let data = [0, 1 / 4 * max, 1 / 2 * max, 3 / 4 * max, max];
+        let generator = Color.colorGenerator(max);
 
         legend
           .append('text')
@@ -2966,14 +2981,13 @@ class MapLegendRenderer {
           .enter()
           .append("rect")
           .attr('class', 'lotivis-map-legend-rect')
-          .style('fill', color.rgbString())
+          .style('fill', generator)
           .attr('x', offset + 10)
           .attr('y', (d, i) => (i * 20) + 30)
           .attr('width', 18)
           .attr('height', 18)
           .style('stroke', 'black')
-          .style('stroke-width', 1)
-          .style('fill-opacity', (d, i) => i / steps);
+          .style('stroke-width', 1);
 
         legend
           .append("g")
@@ -3058,15 +3072,19 @@ class MapDatasetRenderer {
    */
   constructor(mapChart) {
 
+    let generator = Color.colorGenerator(1);
+
     /**
      * Resets the `fill` and `fill-opacity` property of each area.
      */
     function resetAreas() {
-      let style = styleForCSSClass('.lotivis-map-area');
+      styleForCSSClass('.lotivis-map-area');
       mapChart.svg
         .selectAll('.lotivis-map-area')
-        .style('fill', style.fill || 'white')
-        .style('fill-opacity', style['fill-opacity'] || 0);
+        .style('fill', 'whitesmoke')
+        .style('fill-opacity', 1);
+      // .style('fill', style.fill || 'white')
+      // .style('fill-opacity', style['fill-opacity'] || 0);
     }
 
     /**
@@ -3086,17 +3104,20 @@ class MapDatasetRenderer {
         let stackName = stackNames[index];
         let dataForStack = combinedData.filter(data => data.stack === stackName);
         let max = d3.max(dataForStack, item => item.value);
-        let color = Color.colorsForStack(index)[0];
+        mapChart.datasetController.getColorForStack(stackName);
 
         for (let index = 0; index < dataForStack.length; index++) {
+
           let datasetEntry = dataForStack[index];
-          let id = datasetEntry.location;
+          let locationID = datasetEntry.location;
           let opacity = Number(datasetEntry.value / max);
+
           mapChart.svg
             .selectAll('.lotivis-map-area')
-            .filter((item) => item.properties && equals(item.properties.code, id))
-            .style('fill', color.rgbString())
-            .style('fill-opacity', opacity);
+            .filter((item) => equals(mapChart.featureIDAccessor(item), locationID))
+            .style('fill', generator(opacity));
+          // .style('fill-opacity', opacity);
+
         }
       }
     };
@@ -3399,7 +3420,7 @@ class MapChart extends Chart {
    */
   initialize() {
     this.width = 1000;
-    this.height = 500;
+    this.height = 1000;
 
     this.isShowLabels = true;
     this.geoJSON = null;
@@ -3485,7 +3506,7 @@ class MapChart extends Chart {
   onSelectFeature(event, feature) {
     if (!feature || !feature.properties) return;
     if (!this.datasetController) return;
-    let locationID = feature.properties.code;
+    let locationID = this.featureIDAccessor(feature);
     this.updateSensible = false;
     this.datasetController.setLocationsFilter([locationID]);
     this.updateSensible = true;

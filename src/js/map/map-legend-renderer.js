@@ -49,7 +49,8 @@ export class MapLegendRenderer {
         let color = Color.colorsForStack(index, 1)[0];
 
         let steps = 4;
-        let data = [0, 1, 2, 3, 4];
+        let data = [0, 1 / 4 * max, 1 / 2 * max, 3 / 4 * max, max];
+        let generator = Color.colorGenerator(max);
 
         legend
           .append('text')
@@ -66,14 +67,13 @@ export class MapLegendRenderer {
           .enter()
           .append("rect")
           .attr('class', 'lotivis-map-legend-rect')
-          .style('fill', color.rgbString())
+          .style('fill', generator)
           .attr('x', offset + 10)
           .attr('y', (d, i) => (i * 20) + 30)
           .attr('width', 18)
           .attr('height', 18)
           .style('stroke', 'black')
-          .style('stroke-width', 1)
-          .style('fill-opacity', (d, i) => i / steps);
+          .style('stroke-width', 1);
 
         legend
           .append("g")
