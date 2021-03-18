@@ -4,7 +4,7 @@
  * @param selector The id of the svg element.
  * @param filename The name of file which is downloaded.
  */
-import {log_debug} from "./debug";
+import {verbose_log} from "./debug";
 
 // http://bl.ocks.org/Rokotyan/0556f8facbaf344507cdc45dc3622177
 

@@ -11,6 +11,8 @@ import {MapGeoJsonRenderer} from "./map-geojson-renderer";
 import {MapExteriorBorderRenderer} from "./map-exterior-border-renderer";
 import {createGeoJSON} from "../geojson-juggle/create-geojson";
 import {MapMinimapRenderer} from "./map-minimap-renderer";
+import {hashCode} from "../shared/hash";
+import {MapSelectionBoundsRenderer} from "./map-selection-bounds-renderer";
 
 /**
  * A component which renders a geo json with d3.
@@ -40,6 +42,7 @@ export class MapChart extends Chart {
     this.exteriorBorderRenderer = new MapExteriorBorderRenderer(this);
     this.minimapRenderer = new MapMinimapRenderer(this);
     this.tooltipRenderer = new MapTooltipRenderer(this);
+    this.selectionBoundsRenderer = new MapSelectionBoundsRenderer(this);
   }
 
   /**
@@ -47,9 +50,8 @@ export class MapChart extends Chart {
    */
   initialize() {
     this.width = 1000;
-    this.height = 1000;
+    this.height = 500;
 
-    this.tintColor = Color.defaultTint.rgbString();
     this.isShowLabels = true;
     this.geoJSON = null;
     this.departmentsData = [];
@@ -61,7 +63,7 @@ export class MapChart extends Chart {
       if (feature.id) return feature.id;
       if (feature.properties && feature.properties.id) return feature.properties.id;
       if (feature.properties && feature.properties.code) return feature.properties.code;
-      return feature;
+      return hashCode(feature.properties);
     };
 
     this.featureNameAccessor = function (feature) {
@@ -204,6 +206,7 @@ export class MapChart extends Chart {
     this.labelRenderer.render();
     this.minimapRenderer.render();
     this.tooltipRenderer.raise();
+    this.selectionBoundsRenderer.raise();
   }
 
   /**

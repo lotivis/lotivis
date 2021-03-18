@@ -1,5 +1,6 @@
 import {Color} from "../shared/colors";
 import {styleForCSSClass} from "../shared/style";
+import {equals} from "../shared/equal";
 
 /**
  *
@@ -14,12 +15,15 @@ export class MapDatasetRenderer {
    */
   constructor(mapChart) {
 
+    /**
+     * Resets the `fill` and `fill-opacity` property of each area.
+     */
     function resetAreas() {
       let style = styleForCSSClass('.lotivis-map-area');
       mapChart.svg
         .selectAll('.lotivis-map-area')
-        .style('fill', style.fill || 'green')
-        .style('fill-opacity', style.fill || 0.5);
+        .style('fill', style.fill || 'white')
+        .style('fill-opacity', style['fill-opacity'] || 0);
     }
 
     /**
@@ -44,17 +48,12 @@ export class MapDatasetRenderer {
         for (let index = 0; index < dataForStack.length; index++) {
           let datasetEntry = dataForStack[index];
           let id = datasetEntry.location;
-          let opacitydf = datasetEntry.value / max;
-          console.log(opacitydf);
+          let opacity = Number(datasetEntry.value / max);
           mapChart.svg
             .selectAll('.lotivis-map-area')
-            .filter(function (item) {
-              if (!item.properties) return false;
-              return String(item.properties.code) !== String(id);
-            })
+            .filter((item) => item.properties && equals(item.properties.code, id))
             .style('fill', color.rgbString())
-            .style('fill', 'red')
-            .attr('fill-opacity', 0 + opacitydf);
+            .style('fill-opacity', opacity);
         }
       }
     };

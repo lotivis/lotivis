@@ -1,6 +1,6 @@
 import {hashCode} from "../shared/hash";
 import {Constants} from "../shared/constants";
-import {log_debug} from "../shared/debug";
+import {verbose_log} from "../shared/debug";
 
 /**
  *

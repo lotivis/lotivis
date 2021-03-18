@@ -22,6 +22,24 @@ var createID;
 }());
 
 /**
+ * Holds
+ * @type {{}}
+ */
+const Constants = {
+  tooltipOffset: 7,
+  barRadius: 5,
+  debugLog: true
+};
+
+const prefix = '[lotivis]  ';
+
+const verbose_log = console.log;
+
+const debug_log = function (message) {
+  console.log(prefix + message);
+};
+
+/**
  *
  * @class Component
  */
@@ -421,18 +439,6 @@ class DateLegendRenderer {
     };
   }
 }
-
-const log_debug = console.log;
-
-/**
- * Holds
- * @type {{}}
- */
-const Constants = {
-  tooltipOffset: 7,
-  barRadius: 5,
-  debugLog: true
-};
 
 class DateBarsRenderer {
 
@@ -2725,6 +2731,10 @@ function formatNumber(number) {
   return numberFormat.format(number);
 }
 
+function equals(value1, value2) {
+  return String(value1) === String(value2);
+}
+
 /**
  *
  * @class MapTooltipRenderer
@@ -2748,10 +2758,32 @@ class MapTooltipRenderer {
       .attr('ry', 5)
       .style('opacity', 0);
 
-    let bounds = mapChart.svg
-      .append('rect')
-      .attr('class', 'lotivis-map-selection-rect')
-      .style('fill-opacity', 0);
+    function featureMapID(feature) {
+      return `lotivis-map-area-${mapChart.featureIDAccessor(feature)}`;
+    }
+
+    function htmlTitle(feature) {
+      let featureID = mapChart.featureIDAccessor(feature);
+      let featureName = mapChart.featureNameAccessor(feature);
+      return `ID: ${featureID}<br>Name: ${featureName}`;
+    }
+
+    function htmlValues(feature) {
+      let components = [];
+      let featureID = mapChart.featureIDAccessor(feature);
+      if (mapChart.datasetController) {
+        let flatData = mapChart.datasetController.flatData;
+        let combined = combineByLocation(flatData);
+        let data = combined.filter(item => equals(item.location, featureID));
+        components.push('');
+        for (let index = 0; index < data.length; index++) {
+          let item = data[index];
+          let label = (item.label || item.dataset || item.stack);
+          components.push(label + ': ' + formatNumber(item.value));
+        }
+      }
+      return components.join('<br>');
+    }
 
     /**
      * Returns the size of the tooltip.
@@ -2760,47 +2792,24 @@ class MapTooltipRenderer {
     function getTooltipSize() {
       let tooltipWidth = Number(tooltip.style('width').replace('px', '') || 200);
       let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
-      return [tooltipWidth += 20, tooltipHeight += 20];
+      return [tooltipWidth + 20, tooltipHeight + 20];
     }
 
     /**
-     *
-     * @param event
-     * @param feature
+     * Called by map geojson renderer when mouse enters an area drawn on the map.
+     * @param event The mouse event.
+     * @param feature The drawn feature (area).
      */
-    this.mouserEnter = function (event, feature) {
-      let id = mapChart.featureIDAccessor(feature);
+    this.mouseEnter = function (event, feature) {
+      let mapID = featureMapID(feature);
       mapChart.svg
-        // .selectAll('path')
-        .selectAll(`#lotivis-map-area-${id}`)
+        .selectAll(`#${mapID}`)
         .raise() // bring element to top
         .style('stroke', () => color)
         .style('stroke-width', '2')
         .style('stroke-dasharray', '0');
 
-      // set tooltip content
-      let properties = feature.properties;
-      if (!properties) return;
-
-      let code = properties.code;
-      let propertiesSelection = Object.keys(properties);
-      let components = propertiesSelection.map(function (propertyName) {
-        return `${propertyName}: ${properties[propertyName]}`;
-      });
-
-      if (mapChart.datasetController) {
-        let flatData = mapChart.datasetController.flatData;
-        let combined = combineByLocation(flatData);
-        let data = combined.filter(item => +item.location === +code);
-        components.push('');
-        for (let index = 0; index < data.length; index++) {
-          let item = data[index];
-          let label = (item.label || item.dataset || item.stack);
-          components.push(label + ': ' + formatNumber(item.value));
-        }
-      }
-
-      tooltip.html(components.join('<br>'));
+      tooltip.html([htmlTitle(feature), htmlValues(feature)].join('<br>'));
 
       // position tooltip
       let tooltipSize = getTooltipSize();
@@ -2809,69 +2818,78 @@ class MapTooltipRenderer {
       let featureLowerLeft = projection(featureBounds[0]);
       let featureUpperRight = projection(featureBounds[1]);
       let featureBoundsWidth = featureUpperRight[0] - featureLowerLeft[0];
-      let featureBoundsHeight = featureLowerLeft[1] - featureUpperRight[1];
 
       // svg is presented in dynamic sized view box so we need to get the actual size
       // of the element in order to calculate a scale for the position of the tooltip.
       let effectiveSize = mapChart.getElementEffectiveSize();
       let factor = effectiveSize[0] / mapChart.width;
-      let heightFactor = effectiveSize[1] / mapChart.height;
-
-      // calculate offset
       let positionOffset = mapChart.getElementPosition();
 
-      // calculate scaled position
-      let top = 0;
-
-      if ((featureLowerLeft[1] * heightFactor) > (effectiveSize[1] / 2)) {
-        top += featureUpperRight[1];
-        top *= factor;
-        top -= tooltipSize[1];
-        top -= 5;
-      } else {
-        top += featureLowerLeft[1];
-        top *= factor; // Use width factor instead of heightFactor for property using. Can't figure out why width factor works better.
-        top += 5;
+      /**
+       * Calculates and returns the left position for the tooltip.
+       * @returns {*} The left position in pixels.
+       */
+      function getTooltipLeft() {
+        let left = featureLowerLeft[0];
+        left += (featureBoundsWidth / 2);
+        left *= factor;
+        left -= (tooltipSize[0] / 2);
+        left += positionOffset[0];
+        return left;
       }
 
-      top += positionOffset[1];
+      /**
+       * Calculates and returns the top tooltip position when displaying above a feature.
+       * @returns {*} The top position in pixels.
+       */
+      function getTooltipLocationAbove() {
+        let top = featureUpperRight[1] * factor;
+        top -= tooltipSize[1];
+        top += positionOffset[1];
+        top -= Constants.tooltipOffset;
+        return top;
+      }
 
-      // calculate tooltip center
-      let centerBottom = featureLowerLeft[0];
-      centerBottom += (featureBoundsWidth / 2);
-      centerBottom *= factor;
-      centerBottom -= (Number(tooltipSize[0]) / 2);
-      centerBottom += positionOffset[0];
+      /**
+       * Calculates and returns the top tooltip position when displaying under a feature.
+       * @returns {*} The top position in pixels.
+       */
+      function getTooltipLocationUnder() {
+        let top = featureLowerLeft[1] * factor;
+        top += positionOffset[1];
+        top += Constants.tooltipOffset;
+        return top;
+      }
 
-      tooltip.style('opacity', 1)
-        .style('left', centerBottom + 'px')
+      let top = 0;
+      if (featureLowerLeft[1] > (mapChart.height / 2)) {
+        top = getTooltipLocationAbove();
+      } else {
+        top = getTooltipLocationUnder();
+      }
+
+      let left = getTooltipLeft();
+      tooltip
+        .style('opacity', 1)
+        .style('left', left + 'px')
         .style('top', top + 'px');
-
-      bounds
-        .style('opacity', mapChart.drawRectangleAroundSelection ? 1 : 0)
-        .style('width', featureBoundsWidth + 'px')
-        .style('height', featureBoundsHeight + 'px')
-        .style('x', featureLowerLeft[0])
-        .style('y', featureUpperRight[1]);
 
       mapChart.onSelectFeature(event, feature);
     };
 
     /**
-     *
-     * @param event
-     * @param feature
+     * Called by map geojson renderer when mouse leaves an area drawn on the map.
+     * @param event The mouse event.
+     * @param feature The drawn feature (area).
      */
     this.mouseOut = function (event, feature) {
       let style = styleForCSSClass('.lotivis-map-area');
-      d3.select(this)
+      let mapID = featureMapID(feature);
+      d3.select(`#${mapID}`)
         .style('stroke', style.stroke || 'black')
         .style('stroke-width', style['stroke-width'] || '0.7')
-        .style('stroke-dasharray', function (feature) {
-          return feature.departmentsData ? '0' : '1,4';
-        });
+        .style('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4');
       tooltip.style('opacity', 0);
-      bounds.style('opacity', 0);
     };
 
     /**
@@ -2879,7 +2897,6 @@ class MapTooltipRenderer {
      */
     this.raise = function () {
       tooltip.raise();
-      bounds.raise();
     };
   }
 }
@@ -2890,6 +2907,11 @@ class MapTooltipRenderer {
  */
 class MapLegendRenderer {
 
+  /**
+   * Creates a new instance of MapLegendRenderer.
+   *
+   * @param mapChart The parental map chart.
+   */
   constructor(mapChart) {
     let legend;
 
@@ -2994,24 +3016,23 @@ class MapLabelRenderer {
      * Appends labels from datasets.
      */
     this.render = function () {
-      if (!mapChart.geoJSON) return log_debug('no geoJSON');
-      if (!mapChart.datasetController) return log_debug('no datasetController');
+      let geoJSON = mapChart.geoJSON;
+      if (!mapChart.geoJSON) return debug_log('No Geo JSON to render.');
+      let combinedData = mapChart.combinedData;
+      if (!mapChart.datasetController) return debug_log('no datasetController');
 
       removeLabels();
       if (!mapChart.isShowLabels) return;
 
-      let geoJSON = mapChart.geoJSON;
-      let combinedData = mapChart.combinedData;
       mapChart.svg
         .selectAll('text')
         .data(geoJSON.features)
         .enter()
         .append('text')
         .attr('class', 'lotivis-map-label')
-        .attr('fill', mapChart.tintColor)
         .text(function (feature) {
-          let code = +feature.properties.code;
-          let dataset = combinedData.find(dataset => +dataset.location === code);
+          let featureID = mapChart.featureIDAccessor(feature);
+          let dataset = combinedData.find(dataset => equals(dataset.location, featureID));
           return dataset ? formatNumber(dataset.value) : '';
         })
         .attr('x', function (feature) {
@@ -3037,12 +3058,15 @@ class MapDatasetRenderer {
    */
   constructor(mapChart) {
 
+    /**
+     * Resets the `fill` and `fill-opacity` property of each area.
+     */
     function resetAreas() {
       let style = styleForCSSClass('.lotivis-map-area');
       mapChart.svg
         .selectAll('.lotivis-map-area')
-        .style('fill', style.fill || 'green')
-        .style('fill-opacity', style.fill || 0.5);
+        .style('fill', style.fill || 'white')
+        .style('fill-opacity', style['fill-opacity'] || 0);
     }
 
     /**
@@ -3067,17 +3091,12 @@ class MapDatasetRenderer {
         for (let index = 0; index < dataForStack.length; index++) {
           let datasetEntry = dataForStack[index];
           let id = datasetEntry.location;
-          let opacitydf = datasetEntry.value / max;
-          console.log(opacitydf);
+          let opacity = Number(datasetEntry.value / max);
           mapChart.svg
             .selectAll('.lotivis-map-area')
-            .filter(function (item) {
-              if (!item.properties) return false;
-              return String(item.properties.code) !== String(id);
-            })
+            .filter((item) => item.properties && equals(item.properties.code, id))
             .style('fill', color.rgbString())
-            .style('fill', 'red')
-            .attr('fill-opacity', 0 + opacitydf);
+            .style('fill-opacity', opacity);
         }
       }
     };
@@ -3087,34 +3106,55 @@ class MapDatasetRenderer {
 /**
  * @class MapGeoJsonRenderer
  */
+
 class MapGeoJsonRenderer {
 
   /**
    * Creates a new instance of MapGeoJsonRenderer.
-   *
    * @param mapChart The parental map chart.
    */
   constructor(mapChart) {
+
+    /**
+     * To be called when the mouse enters an area drawn on the map.
+     * @param event The mouse event.
+     * @param feature The drawn feature (area).
+     */
+    function mouseEnter(event, feature) {
+      mapChart.tooltipRenderer.mouseEnter(event, feature);
+      mapChart.selectionBoundsRenderer.mouseEnter(event, feature);
+    }
+
+    /**
+     * To be called when the mouse leaves an area drawn on the map.
+     * @param event The mouse event.
+     * @param feature The drawn feature (area).
+     */
+    function mouseOut(event, feature) {
+      mapChart.tooltipRenderer.mouseOut(event, feature);
+      mapChart.selectionBoundsRenderer.mouseOut(event, feature);
+    }
 
     /**
      * Renders the `geoJSON` property.
      */
     this.renderGeoJson = function () {
       let geoJSON = mapChart.presentedGeoJSON;
+      if (!geoJSON) return debug_log('No Geo JSON file to render.');
       let idAccessor = mapChart.featureIDAccessor;
 
-      mapChart.svg
+      mapChart.areas = mapChart.svg
         .selectAll('path')
         .data(geoJSON.features)
         .enter()
         .append('path')
         .attr('d', mapChart.path)
         .attr('id', feature => `lotivis-map-area-${idAccessor(feature)}`)
-        .attr('class', 'lotivis-map-area')
+        .classed('lotivis-map-area', true)
         .style('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4')
         .on('click', mapChart.onSelectFeature.bind(mapChart))
-        .on('mouseenter', mapChart.tooltipRenderer.mouserEnter)
-        .on('mouseout', mapChart.tooltipRenderer.mouseOut);
+        .on('mouseenter', mouseEnter)
+        .on('mouseout', mouseOut);
     };
   }
 }
@@ -3175,12 +3215,7 @@ class MapExteriorBorderRenderer {
      * Renders the exterior border of the presented geo json.
      */
     this.render = function () {
-      if (!self.topojson) {
-        {
-          console.log('Can\'t find topojson lib.');
-        }
-        return;
-      }
+      if (!self.topojson) return debug_log('Can\'t find topojson lib.  Skip rendering of exterior border.');
       let geoJSON = mapChart.presentedGeoJSON;
       let borders = joinFeatures(geoJSON);
       mapChart.svg
@@ -3261,8 +3296,69 @@ class MapMinimapRenderer {
   constructor(mapChart) {
 
     this.render = function () {
-      let miniMapFeatures = mapChart.minimapFeatureCodes;
-      log_debug('miniMapFeatures', miniMapFeatures);
+      mapChart.minimapFeatureCodes;
+      // log_debug('miniMapFeatures', miniMapFeatures);
+    };
+  }
+}
+
+/**
+ *
+ * @param str
+ * @returns {number}
+ */
+function hashCode(str) {
+  let hash = 0, i, chr;
+  for (i = 0; i < str.length; i++) {
+    chr = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+}
+
+/**
+ *
+ * @class
+ */
+class MapSelectionBoundsRenderer {
+
+  /**
+   * Creates a new instance of MapSelectionBoundsRenderer.
+   *
+   * @param mapChart The parental map chart.
+   */
+  constructor(mapChart) {
+
+    let bounds = mapChart.svg
+      .append('rect')
+      .attr('class', 'lotivis-map-selection-rect')
+      .style('fill-opacity', 0);
+
+    this.mouseEnter = function (event, feature) {
+      let projection = mapChart.projection;
+      let featureBounds = d3.geoBounds(feature);
+      let featureLowerLeft = projection(featureBounds[0]);
+      let featureUpperRight = projection(featureBounds[1]);
+      let featureBoundsWidth = featureUpperRight[0] - featureLowerLeft[0];
+      let featureBoundsHeight = featureLowerLeft[1] - featureUpperRight[1];
+      bounds
+        .style('opacity', mapChart.drawRectangleAroundSelection ? 1 : 0)
+        .style('width', featureBoundsWidth + 'px')
+        .style('height', featureBoundsHeight + 'px')
+        .style('x', featureLowerLeft[0])
+        .style('y', featureUpperRight[1]);
+    };
+
+    this.mouseOut = function () {
+      bounds.style('opacity', 0);
+    };
+
+    /**
+     * Raises the rectangle which draws the bounds.
+     */
+    this.raise = function () {
+      bounds.raise();
     };
   }
 }
@@ -3295,6 +3391,7 @@ class MapChart extends Chart {
     this.exteriorBorderRenderer = new MapExteriorBorderRenderer(this);
     this.minimapRenderer = new MapMinimapRenderer(this);
     this.tooltipRenderer = new MapTooltipRenderer(this);
+    this.selectionBoundsRenderer = new MapSelectionBoundsRenderer(this);
   }
 
   /**
@@ -3302,9 +3399,8 @@ class MapChart extends Chart {
    */
   initialize() {
     this.width = 1000;
-    this.height = 1000;
+    this.height = 500;
 
-    this.tintColor = Color.defaultTint.rgbString();
     this.isShowLabels = true;
     this.geoJSON = null;
     this.departmentsData = [];
@@ -3316,7 +3412,7 @@ class MapChart extends Chart {
       if (feature.id) return feature.id;
       if (feature.properties && feature.properties.id) return feature.properties.id;
       if (feature.properties && feature.properties.code) return feature.properties.code;
-      return feature;
+      return hashCode(feature.properties);
     };
 
     this.featureNameAccessor = function (feature) {
@@ -3459,6 +3555,7 @@ class MapChart extends Chart {
     this.labelRenderer.render();
     this.minimapRenderer.render();
     this.tooltipRenderer.raise();
+    this.selectionBoundsRenderer.raise();
   }
 
   /**
@@ -3643,21 +3740,6 @@ class PlotAxisRenderer {
 
     };
   }
-}
-
-/**
- *
- * @param str
- * @returns {number}
- */
-function hashCode(str) {
-  let hash = 0, i, chr;
-  for (i = 0; i < str.length; i++) {
-    chr = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
 }
 
 class PlotBarsRenderer {
@@ -4383,7 +4465,7 @@ class PlotChartSettingsPopup extends Popup {
    *
    */
   willShow() {
-    log_debug('this.chart.showLabels', this.chart.showLabels);
+    verbose_log('this.chart.showLabels', this.chart.showLabels);
     this.showLabelsCheckbox.setChecked(this.chart.showLabels);
     this.sortDropdown.setSelectedOption(this.chart.sort);
   }

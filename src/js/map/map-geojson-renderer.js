@@ -1,34 +1,56 @@
 /**
  * @class MapGeoJsonRenderer
  */
+import {debug_log} from "../shared/debug";
+
 export class MapGeoJsonRenderer {
 
   /**
    * Creates a new instance of MapGeoJsonRenderer.
-   *
    * @param mapChart The parental map chart.
    */
   constructor(mapChart) {
+
+    /**
+     * To be called when the mouse enters an area drawn on the map.
+     * @param event The mouse event.
+     * @param feature The drawn feature (area).
+     */
+    function mouseEnter(event, feature) {
+      mapChart.tooltipRenderer.mouseEnter(event, feature);
+      mapChart.selectionBoundsRenderer.mouseEnter(event, feature);
+    }
+
+    /**
+     * To be called when the mouse leaves an area drawn on the map.
+     * @param event The mouse event.
+     * @param feature The drawn feature (area).
+     */
+    function mouseOut(event, feature) {
+      mapChart.tooltipRenderer.mouseOut(event, feature);
+      mapChart.selectionBoundsRenderer.mouseOut(event, feature);
+    }
 
     /**
      * Renders the `geoJSON` property.
      */
     this.renderGeoJson = function () {
       let geoJSON = mapChart.presentedGeoJSON;
+      if (!geoJSON) return debug_log('No Geo JSON file to render.');
       let idAccessor = mapChart.featureIDAccessor;
 
-      mapChart.svg
+      mapChart.areas = mapChart.svg
         .selectAll('path')
         .data(geoJSON.features)
         .enter()
         .append('path')
         .attr('d', mapChart.path)
         .attr('id', feature => `lotivis-map-area-${idAccessor(feature)}`)
-        .attr('class', 'lotivis-map-area')
+        .classed('lotivis-map-area', true)
         .style('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4')
         .on('click', mapChart.onSelectFeature.bind(mapChart))
-        .on('mouseenter', mapChart.tooltipRenderer.mouserEnter)
-        .on('mouseout', mapChart.tooltipRenderer.mouseOut);
+        .on('mouseenter', mouseEnter)
+        .on('mouseout', mouseOut);
     };
   }
 }

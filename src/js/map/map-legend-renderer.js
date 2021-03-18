@@ -7,6 +7,11 @@ import {formatNumber} from "../shared/format";
  */
 export class MapLegendRenderer {
 
+  /**
+   * Creates a new instance of MapLegendRenderer.
+   *
+   * @param mapChart The parental map chart.
+   */
   constructor(mapChart) {
     let legend;
 

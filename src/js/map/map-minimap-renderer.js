@@ -2,7 +2,7 @@
  *
  * @class MapMinimapRenderer
  */
-import {log_debug} from "../shared/debug";
+import {verbose_log} from "../shared/debug";
 
 export class MapMinimapRenderer {
 
@@ -15,7 +15,7 @@ export class MapMinimapRenderer {
 
     this.render = function () {
       let miniMapFeatures = mapChart.minimapFeatureCodes;
-      log_debug('miniMapFeatures', miniMapFeatures);
+      // log_debug('miniMapFeatures', miniMapFeatures);
     };
   }
 }

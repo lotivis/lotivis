@@ -1,7 +1,7 @@
 import {Popup} from "../components/popup";
 import {Checkbox} from "../components/checkbox";
 import {URLParameters} from "../shared/url-parameters";
-import {log_debug} from "../shared/debug";
+import {verbose_log} from "../shared/debug";
 import {Dropdown} from "../components/dropdown";
 import {Option} from "../components/option";
 import {PlotChartSort} from "./plot-chart";
@@ -66,7 +66,7 @@ export class PlotChartSettingsPopup extends Popup {
    *
    */
   willShow() {
-    log_debug('this.chart.showLabels', this.chart.showLabels);
+    verbose_log('this.chart.showLabels', this.chart.showLabels);
     this.showLabelsCheckbox.setChecked(this.chart.showLabels);
     this.sortDropdown.setSelectedOption(this.chart.sort);
   }

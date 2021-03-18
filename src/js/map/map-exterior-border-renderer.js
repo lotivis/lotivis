@@ -1,5 +1,5 @@
 import {joinFeatures} from "../geojson-juggle/join-features";
-import {Constants} from "../shared/constants";
+import {debug_log} from "../shared/debug";
 
 /**
  *
@@ -18,12 +18,7 @@ export class MapExteriorBorderRenderer {
      * Renders the exterior border of the presented geo json.
      */
     this.render = function () {
-      if (!self.topojson) {
-        if (Constants.debugLog) {
-          console.log('Can\'t find topojson lib.');
-        }
-        return;
-      }
+      if (!self.topojson) return debug_log('Can\'t find topojson lib.  Skip rendering of exterior border.');
       let geoJSON = mapChart.presentedGeoJSON;
       let borders = joinFeatures(geoJSON);
       mapChart.svg

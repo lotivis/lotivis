@@ -1,5 +1,5 @@
 import {Color} from "../shared/colors";
-import {log_debug} from "../shared/debug";
+import {verbose_log} from "../shared/debug";
 
 /**
  *

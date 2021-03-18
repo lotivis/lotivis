@@ -1,4 +1,4 @@
-import {log_debug} from "../shared/debug";
+import {verbose_log} from "../shared/debug";
 import {Constants} from "../shared/constants";
 
 /**

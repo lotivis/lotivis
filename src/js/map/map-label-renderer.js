@@ -1,5 +1,6 @@
-import {log_debug} from "../shared/debug";
+import {debug_log, verbose_log} from "../shared/debug";
 import {formatNumber} from "../shared/format";
+import {equals} from "../shared/equal";
 
 /**
  *
@@ -27,24 +28,23 @@ export class MapLabelRenderer {
      * Appends labels from datasets.
      */
     this.render = function () {
-      if (!mapChart.geoJSON) return log_debug('no geoJSON');
-      if (!mapChart.datasetController) return log_debug('no datasetController');
+      let geoJSON = mapChart.geoJSON;
+      if (!mapChart.geoJSON) return debug_log('No Geo JSON to render.');
+      let combinedData = mapChart.combinedData;
+      if (!mapChart.datasetController) return debug_log('no datasetController');
 
       removeLabels();
       if (!mapChart.isShowLabels) return;
 
-      let geoJSON = mapChart.geoJSON;
-      let combinedData = mapChart.combinedData;
       mapChart.svg
         .selectAll('text')
         .data(geoJSON.features)
         .enter()
         .append('text')
         .attr('class', 'lotivis-map-label')
-        .attr('fill', mapChart.tintColor)
         .text(function (feature) {
-          let code = +feature.properties.code;
-          let dataset = combinedData.find(dataset => +dataset.location === code);
+          let featureID = mapChart.featureIDAccessor(feature);
+          let dataset = combinedData.find(dataset => equals(dataset.location, featureID));
           return dataset ? formatNumber(dataset.value) : '';
         })
         .attr('x', function (feature) {

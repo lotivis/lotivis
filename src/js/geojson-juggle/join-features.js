@@ -1,4 +1,4 @@
-import {log_debug} from "../shared/debug";
+import {verbose_log} from "../shared/debug";
 
 /**
  * Returns a new created instance of Feature combining the given Features.

@@ -1,28 +1,29 @@
 
 .lotivis-map {
-
+  // empty
 }
 
 .lotivis-map-area {
-  fill: red;
-  //fill-opacity: 0;
+  fill: white;
+  fill-opacity: 0;
   stroke: black;
   stroke-width: 1;
   cursor: pointer;
 }
 
 .lotivis-map-exterior-borders {
-  pointer-events: none;
   fill: white;
   fill-opacity: 0;
   stroke: black;
   stroke-width: 1;
+  pointer-events: none;
 }
 
 .lotivis-map-label {
-  pointer-events: none;
+  fill: black;
   text-anchor: middle;
   font-size: 12px;
+  pointer-events: none;
 }
 
 .lotivis-map-selection-rect {
@@ -46,7 +47,6 @@
 .lotivis-map-legend-text {
   // emtpty
 }
-
 
 .lotivis-map-legend-rect {
   stroke: black;

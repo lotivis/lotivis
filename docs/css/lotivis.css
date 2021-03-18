@@ -286,24 +286,26 @@ input[type=checkbox] {
 }
 
 .lotivis-map-area {
-  fill: red;
+  fill: white;
+  fill-opacity: 0;
   stroke: black;
   stroke-width: 1;
   cursor: pointer;
 }
 
 .lotivis-map-exterior-borders {
-  pointer-events: none;
   fill: white;
   fill-opacity: 0;
   stroke: black;
   stroke-width: 1;
+  pointer-events: none;
 }
 
 .lotivis-map-label {
-  pointer-events: none;
+  fill: black;
   text-anchor: middle;
   font-size: 12px;
+  pointer-events: none;
 }
 
 .lotivis-map-selection-rect {
