@@ -3419,7 +3419,7 @@ class MapChart extends Chart {
       if (feature.name) return feature.name;
       if (feature.properties && feature.properties.name) return feature.properties.name;
       if (feature.properties && feature.properties.nom) return feature.properties.nom;
-      return feature;
+      return 'Unknown';
     };
 
     this.projection = d3.geoMercator();
@@ -3545,6 +3545,7 @@ class MapChart extends Chart {
 
     if (!this.geoJSON) {
       this.geoJSON = createGeoJSON(this.datasetController.workingDatasets);
+      this.geoJSONDidChange();
     }
 
     this.exteriorBorderRenderer.render();
