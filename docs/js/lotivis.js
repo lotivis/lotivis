@@ -1,5 +1,5 @@
 /*!
- * lotivis.js v1.0.46
+ * lotivis.js v1.0.47
  * https://github.com/lukasdanckwerth/lotivis#readme
  * (c) 2021 lotivis.js Lukas Danckwerth
  * Released under the MIT License
@@ -11,7 +11,7 @@ typeof define === 'function' && define.amd ? define(['exports'], factory) :
 }(this, (function (exports) { 'use strict';
 
 /**
- *
+ * Creates and returns a unique ID.
  */
 var createID;
 (function() {
@@ -3699,77 +3699,68 @@ class MapChartCard extends ChartCard {
 }
 
 /**
+ * Draws the axis on the plot chart.
  * @class PlotAxisRenderer
  */
 class PlotAxisRenderer {
 
   /**
+   * Creates a new instance of PlotAxisRenderer.
    * @constructor
-   * @param plotChart
+   * @param plotChart The parental plot chart.
    */
   constructor(plotChart) {
 
     /**
-     *
+     * Appends axis on the top, left and bottom of the plot chart.
      */
     this.renderAxis = function () {
 
-      // top axis
+      // top
       plotChart.svg
         .append("g")
         .call(d3.axisTop(plotChart.xChart))
         .attr("transform", () => `translate(0,${plotChart.margin.top})`);
 
-      // bottom axis
-      plotChart.svg
-        .append("g")
-        .call(d3.axisBottom(plotChart.xChart))
-        .attr("transform", () => `translate(0,${plotChart.height - plotChart.margin.bottom})`);
-
-      // left axis
+      // left
       plotChart.svg
         .append("g")
         .call(d3.axisLeft(plotChart.yChart))
         .attr("transform", () => `translate(${plotChart.margin.left},0)`);
 
-    };
-
-    /**
-     * Adds a grid to the chart.
-     */
-    this.renderGrid = function () {
-      let color = 'lightgray';
-      let width = '0.5';
-      let opacity = 0.3;
-
+      // bottom
       plotChart.svg
-        .append('g')
-        .attr('class', 'x axis-grid')
-        .attr('transform', 'translate(0,' + (plotChart.height - plotChart.margin.bottom) + ')')
-        .attr('stroke', color)
-        .attr('stroke-width', width)
-        .attr("opacity", opacity)
-        .call(plotChart.xAxisGrid);
-
-      plotChart.svg
-        .append('g')
-        .attr('class', 'y axis-grid')
-        .attr('transform', `translate(${plotChart.margin.left},0)`)
-        .attr('stroke', color)
-        .attr('stroke-width', width)
-        .attr("opacity", opacity)
-        .call(plotChart.yAxisGrid);
+        .append("g")
+        .call(d3.axisBottom(plotChart.xChart))
+        .attr("transform", () => `translate(0,${plotChart.height - plotChart.margin.bottom})`);
 
     };
   }
 }
 
+/**
+ * Draws the bar on the plot chart.
+ * @class PlotBarsRenderer
+ */
 class PlotBarsRenderer {
 
+  /**
+   * Creates a new instance of PlotAxisRenderer.
+   * @constructor
+   * @param plotChart The parental plot chart.
+   */
   constructor(plotChart) {
 
+    // Constant for the radius of the drawn bars.
+    const radius = 6;
+
+    function createIDFromDataset(dataset) {
+      if (!dataset || !dataset.label) return 0;
+      return dataset.label.replaceAll(' ', '-');
+    }
+
     /**
-     *
+     * Draws the bars.
      */
     this.renderBars = function () {
       let datasets = plotChart.workingDatasets;
@@ -3778,8 +3769,6 @@ class PlotBarsRenderer {
       for (let index = 0; index < datasets.length; index++) {
         this.createGradient(datasets[index]);
       }
-
-      let radius = 6;
 
       plotChart.barsData = plotChart
         .svg
@@ -3790,15 +3779,14 @@ class PlotBarsRenderer {
 
       plotChart.bars = plotChart.barsData
         .append("rect")
-        .attr("fill", (d) => `url(#${this.createIDFromDataset(d)})`)
-        .style("stroke", 'gray')
-        .style("stroke-width", 0.4)
+        .attr("fill", (d) => `url(#lotivis-plot-gradient-${createIDFromDataset(d)})`)
+        .attr('class', 'lotivis-plot-bar')
         .attr("rx", radius)
         .attr("ry", radius)
         .attr("x", (d) => plotChart.xChart(d.earliestDate || 0))
         .attr("y", (d) => plotChart.yChart(d.label) + 1)
         .attr("height", plotChart.yChart.bandwidth() - 2)
-        .attr("id", (d) => 'rect-' + hashCode(d.label))
+        .attr("id", (d) => 'rect-' + createIDFromDataset(d))
         .on('mouseenter', plotChart.tooltipRenderer.showTooltip.bind(plotChart))
         .on('mouseout', plotChart.tooltipRenderer.hideTooltip.bind(plotChart))
         .attr("width", function (data) {
@@ -3811,7 +3799,7 @@ class PlotBarsRenderer {
       let max = plotChart.datasetController.getMax();
       let gradient = this.defs
         .append("linearGradient")
-        .attr("id", this.createIDFromDataset(dataset))
+        .attr("id", 'lotivis-plot-gradient-' + createIDFromDataset(dataset))
         .attr("x1", "0%")
         .attr("x2", "100%")
         .attr("y1", "0%")
@@ -3856,10 +3844,6 @@ class PlotBarsRenderer {
 
         }
       }
-    };
-
-    this.createIDFromDataset = function (dataset) {
-      return hashCode(dataset.label);
     };
   }
 }
@@ -4043,6 +4027,42 @@ class PlotLabelRenderer {
 }
 
 /**
+ * Draws a grid on the plot chart.
+ *
+ * @class PlotGridRenderer
+ */
+class PlotGridRenderer {
+
+  /**
+   * Creates a new instance of PlotGridRenderer.
+   *
+   * @constructor
+   * @param plotChart The parental plot chart.
+   */
+  constructor(plotChart) {
+
+    /**
+     * Adds a grid to the chart.
+     */
+    this.renderGrid = function () {
+
+      plotChart.svg
+        .append('g')
+        .attr('class', 'lotivis-plot-grid lotivis-plot-grid-x')
+        .attr('transform', 'translate(0,' + (plotChart.height - plotChart.margin.bottom) + ')')
+        .call(plotChart.xAxisGrid);
+
+      plotChart.svg
+        .append('g')
+        .attr('class', 'lotivis-plot-grid lotivis-plot-grid-y')
+        .attr('transform', `translate(${plotChart.margin.left},0)`)
+        .call(plotChart.yAxisGrid);
+
+    };
+  }
+}
+
+/**
  *
  * @class PlotChart
  * @extends Component
@@ -4098,6 +4118,7 @@ class PlotChart extends Chart {
     this.datasets = [];
 
     this.axisRenderer = new PlotAxisRenderer(this);
+    this.gridRenderer = new PlotGridRenderer(this);
     this.barsRenderer = new PlotBarsRenderer(this);
     this.labelsRenderer = new PlotLabelRenderer(this);
     this.tooltipRenderer = new PlotTooltipRenderer(this);
@@ -4121,8 +4142,8 @@ class PlotChart extends Chart {
     this.createSVG();
     this.createGraph();
     this.createScales();
+    this.gridRenderer.renderGrid();
     this.axisRenderer.renderAxis();
-    this.axisRenderer.renderGrid();
     this.barsRenderer.renderBars();
     this.labelsRenderer.renderLabels();
   }

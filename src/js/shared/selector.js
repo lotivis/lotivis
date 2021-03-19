@@ -1,5 +1,5 @@
 /**
- *
+ * Creates and returns a unique ID.
  */
 export var createID;
 (function() {
@@ -8,3 +8,8 @@ export var createID;
     return 'lotivis-id-' + uniquePrevious++;
   };
 }());
+
+
+export function toSaveID(theID) {
+
+}

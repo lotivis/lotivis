@@ -1,11 +1,28 @@
 import {hashCode} from "../shared/hash";
 
+/**
+ * Draws the bar on the plot chart.
+ * @class PlotBarsRenderer
+ */
 export class PlotBarsRenderer {
 
+  /**
+   * Creates a new instance of PlotAxisRenderer.
+   * @constructor
+   * @param plotChart The parental plot chart.
+   */
   constructor(plotChart) {
 
+    // Constant for the radius of the drawn bars.
+    const radius = 6;
+
+    function createIDFromDataset(dataset) {
+      if (!dataset || !dataset.label) return 0;
+      return dataset.label.replaceAll(' ', '-');
+    }
+
     /**
-     *
+     * Draws the bars.
      */
     this.renderBars = function () {
       let datasets = plotChart.workingDatasets;
@@ -14,8 +31,6 @@ export class PlotBarsRenderer {
       for (let index = 0; index < datasets.length; index++) {
         this.createGradient(datasets[index]);
       }
-
-      let radius = 6;
 
       plotChart.barsData = plotChart
         .svg
@@ -26,15 +41,14 @@ export class PlotBarsRenderer {
 
       plotChart.bars = plotChart.barsData
         .append("rect")
-        .attr("fill", (d) => `url(#${this.createIDFromDataset(d)})`)
-        .style("stroke", 'gray')
-        .style("stroke-width", 0.4)
+        .attr("fill", (d) => `url(#lotivis-plot-gradient-${createIDFromDataset(d)})`)
+        .attr('class', 'lotivis-plot-bar')
         .attr("rx", radius)
         .attr("ry", radius)
         .attr("x", (d) => plotChart.xChart(d.earliestDate || 0))
         .attr("y", (d) => plotChart.yChart(d.label) + 1)
         .attr("height", plotChart.yChart.bandwidth() - 2)
-        .attr("id", (d) => 'rect-' + hashCode(d.label))
+        .attr("id", (d) => 'rect-' + createIDFromDataset(d))
         .on('mouseenter', plotChart.tooltipRenderer.showTooltip.bind(plotChart))
         .on('mouseout', plotChart.tooltipRenderer.hideTooltip.bind(plotChart))
         .attr("width", function (data) {
@@ -47,7 +61,7 @@ export class PlotBarsRenderer {
       let max = plotChart.datasetController.getMax();
       let gradient = this.defs
         .append("linearGradient")
-        .attr("id", this.createIDFromDataset(dataset))
+        .attr("id", 'lotivis-plot-gradient-' + createIDFromDataset(dataset))
         .attr("x1", "0%")
         .attr("x2", "100%")
         .attr("y1", "0%")
@@ -92,10 +106,6 @@ export class PlotBarsRenderer {
 
         }
       }
-    };
-
-    this.createIDFromDataset = function (dataset) {
-      return hashCode(dataset.label);
     };
   }
 }

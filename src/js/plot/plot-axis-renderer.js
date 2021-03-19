@@ -1,64 +1,38 @@
 /**
+ * Draws the axis on the plot chart.
  * @class PlotAxisRenderer
  */
 export class PlotAxisRenderer {
 
   /**
+   * Creates a new instance of PlotAxisRenderer.
    * @constructor
-   * @param plotChart
+   * @param plotChart The parental plot chart.
    */
   constructor(plotChart) {
 
     /**
-     *
+     * Appends axis on the top, left and bottom of the plot chart.
      */
     this.renderAxis = function () {
 
-      // top axis
+      // top
       plotChart.svg
         .append("g")
         .call(d3.axisTop(plotChart.xChart))
         .attr("transform", () => `translate(0,${plotChart.margin.top})`);
 
-      // bottom axis
-      plotChart.svg
-        .append("g")
-        .call(d3.axisBottom(plotChart.xChart))
-        .attr("transform", () => `translate(0,${plotChart.height - plotChart.margin.bottom})`);
-
-      // left axis
+      // left
       plotChart.svg
         .append("g")
         .call(d3.axisLeft(plotChart.yChart))
         .attr("transform", () => `translate(${plotChart.margin.left},0)`);
 
-    };
-
-    /**
-     * Adds a grid to the chart.
-     */
-    this.renderGrid = function () {
-      let color = 'lightgray';
-      let width = '0.5';
-      let opacity = 0.3;
-
+      // bottom
       plotChart.svg
-        .append('g')
-        .attr('class', 'x axis-grid')
-        .attr('transform', 'translate(0,' + (plotChart.height - plotChart.margin.bottom) + ')')
-        .attr('stroke', color)
-        .attr('stroke-width', width)
-        .attr("opacity", opacity)
-        .call(plotChart.xAxisGrid);
-
-      plotChart.svg
-        .append('g')
-        .attr('class', 'y axis-grid')
-        .attr('transform', `translate(${plotChart.margin.left},0)`)
-        .attr('stroke', color)
-        .attr('stroke-width', width)
-        .attr("opacity", opacity)
-        .call(plotChart.yAxisGrid);
+        .append("g")
+        .call(d3.axisBottom(plotChart.xChart))
+        .attr("transform", () => `translate(0,${plotChart.height - plotChart.margin.bottom})`);
 
     };
   }

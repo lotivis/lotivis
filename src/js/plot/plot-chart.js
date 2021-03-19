@@ -12,6 +12,7 @@ import {DatasetsControllerFilter} from "../data/datasets.controller.filter";
 import {PlotBarsRenderer} from "./plot-bars-renderer";
 import {PlotTooltipRenderer} from "./plot-tooltip-renderer";
 import {PlotLabelRenderer} from "./plot-label-renderer";
+import {PlotGridRenderer} from "./plot-grid-renderer";
 
 /**
  *
@@ -69,6 +70,7 @@ export class PlotChart extends Chart {
     this.datasets = [];
 
     this.axisRenderer = new PlotAxisRenderer(this);
+    this.gridRenderer = new PlotGridRenderer(this);
     this.barsRenderer = new PlotBarsRenderer(this);
     this.labelsRenderer = new PlotLabelRenderer(this);
     this.tooltipRenderer = new PlotTooltipRenderer(this);
@@ -92,8 +94,8 @@ export class PlotChart extends Chart {
     this.createSVG();
     this.createGraph();
     this.createScales();
+    this.gridRenderer.renderGrid();
     this.axisRenderer.renderAxis();
-    this.axisRenderer.renderGrid();
     this.barsRenderer.renderBars();
     this.labelsRenderer.renderLabels();
   }
