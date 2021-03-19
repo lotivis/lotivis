@@ -323,6 +323,10 @@ input[type=checkbox] {
   stroke-width: 1;
 }
 
+.lotivis-plot-background {
+  fill: rgba(255, 255, 255, 0);
+}
+
 .lotivis-plot-bar {
   stroke: lightgrey;
   stroke-width: 1;
@@ -331,6 +335,13 @@ input[type=checkbox] {
 .lotivis-plot-grid {
   color: lightgrey;
   stroke-width: 1;
+}
+
+.lotivis-plot-label {
+  fill: black;
+  text-anchor: start;
+  font-size: 12px;
+  pointer-events: none;
 }
 
 .popup-underground {

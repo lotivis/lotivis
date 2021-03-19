@@ -86,39 +86,13 @@ export class PlotTooltipRenderer {
       tooltip
         .style('left', left + 'px')
         .style('top', top + 'px')
-        // .transition()
         .style('opacity', 1);
-
-      // let id = 'rect-' + hashCode(dataset.label);
-
-      // plotChart
-      //   .svg
-      //   .selectAll('rect')
-      //   .transition()
-      //   .attr('opacity', 0.15);
-
-      // plotChart
-      //   .labels
-      //   .transition()
-      //   .attr('opacity', plotChart.isShowLabels ? 0.15 : 0);
-
-      // plotChart
-      //   .svg
-      //   .selectAll(`#${id}`)
-      //   .transition()
-      //   .attr('opacity', 1);
-      //
-      // plotChart
-      //   .labels
-      //   .selectAll(`#${id}`)
-      //   .transition()
-      //   .attr('opacity', 1);
 
       plotChart.onSelectDataset(event, dataset);
     };
 
     /**
-     *
+     * Hides the tooltip by setting its opacity to 0.
      */
     this.hideTooltip = function () {
       let controller = plotChart.datasetController;
@@ -130,15 +104,6 @@ export class PlotTooltipRenderer {
 
       if (+tooltip.style('opacity') === 0) return;
       tooltip.style('opacity', 0);
-      // plotChart
-      //   .svg
-      //   .selectAll('rect')
-      //   .transition()
-      //   .attr('opacity', 1);
-      // plotChart
-      //   .labels
-      //   .transition()
-      //   .attr('opacity', plotChart.isShowLabels ? 1 : 0);
     };
   }
 }

@@ -15,7 +15,7 @@
 
 | Function           | About                   |
 | ------------------ | ----------------------- |
-| ```precalculate()``` | Calculate temporary datasets specific data. |
 | ```remove()``` | Removes any old content of the chart. |
+| ```precalculate()``` | Calculate temporary datasets specific data. |
 | ```draw()``` | Renders all parts of the chart. |
 

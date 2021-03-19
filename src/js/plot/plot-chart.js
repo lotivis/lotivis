@@ -13,6 +13,7 @@ import {PlotBarsRenderer} from "./plot-bars-renderer";
 import {PlotTooltipRenderer} from "./plot-tooltip-renderer";
 import {PlotLabelRenderer} from "./plot-label-renderer";
 import {PlotGridRenderer} from "./plot-grid-renderer";
+import {verbose_log} from "../shared/debug";
 
 /**
  *
@@ -37,16 +38,13 @@ export class PlotChart extends Chart {
   constructor(parent) {
     super(parent);
 
-    if (Object.getPrototypeOf(parent) === String.prototype) {
-      this.selector = parent;
-      this.element = d3.select('#' + parent);
-    } else {
-      this.element = parent;
-      this.element.attr('id', this.selector);
-    }
-
-    this.initialize();
-    this.update();
+    // if (Object.getPrototypeOf(parent) === String.prototype) {
+    //   this.selector = parent;
+    //   this.element = d3.select('#' + parent);
+    // } else {
+    //   this.element = parent;
+    //   this.element.attr('id', this.selector);
+    // }
   }
 
   /**
@@ -67,8 +65,10 @@ export class PlotChart extends Chart {
     this.isShowLabels = true;
     this.updateSensible = true;
 
-    this.datasets = [];
+    // this.datasets = [];
 
+    // this.configureChart();
+    this.createSVG();
     this.axisRenderer = new PlotAxisRenderer(this);
     this.gridRenderer = new PlotGridRenderer(this);
     this.barsRenderer = new PlotBarsRenderer(this);
@@ -77,22 +77,43 @@ export class PlotChart extends Chart {
   }
 
   /**
+   * Removes any (old) components from the svg.
+   */
+  remove() {
+    this.svg.selectAll('*').remove();
+  }
+
+  /**
    *
    */
-  configureChart() {
+  precalculate() {
     let margin = this.margin;
-    this.height = (this.workingDatasets.length * this.lineHeight) + margin.top + margin.bottom;
+    let barsCount = 0;
+    if (this.workingDatasets && this.workingDatasets.length > 0) {
+      barsCount = this.workingDatasets.length;
+    }
+    this.height = (barsCount * this.lineHeight) + margin.top + margin.bottom;
     this.graphWidth = this.width - margin.left - margin.right;
     this.graphHeight = this.height - margin.top - margin.bottom;
+
+    this.svg
+      .attr("viewBox", `0 0 ${this.width} ${this.height}`);
+    this.background
+      .attr('width', this.width)
+      .attr('height', this.height);
+    this.graph
+      .attr('width', this.width)
+      .attr('height', this.height)
+      .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+
+    this.datasetsDidChange();
   }
 
   /**
    * Creates and renders the chart.
    */
-  drawChart() {
-    if (this.workingDatasets.length === 0) return;
-    this.createSVG();
-    this.createGraph();
+  draw() {
+    if (!this.workingDatasets || this.workingDatasets.length === 0) return;
     this.createScales();
     this.gridRenderer.renderGrid();
     this.axisRenderer.renderAxis();
@@ -106,24 +127,15 @@ export class PlotChart extends Chart {
   update(controller, reason) {
     if (!this.updateSensible) return;
     if (reason === 'dates-filter') return;
-    this.datasetsDidChange();
-    this.sortDatasets();
-    this.configureChart();
-    this.drawChart();
+    this.remove();
+    this.precalculate();
+    this.draw();
   }
 
   /**
-   * Removes all `svg`s from the parental element.
-   */
-  removeSVG() {
-    this.element.selectAll('svg').remove();
-  }
-
-  /**
-   *
+   * Appends the svg element to the parental element.
    */
   createSVG() {
-    this.removeSVG();
     this.svg = this.element
       .append('svg')
       .attr('id', this.svgSelector)
@@ -134,30 +146,21 @@ export class PlotChart extends Chart {
       .append('rect')
       .attr('width', this.width)
       .attr('height', this.height)
-      .attr('fill', 'white')
-      .on('mouseout', function () {
-        // this.tooltipRenderer.hideTooltip();
-      }.bind(this))
-      .on('mouseenter', function () {
-        // this.tooltipRenderer.hideTooltip();
-      }.bind(this));
-  }
+      .attr('class', 'lotivis-plot-background');
 
-  /**
-   *
-   */
-  createGraph() {
     this.graph = this.svg
       .append('g')
       .attr('width', this.graphWidth)
       .attr('height', this.graphHeight)
       .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+
   }
 
   /**
    * Creates scales which are used to calculate the x and y positions of bars or circles.
    */
   createScales() {
+    if (!this.workingDatasets || this.workingDatasets.length === 0) return;
     let listOfDates = extractDatesFromDatasets(this.workingDatasets);
     let listOfLabels = this.workingDatasets
       .map(dataset => dataset.label)
@@ -166,12 +169,14 @@ export class PlotChart extends Chart {
     this.xChart = d3
       .scaleBand()
       .domain(listOfDates)
-      .rangeRound([this.margin.left, this.width - this.margin.right]);
+      .rangeRound([this.margin.left, this.width - this.margin.right])
+      .paddingInner(0.1);
 
     this.yChart = d3
       .scaleBand()
       .domain(listOfLabels)
-      .rangeRound([this.height - this.margin.bottom, this.margin.top]);
+      .rangeRound([this.height - this.margin.bottom, this.margin.top])
+      .paddingInner(0.1);
 
     this.xAxisGrid = d3
       .axisBottom(this.xChart)
@@ -267,6 +272,7 @@ export class PlotChart extends Chart {
       dataset.sum = sumOfLabel(data, dataset.label);
     });
     this.sortDatasets();
+    this.createScales();
   }
 
   /**
@@ -276,7 +282,6 @@ export class PlotChart extends Chart {
   setDatasetController(newController) {
     this.datasetController = newController;
     this.datasetController.addListener(this);
-    this.datasetsDidChange();
     this.update();
   }
 }

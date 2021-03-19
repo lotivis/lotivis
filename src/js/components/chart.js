@@ -37,8 +37,8 @@ export class Chart extends Component {
 
   update() {
     if (!this.updateSensible) return;
-    this.precalculate();
     this.remove();
+    this.precalculate();
     this.draw();
   }
 

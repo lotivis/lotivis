@@ -1286,8 +1286,8 @@ class Chart extends Component {
 
   update() {
     if (!this.updateSensible) return;
-    this.precalculate();
     this.remove();
+    this.precalculate();
     this.draw();
   }
 
@@ -3751,53 +3751,19 @@ class PlotBarsRenderer {
    */
   constructor(plotChart) {
 
-    // Constant for the radius of the drawn bars.
+    // constant for the radius of the drawn bars.
     const radius = 6;
+
+    let definitions = plotChart.svg.append("defs");
 
     function createIDFromDataset(dataset) {
       if (!dataset || !dataset.label) return 0;
       return dataset.label.replaceAll(' ', '-');
     }
 
-    /**
-     * Draws the bars.
-     */
-    this.renderBars = function () {
-      let datasets = plotChart.workingDatasets;
-
-      this.defs = plotChart.svg.append("defs");
-      for (let index = 0; index < datasets.length; index++) {
-        this.createGradient(datasets[index]);
-      }
-
-      plotChart.barsData = plotChart
-        .svg
-        .append("g")
-        .selectAll("g")
-        .data(datasets)
-        .enter();
-
-      plotChart.bars = plotChart.barsData
-        .append("rect")
-        .attr("fill", (d) => `url(#lotivis-plot-gradient-${createIDFromDataset(d)})`)
-        .attr('class', 'lotivis-plot-bar')
-        .attr("rx", radius)
-        .attr("ry", radius)
-        .attr("x", (d) => plotChart.xChart(d.earliestDate || 0))
-        .attr("y", (d) => plotChart.yChart(d.label) + 1)
-        .attr("height", plotChart.yChart.bandwidth() - 2)
-        .attr("id", (d) => 'rect-' + createIDFromDataset(d))
-        .on('mouseenter', plotChart.tooltipRenderer.showTooltip.bind(plotChart))
-        .on('mouseout', plotChart.tooltipRenderer.hideTooltip.bind(plotChart))
-        .attr("width", function (data) {
-          if (!data.earliestDate || !data.latestDate) return 0;
-          return plotChart.xChart(data.latestDate) - plotChart.xChart(data.earliestDate) + plotChart.xChart.bandwidth();
-        }.bind(this));
-    };
-
-    this.createGradient = function (dataset) {
+    function createGradient(dataset) {
       let max = plotChart.datasetController.getMax();
-      let gradient = this.defs
+      let gradient = definitions
         .append("linearGradient")
         .attr("id", 'lotivis-plot-gradient-' + createIDFromDataset(dataset))
         .attr("x1", "0%")
@@ -3844,6 +3810,42 @@ class PlotBarsRenderer {
 
         }
       }
+    }
+
+    /**
+     * Draws the bars.
+     */
+    this.renderBars = function () {
+      let datasets = plotChart.workingDatasets;
+      definitions = plotChart.svg.append("defs");
+
+      for (let index = 0; index < datasets.length; index++) {
+        createGradient(datasets[index]);
+      }
+
+      plotChart.barsData = plotChart
+        .svg
+        .append("g")
+        .selectAll("g")
+        .data(datasets)
+        .enter();
+
+      plotChart.bars = plotChart.barsData
+        .append("rect")
+        .attr("fill", (d) => `url(#lotivis-plot-gradient-${createIDFromDataset(d)})`)
+        .attr('class', 'lotivis-plot-bar')
+        .attr("rx", radius)
+        .attr("ry", radius)
+        .attr("x", (d) => plotChart.xChart(d.earliestDate || 0))
+        .attr("y", (d) => plotChart.yChart(d.label))
+        .attr("height", plotChart.yChart.bandwidth())
+        .attr("id", (d) => 'rect-' + createIDFromDataset(d))
+        .on('mouseenter', plotChart.tooltipRenderer.showTooltip.bind(plotChart))
+        .on('mouseout', plotChart.tooltipRenderer.hideTooltip.bind(plotChart))
+        .attr("width", function (data) {
+          if (!data.earliestDate || !data.latestDate) return 0;
+          return plotChart.xChart(data.latestDate) - plotChart.xChart(data.earliestDate) + plotChart.xChart.bandwidth();
+        }.bind(this));
     };
   }
 }
@@ -3932,39 +3934,13 @@ class PlotTooltipRenderer {
       tooltip
         .style('left', left + 'px')
         .style('top', top + 'px')
-        // .transition()
         .style('opacity', 1);
-
-      // let id = 'rect-' + hashCode(dataset.label);
-
-      // plotChart
-      //   .svg
-      //   .selectAll('rect')
-      //   .transition()
-      //   .attr('opacity', 0.15);
-
-      // plotChart
-      //   .labels
-      //   .transition()
-      //   .attr('opacity', plotChart.isShowLabels ? 0.15 : 0);
-
-      // plotChart
-      //   .svg
-      //   .selectAll(`#${id}`)
-      //   .transition()
-      //   .attr('opacity', 1);
-      //
-      // plotChart
-      //   .labels
-      //   .selectAll(`#${id}`)
-      //   .transition()
-      //   .attr('opacity', 1);
 
       plotChart.onSelectDataset(event, dataset);
     };
 
     /**
-     *
+     * Hides the tooltip by setting its opacity to 0.
      */
     this.hideTooltip = function () {
       let controller = plotChart.datasetController;
@@ -3976,28 +3952,29 @@ class PlotTooltipRenderer {
 
       if (+tooltip.style('opacity') === 0) return;
       tooltip.style('opacity', 0);
-      // plotChart
-      //   .svg
-      //   .selectAll('rect')
-      //   .transition()
-      //   .attr('opacity', 1);
-      // plotChart
-      //   .labels
-      //   .transition()
-      //   .attr('opacity', plotChart.isShowLabels ? 1 : 0);
     };
   }
 }
 
 /**
  *
- * @class
+ * @class PlotLabelRenderer
  */
 class PlotLabelRenderer {
 
+  /**
+   * Creates a new instance of PlotLabelRenderer.
+   *
+   * @constructor
+   * @param plotChart The parental plot chart.
+   */
   constructor(plotChart) {
 
+    /**
+     * Draws the labels on the bars on the plot chart.
+     */
     this.renderLabels = function () {
+      if (!plotChart.isShowLabels) return;
       let xBandwidth = plotChart.yChart.bandwidth();
       let xChart = plotChart.xChart;
       plotChart.labels = plotChart
@@ -4005,17 +3982,9 @@ class PlotLabelRenderer {
         .append('g')
         .attr('transform', `translate(0,${(xBandwidth / 2) + 4})`)
         .append('text')
+        .attr('class', 'lotivis-plot-label')
         .attr("id", (d) => 'rect-' + hashCode(d.label))
-        .attr("fill", 'black')
-        .attr('text-anchor', 'start')
-        .attr('font-size', '12px')
-        .attr('class', 'map-label')
-        .attr('opacity', plotChart.isShowLabels ? 1 : 0)
-        .attr("x", function (d) {
-          let rectX = xChart(d.earliestDate);
-          let offset = xBandwidth / 2;
-          return rectX + offset;
-        })
+        .attr("x", (d) => xChart(d.earliestDate) + (xBandwidth / 2))
         .attr("y", (d) => plotChart.yChart(d.label))
         .attr("width", (d) => xChart(d.latestDate) - xChart(d.earliestDate) + xBandwidth)
         .text(function (dataset) {
@@ -4085,16 +4054,13 @@ class PlotChart extends Chart {
   constructor(parent) {
     super(parent);
 
-    if (Object.getPrototypeOf(parent) === String.prototype) {
-      this.selector = parent;
-      this.element = d3.select('#' + parent);
-    } else {
-      this.element = parent;
-      this.element.attr('id', this.selector);
-    }
-
-    this.initialize();
-    this.update();
+    // if (Object.getPrototypeOf(parent) === String.prototype) {
+    //   this.selector = parent;
+    //   this.element = d3.select('#' + parent);
+    // } else {
+    //   this.element = parent;
+    //   this.element.attr('id', this.selector);
+    // }
   }
 
   /**
@@ -4115,8 +4081,10 @@ class PlotChart extends Chart {
     this.isShowLabels = true;
     this.updateSensible = true;
 
-    this.datasets = [];
+    // this.datasets = [];
 
+    // this.configureChart();
+    this.createSVG();
     this.axisRenderer = new PlotAxisRenderer(this);
     this.gridRenderer = new PlotGridRenderer(this);
     this.barsRenderer = new PlotBarsRenderer(this);
@@ -4125,22 +4093,43 @@ class PlotChart extends Chart {
   }
 
   /**
+   * Removes any (old) components from the svg.
+   */
+  remove() {
+    this.svg.selectAll('*').remove();
+  }
+
+  /**
    *
    */
-  configureChart() {
+  precalculate() {
     let margin = this.margin;
-    this.height = (this.workingDatasets.length * this.lineHeight) + margin.top + margin.bottom;
+    let barsCount = 0;
+    if (this.workingDatasets && this.workingDatasets.length > 0) {
+      barsCount = this.workingDatasets.length;
+    }
+    this.height = (barsCount * this.lineHeight) + margin.top + margin.bottom;
     this.graphWidth = this.width - margin.left - margin.right;
     this.graphHeight = this.height - margin.top - margin.bottom;
+
+    this.svg
+      .attr("viewBox", `0 0 ${this.width} ${this.height}`);
+    this.background
+      .attr('width', this.width)
+      .attr('height', this.height);
+    this.graph
+      .attr('width', this.width)
+      .attr('height', this.height)
+      .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+
+    this.datasetsDidChange();
   }
 
   /**
    * Creates and renders the chart.
    */
-  drawChart() {
-    if (this.workingDatasets.length === 0) return;
-    this.createSVG();
-    this.createGraph();
+  draw() {
+    if (!this.workingDatasets || this.workingDatasets.length === 0) return;
     this.createScales();
     this.gridRenderer.renderGrid();
     this.axisRenderer.renderAxis();
@@ -4154,24 +4143,15 @@ class PlotChart extends Chart {
   update(controller, reason) {
     if (!this.updateSensible) return;
     if (reason === 'dates-filter') return;
-    this.datasetsDidChange();
-    this.sortDatasets();
-    this.configureChart();
-    this.drawChart();
+    this.remove();
+    this.precalculate();
+    this.draw();
   }
 
   /**
-   * Removes all `svg`s from the parental element.
-   */
-  removeSVG() {
-    this.element.selectAll('svg').remove();
-  }
-
-  /**
-   *
+   * Appends the svg element to the parental element.
    */
   createSVG() {
-    this.removeSVG();
     this.svg = this.element
       .append('svg')
       .attr('id', this.svgSelector)
@@ -4182,30 +4162,21 @@ class PlotChart extends Chart {
       .append('rect')
       .attr('width', this.width)
       .attr('height', this.height)
-      .attr('fill', 'white')
-      .on('mouseout', function () {
-        // this.tooltipRenderer.hideTooltip();
-      }.bind(this))
-      .on('mouseenter', function () {
-        // this.tooltipRenderer.hideTooltip();
-      }.bind(this));
-  }
+      .attr('class', 'lotivis-plot-background');
 
-  /**
-   *
-   */
-  createGraph() {
     this.graph = this.svg
       .append('g')
       .attr('width', this.graphWidth)
       .attr('height', this.graphHeight)
       .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+
   }
 
   /**
    * Creates scales which are used to calculate the x and y positions of bars or circles.
    */
   createScales() {
+    if (!this.workingDatasets || this.workingDatasets.length === 0) return;
     let listOfDates = extractDatesFromDatasets(this.workingDatasets);
     let listOfLabels = this.workingDatasets
       .map(dataset => dataset.label)
@@ -4214,12 +4185,14 @@ class PlotChart extends Chart {
     this.xChart = d3
       .scaleBand()
       .domain(listOfDates)
-      .rangeRound([this.margin.left, this.width - this.margin.right]);
+      .rangeRound([this.margin.left, this.width - this.margin.right])
+      .paddingInner(0.1);
 
     this.yChart = d3
       .scaleBand()
       .domain(listOfLabels)
-      .rangeRound([this.height - this.margin.bottom, this.margin.top]);
+      .rangeRound([this.height - this.margin.bottom, this.margin.top])
+      .paddingInner(0.1);
 
     this.xAxisGrid = d3
       .axisBottom(this.xChart)
@@ -4313,6 +4286,7 @@ class PlotChart extends Chart {
       dataset.sum = sumOfLabel(data, dataset.label);
     });
     this.sortDatasets();
+    this.createScales();
   }
 
   /**
@@ -4322,7 +4296,6 @@ class PlotChart extends Chart {
   setDatasetController(newController) {
     this.datasetController = newController;
     this.datasetController.addListener(this);
-    this.datasetsDidChange();
     this.update();
   }
 }
