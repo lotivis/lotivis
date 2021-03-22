@@ -89,7 +89,7 @@ export function extractLocationsFromFlatData(flatData) {
  * @returns {any[]} The set version of the array.
  */
 function toSet(array) {
-  return Array.from(new Set(array)).sort();
+  return Array.from(new Set(array));//.sort();
 }
 
 /**

@@ -6,32 +6,33 @@
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../css/lotivis.css"/>
   <link rel="stylesheet" href="../css/examples.css"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <title>Lotivis - Time Chart Stacked</title>
 </head>
 <body>
 
-<div class="container">
-  <div class="row">
-    <div class="col-2">
+<div class="lotivis-example-container">
+  <div class="lotivis-example-row">
+    <div class="lotivis-example-col-2">
       <a href="../index.html">
         <button class="back-button">
           Back
         </button>
       </a>
     </div>
-    <div class="col-8 text-center">
-      <h1>Time Data Stacked</h1>
+    <div class="lotivis-example-col-8 text-center">
+      <h1>Date Data Stacked</h1>
     </div>
-    <div class="col-12">
-      <div id="time-chart-card">
-        <!-- Time Chart Code Here -->
+    <div class="lotivis-example-col-4">
+      <div class="lotivis-example-data">
+        <samp id="data">
+          <!-- Data Here -->
+        </samp>
       </div>
     </div>
-    <div class="col-12">
-      <samp id="data">
-        <!-- Data Here -->
-      </samp>
+    <div class="lotivis-example-col-8">
+      <div id="date-chart-card">
+        <!-- Date Chart Code Here -->
+      </div>
     </div>
   </div>
 </div>
@@ -41,7 +42,7 @@
 
 <script>
 
-  let timeChartCard = new lotivis.TimeChartCard('time-chart-card');
+  let timeChartCard = new lotivis.TimeChartCard('date-chart-card');
   let chart = timeChartCard.chart;
 
   d3

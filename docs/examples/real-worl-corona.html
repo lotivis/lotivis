@@ -10,29 +10,31 @@
 </head>
 <body>
 
-<div class="container" style="overflow: scroll; overflow-scrolling: auto;">
-  <div class="row">
-    <div class="col-2">
+<div class="lotivis-example-container" style="overflow: scroll; overflow-scrolling: auto;">
+  <div class="lotivis-example-row">
+    <div class="lotivis-example-col-2">
       <a href="../index.html">
         <button class="back-button">
           Back
         </button>
       </a>
     </div>
-    <div class="col-8 text-center">
+    <div class="lotivis-example-col-8 text-center">
       <h1>Corona-Zahlen Zeitverlauf</h1>
     </div>
-    <div class="col-12" style="overflow: scroll;">
+    <div class="lotivis-example-col-12" style="overflow: scroll;">
       <div style="overflow: scroll; width: 20000px">
-        <div id="time-chart-card">
-          <!-- Time Chart Code Here -->
+        <div id="date-chart-card" style="background-color: white">
+          <!-- Date Chart Code Here -->
         </div>
       </div>
     </div>
-    <div class="col-12">
-      <samp id="data">
-        <!-- Data Here -->
-      </samp>
+    <div class="lotivis-example-col-12">
+      <div class="lotivis-example-data">
+        <samp id="data">
+          <!-- Data Here -->
+        </samp>
+      </div>
     </div>
   </div>
 </div>
@@ -42,9 +44,18 @@
 
 <script>
 
-  let timeChart = new lotivis.TimeChart('time-chart-card');
+  let timeChart = new lotivis.TimeChart('date-chart-card', {
+    height: 500,
+    width: 15000,
+    margin: {
+      top: 20
+    },
+    dateAccess: function (date) {
+
+    }
+  });
   timeChart.height = 500;
-  timeChart.width = 20000;
+  timeChart.width = 30000;
   timeChart.margin.top = 20;
 
   let url = 'https://phpefi.schleswig-holstein.de/corona/data202011/cvd_sh_verlauf.csv';

@@ -93,7 +93,7 @@ export class MapChart extends Chart {
       .select(`#${this.selector}`)
       .append('svg')
       .attr('id', this.svgSelector)
-      .attr('class', 'lotivis-map')
+      .attr('class', 'lotivis-chart-svg lotivis-map')
       // .style('width', this.width)
       // .style('height', this.height);
       .attr('viewBox', `0 0 ${this.width} ${this.height}`);

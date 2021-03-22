@@ -63,6 +63,7 @@ export class PlotChart extends Chart {
     this.svg = this.element
       .append('svg')
       .attr('id', this.svgSelector)
+      .attr('class', 'lotivis-chart-svg')
       .attr('preserveAspectRatio', 'xMidYMid meet')
       .attr("viewBox", `0 0 ${this.width} ${this.height}`);
   }

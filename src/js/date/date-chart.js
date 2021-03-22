@@ -9,8 +9,28 @@ import {DateTooltipRenderer} from "./date-tooltip-renderer";
 import {Chart} from "../components/chart";
 import {dateToItemsRelation} from "../data-juggle/dataset-relations";
 import {createStackModel} from "../data-juggle/dataset-stacks";
+import {Constants} from "../shared/constants";
 
-/**
+const defaultConfig = {
+  width: 1000,
+  height: 600,
+  margin: {
+    top: Constants.defaultMargin,
+    right: Constants.defaultMargin,
+    bottom: Constants.defaultMargin,
+    left: Constants.defaultMargin
+  },
+  showLabels: true,
+  combineStacks: false,
+  numberFormat: Intl.NumberFormat('de-DE', {
+    maximumFractionDigits: 3
+  }),
+  dateAccess: function (date) {
+    return Date.parse(date);
+  }
+};
+
+/**¬
  *
  * @class Diachronic Chart Component
  * @extends Chart
@@ -27,6 +47,7 @@ export class DateChart extends Chart {
   }
 
   initializeDefaultValues() {
+    this.config = defaultConfig;
     this.width = 1000;
     this.height = 600;
     this.defaultMargin = 60;
@@ -79,8 +100,8 @@ export class DateChart extends Chart {
     if (!this.datasetController) return;
     // calculate enabled datasets once
     let enabledDatasets = this.datasetController.enabledDatasets;
-    this.dateToItemsRelation = dateToItemsRelation(this.datasetController.workingDatasets);
-    this.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets);
+    this.dateToItemsRelation = dateToItemsRelation(this.datasetController.workingDatasets, this);
+    this.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets, this);
     this.datasetStacks = createStackModel(this.datasetController, this.datasetController.workingDatasets, this.dateToItemsRelation);
     this.datasetStacksPresented = createStackModel(this.datasetController, enabledDatasets, this.dateToItemsRelationPresented);
   }
@@ -155,7 +176,7 @@ export class DateChart extends Chart {
   renderSVG() {
     this.svg = this.element
       .append('svg')
-      .attr('class', 'lotivis-date-chart')
+      .attr('class', 'lotivis-chart-svg lotivis-date-chart')
       // .attr('width', this.width)
       // .attr('height', this.height)
       .attr('preserveAspectRatio', 'xMidYMid meet')

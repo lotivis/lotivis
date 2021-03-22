@@ -26,8 +26,13 @@ var createID;
  * @type {{}}
  */
 const Constants = {
+  // The default margin to use for charts.
+  defaultMargin: 60,
+  // The default offset for the space between an object an the toolbar.
   tooltipOffset: 7,
+  // The default radius to use for bars drawn on a chart.
   barRadius: 5,
+  // A Boolean value indicating whether the debug logging is enabled.
   debugLog: false
 };
 
@@ -611,7 +616,7 @@ function extractLocationsFromFlatData(flatData) {
  * @returns {any[]} The set version of the array.
  */
 function toSet(array) {
-  return Array.from(new Set(array)).sort();
+  return Array.from(new Set(array));//.sort();
 }
 
 /**
@@ -1317,16 +1322,24 @@ class Chart extends Component {
  *
  * @param flatData The array of item.
  */
-function dateToItemsRelation(datasets) {
+function dateToItemsRelation(datasets, chart) {
 
   let flatData = flatDatasets(datasets);
   flatData = combineByDate(flatData);
 
+  chart.config.dateAccess;
   let listOfDates = extractDatesFromDatasets(datasets);
+  verbose_log('listOfDates', listOfDates);
+  listOfDates = listOfDates.reverse();
+  verbose_log('listOfDates', listOfDates);
+  // listOfDates = listOfDates.sort(function (left, right) {
+  //   return dateAccess(left) - dateAccess(right);
+  // });
+
   let listOfLabels = extractLabelsFromDatasets(datasets);
 
   return listOfDates.map(function (date) {
-    let datasetDate = { date: date };
+    let datasetDate = {date: date};
     flatData
       .filter(item => item.date === date)
       .forEach(function (entry) {
@@ -1378,7 +1391,26 @@ function createStackModel(controller, datasets, dateToItemsRelation) {
   });
 }
 
-/**
+const defaultConfig = {
+  width: 1000,
+  height: 600,
+  margin: {
+    top: Constants.defaultMargin,
+    right: Constants.defaultMargin,
+    bottom: Constants.defaultMargin,
+    left: Constants.defaultMargin
+  },
+  showLabels: true,
+  combineStacks: false,
+  numberFormat: Intl.NumberFormat('de-DE', {
+    maximumFractionDigits: 3
+  }),
+  dateAccess: function (date) {
+    return Date.parse(date);
+  }
+};
+
+/**¬
  *
  * @class Diachronic Chart Component
  * @extends Chart
@@ -1395,6 +1427,7 @@ class DateChart extends Chart {
   }
 
   initializeDefaultValues() {
+    this.config = defaultConfig;
     this.width = 1000;
     this.height = 600;
     this.defaultMargin = 60;
@@ -1447,8 +1480,8 @@ class DateChart extends Chart {
     if (!this.datasetController) return;
     // calculate enabled datasets once
     let enabledDatasets = this.datasetController.enabledDatasets;
-    this.dateToItemsRelation = dateToItemsRelation(this.datasetController.workingDatasets);
-    this.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets);
+    this.dateToItemsRelation = dateToItemsRelation(this.datasetController.workingDatasets, this);
+    this.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets, this);
     this.datasetStacks = createStackModel(this.datasetController, this.datasetController.workingDatasets, this.dateToItemsRelation);
     this.datasetStacksPresented = createStackModel(this.datasetController, enabledDatasets, this.dateToItemsRelationPresented);
   }
@@ -1523,7 +1556,7 @@ class DateChart extends Chart {
   renderSVG() {
     this.svg = this.element
       .append('svg')
-      .attr('class', 'lotivis-date-chart')
+      .attr('class', 'lotivis-chart-svg lotivis-date-chart')
       // .attr('width', this.width)
       // .attr('height', this.height)
       .attr('preserveAspectRatio', 'xMidYMid meet')
@@ -1594,12 +1627,24 @@ class DateChart extends Chart {
   }
 }
 
+/**
+ * A lotivis card.
+ *
+ * @class Card
+ * @extends Component
+ */
 class Card extends Component {
+
+  /**
+   * Creates a new instance of Card.
+   *
+   * @param parent The parental component.
+   */
   constructor(parent) {
     super(parent);
     this.element = this.parent
       .append('div')
-      .classed('card', true);
+      .classed('lotivis-card', true);
     this.createHeader();
     this.createBody();
     this.createFooter();
@@ -1608,7 +1653,7 @@ class Card extends Component {
   createHeader() {
     this.header = this.element
       .append('div')
-      .classed('card-header', true);
+      .classed('lotivis-card-header', true);
     this.headerRow = this.header
       .append('div')
       .classed('row', true);
@@ -1633,7 +1678,7 @@ class Card extends Component {
   createBody() {
     this.body = this.element
       .append('div')
-      .classed('card-body', true);
+      .classed('lotivis-card-body', true);
     this.content = this.body
       .append('div')
       .attr('id', 'content');
@@ -1642,7 +1687,7 @@ class Card extends Component {
   createFooter() {
     this.footer = this.element
       .append('div')
-      .classed('card-footer', true);
+      .classed('lotivis-card-footer', true);
     this.footerRow = this.footer
       .append('div')
       .classed('row', true);
@@ -2739,6 +2784,12 @@ function formatNumber(number) {
   return numberFormat.format(number);
 }
 
+/**
+ * Compares the string version of each oof the two given values for equality.
+ * @param value1 The first value to compare.
+ * @param value2 The second value to compare.
+ * @returns {boolean} True if the string versions are equal, false if not.
+ */
 function equals(value1, value2) {
   return String(value1) === String(value2);
 }
@@ -3465,7 +3516,7 @@ class MapChart extends Chart {
       .select(`#${this.selector}`)
       .append('svg')
       .attr('id', this.svgSelector)
-      .attr('class', 'lotivis-map')
+      .attr('class', 'lotivis-chart-svg lotivis-map')
       // .style('width', this.width)
       // .style('height', this.height);
       .attr('viewBox', `0 0 ${this.width} ${this.height}`);
@@ -4099,6 +4150,7 @@ class PlotChart extends Chart {
     this.svg = this.element
       .append('svg')
       .attr('id', this.svgSelector)
+      .attr('class', 'lotivis-chart-svg')
       .attr('preserveAspectRatio', 'xMidYMid meet')
       .attr("viewBox", `0 0 ${this.width} ${this.height}`);
   }
@@ -4685,7 +4737,7 @@ class GeoJson {
   }
 }
 
-DatasetsController.prototype.addListener = function(listener) {
+DatasetsController.prototype.addListener = function (listener) {
   this.listeners.push(listener);
 };
 

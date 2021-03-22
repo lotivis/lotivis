@@ -1,11 +1,23 @@
 import {Component} from "./component";
 
+/**
+ * A lotivis card.
+ *
+ * @class Card
+ * @extends Component
+ */
 export class Card extends Component {
+
+  /**
+   * Creates a new instance of Card.
+   *
+   * @param parent The parental component.
+   */
   constructor(parent) {
     super(parent);
     this.element = this.parent
       .append('div')
-      .classed('card', true);
+      .classed('lotivis-card', true);
     this.createHeader();
     this.createBody();
     this.createFooter();
@@ -14,7 +26,7 @@ export class Card extends Component {
   createHeader() {
     this.header = this.element
       .append('div')
-      .classed('card-header', true);
+      .classed('lotivis-card-header', true);
     this.headerRow = this.header
       .append('div')
       .classed('row', true);
@@ -39,7 +51,7 @@ export class Card extends Component {
   createBody() {
     this.body = this.element
       .append('div')
-      .classed('card-body', true);
+      .classed('lotivis-card-body', true);
     this.content = this.body
       .append('div')
       .attr('id', 'content');
@@ -48,7 +60,7 @@ export class Card extends Component {
   createFooter() {
     this.footer = this.element
       .append('div')
-      .classed('card-footer', true);
+      .classed('lotivis-card-footer', true);
     this.footerRow = this.footer
       .append('div')
       .classed('row', true);

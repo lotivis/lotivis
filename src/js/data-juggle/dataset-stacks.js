@@ -1,5 +1,4 @@
 import {extractStacksFromDatasets} from "./dataset-extract";
-import {Color} from "../shared/colors";
 
 /**
  *

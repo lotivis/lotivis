@@ -54,26 +54,3 @@ input[type="checkbox"] {
 .radio-group label:active {
   opacity: 0.6;
 }
-
-
-// MARK: - Input Range
-
-input[type="range"] {
-  //margin: 0 $spacing 0 0;
-  //cursor: pointer;
-}
-
-.range-container {
-  width: auto;
-  text-align: center;
-
-  input[type="range"] {
-    margin: 0 $spacing 0 $spacing;
-    width: 80%;
-  }
-
-  .range-value-label {
-    width: 100%;
-    display: block;
-  }
-}

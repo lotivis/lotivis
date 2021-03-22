@@ -76,7 +76,7 @@ button:active, a:active {
 }
 
 /* MARK: - Card */
-.card {
+.lotivis-card {
   background-color: #FFFFFFAA;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
@@ -290,7 +290,7 @@ input[type=checkbox] {
   background-color: white;
   background-color: rgba(255, 255, 255, 0.15);
 }
-.popup-underground .card {
+.popup-underground .lotivis-card {
   background-color: #f0f0f1;
   box-shadow: rgba(0, 0, 0, 0.3) 0 0 60px 0;
 }
@@ -393,7 +393,7 @@ input[type=checkbox] {
   height: 100%;
   overflow: scroll;
 }
-.underground .card, .modal-underground .card, .popup-underground .card {
+.underground .lotivis-card, .modal-underground .lotivis-card, .popup-underground .lotivis-card {
   background-color: #f0f0f1;
   box-shadow: rgba(0, 0, 0, 0.3) 0 0 60px 0;
 }

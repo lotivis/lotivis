@@ -50,14 +50,14 @@ export class DatasetsControllerFilter extends DatasetsController {
       if (dataset.label === label) {
         dataset.isEnabled = !dataset.isEnabled;
       }
-    })
+    });
     this.notifyListeners('dataset-toggle');
   }
 
   enableAllDatasets() {
     this.workingDatasets.forEach(function (dataset) {
       dataset.isEnabled = true;
-    })
+    });
     this.notifyListeners('dataset-enable-all');
   }
 
@@ -66,7 +66,7 @@ export class DatasetsControllerFilter extends DatasetsController {
     let aCopy = copy(this.workingDatasets);
 
     let enabled = aCopy
-      .filter(dataset => dataset.isEnabled === true)
+      .filter(dataset => dataset.isEnabled === true);
 
     if (this.datasetFilters && this.datasetFilters.length > 0) {
       enabled = enabled.filter(dataset => this.datasetFilters.includes(dataset.label));
@@ -78,7 +78,7 @@ export class DatasetsControllerFilter extends DatasetsController {
         dataset.data = dataset.data
           .filter(data => locationFilters.includes(String(data.location))) || [];
         return dataset;
-      })
+      });
     }
 
     if (this.dateFilters && this.dateFilters.length > 0) {
@@ -87,7 +87,7 @@ export class DatasetsControllerFilter extends DatasetsController {
         dataset.data = dataset.data
           .filter(data => dateFilters.includes(String(data.date))) || [];
         return dataset;
-      })
+      });
     }
 
     return enabled;
