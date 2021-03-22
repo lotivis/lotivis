@@ -28,7 +28,7 @@ var createID;
 const Constants = {
   tooltipOffset: 7,
   barRadius: 5,
-  debugLog: true
+  debugLog: false
 };
 
 const prefix = '[lotivis]  ';
@@ -36,6 +36,7 @@ const prefix = '[lotivis]  ';
 const verbose_log = console.log;
 
 const debug_log = function (message) {
+  if (!Constants.debugLog) return;
   console.log(prefix + message);
 };
 
@@ -3896,6 +3897,13 @@ class PlotTooltipRenderer {
       return components.join('<br/>');
     }
 
+    /**
+     * Returns the pixel position for to tooltip to display it aligned to the left of a bar.
+     * @param dataset The dataset to display the tooltip for.
+     * @param factor The factor of the view box of the SVG.
+     * @param offset The offset of the chart.
+     * @returns {*} The left pixel position for the tooltip.
+     */
     function getTooltipLeftForDataset(dataset, factor, offset) {
       let left = plotChart.xChart(dataset.earliestDate);
       left *= factor;
@@ -3918,8 +3926,7 @@ class PlotTooltipRenderer {
       let factor = plotChart.getElementEffectiveSize()[0] / plotChart.width;
       let offset = plotChart.getElementPosition();
 
-      let top = plotChart.yChart(dataset.label);
-      top *= factor;
+      let top = plotChart.yChart(dataset.label) * factor;
       top += offset[1];
 
       if ((plotChart.yChart(dataset.label) - plotChart.margin.top) <= (plotChart.graphHeight / 2)) {
@@ -4031,10 +4038,25 @@ class PlotGridRenderer {
   }
 }
 
+class PlotBackgroundRenderer {
+
+  constructor(plotChart) {
+
+    this.render = function () {
+      plotChart.svg
+        .append('rect')
+        .attr('width', plotChart.width)
+        .attr('height', plotChart.height)
+        .attr('class', 'lotivis-plot-background');
+    };
+  }
+}
+
 /**
+ * A lotivis plot chart.
  *
  * @class PlotChart
- * @extends Component
+ * @extends Chart
  */
 class PlotChart extends Chart {
   radius = 23;
@@ -4044,24 +4066,6 @@ class PlotChart extends Chart {
     highColor: 'rgb(0, 122, 255)'
   };
   sort = PlotChartSort.duration;
-
-  /**
-   * Creates an instance of DiachronicChart.
-   *
-   * @constructor
-   * @param {Component} parent The parental component.
-   */
-  constructor(parent) {
-    super(parent);
-
-    // if (Object.getPrototypeOf(parent) === String.prototype) {
-    //   this.selector = parent;
-    //   this.element = d3.select('#' + parent);
-    // } else {
-    //   this.element = parent;
-    //   this.element.attr('id', this.selector);
-    // }
-  }
 
   /**
    * Initializes this diachronic chart by setting the default values.
@@ -4079,17 +4083,24 @@ class PlotChart extends Chart {
     };
 
     this.isShowLabels = true;
-    this.updateSensible = true;
-
-    // this.datasets = [];
-
-    // this.configureChart();
     this.createSVG();
+    this.backgroundRenderer = new PlotBackgroundRenderer(this);
     this.axisRenderer = new PlotAxisRenderer(this);
     this.gridRenderer = new PlotGridRenderer(this);
     this.barsRenderer = new PlotBarsRenderer(this);
     this.labelsRenderer = new PlotLabelRenderer(this);
     this.tooltipRenderer = new PlotTooltipRenderer(this);
+  }
+
+  /**
+   * Appends the svg element to the parental element.
+   */
+  createSVG() {
+    this.svg = this.element
+      .append('svg')
+      .attr('id', this.svgSelector)
+      .attr('preserveAspectRatio', 'xMidYMid meet')
+      .attr("viewBox", `0 0 ${this.width} ${this.height}`);
   }
 
   /**
@@ -4114,13 +4125,6 @@ class PlotChart extends Chart {
 
     this.svg
       .attr("viewBox", `0 0 ${this.width} ${this.height}`);
-    this.background
-      .attr('width', this.width)
-      .attr('height', this.height);
-    this.graph
-      .attr('width', this.width)
-      .attr('height', this.height)
-      .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
 
     this.datasetsDidChange();
   }
@@ -4131,6 +4135,7 @@ class PlotChart extends Chart {
   draw() {
     if (!this.workingDatasets || this.workingDatasets.length === 0) return;
     this.createScales();
+    this.backgroundRenderer.render();
     this.gridRenderer.renderGrid();
     this.axisRenderer.renderAxis();
     this.barsRenderer.renderBars();
@@ -4146,30 +4151,6 @@ class PlotChart extends Chart {
     this.remove();
     this.precalculate();
     this.draw();
-  }
-
-  /**
-   * Appends the svg element to the parental element.
-   */
-  createSVG() {
-    this.svg = this.element
-      .append('svg')
-      .attr('id', this.svgSelector)
-      .attr('preserveAspectRatio', 'xMidYMid meet')
-      .attr("viewBox", `0 0 ${this.width} ${this.height}`);
-
-    this.background = this.svg
-      .append('rect')
-      .attr('width', this.width)
-      .attr('height', this.height)
-      .attr('class', 'lotivis-plot-background');
-
-    this.graph = this.svg
-      .append('g')
-      .attr('width', this.graphWidth)
-      .attr('height', this.graphHeight)
-      .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
-
   }
 
   /**
@@ -4427,10 +4408,9 @@ class Dropdown extends Component {
  * @extends Popup
  */
 class PlotChartSettingsPopup extends Popup {
-  chart;
 
   /**
-   *
+   * Appends the headline and the content row of the popup.
    */
   render() {
     this.card.headerRow.append('h3').text('Settings');
@@ -4439,7 +4419,7 @@ class PlotChartSettingsPopup extends Popup {
   }
 
   /**
-   *
+   * Appends the checkboxes the popups content.
    */
   renderShowLabelsCheckbox() {
     let container = this.row.append('div').classed('col-12 margin-top', true);
@@ -4478,19 +4458,17 @@ class PlotChartSettingsPopup extends Popup {
   }
 
   /**
-   *
+   * Tells this popup that it is about to be displayed.
    */
   willShow() {
     verbose_log('this.chart.showLabels', this.chart.showLabels);
     this.showLabelsCheckbox.setChecked(this.chart.showLabels);
     this.sortDropdown.setSelectedOption(this.chart.sort);
   }
-
-  labels = {};
 }
 
 /**
- *
+ * A card containing a plot chart.
  *
  * @class PlotChartCard
  * @extends Card
@@ -4545,7 +4523,7 @@ class PlotChartCard extends ChartCard {
   }
 
   /**
-   *
+   * Applies possible url parameters.
    */
   applyURLParameters() {
     let instance = URLParameters.getInstance();
@@ -4555,7 +4533,7 @@ class PlotChartCard extends ChartCard {
   }
 
   /**
-   *
+   * Presents the settings popup.
    */
   presentSettingsPopupAction() {
     let bodyElement = d3.select('body');
@@ -4885,6 +4863,7 @@ class ModalPopup extends Popup {
   }
 }
 
+// components
 exports.Component = Component;
 exports.Card = Card;
 exports.ChartCard = ChartCard;
@@ -4895,20 +4874,27 @@ exports.Popup = Popup;
 exports.RadioGroup = RadioGroup;
 exports.Option = Option;
 
+// date
 exports.TimeChart = DateChart;
 exports.TimeChartCard = DateChartCard;
 
+// map
 exports.MapChart = MapChart;
 exports.MapChartCard = MapChartCard;
 
+// plot
 exports.PlotChart = PlotChart;
 exports.PlotChartCard = PlotChartCard;
 
+// datasets
 exports.DatasetController = DatasetsController;
 exports.FilterableDatasetController = DatasetsControllerFilter;
 
+
+// url parameters
 exports.URLParameters = URLParameters;
 
+// geo json
 exports.GeoJson = GeoJson;
 exports.Feature = Feature;
 exports.joinFeatures = joinFeatures;
@@ -4940,6 +4926,9 @@ exports.extractLatestDateWithValue = extractLatestDateWithValue;
 exports.sumOfDataset = sumOfDataset;
 exports.sumOfStack = sumOfStack;
 exports.dateToItemsRelations = dateToItemsRelation;
+
+// constants
+exports.Constants = Constants;
 
 var exports$1 = exports;
 

@@ -6,8 +6,7 @@
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../css/lotivis.css"/>
   <link rel="stylesheet" href="../css/examples.css"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <title>Lotivis - Map Simple</title>
+  <title>Headline</title>
 </head>
 <body>
 
@@ -21,38 +20,38 @@
       </a>
     </div>
     <div class="col-8 text-center">
-      <h1>Map Data</h1>
+      <h1>Headline</h1>
     </div>
-    <div class="col-12">
+    <div class="col-6">
+      <div id="time-chart-card">
+        <!-- Time Chart Code Here -->
+      </div>
+      <div id="plot-chart-card">
+        <!-- Plot Chart Code Here -->
+      </div>
+    </div>
+    <div class="col-6">
       <div id="map-chart-card">
-
+        <!-- Map Chart Code Here -->
       </div>
     </div>
-    <div class="col-12">
-      <div id="radio">
+    <div class="col-6">
 
-      </div>
+    </div>
+    <div class="col-12">
+      <samp id="data">
+        <!-- Data Here -->
+      </samp>
     </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson-server@3.0.1/dist/topojson-server.min.js"></script>
 <script src="../js/lotivis.js"></script>
 
 <script>
 
-  const geoJsonURLGermany = '/assets/Germany.geojson';
-  const mapChartCard = new lotivis.MapChartCard('map-chart-card');
-  const chart = mapChartCard.chart;
-
-  d3
-    .json(geoJsonURLGermany)
-    .then(function (rawGeoJSON) {
-      let geoJSON = new lotivis.GeoJson(rawGeoJSON)
-      chart.setGeoJSON(geoJSON);
-    });
+  lotivis.Constants.debug = true;
 
 </script>
 

@@ -14,11 +14,13 @@ import {PlotTooltipRenderer} from "./plot-tooltip-renderer";
 import {PlotLabelRenderer} from "./plot-label-renderer";
 import {PlotGridRenderer} from "./plot-grid-renderer";
 import {verbose_log} from "../shared/debug";
+import {PlotBackgroundRenderer} from "./plot-background-renderer";
 
 /**
+ * A lotivis plot chart.
  *
  * @class PlotChart
- * @extends Component
+ * @extends Chart
  */
 export class PlotChart extends Chart {
   radius = 23;
@@ -28,24 +30,6 @@ export class PlotChart extends Chart {
     highColor: 'rgb(0, 122, 255)'
   };
   sort = PlotChartSort.duration;
-
-  /**
-   * Creates an instance of DiachronicChart.
-   *
-   * @constructor
-   * @param {Component} parent The parental component.
-   */
-  constructor(parent) {
-    super(parent);
-
-    // if (Object.getPrototypeOf(parent) === String.prototype) {
-    //   this.selector = parent;
-    //   this.element = d3.select('#' + parent);
-    // } else {
-    //   this.element = parent;
-    //   this.element.attr('id', this.selector);
-    // }
-  }
 
   /**
    * Initializes this diachronic chart by setting the default values.
@@ -63,17 +47,24 @@ export class PlotChart extends Chart {
     };
 
     this.isShowLabels = true;
-    this.updateSensible = true;
-
-    // this.datasets = [];
-
-    // this.configureChart();
     this.createSVG();
+    this.backgroundRenderer = new PlotBackgroundRenderer(this);
     this.axisRenderer = new PlotAxisRenderer(this);
     this.gridRenderer = new PlotGridRenderer(this);
     this.barsRenderer = new PlotBarsRenderer(this);
     this.labelsRenderer = new PlotLabelRenderer(this);
     this.tooltipRenderer = new PlotTooltipRenderer(this);
+  }
+
+  /**
+   * Appends the svg element to the parental element.
+   */
+  createSVG() {
+    this.svg = this.element
+      .append('svg')
+      .attr('id', this.svgSelector)
+      .attr('preserveAspectRatio', 'xMidYMid meet')
+      .attr("viewBox", `0 0 ${this.width} ${this.height}`);
   }
 
   /**
@@ -98,13 +89,6 @@ export class PlotChart extends Chart {
 
     this.svg
       .attr("viewBox", `0 0 ${this.width} ${this.height}`);
-    this.background
-      .attr('width', this.width)
-      .attr('height', this.height);
-    this.graph
-      .attr('width', this.width)
-      .attr('height', this.height)
-      .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
 
     this.datasetsDidChange();
   }
@@ -115,6 +99,7 @@ export class PlotChart extends Chart {
   draw() {
     if (!this.workingDatasets || this.workingDatasets.length === 0) return;
     this.createScales();
+    this.backgroundRenderer.render();
     this.gridRenderer.renderGrid();
     this.axisRenderer.renderAxis();
     this.barsRenderer.renderBars();
@@ -130,30 +115,6 @@ export class PlotChart extends Chart {
     this.remove();
     this.precalculate();
     this.draw();
-  }
-
-  /**
-   * Appends the svg element to the parental element.
-   */
-  createSVG() {
-    this.svg = this.element
-      .append('svg')
-      .attr('id', this.svgSelector)
-      .attr('preserveAspectRatio', 'xMidYMid meet')
-      .attr("viewBox", `0 0 ${this.width} ${this.height}`);
-
-    this.background = this.svg
-      .append('rect')
-      .attr('width', this.width)
-      .attr('height', this.height)
-      .attr('class', 'lotivis-plot-background');
-
-    this.graph = this.svg
-      .append('g')
-      .attr('width', this.graphWidth)
-      .attr('height', this.graphHeight)
-      .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
-
   }
 
   /**

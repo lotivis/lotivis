@@ -8,7 +8,7 @@ import {PlotChartSettingsPopup} from "./plot-chart-settings-popup";
 import {downloadImage} from "../shared/screenshot";
 
 /**
- *
+ * A card containing a plot chart.
  *
  * @class PlotChartCard
  * @extends Card
@@ -63,7 +63,7 @@ export class PlotChartCard extends ChartCard {
   }
 
   /**
-   *
+   * Applies possible url parameters.
    */
   applyURLParameters() {
     let instance = URLParameters.getInstance();
@@ -73,7 +73,7 @@ export class PlotChartCard extends ChartCard {
   }
 
   /**
-   *
+   * Presents the settings popup.
    */
   presentSettingsPopupAction() {
     let bodyElement = d3.select('body');

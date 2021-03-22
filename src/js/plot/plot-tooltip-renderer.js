@@ -48,6 +48,13 @@ export class PlotTooltipRenderer {
       return components.join('<br/>');
     }
 
+    /**
+     * Returns the pixel position for to tooltip to display it aligned to the left of a bar.
+     * @param dataset The dataset to display the tooltip for.
+     * @param factor The factor of the view box of the SVG.
+     * @param offset The offset of the chart.
+     * @returns {*} The left pixel position for the tooltip.
+     */
     function getTooltipLeftForDataset(dataset, factor, offset) {
       let left = plotChart.xChart(dataset.earliestDate);
       left *= factor;
@@ -70,8 +77,7 @@ export class PlotTooltipRenderer {
       let factor = plotChart.getElementEffectiveSize()[0] / plotChart.width;
       let offset = plotChart.getElementPosition();
 
-      let top = plotChart.yChart(dataset.label);
-      top *= factor;
+      let top = plotChart.yChart(dataset.label) * factor;
       top += offset[1];
 
       if ((plotChart.yChart(dataset.label) - plotChart.margin.top) <= (plotChart.graphHeight / 2)) {

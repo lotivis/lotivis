@@ -54,8 +54,9 @@ import {ChartCard} from "./js/components/chart-card";
 import {Dropdown} from "./js/components/dropdown";
 import {Popup} from "./js/components/popup";
 import {joinFeatures} from "./js/geojson-juggle/join-features";
+import {Constants} from "./js/shared/constants";
 
-
+// components
 exports.Component = Component;
 exports.Card = Card;
 exports.ChartCard = ChartCard;
@@ -66,20 +67,27 @@ exports.Popup = Popup;
 exports.RadioGroup = RadioGroup;
 exports.Option = Option;
 
+// date
 exports.TimeChart = DateChart;
 exports.TimeChartCard = DateChartCard;
 
+// map
 exports.MapChart = MapChart;
 exports.MapChartCard = MapChartCard;
 
+// plot
 exports.PlotChart = PlotChart;
 exports.PlotChartCard = PlotChartCard;
 
+// datasets
 exports.DatasetController = DatasetsController;
 exports.FilterableDatasetController = DatasetsControllerFilter;
 
+
+// url parameters
 exports.URLParameters = URLParameters;
 
+// geo json
 exports.GeoJson = GeoJson;
 exports.Feature = Feature;
 exports.joinFeatures = joinFeatures;
@@ -111,5 +119,8 @@ exports.extractLatestDateWithValue = extractLatestDateWithValue;
 exports.sumOfDataset = sumOfDataset;
 exports.sumOfStack = sumOfStack;
 exports.dateToItemsRelations = dateToItemsRelation;
+
+// constants
+exports.Constants = Constants;
 
 export default exports;

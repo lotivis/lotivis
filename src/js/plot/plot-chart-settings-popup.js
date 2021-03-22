@@ -12,10 +12,9 @@ import {PlotChartSort} from "./plot-chart";
  * @extends Popup
  */
 export class PlotChartSettingsPopup extends Popup {
-  chart;
 
   /**
-   *
+   * Appends the headline and the content row of the popup.
    */
   render() {
     this.card.headerRow.append('h3').text('Settings');
@@ -24,7 +23,7 @@ export class PlotChartSettingsPopup extends Popup {
   }
 
   /**
-   *
+   * Appends the checkboxes the popups content.
    */
   renderShowLabelsCheckbox() {
     let container = this.row.append('div').classed('col-12 margin-top', true);
@@ -44,7 +43,7 @@ export class PlotChartSettingsPopup extends Popup {
       new Option(PlotChartSort.duration),
       new Option(PlotChartSort.intensity),
       new Option(PlotChartSort.firstDate)
-    ])
+    ]);
     this.sortDropdown.setOnChange(function (value) {
       this.chart.sort = value;
       this.chart.update();
@@ -63,13 +62,11 @@ export class PlotChartSettingsPopup extends Popup {
   }
 
   /**
-   *
+   * Tells this popup that it is about to be displayed.
    */
   willShow() {
     verbose_log('this.chart.showLabels', this.chart.showLabels);
     this.showLabelsCheckbox.setChecked(this.chart.showLabels);
     this.sortDropdown.setSelectedOption(this.chart.sort);
   }
-
-  labels = {};
 }
