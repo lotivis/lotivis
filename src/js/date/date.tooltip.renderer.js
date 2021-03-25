@@ -1,5 +1,6 @@
 import {combineByDate} from "../data-juggle/dataset.combine";
 import {Constants} from "../shared/constants";
+import {verbose_log} from "../shared/debug";
 
 /**
  * Injects and presents a tooltip on a date chart.
@@ -91,6 +92,14 @@ export class DateTooltipRenderer {
         .enabledFlatData
         .filter(item => item.date === date);
 
+      let first = flatData.first();
+      let title;
+      if (first && first.from && first.till) {
+        title = `${first.from} - ${first.till}`;
+      } else {
+        title = `${date}`;
+      }
+
       let dataHTML = combineByDate(flatData)
         .filter(item => item.value > 0)
         .map(function (item) {
@@ -100,7 +109,7 @@ export class DateTooltipRenderer {
         })
         .join('<br>');
 
-      return `<b>${date}</b><br>${dataHTML}`;
+      return `<b>${title}</b><br>${dataHTML}`;
     }
 
     /**

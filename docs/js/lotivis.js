@@ -1204,6 +1204,14 @@ class DateTooltipRenderer {
         .enabledFlatData
         .filter(item => item.date === date);
 
+      let first = flatData.first();
+      let title;
+      if (first && first.from && first.till) {
+        title = `${first.from} - ${first.till}`;
+      } else {
+        title = `${date}`;
+      }
+
       let dataHTML = combineByDate(flatData)
         .filter(item => item.value > 0)
         .map(function (item) {
@@ -1213,7 +1221,7 @@ class DateTooltipRenderer {
         })
         .join('<br>');
 
-      return `<b>${date}</b><br>${dataHTML}`;
+      return `<b>${title}</b><br>${dataHTML}`;
     }
 
     /**
@@ -4779,7 +4787,6 @@ function combineDatasetsByRatio(datasets, ratio) {
 function combineDataByGroupsize(data, ratio) {
   if (!data || data.length <= ratio) return data;
   let combined = combineByDate(data);
-  verbose_log('combined', combined);
   let newData = [];
 
   while (combined.length > 0) {

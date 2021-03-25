@@ -28,7 +28,6 @@ export function combineDatasetsByRatio(datasets, ratio) {
 export function combineDataByGroupsize(data, ratio) {
   if (!data || data.length <= ratio) return data;
   let combined = combineByDate(data);
-  verbose_log('combined', combined);
   let newData = [];
 
   while (combined.length > 0) {
