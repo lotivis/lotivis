@@ -24,9 +24,16 @@
     </div>
     <div class="lotivis-example-col-12">
       <div class="lotivis-card" style="overflow: scroll;">
-        <div style="overflow: scroll; width: 2000px">
-          <div id="date-chart-card" style="background-color: white">
-            <!-- Date Chart Code Here -->
+        <div class="lotivis-card-header">
+          <div id="dropdown-group-size">
+            <!-- Dropdown Code Here -->
+          </div>
+        </div>
+        <div class="lotivis-card-body" style="overflow: scroll;">
+          <div style="overflow: scroll; width: 2000px">
+            <div id="date-chart-card" style="background-color: white">
+              <!-- Date Chart Code Here -->
+            </div>
           </div>
         </div>
       </div>
@@ -53,7 +60,7 @@
       top: 20
     },
     dateAccess: function (date) {
-
+      verbose_log('dateAccess', date);
     }
   });
 
@@ -61,8 +68,36 @@
   timeChart.width = 2000;
   timeChart.margin.top = 20;
 
+  let dropdown = new lotivis.Dropdown.create(
+    'dropdown-group-size',                                // selector
+    ['1 Day', '2 Days', '1 Week', '2 Weeks', '1 Month'],  // options
+    '1 Week',                                             // selected option
+    function (value) {                                    // on change
+      switch (value) {
+        case '1 Day':
+          updateGroupSize(1);
+          break;
+        case '2 Days':
+          updateGroupSize(2);
+          break;
+        case '1 Week':
+          updateGroupSize(7);
+          break;
+        case '2 Weeks':
+          updateGroupSize(14);
+          break;
+        case '1 Month':
+          updateGroupSize(30);
+          break;
+        default:
+          break;
+      }
+    }
+  );
+
+  let originalDatasets = [];
   let url = 'https://phpefi.schleswig-holstein.de/corona/data202011/cvd_sh_verlauf.csv';
-  let dataset = lotivis
+  lotivis
     .parseCSV(url, function (components) {
       return {date: components[0], value: components[1]};
     })
@@ -72,17 +107,18 @@
         datasets[i].data = datasets[i].data.reverse();
       }
 
-      datasets = lotivis.combineDatasetsByRatio(datasets, 14);
-      console.log('datasets', datasets);
-
-      timeChart.datasets = datasets;
-      timeChart.update();
-
+      originalDatasets = datasets;
+      updateGroupSize(7);
       document.getElementById('data').innerText = datasets.csv;
     })
     .catch(function (error) {
       console.log(error);
     });
+
+  function updateGroupSize(newGroupSize) {
+    timeChart.datasets = lotivis.combineDatasetsByRatio(originalDatasets, newGroupSize);
+    timeChart.update();
+  }
 
 </script>
 

@@ -4277,109 +4277,131 @@ const PlotChartSort = {
  */
 class Dropdown extends Component {
 
-    constructor(parent) {
-        super(parent);
-        this.inputElements = [];
-        this.selector = createID();
-        this.element = parent
-            .append('div')
-            .classed('dropdown-container', true);
-        this.selectId = createID();
-        this.renderLabel();
-        this.renderSelect();
-    }
+  /**
+   *
+   * @param parent
+   */
+  constructor(parent) {
+    super(parent);
+    this.inputElements = [];
+    this.selector = createID();
+    this.element = parent
+      .append('div')
+      .classed('dropdown-container', true);
+    this.selectId = createID();
+    this.renderLabel();
+    this.renderSelect();
+  }
 
-    renderLabel() {
-        this.label = this.element
-            .append('label')
-            .attr('for', this.selectId);
-    }
+  renderLabel() {
+    this.label = this.element
+      .append('label')
+      .attr('for', this.selectId);
+  }
 
-    renderSelect() {
-        let thisReference = this;
-        this.select = this.element
-            .append('select')
-            .classed('form-control form-control-sm', true)
-            .attr('id', this.selectId)
-            .on('change', function (event) {
-                thisReference.onClick(event);
-            });
-    }
+  renderSelect() {
+    let thisReference = this;
+    this.select = this.element
+      .append('select')
+      .classed('form-control form-control-sm', true)
+      .attr('id', this.selectId)
+      .on('change', function (event) {
+        thisReference.onClick(event);
+      });
+  }
 
-    addOption(optionId, optionName) {
-        return this.select
-            .append('option')
-            .attr('id', optionId)
-            .attr('value', optionId)
-            .text(optionName);
-    }
+  addOption(optionId, optionName) {
+    return this.select
+      .append('option')
+      .attr('id', optionId)
+      .attr('value', optionId)
+      .text(optionName);
+  }
 
-    setOptions(options) {
-        this.removeAllInputs();
-        for (let i = 0; i < options.length; i++) {
-            let id = options[i][0] || options[i].id;
-            let name = options[i][1] || options[i].translatedTitle;
-            let inputElement = this.addOption(id, name);
-            this.inputElements.push(inputElement);
-        }
-        return this;
-    }
+  setOptions(options) {
+    this.removeAllInputs();
+    for (let i = 0; i < options.length; i++) {
+      let id, name;
 
-    removeAllInputs() {
-        this.element.selectAll('input').remove();
-        return this;
-    }
+      if (Array.isArray(options[i])) {
+        id = options[i][0] || options[i].id;
+        name = options[i][1] || options[i].translatedTitle;
+      } else if (typeof options[i] === 'string') {
+        id = options[i];
+        name = options[i];
+      }
 
-    onClick(event) {
-        let element = event.target;
-        if (!element) {
-            return;
-        }
-        let value = element.value;
-        if (!this.onChange) {
-            return;
-        }
-        this.onChange(value);
-        return this;
+      let inputElement = this.addOption(id, name);
+      this.inputElements.push(inputElement);
     }
+    return this;
+  }
 
-    onChange(argument) {
-        console.log('argument: ' + argument);
-        if (typeof argument !== 'string') {
-            this.onChange = argument;
-        }
-        return this;
+  removeAllInputs() {
+    this.element.selectAll('input').remove();
+    return this;
+  }
+
+  onClick(event) {
+    let element = event.target;
+    if (!element) {
+      return;
     }
-
-    // MARK: - Chaining Setter
-
-    setLabelText(text) {
-        this.label.text(text);
-        return this;
+    let value = element.value;
+    if (!this.onChange) {
+      return;
     }
+    this.onChange(value);
+    return this;
+  }
 
-    setOnChange(callback) {
-        this.onChange = callback;
-        return this;
+  onChange(argument) {
+    console.log('argument: ' + argument);
+    if (typeof argument !== 'string') {
+      this.onChange = argument;
     }
+    return this;
+  }
 
-    setSelectedOption(optionID) {
-        if (this.inputElements.find(function (item) {
-            return item.attr('value') === optionID;
-        }) !== undefined) {
-            this.value = optionID;
-        }
-        return this;
-    }
+  // MARK: - Chaining Setter
 
-    set value(optionID) {
-        document.getElementById(this.selectId).value = optionID;
-    }
+  setLabelText(text) {
+    this.label.text(text);
+    return this;
+  }
 
-    get value() {
-        return document.getElementById(this.selectId).value;
+  setOnChange(callback) {
+    this.onChange = callback;
+    return this;
+  }
+
+  setSelectedOption(optionID) {
+    if (this.inputElements.find(function (item) {
+      return item.attr('value') === optionID;
+    }) !== undefined) {
+      this.value = optionID;
     }
+    return this;
+  }
+
+  set value(optionID) {
+    document.getElementById(this.selectId).value = optionID;
+  }
+
+  get value() {
+    return document.getElementById(this.selectId).value;
+  }
 }
+
+Dropdown.create = function (selector, options, selectedOption, onChange) {
+  let div = d3.select(`#${selector}`);
+  let dropdown = new Dropdown(div);
+  dropdown.setLabelText('Group Size');
+  dropdown.setOptions(options);
+  dropdown.setSelectedOption(selectedOption);
+  dropdown.setOnChange(onChange);
+  return dropdown;
+};
 
 /**
  *
