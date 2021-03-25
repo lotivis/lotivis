@@ -4,6 +4,8 @@
 
 A dataset collection is basically an array of datasets.
 
+
+
 ### Dataset
 
 | Property | Use |
@@ -12,9 +14,13 @@ A dataset collection is basically an array of datasets.
 | stack: String | The stack / group of the dataset. Useful to datasetCombine datasets when presented. |
 | data: [Item] | The actual data of the dataset. |
 
+
+
 ### Data
 
 Data is a collection of items.
+
+
 
 ### Item
 
@@ -26,4 +32,8 @@ Data is a collection of items.
 | datumTotal: Number \| Any \| null | The total amount of values in the datum. |
 | location: String \| Identifier \| null | The location from which the item comes from. |
 | locationTotal: Number \| Any \| null | The total amount of value in the location. |
+
+
+
+### Dataview
 

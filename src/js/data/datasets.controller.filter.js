@@ -2,9 +2,9 @@ import {
   extractDatesFromDatasets,
   extractLabelsFromDatasets,
   extractStacksFromDatasets
-} from "../data-juggle/dataset-extract";
+} from "../data-juggle/dataset.extract";
 import {DatasetsController} from "./datasets.controller";
-import {flatDatasets} from "../data-juggle/dataset-flat";
+import {flatDatasets} from "../data-juggle/dataset.flat";
 import {copy} from "../shared/copy";
 
 /**

@@ -22,10 +22,12 @@
     <div class="lotivis-example-col-8 text-center">
       <h1>Corona-Zahlen Zeitverlauf</h1>
     </div>
-    <div class="lotivis-example-col-12" style="overflow: scroll;">
-      <div style="overflow: scroll; width: 20000px">
-        <div id="date-chart-card" style="background-color: white">
-          <!-- Date Chart Code Here -->
+    <div class="lotivis-example-col-12">
+      <div class="lotivis-card" style="overflow: scroll;">
+        <div style="overflow: scroll; width: 2000px">
+          <div id="date-chart-card" style="background-color: white">
+            <!-- Date Chart Code Here -->
+          </div>
         </div>
       </div>
     </div>
@@ -46,7 +48,7 @@
 
   let timeChart = new lotivis.TimeChart('date-chart-card', {
     height: 500,
-    width: 15000,
+    width: 2000,
     margin: {
       top: 20
     },
@@ -54,8 +56,9 @@
 
     }
   });
+
   timeChart.height = 500;
-  timeChart.width = 30000;
+  timeChart.width = 2000;
   timeChart.margin.top = 20;
 
   let url = 'https://phpefi.schleswig-holstein.de/corona/data202011/cvd_sh_verlauf.csv';
@@ -65,6 +68,11 @@
     })
     .then(function (datasets) {
 
+      for (let i = 0; i < datasets.length; i++) {
+        datasets[i].data = datasets[i].data.reverse();
+      }
+
+      datasets = lotivis.combineDatasetsByRatio(datasets, 14);
       console.log('datasets', datasets);
 
       timeChart.datasets = datasets;

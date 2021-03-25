@@ -75,9 +75,8 @@ button:active, a:active {
   margin-right: 8px;
 }
 
-/* MARK: - Card */
 .lotivis-card {
-  background-color: #FFFFFFAA;
+  background-color: #FFFFFF;
   border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   box-shadow: rgba(0, 0, 0, 0.05) 0 0 30px 0;
@@ -85,16 +84,17 @@ button:active, a:active {
   margin: 0 0 20px 0;
 }
 
-.card-header {
+.lotivis-card-header {
   padding: 10px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-.card-body {
+.lotivis-card-body {
   width: 100%;
+  overflow: scroll;
 }
 
-.card-footer {
+.lotivis-card-footer {
   padding-left: 10px;
   padding-right: 10px;
   padding-top: 6px;
@@ -146,8 +146,18 @@ button:active, a:active {
   color: red;
 }
 
-.chart-label {
+.lotivis-date-chart-label {
   pointer-events: none;
+  font-size: 20px;
+}
+
+.lotivis-date-chart-legend-label {
+  font-size: 13px;
+}
+
+.lotivis-date-chart-legend-circle {
+  cursor: pointer;
+  stroke-width: 2;
 }
 
 .lotivis-date-chart-bar {
@@ -202,79 +212,62 @@ input[type=checkbox] {
   opacity: 0.6;
 }
 
-.range-container {
-  width: auto;
-  text-align: center;
-}
-.range-container input[type=range] {
-  margin: 0 5px 0 5px;
-  width: 80%;
-}
-.range-container .range-value-label {
-  width: 100%;
-  display: block;
+.lotivis-map-area {
+  fill: white;
+  fill-opacity: 0;
+  stroke: black;
+  stroke-width: 1;
+  cursor: pointer;
 }
 
-.container {
-  padding: 0 50px 0 50px;
-  margin: auto;
-  max-width: 1200px;
+.lotivis-map-exterior-borders {
+  fill: white;
+  fill-opacity: 0;
+  stroke: black;
+  stroke-width: 1;
+  pointer-events: none;
 }
 
-.container-full {
-  padding: 0;
-  margin: auto;
+.lotivis-map-label {
+  fill: black;
+  text-anchor: middle;
+  font-size: 12px;
+  pointer-events: none;
 }
 
-.row, .group {
-  width: 100%;
-  display: inline-flex;
-  flex-wrap: wrap;
-  line-height: 1.4;
+.lotivis-map-selection-rect {
+  pointer-events: none;
+  position: absolute;
+  fill: white;
+  fill-opacity: 0;
+  stroke: red;
+  stroke-width: 1px;
+  stroke-dasharray: 1, 3;
 }
 
-.group {
-  margin: 15px 0 20px 0;
+.lotivis-map-legend-rect {
+  stroke: black;
+  stroke-width: 1;
 }
 
-.col-lg-12, .col-12 {
-  width: calc(100% - 20px);
+.lotivis-plot-background {
+  fill: rgba(255, 255, 255, 0);
 }
 
-.col-lg-8, .col-8 {
-  width: calc(66% - 20px);
+.lotivis-plot-bar {
+  stroke: lightgrey;
+  stroke-width: 1;
 }
 
-.col-lg-6, .col-6 {
-  width: calc(50% - 20px);
+.lotivis-plot-grid {
+  color: lightgrey;
+  stroke-width: 1;
 }
 
-.col-lg-4, .col-4 {
-  width: calc(33% - 20px);
-}
-
-.col-lg-3, .col-3 {
-  width: calc(25% - 20px);
-}
-
-.col-lg-2, .col-2 {
-  width: calc(16.6% - 20px);
-}
-
-.col-lg-12,
-.col-lg-6,
-.col-lg-4,
-.col-lg-3,
-.col-lg-2,
-.col-12,
-.col-6,
-.col-4,
-.col-3,
-.col-2 {
-  padding: 0 10px;
-}
-
-.map-label {
+.lotivis-plot-label {
+  fill: black;
+  text-anchor: start;
+  font-size: 12px;
   pointer-events: none;
 }
 

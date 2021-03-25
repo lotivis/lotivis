@@ -870,6 +870,9 @@ class DatasetsController {
     this.dates = extractDatesFromDatasets(datasets);
     this.locations = extractLocationsFromDatasets(datasets);
     this.datasetsColorsController = new DatasetsColorsController(this);
+    this.dateAccess = function (date) {
+      return Date.parse(date);
+    };
   }
 
   get flatDataCombinedStacks() {
@@ -1318,79 +1321,6 @@ class Chart extends Component {
   }
 }
 
-/**
- *
- * @param flatData The array of item.
- */
-function dateToItemsRelation(datasets, chart) {
-
-  let flatData = flatDatasets(datasets);
-  flatData = combineByDate(flatData);
-
-  chart.config.dateAccess;
-  let listOfDates = extractDatesFromDatasets(datasets);
-  verbose_log('listOfDates', listOfDates);
-  listOfDates = listOfDates.reverse();
-  verbose_log('listOfDates', listOfDates);
-  // listOfDates = listOfDates.sort(function (left, right) {
-  //   return dateAccess(left) - dateAccess(right);
-  // });
-
-  let listOfLabels = extractLabelsFromDatasets(datasets);
-
-  return listOfDates.map(function (date) {
-    let datasetDate = {date: date};
-    flatData
-      .filter(item => item.date === date)
-      .forEach(function (entry) {
-        datasetDate[entry.dataset] = entry.value;
-        datasetDate.total = entry.dateTotal;
-      });
-
-    // add zero values for empty datasets
-    for (let index = 0; index < listOfLabels.length; index++) {
-      let label = listOfLabels[index];
-      if (!datasetDate[label]) {
-        datasetDate[label] = 0;
-      }
-    }
-
-    return datasetDate;
-  });
-}
-
-/**
- *
- * @param datasets
- * @param dateToItemsRelation
- * @returns {*[]}
- */
-function createStackModel(controller, datasets, dateToItemsRelation) {
-  let listOfStacks = extractStacksFromDatasets(datasets);
-
-  return listOfStacks.map(function (stackName) {
-
-    let stackCandidates = datasets.filter(function (dataset) {
-      return dataset.stack === stackName
-        || dataset.label === stackName;
-    });
-
-    let candidatesNames = stackCandidates.map(stackCandidate => stackCandidate.label);
-    let candidatesColors = stackCandidates.map(stackCandidate => controller.getColorForDataset(stackCandidate.label));
-
-    let stack = d3
-      .stack()
-      .keys(candidatesNames)
-      (dateToItemsRelation);
-
-    stack.label = stackName;
-    stack.stack = stackName;
-    stack.colors = candidatesColors;
-
-    return stack;
-  });
-}
-
 const defaultConfig = {
   width: 1000,
   height: 600,
@@ -1478,24 +1408,13 @@ class DateChart extends Chart {
    */
   precalculateHelpData() {
     if (!this.datasetController) return;
-    // calculate enabled datasets once
-    let enabledDatasets = this.datasetController.enabledDatasets;
-    this.dateToItemsRelation = dateToItemsRelation(this.datasetController.workingDatasets, this);
-    this.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets, this);
-    this.datasetStacks = createStackModel(this.datasetController, this.datasetController.workingDatasets, this.dateToItemsRelation);
-    this.datasetStacksPresented = createStackModel(this.datasetController, enabledDatasets, this.dateToItemsRelationPresented);
+    this.dataview = this.datasetController.getDateDataview();
   }
 
   /**
    * Creates scales which are used to calculate the x and y positions of bars or circles.
    */
   createScales() {
-
-    this.max = d3.max(this.datasetStacksPresented, function (stack) {
-      return d3.max(stack, function (series) {
-        return d3.max(series.map(item => item['1']));
-      });
-    });
 
     this.xChart = d3
       .scaleBand()
@@ -1511,7 +1430,7 @@ class DateChart extends Chart {
 
     this.yChart = d3
       .scaleLinear()
-      .domain([0, this.max]).nice()
+      .domain([0, this.dataview.max]).nice()
       .rangeRound([this.height - this.margin.bottom, this.margin.top]);
 
   }
@@ -1530,7 +1449,7 @@ class DateChart extends Chart {
    */
   draw() {
     this.renderSVG();
-    if (!this.datasetStacks || this.datasetStacks.length === 0) return;
+    if (!this.dataview || !this.dataview.datasetStacks || this.dataview.datasetStacks.length === 0) return;
     this.axisRenderer.createAxis();
     this.axisRenderer.renderAxis();
     this.axisRenderer.renderGrid();
@@ -1542,8 +1461,8 @@ class DateChart extends Chart {
       this.legendRenderer.renderNormalLegend();
     }
 
-    for (let index = 0; index < this.datasetStacksPresented.length; index++) {
-      let stack = this.datasetStacksPresented[index];
+    for (let index = 0; index < this.dataview.datasetStacksPresented.length; index++) {
+      let stack = this.dataview.datasetStacksPresented[index];
       this.barsRenderer.renderBars(stack, index);
       if (this.isShowLabels === false) continue;
       this.labelRenderer.renderBarLabels(stack, index);
@@ -2150,20 +2069,20 @@ class RadioGroup extends Component {
 
 /**
  *
- * @class URLParameters
+ * @class UrlParameters
  */
-class URLParameters {
+class UrlParameters {
 
   /**
    * Returns the singleton instance.
    *
-   * @returns {URLParameters}
+   * @returns {UrlParameters}
    */
   static getInstance() {
-    if (!URLParameters.instance) {
-      URLParameters.instance = new URLParameters();
+    if (!UrlParameters.instance) {
+      UrlParameters.instance = new UrlParameters();
     }
-    return URLParameters.instance;
+    return UrlParameters.instance;
   }
 
   /**
@@ -2217,20 +2136,20 @@ class URLParameters {
   }
 }
 
-URLParameters.language = 'language';
-URLParameters.page = 'page';
-URLParameters.query = 'query';
-URLParameters.searchViewMode = 'search-view-mode';
-URLParameters.chartType = 'chart-type';
-URLParameters.chartShowLabels = 'chart-show-labels';
-URLParameters.chartCombineStacks = 'chart-datasetCombine-stacks';
-URLParameters.contentType = 'content-type';
-URLParameters.valueType = 'value-type';
-URLParameters.searchSensitivity = 'search-sensitivity';
-URLParameters.startYear = 'start-year';
-URLParameters.endYear = 'end-year';
+UrlParameters.language = 'language';
+UrlParameters.page = 'page';
+UrlParameters.query = 'query';
+UrlParameters.searchViewMode = 'search-view-mode';
+UrlParameters.chartType = 'chart-type';
+UrlParameters.chartShowLabels = 'chart-show-labels';
+UrlParameters.chartCombineStacks = 'chart-datasetCombine-stacks';
+UrlParameters.contentType = 'content-type';
+UrlParameters.valueType = 'value-type';
+UrlParameters.searchSensitivity = 'search-sensitivity';
+UrlParameters.startYear = 'start-year';
+UrlParameters.endYear = 'end-year';
 
-URLParameters.showTestData = 'show-test-data';
+UrlParameters.showTestData = 'show-test-data';
 
 /**
  *
@@ -2280,7 +2199,7 @@ class DateChartSettingsPopup extends Popup {
     this.showLabelsCheckbox.onClick = function (checked) {
       this.diachronicChart.isShowLabels = checked;
       this.diachronicChart.update();
-      URLParameters.getInstance().set(URLParameters.chartShowLabels, checked);
+      UrlParameters.getInstance().set(UrlParameters.chartShowLabels, checked);
     }.bind(this);
   }
 
@@ -2291,7 +2210,7 @@ class DateChartSettingsPopup extends Popup {
     this.combineStacksCheckbox.onClick = function (checked) {
       this.diachronicChart.isCombineStacks = checked;
       this.diachronicChart.update();
-      URLParameters.getInstance().set(URLParameters.chartCombineStacks, checked);
+      UrlParameters.getInstance().set(UrlParameters.chartCombineStacks, checked);
     }.bind(this);
   }
 
@@ -2306,7 +2225,7 @@ class DateChartSettingsPopup extends Popup {
     this.typeRadioGroup.onChange = function (value) {
       this.diachronicChart.type = value;
       this.diachronicChart.update();
-      URLParameters.getInstance().set(URLParameters.chartType, value);
+      UrlParameters.getInstance().set(UrlParameters.chartType, value);
     }.bind(this);
   }
 
@@ -2700,12 +2619,12 @@ class DateChartCard extends ChartCard {
    *
    */
   applyURLParameters() {
-    this.chart.type = URLParameters.getInstance()
-      .getString(URLParameters.chartType, 'bar');
-    this.chart.isShowLabels = URLParameters.getInstance()
-      .getBoolean(URLParameters.chartShowLabels, false);
-    this.chart.isCombineStacks = URLParameters.getInstance()
-      .getBoolean(URLParameters.chartCombineStacks, false);
+    this.chart.type = UrlParameters.getInstance()
+      .getString(UrlParameters.chartType, 'bar');
+    this.chart.isShowLabels = UrlParameters.getInstance()
+      .getBoolean(UrlParameters.chartShowLabels, false);
+    this.chart.isCombineStacks = UrlParameters.getInstance()
+      .getBoolean(UrlParameters.chartCombineStacks, false);
   }
 
   /**
@@ -3177,13 +3096,13 @@ class MapDatasetRenderer {
 }
 
 /**
- * @class MapGeoJsonRenderer
+ * @class MapGeojsonRenderer
  */
 
-class MapGeoJsonRenderer {
+class MapGeojsonRenderer {
 
   /**
-   * Creates a new instance of MapGeoJsonRenderer.
+   * Creates a new instance of MapGeojsonRenderer.
    * @param mapChart The parental map chart.
    */
   constructor(mapChart) {
@@ -3459,7 +3378,7 @@ class MapChart extends Chart {
     this.renderSVG();
     this.labelRenderer = new MapLabelRenderer(this);
     this.legendRenderer = new MapLegendRenderer(this);
-    this.geoJSONRenderer = new MapGeoJsonRenderer(this);
+    this.geoJSONRenderer = new MapGeojsonRenderer(this);
     this.datasetRenderer = new MapDatasetRenderer(this);
     this.exteriorBorderRenderer = new MapExteriorBorderRenderer(this);
     this.minimapRenderer = new MapMinimapRenderer(this);
@@ -3680,7 +3599,7 @@ class MapChartSettingsPopup extends Popup {
     this.showLabelsCheckbox.onClick = function (checked) {
       this.mapChart.isShowLabels = checked;
       this.mapChart.update();
-      URLParameters.getInstance().setWithoutDeleting('map-show-labels', checked);
+      UrlParameters.getInstance().setWithoutDeleting('map-show-labels', checked);
     }.bind(this);
   }
 
@@ -4480,7 +4399,7 @@ class PlotChartSettingsPopup extends Popup {
     this.showLabelsCheckbox.onClick = function (checked) {
       this.chart.showLabels = checked;
       this.chart.update();
-      URLParameters.getInstance().set(URLParameters.chartShowLabels, checked);
+      UrlParameters.getInstance().set(UrlParameters.chartShowLabels, checked);
     }.bind(this);
 
     let dropdownContainer = this.row.append('div').classed('col-12', true);
@@ -4578,10 +4497,10 @@ class PlotChartCard extends ChartCard {
    * Applies possible url parameters.
    */
   applyURLParameters() {
-    let instance = URLParameters.getInstance();
-    this.chart.type = instance.getString(URLParameters.chartType, 'bar');
-    this.chart.isShowLabels = instance.getBoolean(URLParameters.chartShowLabels, false);
-    this.chart.isCombineStacks = instance.getBoolean(URLParameters.chartCombineStacks, false);
+    let instance = UrlParameters.getInstance();
+    this.chart.type = instance.getString(UrlParameters.chartType, 'bar');
+    this.chart.isShowLabels = instance.getBoolean(UrlParameters.chartShowLabels, false);
+    this.chart.isCombineStacks = instance.getBoolean(UrlParameters.chartCombineStacks, false);
   }
 
   /**
@@ -4737,6 +4656,48 @@ class GeoJson {
   }
 }
 
+/**
+ *
+ * @param datasets
+ * @param dateAccess
+ * @returns {{date: *}[]}
+ */
+function dateToItemsRelation(datasets, dateAccess) {
+
+  let flatData = flatDatasets(datasets);
+  flatData = combineByDate(flatData);
+
+  let listOfDates = extractDatesFromDatasets(datasets);
+  // verbose_log('listOfDates', listOfDates);
+  listOfDates = listOfDates.reverse();
+  // verbose_log('listOfDates', listOfDates);
+  // listOfDates = listOfDates.sort(function (left, right) {
+  //   return dateAccess(left) - dateAccess(right);
+  // });
+
+  let listOfLabels = extractLabelsFromDatasets(datasets);
+
+  return listOfDates.map(function (date) {
+    let datasetDate = {date: date};
+    flatData
+      .filter(item => item.date === date)
+      .forEach(function (entry) {
+        datasetDate[entry.dataset] = entry.value;
+        datasetDate.total = entry.dateTotal;
+      });
+
+    // add zero values for empty datasets
+    for (let index = 0; index < listOfLabels.length; index++) {
+      let label = listOfLabels[index];
+      if (!datasetDate[label]) {
+        datasetDate[label] = 0;
+      }
+    }
+
+    return datasetDate;
+  });
+}
+
 DatasetsController.prototype.addListener = function (listener) {
   this.listeners.push(listener);
 };
@@ -4758,8 +4719,116 @@ DatasetsController.prototype.notifyListeners = function (reason = 'none') {
 /**
  *
  * @param datasets
+ * @param dateToItemsRelation
+ * @returns {*[]}
  */
-function renderCSV(datasets) {
+function createStackModel(controller, datasets, dateToItemsRelation) {
+  let listOfStacks = extractStacksFromDatasets(datasets);
+
+  return listOfStacks.map(function (stackName) {
+
+    let stackCandidates = datasets.filter(function (dataset) {
+      return dataset.stack === stackName
+        || dataset.label === stackName;
+    });
+
+    let candidatesNames = stackCandidates.map(stackCandidate => stackCandidate.label);
+    let candidatesColors = stackCandidates.map(stackCandidate => controller.getColorForDataset(stackCandidate.label));
+
+    let stack = d3
+      .stack()
+      .keys(candidatesNames)
+      (dateToItemsRelation);
+
+    stack.label = stackName;
+    stack.stack = stackName;
+    stack.colors = candidatesColors;
+
+    return stack;
+  });
+}
+
+Array.prototype.first = function () {
+  return this[0];
+};
+Array.prototype.last = function () {
+  return this[this.length - 1];
+};
+
+/**
+ * Combines each `ratio` entries to one.
+ * @param datasets The datasets collection.
+ * @param ratio The ratio.
+ */
+function combineDatasetsByRatio(datasets, ratio) {
+  let copied = copy(datasets);
+  for (let index = 0; index < copied.length; index++) {
+    let dataset = copied[index];
+    let data = dataset.data;
+    dataset.data = combineDataByGroupsize(data, ratio);
+    copied[index] = dataset;
+  }
+  return copied;
+}
+
+/**
+ *
+ * @param data
+ * @param ratio
+ */
+function combineDataByGroupsize(data, ratio) {
+  if (!data || data.length <= ratio) return data;
+  let combined = combineByDate(data);
+  verbose_log('combined', combined);
+  let newData = [];
+
+  while (combined.length > 0) {
+    let dateGroup = combined.splice(0, ratio);
+    let firstItem = dateGroup.first();
+    let lastItem = dateGroup.last();
+    let item = {};
+    item.dataset = firstItem.dataset;
+    item.stack = firstItem.stack;
+    item.date = firstItem.date;
+    item.date = firstItem.date;
+    item.from = firstItem.date;
+    item.till = lastItem.date;
+    item.value = sumOfValues(dateGroup);
+    newData.push(item);
+  }
+
+  return newData;
+}
+
+/**
+ * Returns a new generated DateDataview for the current enabled data of dataset of this controller.
+ */
+DatasetsController.prototype.getDateDataview = function () {
+  this.dateAccess;
+  let workingDatasets = copy(this.workingDatasets);
+  let enabledDatasets = copy(this.enabledDatasets || workingDatasets);
+  let dateGroupRatio = 2;
+  let dataview = {};
+
+  dataview.dateGroupRatio = dateGroupRatio;
+  dataview.datasets = combineDatasetsByRatio(workingDatasets, dateGroupRatio);
+  dataview.dateToItemsRelation = dateToItemsRelation(workingDatasets);
+  dataview.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets);
+  dataview.datasetStacks = createStackModel(this, workingDatasets, dataview.dateToItemsRelation);
+  dataview.datasetStacksPresented = createStackModel(this, enabledDatasets, dataview.dateToItemsRelationPresented);
+  dataview.max = d3.max(dataview.datasetStacksPresented, function (stack) {
+    return d3.max(stack, function (series) {
+      return d3.max(series.map(item => item['1']));
+    });
+  });
+  return dataview;
+};
+
+/**
+ *
+ * @param datasets
+ */
+function renderCsv(datasets) {
   let flatData = flatDatasets(datasets);
   let csvContent = 'label,value,date,location\n';
   for (let index = 0; index < flatData.length; index++) {
@@ -4798,7 +4867,7 @@ function trimByChar(string, character) {
  * @param extractItemBlock
  * @returns {Promise<[]>}
  */
-function parseCSV(
+function parseCsv(
   url,
   extractItemBlock = function (components) {
     return {date: components[0], value: components[1]};
@@ -4944,15 +5013,15 @@ exports.FilterableDatasetController = DatasetsControllerFilter;
 
 
 // url parameters
-exports.URLParameters = URLParameters;
+exports.URLParameters = UrlParameters;
 
 // geo json
 exports.GeoJson = GeoJson;
 exports.Feature = Feature;
 exports.joinFeatures = joinFeatures;
 
-exports.renderCSV = renderCSV;
-exports.parseCSV = parseCSV;
+exports.renderCSV = renderCsv;
+exports.parseCSV = parseCsv;
 
 exports.createGeoJSON = createGeoJSON;
 
@@ -4963,6 +5032,10 @@ exports.combine = combine;
 exports.combineByStacks = combineByStacks;
 exports.combineByDate = combineByDate;
 exports.combineByLocation = combineByLocation;
+
+exports.combineDataByGroupsize = combineDataByGroupsize;
+exports.combineDatasetsByRatio = combineDatasetsByRatio;
+
 exports.extractLabelsFromDatasets = extractLabelsFromDatasets;
 exports.extractLabelsFromFlatData = extractLabelsFromFlatData;
 exports.extractStacksFromDatasets = extractStacksFromDatasets;

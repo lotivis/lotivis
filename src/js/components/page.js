@@ -1,8 +1,8 @@
 import {Button} from './button';
-import {URLParameters} from "../shared/url-parameters";
-import {RadioGroup} from "./radio-group";
+import {UrlParameters} from "../shared/url.parameters";
+import {RadioGroup} from "./radio.group";
 import {Application} from "../application";
-import {ModalPopup} from "./modal-popup";
+import {ModalPopup} from "./modal.popup";
 
 export class Page {
 
@@ -186,7 +186,7 @@ export class Page {
 
     this.footerLanguageRadioGroup.onChange = function (value) {
       Language.setLanguage(value);
-      URLParameters.getInstance().set(URLParameters.language, value);
+      UrlParameters.getInstance().set(UrlParameters.language, value);
       Application.default.reloadPage();
     };
 
@@ -214,7 +214,7 @@ export class Page {
   }
 
   updateFooterURL() {
-    let url = URLParameters.getInstance().getURL();
+    let url = UrlParameters.getInstance().getURL();
     this.footerURLLabel.text(url);
   }
 
