@@ -6,6 +6,7 @@ export class DateLegendRenderer {
   constructor(timeChart) {
 
     this.renderNormalLegend = function () {
+      let config = timeChart.config;
       let controller = timeChart.datasetController;
       let datasets = controller.workingDatasets;
       let datasetNames = controller.labels;
@@ -14,7 +15,7 @@ export class DateLegendRenderer {
 
       let xLegend = d3.scaleBand()
         .domain(datasetNames)
-        .rangeRound([timeChart.margin.left, timeChart.width - timeChart.margin.right]);
+        .rangeRound([config.margin.left, config.width - config.margin.right]);
 
       let legends = timeChart.graph
         .selectAll('.legend')

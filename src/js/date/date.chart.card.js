@@ -36,9 +36,12 @@ export class DateChartCard extends ChartCard {
    *
    */
   renderChart() {
-    this.chart = new DateChart(this.body);
-    this.chart.margin.left = 50;
-    this.chart.margin.right = 50;
+    this.chart = new DateChart(this.body, {
+      margin: {
+        left: 50,
+        right: 50
+      }
+    });
   }
 
   /**

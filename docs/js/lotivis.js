@@ -191,63 +191,37 @@ Color.colorGenerator = function (till) {
     .range(['yellow', 'orange', 'red', 'purple']);
 };
 
+/**
+ * @class DateAxisRenderer
+ */
 class DateAxisRenderer {
 
-  constructor(timeChart) {
+  /**
+   * Creates a new instance of DateAxisRenderer.
+   *
+   * @param dateChart The parental date chart.
+   */
+  constructor(dateChart) {
 
     /**
-     *
-     */
-    this.createAxis = function () {
-      this.xAxisGrid = d3
-        .axisBottom(timeChart.xChart)
-        .tickSize(-timeChart.graphHeight)
-        .tickFormat('');
-
-      this.yAxisGrid = d3
-        .axisLeft(timeChart.yChart)
-        .tickSize(-timeChart.graphWidth)
-        .tickFormat('')
-        .ticks(20);
-    };
-
-    /**
-     *
+     * Appends the `left` and `bottom` axis to the date chart.
      */
     this.renderAxis = function () {
-      timeChart.svg
-        .append("g")
-        .call(d3.axisBottom(timeChart.xChart))
-        .attr("transform", () => `translate(0,${timeChart.height - timeChart.margin.bottom})`);
-      timeChart.svg
-        .append("g")
-        .call(d3.axisLeft(timeChart.yChart))
-        .attr("transform", () => `translate(${timeChart.margin.left},0)`);
-    };
+      let height = dateChart.config.height;
+      let margin = dateChart.config.margin;
 
-    /**
-     *
-     */
-    this.renderGrid = function () {
-      let color = 'lightgray';
-      let width = '0.5';
-      let opacity = 0.3;
-      timeChart.svg
-        .append('g')
-        .attr('class', 'x axis-grid')
-        .attr('transform', 'translate(0,' + (timeChart.height - timeChart.margin.bottom) + ')')
-        .attr('stroke', color)
-        .attr('stroke-width', width)
-        .attr("opacity", opacity)
-        .call(this.xAxisGrid);
-      timeChart.svg
-        .append('g')
-        .attr('class', 'y axis-grid')
-        .attr('transform', `translate(${timeChart.margin.left},0)`)
-        .attr('stroke', color)
-        .attr('stroke-width', width)
-        .attr("opacity", opacity)
-        .call(this.yAxisGrid);
+      // left
+      dateChart.svg
+        .append("g")
+        .call(d3.axisLeft(dateChart.yChart))
+        .attr("transform", () => `translate(${margin.left},0)`);
+
+      // bottom
+      dateChart.svg
+        .append("g")
+        .call(d3.axisBottom(dateChart.xChart))
+        .attr("transform", () => `translate(0,${height - margin.bottom})`);
+
     };
   }
 }
@@ -356,6 +330,7 @@ class DateLegendRenderer {
   constructor(timeChart) {
 
     this.renderNormalLegend = function () {
+      let config = timeChart.config;
       let controller = timeChart.datasetController;
       let datasets = controller.workingDatasets;
       let datasetNames = controller.labels;
@@ -364,7 +339,7 @@ class DateLegendRenderer {
 
       let xLegend = d3.scaleBand()
         .domain(datasetNames)
-        .rangeRound([timeChart.margin.left, timeChart.width - timeChart.margin.right]);
+        .rangeRound([config.margin.left, config.width - config.margin.right]);
 
       let legends = timeChart.graph
         .selectAll('.legend')
@@ -1090,6 +1065,7 @@ class DateGhostBarsRenderer {
     }
 
     this.renderGhostBars = function () {
+      let margin = dateChart.config.margin;
       let dates = dateChart.datasetController.dates;
       dateChart
         .svg
@@ -1104,9 +1080,9 @@ class DateGhostBarsRenderer {
         .attr("rx", Constants.barRadius)
         .attr("ry", Constants.barRadius)
         .attr("x", (date) => dateChart.xChart(date))
-        .attr("y", dateChart.margin.top)
+        .attr("y", margin.top)
         .attr("width", dateChart.xChart.bandwidth())
-        .attr("height", dateChart.height - dateChart.margin.bottom - dateChart.margin.top)
+        .attr("height", dateChart.config.height - margin.bottom - margin.top)
         .on('mouseenter', onMouseEnter.bind(this))
         .on('mouseout', onMouserOut.bind(this));
 
@@ -1156,7 +1132,7 @@ class DateTooltipRenderer {
      * @returns {number}
      */
     function getTop(factor, offset, tooltipSize) {
-      let top = dateChart.margin.top * factor;
+      let top = dateChart.config.margin.top * factor;
       top += (((dateChart.graphHeight * factor) - tooltipSize[1]) / 2);
       top += offset[1] - 10;
       return top;
@@ -1238,13 +1214,13 @@ class DateTooltipRenderer {
 
       // position tooltip
       let tooltipSize = getTooltipSize();
-      let factor = dateChart.getElementEffectiveSize()[0] / dateChart.width;
+      let factor = dateChart.getElementEffectiveSize()[0] / dateChart.config.width;
       let offset = dateChart.getElementPosition();
       let top = getTop(factor, offset, tooltipSize);
       let left = dateChart.xChart(date);
 
       // differ tooltip position on bar position
-      if (left > (dateChart.width / 2)) {
+      if (left > (dateChart.config.width / 2)) {
         left = getXLeft(date, factor, offset, tooltipSize);
       } else {
         left = getXRight(date, factor, offset);
@@ -1280,7 +1256,7 @@ class Chart extends Component {
    * @constructor
    * @param {Component} parent The parental component.
    */
-  constructor(parent) {
+  constructor(parent, config) {
     super(parent);
 
     if (Object.getPrototypeOf(parent) === String.prototype) {
@@ -1291,6 +1267,7 @@ class Chart extends Component {
       this.element.attr('id', this.selector);
     }
 
+    this.config = config;
     this.svgSelector = createID();
     this.updateSensible = true;
     this.initialize();
@@ -1326,6 +1303,67 @@ class Chart extends Component {
 
   makeUpdateSensible() {
     this.updateSensible = true;
+  }
+}
+
+/**
+ * @class DateGridRenderer
+ */
+class DateGridRenderer {
+
+  /**
+   * Creates a new instance of DateGridRenderer.
+   *
+   * @param dateChart
+   */
+  constructor(dateChart) {
+
+    /**
+     *
+     */
+    this.createAxis = function () {
+
+      this.xAxisGrid = d3
+        .axisBottom(dateChart.xChart)
+        .tickSize(-dateChart.graphHeight)
+        .tickFormat('');
+
+      this.yAxisGrid = d3
+        .axisLeft(dateChart.yChart)
+        .tickSize(-dateChart.graphWidth)
+        .tickFormat('')
+        .ticks(20);
+
+    };
+
+    /**
+     *
+     */
+    this.renderGrid = function () {
+      let config = dateChart.config;
+      let color = 'lightgray';
+      let width = '0.5';
+      let opacity = 0.3;
+
+      dateChart.svg
+        .append('g')
+        .attr('class', 'x axis-grid')
+        .attr('transform', 'translate(0,' + (config.height - config.margin.bottom) + ')')
+        .attr('stroke', color)
+        .attr('stroke-width', width)
+        .attr("opacity", opacity)
+        .call(this.xAxisGrid);
+
+      dateChart.svg
+        .append('g')
+        .attr('class', 'y axis-grid')
+        .attr('transform', `translate(${config.margin.left},0)`)
+        .attr('stroke', color)
+        .attr('stroke-width', width)
+        .attr("opacity", opacity)
+        .call(this.yAxisGrid);
+
+    };
   }
 }
 
@@ -1365,16 +1403,15 @@ class DateChart extends Chart {
   }
 
   initializeDefaultValues() {
-    this.config = defaultConfig;
-    this.width = 1000;
-    this.height = 600;
-    this.defaultMargin = 60;
-    this.margin = {
-      top: this.defaultMargin,
-      right: this.defaultMargin,
-      bottom: this.defaultMargin,
-      left: this.defaultMargin
-    };
+
+    this.config;
+    let margin;
+    margin = Object.assign({}, defaultConfig.margin);
+    margin = Object.assign(margin, this.config.margin);
+
+    let config = Object.assign({}, defaultConfig);
+    this.config = Object.assign(config, this.config);
+    this.config.margin = margin;
 
     this.datasets = [];
 
@@ -1393,6 +1430,7 @@ class DateChart extends Chart {
 
   initializeRenderers() {
     this.axisRenderer = new DateAxisRenderer(this);
+    this.gridRenderer = new DateGridRenderer(this);
     this.labelRenderer = new DateLabelRenderer(this);
     this.legendRenderer = new DateLegendRenderer(this);
     this.barsRenderer = new DateBarsRenderer(this);
@@ -1404,9 +1442,10 @@ class DateChart extends Chart {
    * @override
    */
   precalculate() {
-    let margin = this.margin;
-    this.graphWidth = this.width - margin.left - margin.right;
-    this.graphHeight = this.height - margin.top - margin.bottom;
+    let config = this.config;
+    let margin = config.margin;
+    this.graphWidth = config.width - margin.left - margin.right;
+    this.graphHeight = config.height - margin.top - margin.bottom;
     this.precalculateHelpData();
     this.createScales();
   }
@@ -1423,11 +1462,13 @@ class DateChart extends Chart {
    * Creates scales which are used to calculate the x and y positions of bars or circles.
    */
   createScales() {
+    let config = this.config;
+    let margin = config.margin;
 
     this.xChart = d3
       .scaleBand()
       .domain(this.datasetController.dates)
-      .rangeRound([this.margin.left, this.width - this.margin.right])
+      .rangeRound([margin.left, config.width - margin.right])
       .paddingInner(0.1);
 
     this.xStack = d3
@@ -1438,8 +1479,9 @@ class DateChart extends Chart {
 
     this.yChart = d3
       .scaleLinear()
-      .domain([0, this.dataview.max]).nice()
-      .rangeRound([this.height - this.margin.bottom, this.margin.top]);
+      .domain([0, this.dataview.max])
+      .nice()
+      .rangeRound([config.height - margin.bottom, margin.top]);
 
   }
 
@@ -1458,9 +1500,9 @@ class DateChart extends Chart {
   draw() {
     this.renderSVG();
     if (!this.dataview || !this.dataview.datasetStacks || this.dataview.datasetStacks.length === 0) return;
-    this.axisRenderer.createAxis();
     this.axisRenderer.renderAxis();
-    this.axisRenderer.renderGrid();
+    this.gridRenderer.createAxis();
+    this.gridRenderer.renderGrid();
     this.ghostBarsRenderer.renderGhostBars();
 
     if (this.isCombineStacks) {
@@ -1484,16 +1526,16 @@ class DateChart extends Chart {
     this.svg = this.element
       .append('svg')
       .attr('class', 'lotivis-chart-svg lotivis-date-chart')
-      // .attr('width', this.width)
+      // .attr('width', this.config.width)
       // .attr('height', this.height)
       .attr('preserveAspectRatio', 'xMidYMid meet')
-      .attr("viewBox", `0 0 ${this.width} ${this.height}`)
+      .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`)
       .attr('id', this.svgSelector);
 
     this.background = this.svg
       .append('rect')
-      .attr('width', this.width)
-      .attr('height', this.height)
+      .attr('width', this.config.width)
+      .attr('height', this.config.height)
       .attr('fill', 'white')
       .attr('opacity', 0);
 
@@ -1514,7 +1556,7 @@ class DateChart extends Chart {
       .append('g')
       .attr('width', this.graphWidth)
       .attr('height', this.graphHeight)
-      .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+      .attr('transform', `translate(${this.config.margin.left},${this.config.margin.top})`);
   }
 
   /**
@@ -2597,9 +2639,12 @@ class DateChartCard extends ChartCard {
    *
    */
   renderChart() {
-    this.chart = new DateChart(this.body);
-    this.chart.margin.left = 50;
-    this.chart.margin.right = 50;
+    this.chart = new DateChart(this.body, {
+      margin: {
+        left: 50,
+        right: 50
+      }
+    });
   }
 
   /**

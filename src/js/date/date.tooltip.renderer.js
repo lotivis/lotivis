@@ -44,7 +44,7 @@ export class DateTooltipRenderer {
      * @returns {number}
      */
     function getTop(factor, offset, tooltipSize) {
-      let top = dateChart.margin.top * factor;
+      let top = dateChart.config.margin.top * factor;
       top += (((dateChart.graphHeight * factor) - tooltipSize[1]) / 2);
       top += offset[1] - 10;
       return top;
@@ -126,13 +126,13 @@ export class DateTooltipRenderer {
 
       // position tooltip
       let tooltipSize = getTooltipSize();
-      let factor = dateChart.getElementEffectiveSize()[0] / dateChart.width;
+      let factor = dateChart.getElementEffectiveSize()[0] / dateChart.config.width;
       let offset = dateChart.getElementPosition();
       let top = getTop(factor, offset, tooltipSize);
       let left = dateChart.xChart(date);
 
       // differ tooltip position on bar position
-      if (left > (dateChart.width / 2)) {
+      if (left > (dateChart.config.width / 2)) {
         left = getXLeft(date, factor, offset, tooltipSize);
       } else {
         left = getXRight(date, factor, offset);

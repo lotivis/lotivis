@@ -191,63 +191,33 @@ Color.colorGenerator = function (till) {
     .range(['yellow', 'orange', 'red', 'purple']);
 };
 
+/**
+ * @class DateAxisRenderer
+ */
 class DateAxisRenderer {
 
-  constructor(timeChart) {
-
-    /**
-     *
-     */
-    this.createAxis = function () {
-      this.xAxisGrid = d3
-        .axisBottom(timeChart.xChart)
-        .tickSize(-timeChart.graphHeight)
-        .tickFormat('');
-
-      this.yAxisGrid = d3
-        .axisLeft(timeChart.yChart)
-        .tickSize(-timeChart.graphWidth)
-        .tickFormat('')
-        .ticks(20);
-    };
+  constructor(dateChart) {
 
     /**
      *
      */
     this.renderAxis = function () {
-      timeChart.svg
-        .append("g")
-        .call(d3.axisBottom(timeChart.xChart))
-        .attr("transform", () => `translate(0,${timeChart.height - timeChart.margin.bottom})`);
-      timeChart.svg
-        .append("g")
-        .call(d3.axisLeft(timeChart.yChart))
-        .attr("transform", () => `translate(${timeChart.margin.left},0)`);
-    };
+      let config = dateChart.config;
+      let margin = config.margin;
+      console.log('margin', margin);
 
-    /**
-     *
-     */
-    this.renderGrid = function () {
-      let color = 'lightgray';
-      let width = '0.5';
-      let opacity = 0.3;
-      timeChart.svg
-        .append('g')
-        .attr('class', 'x axis-grid')
-        .attr('transform', 'translate(0,' + (timeChart.height - timeChart.margin.bottom) + ')')
-        .attr('stroke', color)
-        .attr('stroke-width', width)
-        .attr("opacity", opacity)
-        .call(this.xAxisGrid);
-      timeChart.svg
-        .append('g')
-        .attr('class', 'y axis-grid')
-        .attr('transform', `translate(${timeChart.margin.left},0)`)
-        .attr('stroke', color)
-        .attr('stroke-width', width)
-        .attr("opacity", opacity)
-        .call(this.yAxisGrid);
+      // left
+      dateChart.svg
+        .append("g")
+        .call(d3.axisLeft(dateChart.yChart))
+        .attr("transform", () => `translate(${margin.left},0)`);
+
+      // bottom
+      dateChart.svg
+        .append("g")
+        .call(d3.axisBottom(dateChart.xChart))
+        .attr("transform", () => `translate(0,${config.height - margin.bottom})`);
+
     };
   }
 }
@@ -356,6 +326,7 @@ class DateLegendRenderer {
   constructor(timeChart) {
 
     this.renderNormalLegend = function () {
+      let config = timeChart.config;
       let controller = timeChart.datasetController;
       let datasets = controller.workingDatasets;
       let datasetNames = controller.labels;
@@ -364,7 +335,7 @@ class DateLegendRenderer {
 
       let xLegend = d3.scaleBand()
         .domain(datasetNames)
-        .rangeRound([timeChart.margin.left, timeChart.width - timeChart.margin.right]);
+        .rangeRound([config.margin.left, config.width - config.margin.right]);
 
       let legends = timeChart.graph
         .selectAll('.legend')
@@ -1204,6 +1175,14 @@ class DateTooltipRenderer {
         .enabledFlatData
         .filter(item => item.date === date);
 
+      let first = flatData.first();
+      let title;
+      if (first && first.from && first.till) {
+        title = `${first.from} - ${first.till}`;
+      } else {
+        title = `${date}`;
+      }
+
       let dataHTML = combineByDate(flatData)
         .filter(item => item.value > 0)
         .map(function (item) {
@@ -1213,7 +1192,7 @@ class DateTooltipRenderer {
         })
         .join('<br>');
 
-      return `<b>${date}</b><br>${dataHTML}`;
+      return `<b>${title}</b><br>${dataHTML}`;
     }
 
     /**
@@ -1272,7 +1251,7 @@ class Chart extends Component {
    * @constructor
    * @param {Component} parent The parental component.
    */
-  constructor(parent) {
+  constructor(parent, config) {
     super(parent);
 
     if (Object.getPrototypeOf(parent) === String.prototype) {
@@ -1283,6 +1262,7 @@ class Chart extends Component {
       this.element.attr('id', this.selector);
     }
 
+    this.config = config;
     this.svgSelector = createID();
     this.updateSensible = true;
     this.initialize();
@@ -1318,6 +1298,67 @@ class Chart extends Component {
 
   makeUpdateSensible() {
     this.updateSensible = true;
+  }
+}
+
+/**
+ * @class DateGridRenderer
+ */
+class DateGridRenderer {
+
+  /**
+   * Creates a new instance of DateGridRenderer.
+   *
+   * @param dateChart
+   */
+  constructor(dateChart) {
+
+    /**
+     *
+     */
+    this.createAxis = function () {
+
+      this.xAxisGrid = d3
+        .axisBottom(dateChart.xChart)
+        .tickSize(-dateChart.graphHeight)
+        .tickFormat('');
+
+      this.yAxisGrid = d3
+        .axisLeft(dateChart.yChart)
+        .tickSize(-dateChart.graphWidth)
+        .tickFormat('')
+        .ticks(20);
+
+    };
+
+    /**
+     *
+     */
+    this.renderGrid = function () {
+      let config = dateChart.config;
+      let color = 'lightgray';
+      let width = '0.5';
+      let opacity = 0.3;
+
+      dateChart.svg
+        .append('g')
+        .attr('class', 'x axis-grid')
+        .attr('transform', 'translate(0,' + (config.height - config.margin.bottom) + ')')
+        .attr('stroke', color)
+        .attr('stroke-width', width)
+        .attr("opacity", opacity)
+        .call(this.xAxisGrid);
+
+      dateChart.svg
+        .append('g')
+        .attr('class', 'y axis-grid')
+        .attr('transform', `translate(${config.margin.left},0)`)
+        .attr('stroke', color)
+        .attr('stroke-width', width)
+        .attr("opacity", opacity)
+        .call(this.yAxisGrid);
+
+    };
   }
 }
 
@@ -1357,16 +1398,24 @@ class DateChart extends Chart {
   }
 
   initializeDefaultValues() {
-    this.config = defaultConfig;
-    this.width = 1000;
-    this.height = 600;
-    this.defaultMargin = 60;
-    this.margin = {
-      top: this.defaultMargin,
-      right: this.defaultMargin,
-      bottom: this.defaultMargin,
-      left: this.defaultMargin
-    };
+    console.log('defaultConfig.margin', defaultConfig.margin);
+    console.log('theConfig.margin', this.config.margin);
+
+    let theConfig = this.config;
+    let margin = Object.assign(theConfig.margin, defaultConfig.margin);
+
+    console.log('margin', margin.left);
+
+    Object.assign(theConfig, defaultConfig);
+
+
+
+
+    console.log('margin', theConfig.margin);
+
+    theConfig.margin = Object.assign(defaultConfig.margin, theConfig.margin);
+    this.config = theConfig;
+    console.log('this.config 4', this.config);
 
     this.datasets = [];
 
@@ -1385,6 +1434,7 @@ class DateChart extends Chart {
 
   initializeRenderers() {
     this.axisRenderer = new DateAxisRenderer(this);
+    this.gridRenderer = new DateGridRenderer(this);
     this.labelRenderer = new DateLabelRenderer(this);
     this.legendRenderer = new DateLegendRenderer(this);
     this.barsRenderer = new DateBarsRenderer(this);
@@ -1396,9 +1446,10 @@ class DateChart extends Chart {
    * @override
    */
   precalculate() {
-    let margin = this.margin;
-    this.graphWidth = this.width - margin.left - margin.right;
-    this.graphHeight = this.height - margin.top - margin.bottom;
+    let config = this.config;
+    let margin = config.margin;
+    this.graphWidth = config.width - margin.left - margin.right;
+    this.graphHeight = config.height - margin.top - margin.bottom;
     this.precalculateHelpData();
     this.createScales();
   }
@@ -1415,11 +1466,13 @@ class DateChart extends Chart {
    * Creates scales which are used to calculate the x and y positions of bars or circles.
    */
   createScales() {
+    let config = this.config;
+    let margin = config.margin;
 
     this.xChart = d3
       .scaleBand()
       .domain(this.datasetController.dates)
-      .rangeRound([this.margin.left, this.width - this.margin.right])
+      .rangeRound([margin.left, config.width - margin.right])
       .paddingInner(0.1);
 
     this.xStack = d3
@@ -1430,8 +1483,9 @@ class DateChart extends Chart {
 
     this.yChart = d3
       .scaleLinear()
-      .domain([0, this.dataview.max]).nice()
-      .rangeRound([this.height - this.margin.bottom, this.margin.top]);
+      .domain([0, this.dataview.max])
+      .nice()
+      .rangeRound([config.height - margin.bottom, margin.top]);
 
   }
 
@@ -1450,9 +1504,9 @@ class DateChart extends Chart {
   draw() {
     this.renderSVG();
     if (!this.dataview || !this.dataview.datasetStacks || this.dataview.datasetStacks.length === 0) return;
-    this.axisRenderer.createAxis();
     this.axisRenderer.renderAxis();
-    this.axisRenderer.renderGrid();
+    this.gridRenderer.createAxis();
+    this.gridRenderer.renderGrid();
     this.ghostBarsRenderer.renderGhostBars();
 
     if (this.isCombineStacks) {
@@ -1476,16 +1530,16 @@ class DateChart extends Chart {
     this.svg = this.element
       .append('svg')
       .attr('class', 'lotivis-chart-svg lotivis-date-chart')
-      // .attr('width', this.width)
+      // .attr('width', this.config.width)
       // .attr('height', this.height)
       .attr('preserveAspectRatio', 'xMidYMid meet')
-      .attr("viewBox", `0 0 ${this.width} ${this.height}`)
+      .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`)
       .attr('id', this.svgSelector);
 
     this.background = this.svg
       .append('rect')
-      .attr('width', this.width)
-      .attr('height', this.height)
+      .attr('width', this.config.width)
+      .attr('height', this.config.height)
       .attr('fill', 'white')
       .attr('opacity', 0);
 
@@ -1506,7 +1560,7 @@ class DateChart extends Chart {
       .append('g')
       .attr('width', this.graphWidth)
       .attr('height', this.graphHeight)
-      .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+      .attr('transform', `translate(${this.config.margin.left},${this.config.margin.top})`);
   }
 
   /**
@@ -2589,9 +2643,12 @@ class DateChartCard extends ChartCard {
    *
    */
   renderChart() {
-    this.chart = new DateChart(this.body);
-    this.chart.margin.left = 50;
-    this.chart.margin.right = 50;
+    this.chart = new DateChart(this.body, {
+      margin: {
+        left: 50,
+        right: 50
+      }
+    });
   }
 
   /**
@@ -4269,109 +4326,131 @@ const PlotChartSort = {
  */
 class Dropdown extends Component {
 
-    constructor(parent) {
-        super(parent);
-        this.inputElements = [];
-        this.selector = createID();
-        this.element = parent
-            .append('div')
-            .classed('dropdown-container', true);
-        this.selectId = createID();
-        this.renderLabel();
-        this.renderSelect();
-    }
+  /**
+   *
+   * @param parent
+   */
+  constructor(parent) {
+    super(parent);
+    this.inputElements = [];
+    this.selector = createID();
+    this.element = parent
+      .append('div')
+      .classed('dropdown-container', true);
+    this.selectId = createID();
+    this.renderLabel();
+    this.renderSelect();
+  }
 
-    renderLabel() {
-        this.label = this.element
-            .append('label')
-            .attr('for', this.selectId);
-    }
+  renderLabel() {
+    this.label = this.element
+      .append('label')
+      .attr('for', this.selectId);
+  }
 
-    renderSelect() {
-        let thisReference = this;
-        this.select = this.element
-            .append('select')
-            .classed('form-control form-control-sm', true)
-            .attr('id', this.selectId)
-            .on('change', function (event) {
-                thisReference.onClick(event);
-            });
-    }
+  renderSelect() {
+    let thisReference = this;
+    this.select = this.element
+      .append('select')
+      .classed('form-control form-control-sm', true)
+      .attr('id', this.selectId)
+      .on('change', function (event) {
+        thisReference.onClick(event);
+      });
+  }
 
-    addOption(optionId, optionName) {
-        return this.select
-            .append('option')
-            .attr('id', optionId)
-            .attr('value', optionId)
-            .text(optionName);
-    }
+  addOption(optionId, optionName) {
+    return this.select
+      .append('option')
+      .attr('id', optionId)
+      .attr('value', optionId)
+      .text(optionName);
+  }
 
-    setOptions(options) {
-        this.removeAllInputs();
-        for (let i = 0; i < options.length; i++) {
-            let id = options[i][0] || options[i].id;
-            let name = options[i][1] || options[i].translatedTitle;
-            let inputElement = this.addOption(id, name);
-            this.inputElements.push(inputElement);
-        }
-        return this;
-    }
+  setOptions(options) {
+    this.removeAllInputs();
+    for (let i = 0; i < options.length; i++) {
+      let id, name;
 
-    removeAllInputs() {
-        this.element.selectAll('input').remove();
-        return this;
-    }
+      if (Array.isArray(options[i])) {
+        id = options[i][0] || options[i].id;
+        name = options[i][1] || options[i].translatedTitle;
+      } else if (typeof options[i] === 'string') {
+        id = options[i];
+        name = options[i];
+      }
 
-    onClick(event) {
-        let element = event.target;
-        if (!element) {
-            return;
-        }
-        let value = element.value;
-        if (!this.onChange) {
-            return;
-        }
-        this.onChange(value);
-        return this;
+      let inputElement = this.addOption(id, name);
+      this.inputElements.push(inputElement);
     }
+    return this;
+  }
 
-    onChange(argument) {
-        console.log('argument: ' + argument);
-        if (typeof argument !== 'string') {
-            this.onChange = argument;
-        }
-        return this;
+  removeAllInputs() {
+    this.element.selectAll('input').remove();
+    return this;
+  }
+
+  onClick(event) {
+    let element = event.target;
+    if (!element) {
+      return;
     }
-
-    // MARK: - Chaining Setter
-
-    setLabelText(text) {
-        this.label.text(text);
-        return this;
+    let value = element.value;
+    if (!this.onChange) {
+      return;
     }
+    this.onChange(value);
+    return this;
+  }
 
-    setOnChange(callback) {
-        this.onChange = callback;
-        return this;
+  onChange(argument) {
+    console.log('argument: ' + argument);
+    if (typeof argument !== 'string') {
+      this.onChange = argument;
     }
+    return this;
+  }
 
-    setSelectedOption(optionID) {
-        if (this.inputElements.find(function (item) {
-            return item.attr('value') === optionID;
-        }) !== undefined) {
-            this.value = optionID;
-        }
-        return this;
-    }
+  // MARK: - Chaining Setter
 
-    set value(optionID) {
-        document.getElementById(this.selectId).value = optionID;
-    }
+  setLabelText(text) {
+    this.label.text(text);
+    return this;
+  }
 
-    get value() {
-        return document.getElementById(this.selectId).value;
+  setOnChange(callback) {
+    this.onChange = callback;
+    return this;
+  }
+
+  setSelectedOption(optionID) {
+    if (this.inputElements.find(function (item) {
+      return item.attr('value') === optionID;
+    }) !== undefined) {
+      this.value = optionID;
     }
+    return this;
+  }
+
+  set value(optionID) {
+    document.getElementById(this.selectId).value = optionID;
+  }
+
+  get value() {
+    return document.getElementById(this.selectId).value;
+  }
 }
+
+Dropdown.create = function (selector, options, selectedOption, onChange) {
+  let div = d3.select(`#${selector}`);
+  let dropdown = new Dropdown(div);
+  dropdown.setLabelText('Group Size');
+  dropdown.setOptions(options);
+  dropdown.setSelectedOption(selectedOption);
+  dropdown.setOnChange(onChange);
+  return dropdown;
+};
 
 /**
  *
@@ -4779,7 +4858,6 @@ function combineDatasetsByRatio(datasets, ratio) {
 function combineDataByGroupsize(data, ratio) {
   if (!data || data.length <= ratio) return data;
   let combined = combineByDate(data);
-  verbose_log('combined', combined);
   let newData = [];
 
   while (combined.length > 0) {

@@ -8,7 +8,7 @@ import {DateGhostBarsRenderer} from "./date.ghost.bars.renderer";
 import {DateTooltipRenderer} from "./date.tooltip.renderer";
 import {Chart} from "../components/chart";
 import {Constants} from "../shared/constants";
-import {verbose_log} from "../shared/debug";
+import {DateGridRenderer} from "./date.grid.renderer";
 
 const defaultConfig = {
   width: 1000,
@@ -46,16 +46,15 @@ export class DateChart extends Chart {
   }
 
   initializeDefaultValues() {
-    this.config = defaultConfig;
-    this.width = 1000;
-    this.height = 600;
-    this.defaultMargin = 60;
-    this.margin = {
-      top: this.defaultMargin,
-      right: this.defaultMargin,
-      bottom: this.defaultMargin,
-      left: this.defaultMargin
-    };
+
+    let theConfig = this.config;
+    let margin;
+    margin = Object.assign({}, defaultConfig.margin);
+    margin = Object.assign(margin, this.config.margin);
+
+    let config = Object.assign({}, defaultConfig);
+    this.config = Object.assign(config, this.config);
+    this.config.margin = margin;
 
     this.datasets = [];
 
@@ -74,6 +73,7 @@ export class DateChart extends Chart {
 
   initializeRenderers() {
     this.axisRenderer = new DateAxisRenderer(this);
+    this.gridRenderer = new DateGridRenderer(this);
     this.labelRenderer = new DateLabelRenderer(this);
     this.legendRenderer = new DateLegendRenderer(this);
     this.barsRenderer = new DateBarsRenderer(this);
@@ -85,9 +85,10 @@ export class DateChart extends Chart {
    * @override
    */
   precalculate() {
-    let margin = this.margin;
-    this.graphWidth = this.width - margin.left - margin.right;
-    this.graphHeight = this.height - margin.top - margin.bottom;
+    let config = this.config;
+    let margin = config.margin;
+    this.graphWidth = config.width - margin.left - margin.right;
+    this.graphHeight = config.height - margin.top - margin.bottom;
     this.precalculateHelpData();
     this.createScales();
   }
@@ -104,11 +105,13 @@ export class DateChart extends Chart {
    * Creates scales which are used to calculate the x and y positions of bars or circles.
    */
   createScales() {
+    let config = this.config;
+    let margin = config.margin;
 
     this.xChart = d3
       .scaleBand()
       .domain(this.datasetController.dates)
-      .rangeRound([this.margin.left, this.width - this.margin.right])
+      .rangeRound([margin.left, config.width - margin.right])
       .paddingInner(0.1);
 
     this.xStack = d3
@@ -119,8 +122,9 @@ export class DateChart extends Chart {
 
     this.yChart = d3
       .scaleLinear()
-      .domain([0, this.dataview.max]).nice()
-      .rangeRound([this.height - this.margin.bottom, this.margin.top]);
+      .domain([0, this.dataview.max])
+      .nice()
+      .rangeRound([config.height - margin.bottom, margin.top]);
 
   }
 
@@ -139,9 +143,9 @@ export class DateChart extends Chart {
   draw() {
     this.renderSVG();
     if (!this.dataview || !this.dataview.datasetStacks || this.dataview.datasetStacks.length === 0) return;
-    this.axisRenderer.createAxis();
     this.axisRenderer.renderAxis();
-    this.axisRenderer.renderGrid();
+    this.gridRenderer.createAxis();
+    this.gridRenderer.renderGrid();
     this.ghostBarsRenderer.renderGhostBars();
 
     if (this.isCombineStacks) {
@@ -165,16 +169,16 @@ export class DateChart extends Chart {
     this.svg = this.element
       .append('svg')
       .attr('class', 'lotivis-chart-svg lotivis-date-chart')
-      // .attr('width', this.width)
+      // .attr('width', this.config.width)
       // .attr('height', this.height)
       .attr('preserveAspectRatio', 'xMidYMid meet')
-      .attr("viewBox", `0 0 ${this.width} ${this.height}`)
+      .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`)
       .attr('id', this.svgSelector);
 
     this.background = this.svg
       .append('rect')
-      .attr('width', this.width)
-      .attr('height', this.height)
+      .attr('width', this.config.width)
+      .attr('height', this.config.height)
       .attr('fill', 'white')
       .attr('opacity', 0);
 
@@ -195,7 +199,7 @@ export class DateChart extends Chart {
       .append('g')
       .attr('width', this.graphWidth)
       .attr('height', this.graphHeight)
-      .attr('transform', `translate(${this.margin.left},${this.margin.top})`);
+      .attr('transform', `translate(${this.config.margin.left},${this.config.margin.top})`);
   }
 
   /**

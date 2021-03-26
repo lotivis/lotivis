@@ -48,6 +48,7 @@ export class DateGhostBarsRenderer {
     }
 
     this.renderGhostBars = function () {
+      let margin = dateChart.config.margin;
       let dates = dateChart.datasetController.dates;
       dateChart
         .svg
@@ -62,9 +63,9 @@ export class DateGhostBarsRenderer {
         .attr("rx", Constants.barRadius)
         .attr("ry", Constants.barRadius)
         .attr("x", (date) => dateChart.xChart(date))
-        .attr("y", dateChart.margin.top)
+        .attr("y", margin.top)
         .attr("width", dateChart.xChart.bandwidth())
-        .attr("height", dateChart.height - dateChart.margin.bottom - dateChart.margin.top)
+        .attr("height", dateChart.config.height - margin.bottom - margin.top)
         .on('mouseenter', onMouseEnter.bind(this))
         .on('mouseout', onMouserOut.bind(this));
 

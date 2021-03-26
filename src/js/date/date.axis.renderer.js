@@ -1,60 +1,34 @@
+/**
+ * @class DateAxisRenderer
+ */
 export class DateAxisRenderer {
 
-  constructor(timeChart) {
+  /**
+   * Creates a new instance of DateAxisRenderer.
+   *
+   * @param dateChart The parental date chart.
+   */
+  constructor(dateChart) {
 
     /**
-     *
-     */
-    this.createAxis = function () {
-      this.xAxisGrid = d3
-        .axisBottom(timeChart.xChart)
-        .tickSize(-timeChart.graphHeight)
-        .tickFormat('');
-
-      this.yAxisGrid = d3
-        .axisLeft(timeChart.yChart)
-        .tickSize(-timeChart.graphWidth)
-        .tickFormat('')
-        .ticks(20);
-    };
-
-    /**
-     *
+     * Appends the `left` and `bottom` axis to the date chart.
      */
     this.renderAxis = function () {
-      timeChart.svg
-        .append("g")
-        .call(d3.axisBottom(timeChart.xChart))
-        .attr("transform", () => `translate(0,${timeChart.height - timeChart.margin.bottom})`);
-      timeChart.svg
-        .append("g")
-        .call(d3.axisLeft(timeChart.yChart))
-        .attr("transform", () => `translate(${timeChart.margin.left},0)`);
-    };
+      let height = dateChart.config.height;
+      let margin = dateChart.config.margin;
 
-    /**
-     *
-     */
-    this.renderGrid = function () {
-      let color = 'lightgray';
-      let width = '0.5';
-      let opacity = 0.3;
-      timeChart.svg
-        .append('g')
-        .attr('class', 'x axis-grid')
-        .attr('transform', 'translate(0,' + (timeChart.height - timeChart.margin.bottom) + ')')
-        .attr('stroke', color)
-        .attr('stroke-width', width)
-        .attr("opacity", opacity)
-        .call(this.xAxisGrid);
-      timeChart.svg
-        .append('g')
-        .attr('class', 'y axis-grid')
-        .attr('transform', `translate(${timeChart.margin.left},0)`)
-        .attr('stroke', color)
-        .attr('stroke-width', width)
-        .attr("opacity", opacity)
-        .call(this.yAxisGrid);
+      // left
+      dateChart.svg
+        .append("g")
+        .call(d3.axisLeft(dateChart.yChart))
+        .attr("transform", () => `translate(${margin.left},0)`);
+
+      // bottom
+      dateChart.svg
+        .append("g")
+        .call(d3.axisBottom(dateChart.xChart))
+        .attr("transform", () => `translate(0,${height - margin.bottom})`);
+
     };
   }
 }

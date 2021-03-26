@@ -14,7 +14,7 @@ export class Chart extends Component {
    * @constructor
    * @param {Component} parent The parental component.
    */
-  constructor(parent) {
+  constructor(parent, config) {
     super(parent);
 
     if (Object.getPrototypeOf(parent) === String.prototype) {
@@ -25,6 +25,7 @@ export class Chart extends Component {
       this.element.attr('id', this.selector);
     }
 
+    this.config = config;
     this.svgSelector = createID();
     this.updateSensible = true;
     this.initialize();
