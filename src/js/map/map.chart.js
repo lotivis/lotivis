@@ -12,6 +12,7 @@ import {createGeoJSON} from "../geojson-juggle/create.geojson";
 import {MapMinimapRenderer} from "./map.minimap.renderer";
 import {hashCode} from "../shared/hash";
 import {MapSelectionBoundsRenderer} from "./map.selection.bounds.renderer";
+import {defaultMapChartConfig} from "./map.chart.config";
 
 /**
  * A component which renders a geo json with d3.
@@ -25,9 +26,10 @@ export class MapChart extends Chart {
    * Creates a new instance of MapChart.
    *
    * @param parent The parental component.
+   * @param config The configuration of the map chart.
    */
-  constructor(parent) {
-    super(parent);
+  constructor(parent, config) {
+    super(parent, config);
     this.element = parent
       .append('div')
       .attr('id', this.selector);
@@ -48,29 +50,14 @@ export class MapChart extends Chart {
    * Initialize with default values.
    */
   initialize() {
-    this.width = 1000;
-    this.height = 1000;
+    let theConfig = this.config;
+    let margin;
+    margin = Object.assign({}, defaultMapChartConfig.margin);
+    margin = Object.assign(margin, theConfig.margin || {});
 
-    this.isShowLabels = true;
-    this.geoJSON = null;
-    this.departmentsData = [];
-    this.excludedFeatureCodes = [];
-    this.updateSensible = true;
-    this.drawRectangleAroundSelection = true;
-
-    this.featureIDAccessor = function (feature) {
-      if (feature.id) return feature.id;
-      if (feature.properties && feature.properties.id) return feature.properties.id;
-      if (feature.properties && feature.properties.code) return feature.properties.code;
-      return hashCode(feature.properties);
-    };
-
-    this.featureNameAccessor = function (feature) {
-      if (feature.name) return feature.name;
-      if (feature.properties && feature.properties.name) return feature.properties.name;
-      if (feature.properties && feature.properties.nom) return feature.properties.nom;
-      return 'Unknown';
-    };
+    let config = Object.assign({}, defaultMapChartConfig);
+    this.config = Object.assign(config, this.config);
+    this.config.margin = margin;
 
     this.projection = d3.geoMercator();
     this.path = d3.geoPath().projection(this.projection);
@@ -96,12 +83,12 @@ export class MapChart extends Chart {
       .attr('class', 'lotivis-chart-svg lotivis-map')
       // .style('width', this.width)
       // .style('height', this.height);
-      .attr('viewBox', `0 0 ${this.width} ${this.height}`);
+      .attr('viewBox', `0 0 ${this.config.width} ${this.config.height}`);
 
     this.background = this.svg
       .append('rect')
-      .attr('width', this.width)
-      .attr('height', this.height)
+      .attr('width', this.config.width)
+      .attr('height', this.config.height)
       .attr('fill', 'white');
 
     // create a background rectangle for receiving mouse enter events
@@ -124,7 +111,7 @@ export class MapChart extends Chart {
    * @param geoJSON
    */
   zoomTo(geoJSON) {
-    this.projection.fitSize([this.width, this.height], geoJSON);
+    this.projection.fitSize([this.config.width, this.config.height], geoJSON);
   }
 
   /**
@@ -135,7 +122,7 @@ export class MapChart extends Chart {
   onSelectFeature(event, feature) {
     if (!feature || !feature.properties) return;
     if (!this.datasetController) return;
-    let locationID = this.featureIDAccessor(feature);
+    let locationID = this.config.featureIDAccessor(feature);
     this.updateSensible = false;
     this.datasetController.setLocationsFilter([locationID]);
     this.updateSensible = true;

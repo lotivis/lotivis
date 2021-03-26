@@ -1,6 +1,5 @@
 import {styleForCSSClass} from "../shared/style";
 import {equals} from "../shared/equal";
-import {verbose_log} from "../shared/debug";
 import {Color} from "../shared/colors";
 
 /**
@@ -58,7 +57,7 @@ export class MapDatasetRenderer {
 
           mapChart.svg
             .selectAll('.lotivis-map-area')
-            .filter((item) => equals(mapChart.featureIDAccessor(item), locationID))
+            .filter((item) => equals(mapChart.config.featureIDAccessor(item), locationID))
             .style('fill', generator(opacity));
           // .style('fill-opacity', opacity);
 

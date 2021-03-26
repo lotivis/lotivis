@@ -1267,7 +1267,7 @@ class Chart extends Component {
       this.element.attr('id', this.selector);
     }
 
-    this.config = config;
+    this.config = config || {};
     this.svgSelector = createID();
     this.updateSensible = true;
     this.initialize();
@@ -1538,19 +1538,6 @@ class DateChart extends Chart {
       .attr('height', this.config.height)
       .attr('fill', 'white')
       .attr('opacity', 0);
-
-    // create a background rectangle for receiving mouse enter events
-    // in order to reset the location data filter.
-    // this.background
-    //   .on('mouseenter', function () {
-    //     let controller = this.datasetController;
-    //     let filters = controller.dateFilters;
-    //     if (!filters || filters.length === 0) return;
-    //     this.makeUpdateInsensible();
-    //     controller.setDatesFilter([]);
-    //     this.makeUpdateSensible();
-    //     this.ghostBarsRenderer.hideAll();
-    //   }.bind(this));
 
     this.graph = this.svg
       .append('g')
@@ -2709,6 +2696,7 @@ class DateChartCard extends ChartCard {
  * @returns {*}
  */
 function removeFeatures(geoJSON, removeCandidates) {
+  if (!Array.isArray(removeCandidates)) return geoJSON;
   let newGeoJSON = geoJSON;
   for (let index = 0; index < removeCandidates.length; index++) {
     let code = removeCandidates[index];
@@ -2790,18 +2778,18 @@ class MapTooltipRenderer {
       .style('opacity', 0);
 
     function featureMapID(feature) {
-      return `lotivis-map-area-${mapChart.featureIDAccessor(feature)}`;
+      return `lotivis-map-area-${mapChart.config.featureIDAccessor(feature)}`;
     }
 
     function htmlTitle(feature) {
-      let featureID = mapChart.featureIDAccessor(feature);
-      let featureName = mapChart.featureNameAccessor(feature);
+      let featureID = mapChart.config.featureIDAccessor(feature);
+      let featureName = mapChart.config.featureNameAccessor(feature);
       return `ID: ${featureID}<br>Name: ${featureName}`;
     }
 
     function htmlValues(feature) {
       let components = [];
-      let featureID = mapChart.featureIDAccessor(feature);
+      let featureID = mapChart.config.featureIDAccessor(feature);
       if (mapChart.datasetController) {
         let flatData = mapChart.datasetController.flatData;
         let combined = combineByLocation(flatData);
@@ -2860,7 +2848,7 @@ class MapTooltipRenderer {
       // svg is presented in dynamic sized view box so we need to get the actual size
       // of the element in order to calculate a scale for the position of the tooltip.
       let effectiveSize = mapChart.getElementEffectiveSize();
-      let factor = effectiveSize[0] / mapChart.width;
+      let factor = effectiveSize[0] / mapChart.config.width;
       let positionOffset = mapChart.getElementPosition();
 
       /**
@@ -2900,7 +2888,7 @@ class MapTooltipRenderer {
       }
 
       let top = 0;
-      if (featureLowerLeft[1] > (mapChart.height / 2)) {
+      if (featureLowerLeft[1] > (mapChart.config.height / 2)) {
         top = getTooltipLocationAbove();
       } else {
         top = getTooltipLocationUnder();
@@ -3060,7 +3048,7 @@ class MapLabelRenderer {
       if (!mapChart.datasetController) return debug_log('no datasetController');
 
       removeLabels();
-      if (!mapChart.isShowLabels) return;
+      if (!mapChart.config.isShowLabels) return;
 
       mapChart.svg
         .selectAll('text')
@@ -3069,7 +3057,7 @@ class MapLabelRenderer {
         .append('text')
         .attr('class', 'lotivis-map-label')
         .text(function (feature) {
-          let featureID = mapChart.featureIDAccessor(feature);
+          let featureID = mapChart.config.featureIDAccessor(feature);
           let dataset = combinedData.find(dataset => equals(dataset.location, featureID));
           return dataset ? formatNumber(dataset.value) : '';
         })
@@ -3079,6 +3067,7 @@ class MapLabelRenderer {
         .attr('y', function (feature) {
           return mapChart.projection(feature.center)[1];
         }.bind(this));
+
     };
   }
 }
@@ -3138,7 +3127,7 @@ class MapDatasetRenderer {
 
           mapChart.svg
             .selectAll('.lotivis-map-area')
-            .filter((item) => equals(mapChart.featureIDAccessor(item), locationID))
+            .filter((item) => equals(mapChart.config.featureIDAccessor(item), locationID))
             .style('fill', generator(opacity));
           // .style('fill-opacity', opacity);
 
@@ -3181,12 +3170,12 @@ class MapGeojsonRenderer {
     }
 
     /**
-     * Renders the `geoJSON` property.
+     * Renders the `presentedGeoJSON` property.
      */
     this.renderGeoJson = function () {
       let geoJSON = mapChart.presentedGeoJSON;
       if (!geoJSON) return debug_log('No Geo JSON file to render.');
-      let idAccessor = mapChart.featureIDAccessor;
+      let idAccessor = mapChart.config.featureIDAccessor;
 
       mapChart.areas = mapChart.svg
         .selectAll('path')
@@ -3263,6 +3252,7 @@ class MapExteriorBorderRenderer {
       if (!self.topojson) return debug_log('Can\'t find topojson lib.  Skip rendering of exterior border.');
       let geoJSON = mapChart.presentedGeoJSON;
       let borders = joinFeatures(geoJSON);
+      if (!borders) return;
       mapChart.svg
         .append('path')
         .datum(borders)
@@ -3364,7 +3354,7 @@ function hashCode(str) {
 
 /**
  *
- * @class
+ * @class MapSelectionBoundsRenderer
  */
 class MapSelectionBoundsRenderer {
 
@@ -3380,7 +3370,13 @@ class MapSelectionBoundsRenderer {
       .attr('class', 'lotivis-map-selection-rect')
       .style('fill-opacity', 0);
 
+    /**
+     * Tells this renderer that the mouse moved in an area.
+     * @param event The mouse event.
+     * @param feature The feature (area) that the mouse is now pointing on.
+     */
     this.mouseEnter = function (event, feature) {
+      if (!mapChart.config.drawRectangleAroundSelection) return;
       let projection = mapChart.projection;
       let featureBounds = d3.geoBounds(feature);
       let featureLowerLeft = projection(featureBounds[0]);
@@ -3388,13 +3384,16 @@ class MapSelectionBoundsRenderer {
       let featureBoundsWidth = featureUpperRight[0] - featureLowerLeft[0];
       let featureBoundsHeight = featureLowerLeft[1] - featureUpperRight[1];
       bounds
-        .style('opacity', mapChart.drawRectangleAroundSelection ? 1 : 0)
         .style('width', featureBoundsWidth + 'px')
         .style('height', featureBoundsHeight + 'px')
         .style('x', featureLowerLeft[0])
-        .style('y', featureUpperRight[1]);
+        .style('y', featureUpperRight[1])
+        .style('opacity', 1);
     };
 
+    /**
+     * Tells this renderer that the mouse moved out of an area.
+     */
     this.mouseOut = function () {
       bounds.style('opacity', 0);
     };
@@ -3409,6 +3408,38 @@ class MapSelectionBoundsRenderer {
 }
 
 /**
+ *
+ * @type {{}}
+ */
+const defaultMapChartConfig = {
+  width: 1000,
+  height: 1000,
+  margin: {
+    top: Constants.defaultMargin,
+    right: Constants.defaultMargin,
+    bottom: Constants.defaultMargin,
+    left: Constants.defaultMargin
+  },
+  isShowLabels: true,
+  geoJSON: null,
+  departmentsData: [],
+  excludedFeatureCodes: [],
+  drawRectangleAroundSelection: false,
+  featureIDAccessor: function (feature) {
+    if (feature.id) return feature.id;
+    if (feature.properties && feature.properties.id) return feature.properties.id;
+    if (feature.properties && feature.properties.code) return feature.properties.code;
+    return hashCode(feature.properties);
+  },
+  featureNameAccessor: function (feature) {
+    if (feature.name) return feature.name;
+    if (feature.properties && feature.properties.name) return feature.properties.name;
+    if (feature.properties && feature.properties.nom) return feature.properties.nom;
+    return 'Unknown';
+  }
+};
+
+/**
  * A component which renders a geo json with d3.
  *
  * @class MapChart
@@ -3420,9 +3451,10 @@ class MapChart extends Chart {
    * Creates a new instance of MapChart.
    *
    * @param parent The parental component.
+   * @param config The configuration of the map chart.
    */
-  constructor(parent) {
-    super(parent);
+  constructor(parent, config) {
+    super(parent, config);
     this.element = parent
       .append('div')
       .attr('id', this.selector);
@@ -3443,29 +3475,14 @@ class MapChart extends Chart {
    * Initialize with default values.
    */
   initialize() {
-    this.width = 1000;
-    this.height = 1000;
+    let theConfig = this.config;
+    let margin;
+    margin = Object.assign({}, defaultMapChartConfig.margin);
+    margin = Object.assign(margin, theConfig.margin || {});
 
-    this.isShowLabels = true;
-    this.geoJSON = null;
-    this.departmentsData = [];
-    this.excludedFeatureCodes = [];
-    this.updateSensible = true;
-    this.drawRectangleAroundSelection = true;
-
-    this.featureIDAccessor = function (feature) {
-      if (feature.id) return feature.id;
-      if (feature.properties && feature.properties.id) return feature.properties.id;
-      if (feature.properties && feature.properties.code) return feature.properties.code;
-      return hashCode(feature.properties);
-    };
-
-    this.featureNameAccessor = function (feature) {
-      if (feature.name) return feature.name;
-      if (feature.properties && feature.properties.name) return feature.properties.name;
-      if (feature.properties && feature.properties.nom) return feature.properties.nom;
-      return 'Unknown';
-    };
+    let config = Object.assign({}, defaultMapChartConfig);
+    this.config = Object.assign(config, this.config);
+    this.config.margin = margin;
 
     this.projection = d3.geoMercator();
     this.path = d3.geoPath().projection(this.projection);
@@ -3491,12 +3508,12 @@ class MapChart extends Chart {
       .attr('class', 'lotivis-chart-svg lotivis-map')
       // .style('width', this.width)
       // .style('height', this.height);
-      .attr('viewBox', `0 0 ${this.width} ${this.height}`);
+      .attr('viewBox', `0 0 ${this.config.width} ${this.config.height}`);
 
     this.background = this.svg
       .append('rect')
-      .attr('width', this.width)
-      .attr('height', this.height)
+      .attr('width', this.config.width)
+      .attr('height', this.config.height)
       .attr('fill', 'white');
 
     // create a background rectangle for receiving mouse enter events
@@ -3519,7 +3536,7 @@ class MapChart extends Chart {
    * @param geoJSON
    */
   zoomTo(geoJSON) {
-    this.projection.fitSize([this.width, this.height], geoJSON);
+    this.projection.fitSize([this.config.width, this.config.height], geoJSON);
   }
 
   /**
@@ -3530,7 +3547,7 @@ class MapChart extends Chart {
   onSelectFeature(event, feature) {
     if (!feature || !feature.properties) return;
     if (!this.datasetController) return;
-    let locationID = this.featureIDAccessor(feature);
+    let locationID = this.config.featureIDAccessor(feature);
     this.updateSensible = false;
     this.datasetController.setLocationsFilter([locationID]);
     this.updateSensible = true;

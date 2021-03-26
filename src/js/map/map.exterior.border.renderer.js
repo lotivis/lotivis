@@ -21,6 +21,7 @@ export class MapExteriorBorderRenderer {
       if (!self.topojson) return debug_log('Can\'t find topojson lib.  Skip rendering of exterior border.');
       let geoJSON = mapChart.presentedGeoJSON;
       let borders = joinFeatures(geoJSON);
+      if (!borders) return;
       mapChart.svg
         .append('path')
         .datum(borders)

@@ -32,12 +32,12 @@ export class MapGeojsonRenderer {
     }
 
     /**
-     * Renders the `geoJSON` property.
+     * Renders the `presentedGeoJSON` property.
      */
     this.renderGeoJson = function () {
       let geoJSON = mapChart.presentedGeoJSON;
       if (!geoJSON) return debug_log('No Geo JSON file to render.');
-      let idAccessor = mapChart.featureIDAccessor;
+      let idAccessor = mapChart.config.featureIDAccessor;
 
       mapChart.areas = mapChart.svg
         .selectAll('path')

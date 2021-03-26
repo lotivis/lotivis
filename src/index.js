@@ -58,7 +58,6 @@ import {joinFeatures} from "./js/geojson-juggle/join.features";
 import {Constants} from "./js/shared/constants";
 import {
   combineDatasetsByRatio,
-  combineDataByRatio,
   combineDataByGroupsize
 } from "./js/data-juggle/dataset.combine.ratio";
 

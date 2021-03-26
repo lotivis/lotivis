@@ -182,19 +182,6 @@ export class DateChart extends Chart {
       .attr('fill', 'white')
       .attr('opacity', 0);
 
-    // create a background rectangle for receiving mouse enter events
-    // in order to reset the location data filter.
-    // this.background
-    //   .on('mouseenter', function () {
-    //     let controller = this.datasetController;
-    //     let filters = controller.dateFilters;
-    //     if (!filters || filters.length === 0) return;
-    //     this.makeUpdateInsensible();
-    //     controller.setDatesFilter([]);
-    //     this.makeUpdateSensible();
-    //     this.ghostBarsRenderer.hideAll();
-    //   }.bind(this));
-
     this.graph = this.svg
       .append('g')
       .attr('width', this.graphWidth)

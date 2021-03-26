@@ -1,7 +1,6 @@
-import {combine, combineByDate} from "./dataset.combine";
+import {combineByDate} from "./dataset.combine";
 import '../shared/arrays';
 import {sumOfValues} from "./dataset.sum";
-import {verbose_log} from "../shared/debug";
 import {copy} from "../shared/copy";
 
 /**

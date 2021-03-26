@@ -5,6 +5,7 @@
  * @returns {*}
  */
 export function removeFeatures(geoJSON, removeCandidates) {
+  if (!Array.isArray(removeCandidates)) return geoJSON;
   let newGeoJSON = geoJSON;
   for (let index = 0; index < removeCandidates.length; index++) {
     let code = removeCandidates[index];

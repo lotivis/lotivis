@@ -25,7 +25,7 @@ export class Chart extends Component {
       this.element.attr('id', this.selector);
     }
 
-    this.config = config;
+    this.config = config || {};
     this.svgSelector = createID();
     this.updateSensible = true;
     this.initialize();

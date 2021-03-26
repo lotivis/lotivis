@@ -29,18 +29,18 @@ export class MapTooltipRenderer {
       .style('opacity', 0);
 
     function featureMapID(feature) {
-      return `lotivis-map-area-${mapChart.featureIDAccessor(feature)}`;
+      return `lotivis-map-area-${mapChart.config.featureIDAccessor(feature)}`;
     }
 
     function htmlTitle(feature) {
-      let featureID = mapChart.featureIDAccessor(feature);
-      let featureName = mapChart.featureNameAccessor(feature);
+      let featureID = mapChart.config.featureIDAccessor(feature);
+      let featureName = mapChart.config.featureNameAccessor(feature);
       return `ID: ${featureID}<br>Name: ${featureName}`;
     }
 
     function htmlValues(feature) {
       let components = [];
-      let featureID = mapChart.featureIDAccessor(feature);
+      let featureID = mapChart.config.featureIDAccessor(feature);
       if (mapChart.datasetController) {
         let flatData = mapChart.datasetController.flatData;
         let combined = combineByLocation(flatData);
@@ -99,7 +99,7 @@ export class MapTooltipRenderer {
       // svg is presented in dynamic sized view box so we need to get the actual size
       // of the element in order to calculate a scale for the position of the tooltip.
       let effectiveSize = mapChart.getElementEffectiveSize();
-      let factor = effectiveSize[0] / mapChart.width;
+      let factor = effectiveSize[0] / mapChart.config.width;
       let positionOffset = mapChart.getElementPosition();
 
       /**
@@ -139,7 +139,7 @@ export class MapTooltipRenderer {
       }
 
       let top = 0;
-      if (featureLowerLeft[1] > (mapChart.height / 2)) {
+      if (featureLowerLeft[1] > (mapChart.config.height / 2)) {
         top = getTooltipLocationAbove();
       } else {
         top = getTooltipLocationUnder();

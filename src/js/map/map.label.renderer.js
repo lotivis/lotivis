@@ -34,7 +34,7 @@ export class MapLabelRenderer {
       if (!mapChart.datasetController) return debug_log('no datasetController');
 
       removeLabels();
-      if (!mapChart.isShowLabels) return;
+      if (!mapChart.config.isShowLabels) return;
 
       mapChart.svg
         .selectAll('text')
@@ -43,7 +43,7 @@ export class MapLabelRenderer {
         .append('text')
         .attr('class', 'lotivis-map-label')
         .text(function (feature) {
-          let featureID = mapChart.featureIDAccessor(feature);
+          let featureID = mapChart.config.featureIDAccessor(feature);
           let dataset = combinedData.find(dataset => equals(dataset.location, featureID));
           return dataset ? formatNumber(dataset.value) : '';
         })
@@ -53,6 +53,7 @@ export class MapLabelRenderer {
         .attr('y', function (feature) {
           return mapChart.projection(feature.center)[1];
         }.bind(this));
+
     };
   }
 }
