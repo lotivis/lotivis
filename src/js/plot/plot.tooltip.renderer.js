@@ -93,8 +93,6 @@ export class PlotTooltipRenderer {
         .style('left', left + 'px')
         .style('top', top + 'px')
         .style('opacity', 1);
-
-      plotChart.onSelectDataset(event, dataset);
     };
 
     /**

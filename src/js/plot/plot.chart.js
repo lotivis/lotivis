@@ -25,13 +25,6 @@ import {verbose_log} from "../shared/debug";
  * @extends Chart
  */
 export class PlotChart extends Chart {
-  radius = 23;
-  isShowLabels = true;
-  configuration = {
-    lowColor: 'rgb(184, 233, 148)',
-    highColor: 'rgb(0, 122, 255)'
-  };
-  sort = PlotChartSort.duration;
 
   /**
    * Initializes this diachronic chart by setting the default values.
@@ -112,6 +105,7 @@ export class PlotChart extends Chart {
    * Updates the plot chart.
    */
   update(controller, reason) {
+    verbose_log('reason', reason);
     if (!this.updateSensible) return;
     if (reason === 'dates-filter') return;
     this.remove();
@@ -161,6 +155,7 @@ export class PlotChart extends Chart {
   onSelectDataset(event, dataset) {
     if (!dataset || !dataset.label) return;
     let label = dataset.label;
+    if (this.datasetController.listeners.length === 1) return;
     this.updateSensible = false;
     this.datasetController.setDatasetsFilter([label]);
     this.updateSensible = true;

@@ -3819,8 +3819,8 @@ class PlotBarsRenderer {
       let lastDate = dataset.latestDate;
       let timespan = lastDate - firstDate;
       let colorInterpolator = d3.interpolateRgb(
-        plotChart.configuration.lowColor,
-        plotChart.configuration.highColor
+        plotChart.config.lowColor,
+        plotChart.config.highColor
       );
 
       if (firstDate === lastDate) {
@@ -3860,9 +3860,8 @@ class PlotBarsRenderer {
      * @param dataset The represented dataset.
      */
     function mouseEnter(event, dataset) {
-      verbose_log('event', event);
-      verbose_log('bar', dataset);
-      plotChart.tooltipRenderer.showTooltip.bind(plotChart);
+      plotChart.tooltipRenderer.showTooltip.bind(plotChart)(event, dataset);
+      plotChart.onSelectDataset(event, dataset);
     }
 
     /**
@@ -3871,7 +3870,7 @@ class PlotBarsRenderer {
      * @param dataset The represented dataset.
      */
     function mouseOut(event, dataset) {
-      plotChart.tooltipRenderer.hideTooltip.bind(plotChart);
+      plotChart.tooltipRenderer.hideTooltip.bind(plotChart)(event, dataset);
     }
 
     /**
@@ -4003,8 +4002,6 @@ class PlotTooltipRenderer {
         .style('left', left + 'px')
         .style('top', top + 'px')
         .style('opacity', 1);
-
-      plotChart.onSelectDataset(event, dataset);
     };
 
     /**
@@ -4150,13 +4147,6 @@ const defaultPlotChartConfig = {
  * @extends Chart
  */
 class PlotChart extends Chart {
-  radius = 23;
-  isShowLabels = true;
-  configuration = {
-    lowColor: 'rgb(184, 233, 148)',
-    highColor: 'rgb(0, 122, 255)'
-  };
-  sort = PlotChartSort.duration;
 
   /**
    * Initializes this diachronic chart by setting the default values.
@@ -4237,6 +4227,7 @@ class PlotChart extends Chart {
    * Updates the plot chart.
    */
   update(controller, reason) {
+    verbose_log('reason', reason);
     if (!this.updateSensible) return;
     if (reason === 'dates-filter') return;
     this.remove();
@@ -4286,6 +4277,7 @@ class PlotChart extends Chart {
   onSelectDataset(event, dataset) {
     if (!dataset || !dataset.label) return;
     let label = dataset.label;
+    if (this.datasetController.listeners.length === 1) return;
     this.updateSensible = false;
     this.datasetController.setDatasetsFilter([label]);
     this.updateSensible = true;

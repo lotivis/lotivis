@@ -40,8 +40,8 @@ export class PlotBarsRenderer {
       let lastDate = dataset.latestDate;
       let timespan = lastDate - firstDate;
       let colorInterpolator = d3.interpolateRgb(
-        plotChart.configuration.lowColor,
-        plotChart.configuration.highColor
+        plotChart.config.lowColor,
+        plotChart.config.highColor
       );
 
       if (firstDate === lastDate) {
@@ -81,9 +81,8 @@ export class PlotBarsRenderer {
      * @param dataset The represented dataset.
      */
     function mouseEnter(event, dataset) {
-      verbose_log('event', event);
-      verbose_log('bar', dataset);
-      plotChart.tooltipRenderer.showTooltip.bind(plotChart);
+      plotChart.tooltipRenderer.showTooltip.bind(plotChart)(event, dataset);
+      plotChart.onSelectDataset(event, dataset);
     }
 
     /**
@@ -92,7 +91,7 @@ export class PlotBarsRenderer {
      * @param dataset The represented dataset.
      */
     function mouseOut(event, dataset) {
-      plotChart.tooltipRenderer.hideTooltip.bind(plotChart);
+      plotChart.tooltipRenderer.hideTooltip.bind(plotChart)(event, dataset);
     }
 
     /**
