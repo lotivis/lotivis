@@ -36,9 +36,12 @@ export class PlotChartCard extends ChartCard {
    * Injects the plot chart in the body of the card.
    */
   injectChart() {
-    this.chart = new PlotChart(this.body);
-    this.chart.margin.left = 120;
-    this.chart.margin.right = 50;
+    this.chart = new PlotChart(this.body, {
+      margin: {
+        left: 120,
+        right: 50
+      }
+    });
   }
 
   /**

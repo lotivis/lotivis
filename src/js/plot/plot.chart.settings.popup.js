@@ -4,7 +4,7 @@ import {UrlParameters} from "../shared/url.parameters";
 import {verbose_log} from "../shared/debug";
 import {Dropdown} from "../components/dropdown";
 import {Option} from "../components/option";
-import {PlotChartSort} from "./plot.chart";
+import {PlotChartSort} from "./plot.chart.sort";
 
 /**
  *

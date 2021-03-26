@@ -13,8 +13,10 @@ import {PlotBarsRenderer} from "./plot.bars.renderer";
 import {PlotTooltipRenderer} from "./plot.tooltip.renderer";
 import {PlotLabelRenderer} from "./plot.label.renderer";
 import {PlotGridRenderer} from "./plot.grid.renderer";
-import {verbose_log} from "../shared/debug";
 import {PlotBackgroundRenderer} from "./plot.background.renderer";
+import {defaultPlotChartConfig} from "./plot.chart.config";
+import {PlotChartSort} from "./plot.chart.sort";
+import {verbose_log} from "../shared/debug";
 
 /**
  * A lotivis plot chart.
@@ -35,18 +37,16 @@ export class PlotChart extends Chart {
    * Initializes this diachronic chart by setting the default values.
    */
   initialize() {
-    this.width = 1000;
-    this.height = 600;
-    this.defaultMargin = 60;
-    this.lineHeight = 28;
-    this.margin = {
-      top: this.defaultMargin,
-      right: this.defaultMargin,
-      bottom: this.defaultMargin,
-      left: this.defaultMargin + 100
-    };
 
-    this.isShowLabels = true;
+    let theConfig = this.config;
+    let margin;
+    margin = Object.assign({}, defaultPlotChartConfig.margin);
+    margin = Object.assign(margin, this.config.margin);
+
+    let config = Object.assign({}, defaultPlotChartConfig);
+    this.config = Object.assign(config, this.config);
+    this.config.margin = margin;
+
     this.createSVG();
     this.backgroundRenderer = new PlotBackgroundRenderer(this);
     this.axisRenderer = new PlotAxisRenderer(this);
@@ -65,7 +65,7 @@ export class PlotChart extends Chart {
       .attr('id', this.svgSelector)
       .attr('class', 'lotivis-chart-svg')
       .attr('preserveAspectRatio', 'xMidYMid meet')
-      .attr("viewBox", `0 0 ${this.width} ${this.height}`);
+      .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`);
   }
 
   /**
@@ -79,17 +79,18 @@ export class PlotChart extends Chart {
    *
    */
   precalculate() {
-    let margin = this.margin;
+    let margin = this.config.margin;
     let barsCount = 0;
     if (this.workingDatasets && this.workingDatasets.length > 0) {
       barsCount = this.workingDatasets.length;
     }
-    this.height = (barsCount * this.lineHeight) + margin.top + margin.bottom;
-    this.graphWidth = this.width - margin.left - margin.right;
+    this.height = (barsCount * this.config.lineHeight) + margin.top + margin.bottom;
+    this.preferredHeight = this.height;
+    this.graphWidth = this.config.width - margin.left - margin.right;
     this.graphHeight = this.height - margin.top - margin.bottom;
 
     this.svg
-      .attr("viewBox", `0 0 ${this.width} ${this.height}`);
+      .attr("viewBox", `0 0 ${this.config.width} ${this.height}`);
 
     this.datasetsDidChange();
   }
@@ -131,13 +132,13 @@ export class PlotChart extends Chart {
     this.xChart = d3
       .scaleBand()
       .domain(listOfDates)
-      .rangeRound([this.margin.left, this.width - this.margin.right])
+      .rangeRound([this.config.margin.left, this.config.width - this.config.margin.right])
       .paddingInner(0.1);
 
     this.yChart = d3
       .scaleBand()
       .domain(listOfLabels)
-      .rangeRound([this.height - this.margin.bottom, this.margin.top])
+      .rangeRound([this.height - this.config.margin.bottom, this.config.margin.top])
       .paddingInner(0.1);
 
     this.xAxisGrid = d3
@@ -247,13 +248,3 @@ export class PlotChart extends Chart {
     this.update();
   }
 }
-
-/**
- * Enumeration of sorts available in the plot chart.
- */
-export const PlotChartSort = {
-  alphabetically: 'alphabetically',
-  duration: 'duration',
-  intensity: 'intensity',
-  firstDate: 'firstDate'
-};

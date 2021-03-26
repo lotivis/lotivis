@@ -69,19 +69,19 @@ export class PlotTooltipRenderer {
      * @param dataset The dataset.
      */
     this.showTooltip = function (event, dataset) {
-
+      if (!plotChart.config.showTooltip) return;
       tooltip.html(getHTMLContentForDataset(dataset));
 
       // position tooltip
       let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
-      let factor = plotChart.getElementEffectiveSize()[0] / plotChart.width;
+      let factor = plotChart.getElementEffectiveSize()[0] / plotChart.config.width;
       let offset = plotChart.getElementPosition();
 
       let top = plotChart.yChart(dataset.label) * factor;
       top += offset[1];
 
-      if ((plotChart.yChart(dataset.label) - plotChart.margin.top) <= (plotChart.graphHeight / 2)) {
-        top += (plotChart.lineHeight * factor) + Constants.tooltipOffset;
+      if ((plotChart.yChart(dataset.label) - plotChart.config.margin.top) <= (plotChart.graphHeight / 2)) {
+        top += (plotChart.config.lineHeight * factor) + Constants.tooltipOffset;
       } else {
         top -= tooltipHeight + 20; // subtract padding
         top -= Constants.tooltipOffset;

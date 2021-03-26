@@ -1,4 +1,5 @@
 import {hashCode} from "../shared/hash";
+import {verbose_log} from "../shared/debug";
 
 /**
  * Draws the bar on the plot chart.
@@ -75,6 +76,26 @@ export class PlotBarsRenderer {
     }
 
     /**
+     * To be called when the mouse enters a bar on the plot chart.
+     * @param event The mouse event.
+     * @param dataset The represented dataset.
+     */
+    function mouseEnter(event, dataset) {
+      verbose_log('event', event);
+      verbose_log('bar', dataset);
+      plotChart.tooltipRenderer.showTooltip.bind(plotChart);
+    }
+
+    /**
+     * To be called when the mouse leaves a bar on the plot chart.
+     * @param event The mouse event.
+     * @param dataset The represented dataset.
+     */
+    function mouseOut(event, dataset) {
+      plotChart.tooltipRenderer.hideTooltip.bind(plotChart);
+    }
+
+    /**
      * Draws the bars.
      */
     this.renderBars = function () {
@@ -102,8 +123,8 @@ export class PlotBarsRenderer {
         .attr("y", (d) => plotChart.yChart(d.label))
         .attr("height", plotChart.yChart.bandwidth())
         .attr("id", (d) => 'rect-' + createIDFromDataset(d))
-        .on('mouseenter', plotChart.tooltipRenderer.showTooltip.bind(plotChart))
-        .on('mouseout', plotChart.tooltipRenderer.hideTooltip.bind(plotChart))
+        .on('mouseenter', mouseEnter)
+        .on('mouseout', mouseOut)
         .attr("width", function (data) {
           if (!data.earliestDate || !data.latestDate) return 0;
           return plotChart.xChart(data.latestDate) - plotChart.xChart(data.earliestDate) + plotChart.xChart.bandwidth();

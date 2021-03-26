@@ -3756,24 +3756,25 @@ class PlotAxisRenderer {
      * Appends axis on the top, left and bottom of the plot chart.
      */
     this.renderAxis = function () {
+      let margin = plotChart.config.margin;
 
       // top
       plotChart.svg
         .append("g")
         .call(d3.axisTop(plotChart.xChart))
-        .attr("transform", () => `translate(0,${plotChart.margin.top})`);
+        .attr("transform", () => `translate(0,${margin.top})`);
 
       // left
       plotChart.svg
         .append("g")
         .call(d3.axisLeft(plotChart.yChart))
-        .attr("transform", () => `translate(${plotChart.margin.left},0)`);
+        .attr("transform", () => `translate(${margin.left},0)`);
 
       // bottom
       plotChart.svg
         .append("g")
         .call(d3.axisBottom(plotChart.xChart))
-        .attr("transform", () => `translate(0,${plotChart.height - plotChart.margin.bottom})`);
+        .attr("transform", () => `translate(0,${plotChart.height - margin.bottom})`);
 
     };
   }
@@ -3854,6 +3855,26 @@ class PlotBarsRenderer {
     }
 
     /**
+     * To be called when the mouse enters a bar on the plot chart.
+     * @param event The mouse event.
+     * @param dataset The represented dataset.
+     */
+    function mouseEnter(event, dataset) {
+      verbose_log('event', event);
+      verbose_log('bar', dataset);
+      plotChart.tooltipRenderer.showTooltip.bind(plotChart);
+    }
+
+    /**
+     * To be called when the mouse leaves a bar on the plot chart.
+     * @param event The mouse event.
+     * @param dataset The represented dataset.
+     */
+    function mouseOut(event, dataset) {
+      plotChart.tooltipRenderer.hideTooltip.bind(plotChart);
+    }
+
+    /**
      * Draws the bars.
      */
     this.renderBars = function () {
@@ -3881,8 +3902,8 @@ class PlotBarsRenderer {
         .attr("y", (d) => plotChart.yChart(d.label))
         .attr("height", plotChart.yChart.bandwidth())
         .attr("id", (d) => 'rect-' + createIDFromDataset(d))
-        .on('mouseenter', plotChart.tooltipRenderer.showTooltip.bind(plotChart))
-        .on('mouseout', plotChart.tooltipRenderer.hideTooltip.bind(plotChart))
+        .on('mouseenter', mouseEnter)
+        .on('mouseout', mouseOut)
         .attr("width", function (data) {
           if (!data.earliestDate || !data.latestDate) return 0;
           return plotChart.xChart(data.latestDate) - plotChart.xChart(data.earliestDate) + plotChart.xChart.bandwidth();
@@ -3958,19 +3979,19 @@ class PlotTooltipRenderer {
      * @param dataset The dataset.
      */
     this.showTooltip = function (event, dataset) {
-
+      if (!plotChart.config.showTooltip) return;
       tooltip.html(getHTMLContentForDataset(dataset));
 
       // position tooltip
       let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
-      let factor = plotChart.getElementEffectiveSize()[0] / plotChart.width;
+      let factor = plotChart.getElementEffectiveSize()[0] / plotChart.config.width;
       let offset = plotChart.getElementPosition();
 
       let top = plotChart.yChart(dataset.label) * factor;
       top += offset[1];
 
-      if ((plotChart.yChart(dataset.label) - plotChart.margin.top) <= (plotChart.graphHeight / 2)) {
-        top += (plotChart.lineHeight * factor) + Constants.tooltipOffset;
+      if ((plotChart.yChart(dataset.label) - plotChart.config.margin.top) <= (plotChart.graphHeight / 2)) {
+        top += (plotChart.config.lineHeight * factor) + Constants.tooltipOffset;
       } else {
         top -= tooltipHeight + 20; // subtract padding
         top -= Constants.tooltipOffset;
@@ -4021,7 +4042,7 @@ class PlotLabelRenderer {
      * Draws the labels on the bars on the plot chart.
      */
     this.renderLabels = function () {
-      if (!plotChart.isShowLabels) return;
+      if (!plotChart.config.isShowLabels) return;
       let xBandwidth = plotChart.yChart.bandwidth();
       let xChart = plotChart.xChart;
       plotChart.labels = plotChart
@@ -4061,17 +4082,18 @@ class PlotGridRenderer {
      * Adds a grid to the chart.
      */
     this.renderGrid = function () {
+      if (!plotChart.config.drawGrid) return;
 
       plotChart.svg
         .append('g')
         .attr('class', 'lotivis-plot-grid lotivis-plot-grid-x')
-        .attr('transform', 'translate(0,' + (plotChart.height - plotChart.margin.bottom) + ')')
+        .attr('transform', 'translate(0,' + (plotChart.preferredHeight - plotChart.config.margin.bottom) + ')')
         .call(plotChart.xAxisGrid);
 
       plotChart.svg
         .append('g')
         .attr('class', 'lotivis-plot-grid lotivis-plot-grid-y')
-        .attr('transform', `translate(${plotChart.margin.left},0)`)
+        .attr('transform', `translate(${plotChart.config.margin.left},0)`)
         .call(plotChart.yAxisGrid);
 
     };
@@ -4093,6 +4115,35 @@ class PlotBackgroundRenderer {
 }
 
 /**
+ * Enumeration of sorts available in the plot chart.
+ */
+const PlotChartSort = {
+  alphabetically: 'alphabetically',
+  duration: 'duration',
+  intensity: 'intensity',
+  firstDate: 'firstDate'
+};
+
+const defaultPlotChartConfig = {
+  width: 1000,
+  height: 600,
+  margin: {
+    top: Constants.defaultMargin,
+    right: Constants.defaultMargin,
+    bottom: Constants.defaultMargin,
+    left: Constants.defaultMargin
+  },
+  lineHeight: 28,
+  radius: 23,
+  isShowLabels: true,
+  drawGrid: true,
+  showTooltip: true,
+  lowColor: 'rgb(184, 233, 148)',
+  highColor: 'rgb(0, 122, 255)',
+  sort: PlotChartSort.duration
+};
+
+/**
  * A lotivis plot chart.
  *
  * @class PlotChart
@@ -4111,18 +4162,16 @@ class PlotChart extends Chart {
    * Initializes this diachronic chart by setting the default values.
    */
   initialize() {
-    this.width = 1000;
-    this.height = 600;
-    this.defaultMargin = 60;
-    this.lineHeight = 28;
-    this.margin = {
-      top: this.defaultMargin,
-      right: this.defaultMargin,
-      bottom: this.defaultMargin,
-      left: this.defaultMargin + 100
-    };
 
-    this.isShowLabels = true;
+    this.config;
+    let margin;
+    margin = Object.assign({}, defaultPlotChartConfig.margin);
+    margin = Object.assign(margin, this.config.margin);
+
+    let config = Object.assign({}, defaultPlotChartConfig);
+    this.config = Object.assign(config, this.config);
+    this.config.margin = margin;
+
     this.createSVG();
     this.backgroundRenderer = new PlotBackgroundRenderer(this);
     this.axisRenderer = new PlotAxisRenderer(this);
@@ -4141,7 +4190,7 @@ class PlotChart extends Chart {
       .attr('id', this.svgSelector)
       .attr('class', 'lotivis-chart-svg')
       .attr('preserveAspectRatio', 'xMidYMid meet')
-      .attr("viewBox", `0 0 ${this.width} ${this.height}`);
+      .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`);
   }
 
   /**
@@ -4155,17 +4204,18 @@ class PlotChart extends Chart {
    *
    */
   precalculate() {
-    let margin = this.margin;
+    let margin = this.config.margin;
     let barsCount = 0;
     if (this.workingDatasets && this.workingDatasets.length > 0) {
       barsCount = this.workingDatasets.length;
     }
-    this.height = (barsCount * this.lineHeight) + margin.top + margin.bottom;
-    this.graphWidth = this.width - margin.left - margin.right;
+    this.height = (barsCount * this.config.lineHeight) + margin.top + margin.bottom;
+    this.preferredHeight = this.height;
+    this.graphWidth = this.config.width - margin.left - margin.right;
     this.graphHeight = this.height - margin.top - margin.bottom;
 
     this.svg
-      .attr("viewBox", `0 0 ${this.width} ${this.height}`);
+      .attr("viewBox", `0 0 ${this.config.width} ${this.height}`);
 
     this.datasetsDidChange();
   }
@@ -4207,13 +4257,13 @@ class PlotChart extends Chart {
     this.xChart = d3
       .scaleBand()
       .domain(listOfDates)
-      .rangeRound([this.margin.left, this.width - this.margin.right])
+      .rangeRound([this.config.margin.left, this.config.width - this.config.margin.right])
       .paddingInner(0.1);
 
     this.yChart = d3
       .scaleBand()
       .domain(listOfLabels)
-      .rangeRound([this.height - this.margin.bottom, this.margin.top])
+      .rangeRound([this.height - this.config.margin.bottom, this.config.margin.top])
       .paddingInner(0.1);
 
     this.xAxisGrid = d3
@@ -4321,16 +4371,6 @@ class PlotChart extends Chart {
     this.update();
   }
 }
-
-/**
- * Enumeration of sorts available in the plot chart.
- */
-const PlotChartSort = {
-  alphabetically: 'alphabetically',
-  duration: 'duration',
-  intensity: 'intensity',
-  firstDate: 'firstDate'
-};
 
 /**
  *
@@ -4559,9 +4599,12 @@ class PlotChartCard extends ChartCard {
    * Injects the plot chart in the body of the card.
    */
   injectChart() {
-    this.chart = new PlotChart(this.body);
-    this.chart.margin.left = 120;
-    this.chart.margin.right = 50;
+    this.chart = new PlotChart(this.body, {
+      margin: {
+        left: 120,
+        right: 50
+      }
+    });
   }
 
   /**
