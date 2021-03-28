@@ -37,3 +37,13 @@ Data is a collection of items.
 
 ### Dataview
 
+
+
+### DataController
+
+| Property                          | Use                                            |
+| --------------------------------- | ---------------------------------------------- |
+| ```originalDatasets: [Dataset]``` | Reference to the original datasets collection. |
+| ```datasets: [Dataset]```         | The working datasets.                          |
+| ```flatData: [Item]```            | Flat collection of items of the datasets.      |
+

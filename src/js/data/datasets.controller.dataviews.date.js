@@ -10,7 +10,7 @@ import {combineDatasetsByRatio} from "../data-juggle/dataset.combine.ratio";
 DatasetsController.prototype.getDateDataview = function () {
   let dateAccess = this.dateAccess;
   let workingDatasets = copy(this.workingDatasets);
-  let enabledDatasets = copy(this.enabledDatasets || workingDatasets);
+  let enabledDatasets = copy(this.enabledDatasets() || workingDatasets);
   let dateGroupRatio = 2;
   let dataview = {};
 

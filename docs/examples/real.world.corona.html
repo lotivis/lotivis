@@ -30,8 +30,8 @@
           </div>
         </div>
         <div class="lotivis-card-body" style="overflow: scroll;">
-          <div style="overflow: scroll; width: 2000px">
-            <div id="date-chart-card" style="background-color: white">
+          <div style="width: 2000px">
+            <div id="date-chart">
               <!-- Date Chart Code Here -->
             </div>
           </div>
@@ -53,7 +53,7 @@
 
 <script>
 
-  let timeChart = new lotivis.TimeChart('date-chart-card', {
+  let timeChart = new lotivis.DateChart('date-chart', {
     height: 500,
     width: 2000,
     margin: {

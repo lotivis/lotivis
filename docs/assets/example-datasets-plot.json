@@ -88,5 +88,25 @@
         "value": 0
       }
     ]
+  },
+  {
+    "label": "dataset_4",
+    "data": [
+      {
+        "location": 1,
+        "date": 2000,
+        "value": 3
+      }
+    ]
+  },
+  {
+    "label": "dataset_5",
+    "data": [
+      {
+        "location": 1,
+        "date": 2003,
+        "value": 5
+      }
+    ]
   }
 ]

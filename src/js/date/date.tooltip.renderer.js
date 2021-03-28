@@ -89,7 +89,7 @@ export class DateTooltipRenderer {
      */
     function getHTMLForDate(date) {
       let flatData = dateChart.datasetController
-        .enabledFlatData
+        .enabledFlatData()
         .filter(item => item.date === date);
 
       let first = flatData.first();

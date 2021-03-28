@@ -1,5 +1,5 @@
 import {combineByLocation} from "../data-juggle/dataset.combine";
-import {Color} from "../shared/colors";
+import {Color} from "../shared/color";
 import {styleForCSSClass} from "../shared/style";
 import {formatNumber} from "../shared/format";
 import {equals} from "../shared/equal";

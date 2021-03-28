@@ -30,6 +30,10 @@ export class DatasetsController {
     this.dateAccess = function (date) {
       return Date.parse(date);
     };
+
+    this.locationFilters = [];
+    this.dateFilters = [];
+    this.datasetFilters = [];
   }
 
   get flatDataCombinedStacks() {

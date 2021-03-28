@@ -1,6 +1,7 @@
 import {styleForCSSClass} from "../shared/style";
 import {equals} from "../shared/equal";
-import {Color} from "../shared/colors";
+import {Color} from "../shared/color";
+import '../shared/color.map';
 
 /**
  *
@@ -26,8 +27,6 @@ export class MapDatasetRenderer {
         .selectAll('.lotivis-map-area')
         .style('fill', 'whitesmoke')
         .style('fill-opacity', 1);
-      // .style('fill', style.fill || 'white')
-      // .style('fill-opacity', style['fill-opacity'] || 0);
     }
 
     /**
@@ -39,7 +38,6 @@ export class MapDatasetRenderer {
 
       let stackNames = mapChart.datasetController.stacks;
       let combinedData = mapChart.combinedData;
-
       resetAreas();
 
       for (let index = 0; index < stackNames.length; index++) {
@@ -59,7 +57,6 @@ export class MapDatasetRenderer {
             .selectAll('.lotivis-map-area')
             .filter((item) => equals(mapChart.config.featureIDAccessor(item), locationID))
             .style('fill', generator(opacity));
-          // .style('fill-opacity', opacity);
 
         }
       }

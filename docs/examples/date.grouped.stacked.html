@@ -146,9 +146,9 @@
   let string = JSON.stringify(datasets, null, 2);
   document.getElementById('data').innerHTML = string;
 
-  let timeChartCard = new lotivis.TimeChartCard('date-chart-card');
-  timeChartCard.chart.datasets = datasets;
-  timeChartCard.chart.update();
+  let dateChartCard = new lotivis.DateChartCard('date-chart-card');
+  dateChartCard.chart.datasets = datasets;
+  dateChartCard.chart.update();
 
 </script>
 

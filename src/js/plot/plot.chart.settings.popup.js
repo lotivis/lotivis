@@ -18,7 +18,9 @@ export class PlotChartSettingsPopup extends Popup {
    */
   render() {
     this.card.headerRow.append('h3').text('Settings');
-    this.row = this.card.body.append('div').classed('row', true);
+    this.row = this.card.body
+      .append('div')
+      .classed('lotivis-row margin-left margin-right margin-top', true);
     this.renderShowLabelsCheckbox();
   }
 
@@ -26,16 +28,17 @@ export class PlotChartSettingsPopup extends Popup {
    * Appends the checkboxes the popups content.
    */
   renderShowLabelsCheckbox() {
-    let container = this.row.append('div').classed('col-12 margin-top', true);
+    let container = this.row.append('div').classed('lotivis-margin-top', true);
+
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText('Labels');
     this.showLabelsCheckbox.onClick = function (checked) {
-      this.chart.showLabels = checked;
+      this.chart.config.isShowLabels = checked;
       this.chart.update();
       UrlParameters.getInstance().set(UrlParameters.chartShowLabels, checked);
     }.bind(this);
 
-    let dropdownContainer = this.row.append('div').classed('col-12', true);
+    let dropdownContainer = this.row.append('div').classed('lotivis-col-12', true);
     this.sortDropdown = new Dropdown(dropdownContainer);
     this.sortDropdown.setLabelText('Sort');
     this.sortDropdown.setOptions([
@@ -55,18 +58,14 @@ export class PlotChartSettingsPopup extends Popup {
    * @returns {{width: number, height: number}}
    */
   preferredSize() {
-    return {
-      width: 240,
-      height: 600
-    };
+    return {width: 240, height: 600};
   }
 
   /**
    * Tells this popup that it is about to be displayed.
    */
   willShow() {
-    verbose_log('this.chart.showLabels', this.chart.showLabels);
-    this.showLabelsCheckbox.setChecked(this.chart.showLabels);
+    this.showLabelsCheckbox.setChecked(this.chart.config.isShowLabels);
     this.sortDropdown.setSelectedOption(this.chart.sort);
   }
 }

@@ -30,7 +30,6 @@ export class ChartCard extends Card {
     this.screenshotButton = new Button(this.headerRightComponent);
     this.screenshotButton.setText('Screenshot');
     this.screenshotButton.element.classed('simple-button', true);
-    this.screenshotButton.setFontAwesomeImage('camera');
     this.screenshotButton.onClick = function (event) {
       this.screenshotButtonAction(event);
     }.bind(this);
@@ -38,7 +37,6 @@ export class ChartCard extends Card {
     this.moreButton = new Button(this.headerRightComponent);
     this.moreButton.setText('More');
     this.moreButton.element.classed('simple-button', true);
-    this.moreButton.setFontAwesomeImage('ellipsis-h');
     this.moreButton.onClick = function (event) {
       this.presentSettingsPopupAction(event);
     }.bind(this);

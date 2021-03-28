@@ -22,10 +22,10 @@ export class DateChartCard extends ChartCard {
    * @param name
    */
   constructor(selector, name) {
-    super(selector);
-    if (!selector) throw 'No selector specified.';
-    this.selector = selector;
-    this.name = selector;
+    let theSelector = selector || 'date-chart-card';
+    super(theSelector);
+    this.selector = theSelector;
+    this.name = theSelector;
     this.datasets = [];
     this.renderChart();
     this.renderRadioGroup();

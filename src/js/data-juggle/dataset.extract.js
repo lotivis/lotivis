@@ -99,7 +99,7 @@ function toSet(array) {
  * @returns {*} The earliest date.
  */
 export function extractEarliestDate(flatData) {
-  return extractDatesFromFlatData(flatData).shift();
+  return extractDatesFromFlatData(flatData).sort().shift();
 }
 
 /**
@@ -109,8 +109,7 @@ export function extractEarliestDate(flatData) {
  * @returns {*} The earliest date.
  */
 export function extractEarliestDateWithValue(flatData) {
-  let withValue = flatData.filter(item => (item.value || 0) > 0);
-  return extractDatesFromFlatData(withValue).shift();
+  return extractDatesFromFlatData(filterWithValue(flatData)).sort().shift();
 }
 
 /**
@@ -120,7 +119,7 @@ export function extractEarliestDateWithValue(flatData) {
  * @returns {*} The latest date.
  */
 export function extractLatestDate(flatData) {
-  return extractDatesFromFlatData(flatData).pop();
+  return extractDatesFromFlatData(flatData).sort().pop();
 }
 
 /**
@@ -130,6 +129,15 @@ export function extractLatestDate(flatData) {
  * @returns {*} The latest date.
  */
 export function extractLatestDateWithValue(flatData) {
-  let withValue = flatData.filter(item => (item.value || 0) > 0);
-  return extractDatesFromFlatData(withValue).pop();
+  return extractDatesFromFlatData(filterWithValue(flatData)).sort().pop();
+}
+
+/**
+ * Returns a filtered collection containing all items which have a valid value greater than 0.
+ *
+ * @param flatData The flat data to filter.
+ * @returns {*} All items with a value greater 0.
+ */
+export function filterWithValue(flatData) {
+  return flatData.filter(item => (item.value || 0) > 0);
 }

@@ -4,6 +4,8 @@
  * @param datasets The collection of datasets.
  * @returns {[]} The array containing the flat data.
  */
+import {copy} from "../shared/copy";
+
 export function flatDatasets(datasets) {
   let flatData = [];
   datasets.forEach(function (dataset) {
@@ -25,9 +27,10 @@ export function flatDataset(dataset) {
     return flatData;
   }
   dataset.data.forEach(item => {
-    item.dataset = dataset.label;
-    item.stack = dataset.stack;
-    flatData.push(item);
+    let newItem = copy(item);
+    newItem.dataset = dataset.label;
+    newItem.stack = dataset.stack;
+    flatData.push(newItem);
   });
   return flatData;
 }

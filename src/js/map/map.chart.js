@@ -5,14 +5,13 @@ import {MapTooltipRenderer} from "./map.tooltip.renderer";
 import {MapLegendRenderer} from "./map.legend.renderer";
 import {MapLabelRenderer} from "./map.label.renderer";
 import {MapDatasetRenderer} from "./map.dataset.renderer";
-import {DatasetsControllerFilter} from "../data/datasets.controller.filter";
 import {MapGeojsonRenderer} from "./map.geojson.renderer";
 import {MapExteriorBorderRenderer} from "./map.exterior.border.renderer";
 import {createGeoJSON} from "../geojson-juggle/create.geojson";
 import {MapMinimapRenderer} from "./map.minimap.renderer";
-import {hashCode} from "../shared/hash";
 import {MapSelectionBoundsRenderer} from "./map.selection.bounds.renderer";
 import {defaultMapChartConfig} from "./map.chart.config";
+import {DatasetsController} from "../data/datasets.controller";
 
 /**
  * A component which renders a geo json with d3.
@@ -157,7 +156,7 @@ export class MapChart extends Chart {
    * @param newDatasets
    */
   set datasets(newDatasets) {
-    this.setDatasetController(new DatasetsControllerFilter(newDatasets));
+    this.setDatasetController(new DatasetsController(newDatasets));
   }
 
   /**
@@ -174,7 +173,7 @@ export class MapChart extends Chart {
    */
   datasetsDidChange() {
     if (!this.datasetController) return;
-    const combinedByStack = combineByStacks(this.datasetController.enabledFlatData);
+    const combinedByStack = combineByStacks(this.datasetController.enabledFlatData());
     this.combinedData = combineByLocation(combinedByStack);
 
     this.svg.remove();

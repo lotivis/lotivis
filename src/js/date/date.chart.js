@@ -1,14 +1,14 @@
-import {Color} from "../shared/colors";
+import {Color} from "../shared/color";
 import {DateAxisRenderer} from "./date.axis.renderer";
 import {DateLabelRenderer} from "./date.label.renderer";
 import {DateLegendRenderer} from "./date.legend.renderer";
 import {DateBarsRenderer} from "./date.bars.renderer";
-import {DatasetsControllerFilter} from "../data/datasets.controller.filter";
 import {DateGhostBarsRenderer} from "./date.ghost.bars.renderer";
 import {DateTooltipRenderer} from "./date.tooltip.renderer";
 import {Chart} from "../components/chart";
 import {Constants} from "../shared/constants";
 import {DateGridRenderer} from "./date.grid.renderer";
+import {DatasetsController} from "../data/datasets.controller";
 
 const defaultConfig = {
   width: 1000,
@@ -116,7 +116,7 @@ export class DateChart extends Chart {
 
     this.xStack = d3
       .scaleBand()
-      .domain(this.datasetController.enabledStacks)
+      .domain(this.datasetController.enabledStacks())
       .rangeRound([0, this.xChart.bandwidth()])
       .padding(0.05);
 
@@ -214,7 +214,7 @@ export class DateChart extends Chart {
    * @param newDatasets
    */
   set datasets(newDatasets) {
-    this.setDatasetController(new DatasetsControllerFilter(newDatasets));
+    this.setDatasetController(new DatasetsController(newDatasets));
   }
 
   /**

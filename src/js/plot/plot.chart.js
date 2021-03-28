@@ -8,7 +8,6 @@ import {combineByDate} from "../data-juggle/dataset.combine";
 import {sumOfLabel} from "../data-juggle/dataset.sum";
 import {PlotAxisRenderer} from "./plot.axis.renderer";
 import {copy} from "../shared/copy";
-import {DatasetsControllerFilter} from "../data/datasets.controller.filter";
 import {PlotBarsRenderer} from "./plot.bars.renderer";
 import {PlotTooltipRenderer} from "./plot.tooltip.renderer";
 import {PlotLabelRenderer} from "./plot.label.renderer";
@@ -17,6 +16,8 @@ import {PlotBackgroundRenderer} from "./plot.background.renderer";
 import {defaultPlotChartConfig} from "./plot.chart.config";
 import {PlotChartSort} from "./plot.chart.sort";
 import {verbose_log} from "../shared/debug";
+import {DatasetsController} from "../data/datasets.controller";
+import "../data/datasets.controller.dataviews.plot";
 
 /**
  * A lotivis plot chart.
@@ -72,27 +73,33 @@ export class PlotChart extends Chart {
    *
    */
   precalculate() {
-    let margin = this.config.margin;
-    let barsCount = 0;
-    if (this.workingDatasets && this.workingDatasets.length > 0) {
-      barsCount = this.workingDatasets.length;
+    if (this.datasetController) {
+      this.dataView = this.datasetController.getPlotDataview();
+    } else {
+      this.dataView = {datasets: [], barsCount: 0};
     }
-    this.height = (barsCount * this.config.lineHeight) + margin.top + margin.bottom;
-    this.preferredHeight = this.height;
+
+    verbose_log('this.dataView', this.dataView);
+
+    let margin = this.config.margin;
+    let barsCount = this.dataView.labelsCount || 0;
+
     this.graphWidth = this.config.width - margin.left - margin.right;
-    this.graphHeight = this.height - margin.top - margin.bottom;
+    this.graphHeight = (barsCount * this.config.lineHeight);
+    this.height = this.graphHeight + margin.top + margin.bottom;
+    this.preferredHeight = this.height;
 
     this.svg
-      .attr("viewBox", `0 0 ${this.config.width} ${this.height}`);
+      .attr("viewBox", `0 0 ${this.config.width} ${this.preferredHeight}`);
 
-    this.datasetsDidChange();
+    this.sortDatasets();
+    this.createScales();
   }
 
   /**
    * Creates and renders the chart.
    */
   draw() {
-    if (!this.workingDatasets || this.workingDatasets.length === 0) return;
     this.createScales();
     this.backgroundRenderer.render();
     this.gridRenderer.renderGrid();
@@ -105,7 +112,6 @@ export class PlotChart extends Chart {
    * Updates the plot chart.
    */
   update(controller, reason) {
-    verbose_log('reason', reason);
     if (!this.updateSensible) return;
     if (reason === 'dates-filter') return;
     this.remove();
@@ -117,21 +123,16 @@ export class PlotChart extends Chart {
    * Creates scales which are used to calculate the x and y positions of bars or circles.
    */
   createScales() {
-    if (!this.workingDatasets || this.workingDatasets.length === 0) return;
-    let listOfDates = extractDatesFromDatasets(this.workingDatasets);
-    let listOfLabels = this.workingDatasets
-      .map(dataset => dataset.label)
-      .reverse();
 
     this.xChart = d3
       .scaleBand()
-      .domain(listOfDates)
+      .domain(this.dataView.dates || [])
       .rangeRound([this.config.margin.left, this.config.width - this.config.margin.right])
       .paddingInner(0.1);
 
     this.yChart = d3
       .scaleBand()
-      .domain(listOfLabels)
+      .domain(this.dataView.labels || [])
       .rangeRound([this.height - this.config.margin.bottom, this.config.margin.top])
       .paddingInner(0.1);
 
@@ -162,22 +163,22 @@ export class PlotChart extends Chart {
   }
 
   sortDatasets() {
-    this.workingDatasets = this.workingDatasets.reverse();
+    this.dataView.datasets = this.dataView.datasets.reverse();
     switch (this.sort) {
       case PlotChartSort.alphabetically:
-        this.workingDatasets = this.workingDatasets
+        this.dataView.datasets = this.dataView.datasets
           .sort((set1, set2) => set1.label > set2.label);
         break;
       case PlotChartSort.duration:
-        this.workingDatasets = this.workingDatasets
+        this.dataView.datasets = this.dataView.datasets
           .sort((set1, set2) => set1.duration < set2.duration);
         break;
       case PlotChartSort.intensity:
-        this.workingDatasets = this.workingDatasets
+        this.dataView.datasets = this.dataView.datasets
           .sort((set1, set2) => set1.sum < set2.sum);
         break;
       case PlotChartSort.firstDate:
-        this.workingDatasets = this.workingDatasets
+        this.dataView.datasets = this.dataView.datasets
           .sort((set1, set2) => set1.earliestDate > set2.earliestDate);
         break;
       default:
@@ -185,20 +186,12 @@ export class PlotChart extends Chart {
     }
   }
 
-  set showLabels(newValue) {
-    this.isShowLabels = newValue;
-  }
-
-  get showLabels() {
-    return this.isShowLabels;
-  }
-
   /**
    * Sets the datasets.
    * @param newDatasets The array of datasets.
    */
   set datasets(newDatasets) {
-    this.setDatasetController(new DatasetsControllerFilter(newDatasets));
+    this.setDatasetController(new DatasetsController(newDatasets));
   }
 
   /**
@@ -210,32 +203,8 @@ export class PlotChart extends Chart {
   }
 
   /**
-   *
-   */
-  datasetsDidChange() {
-    if (!this.datasetController) return;
-    let datasets = this.datasetController.enabledDatasets;
-    this.workingDatasets = copy(datasets);
-    this.workingDatasets.forEach(function (dataset) {
-      let data = dataset.data;
-      let firstDate = extractEarliestDateWithValue(data);
-      let lastDate = extractLatestDateWithValue(data);
-      let duration = lastDate - firstDate;
-      data.forEach(item => item.label = dataset.label);
-      data = data.sort((left, right) => left.date - right.date);
-      dataset.earliestDate = firstDate;
-      dataset.latestDate = lastDate;
-      dataset.duration = duration;
-      dataset.data = combineByDate(data);
-      dataset.sum = sumOfLabel(data, dataset.label);
-    });
-    this.sortDatasets();
-    this.createScales();
-  }
-
-  /**
-   *
-   * @param newController
+   * Sets the nes datasets controller.
+   * @param newController The dataset controller.
    */
   setDatasetController(newController) {
     this.datasetController = newController;

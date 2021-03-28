@@ -43,8 +43,9 @@ import {
 import {UrlParameters} from "./js/shared/url.parameters";
 import {DatasetsController} from "./js/data/datasets.controller";
 import "./js/data/datasets.controller.listeners";
-import "./js/data/datasets.controller.dataviews";
-import {DatasetsControllerFilter} from "./js/data/datasets.controller.filter";
+import "./js/data/datasets.controller.filter";
+import "./js/data/datasets.controller.dataviews.date";
+import "./js/data/datasets.controller.dataviews.plot";
 import {renderCsv} from "./js/parse/render.csv";
 import {parseCsv} from "./js/parse/parse.csv";
 import {createGeoJSON} from "./js/geojson-juggle/create.geojson";
@@ -61,6 +62,15 @@ import {
   combineDataByGroupsize
 } from "./js/data-juggle/dataset.combine.ratio";
 
+import {Color} from "./js/shared/color";
+import './js/shared/color.defaults';
+import './js/shared/color.map';
+import './js/shared/color.plot';
+import './js/shared/color.random';
+import './js/shared/color.stack';
+
+exports.Color = Color;
+
 // components
 exports.Component = Component;
 exports.Card = Card;
@@ -73,8 +83,8 @@ exports.RadioGroup = RadioGroup;
 exports.Option = Option;
 
 // date
-exports.TimeChart = DateChart;
-exports.TimeChartCard = DateChartCard;
+exports.DateChart = DateChart;
+exports.DateChartCard = DateChartCard;
 
 // map
 exports.MapChart = MapChart;
@@ -86,8 +96,6 @@ exports.PlotChartCard = PlotChartCard;
 
 // datasets
 exports.DatasetController = DatasetsController;
-exports.FilterableDatasetController = DatasetsControllerFilter;
-
 
 // url parameters
 exports.URLParameters = UrlParameters;

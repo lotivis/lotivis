@@ -8,122 +8,132 @@ import {flatDatasets} from "../data-juggle/dataset.flat";
 import {copy} from "../shared/copy";
 
 /**
- *
+ * Resets all filters.  Notifies listeners.
  */
-export class DatasetsControllerFilter extends DatasetsController {
+DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
+  this.locationFilters = [];
+  this.dateFilters = [];
+  this.datasetFilters = [];
+  if (!notifyListeners) return;
+  this.notifyListeners('reset-filters');
+};
 
-  constructor(datasets) {
-    super(datasets);
-    this.listeners = [];
-    this.locationFilters = [];
-    this.dateFilters = [];
-    this.datasetFilters = [];
+/**
+ * Sets the locations filter.  Notifies listeners.
+ * @param locations The locations to filter.
+ */
+DatasetsController.prototype.setLocationsFilter = function (locations) {
+  this.resetFilters(false);
+  this.locationFilters = locations.map(location => String(location));
+  this.notifyListeners('location-filter');
+};
+
+/**
+ * Sets the dates filter.  Notifies listeners.
+ * @param dates The dates to filter.
+ */
+DatasetsController.prototype.setDatesFilter = function (dates) {
+  this.resetFilters(false);
+  this.dateFilters = dates.map(date => String(date));
+  this.notifyListeners('dates-filter');
+};
+
+/**
+ * Sets the datasets filter.  Notifies listeners.
+ * @param datasets The datasets to filter.
+ */
+DatasetsController.prototype.setDatasetsFilter = function (datasets) {
+  this.resetFilters(false);
+  this.datasetFilters = datasets.map(dataset => String(dataset));
+  this.notifyListeners('dataset-filter');
+};
+
+/**
+ * Toggles the enabled of the dataset with the given label.  Notifies listeners.
+ * @param label The label of the dataset.
+ */
+DatasetsController.prototype.toggleDataset = function (label) {
+  this.workingDatasets.forEach(function (dataset) {
+    if (dataset.label === label) {
+      dataset.isEnabled = !dataset.isEnabled;
+    }
+  });
+  this.notifyListeners('dataset-toggle');
+};
+
+/**
+ * Enables all datasets.  Notifies listeners.
+ */
+DatasetsController.prototype.enableAllDatasets = function () {
+  this.workingDatasets.forEach(function (dataset) {
+    dataset.isEnabled = true;
+  });
+  this.notifyListeners('dataset-enable-all');
+};
+
+/**
+ * Returns a newly generated collection containing all enabled datasets.
+ * @returns {*} The collection of enabled datasets.
+ */
+DatasetsController.prototype.enabledDatasets = function () {
+  let aCopy = copy(this.workingDatasets);
+
+  let enabled = aCopy
+    .filter(dataset => dataset.isEnabled === true);
+
+  if (this.datasetFilters && this.datasetFilters.length > 0) {
+    enabled = enabled.filter(dataset => this.datasetFilters.includes(dataset.label));
   }
 
-  resetFilters() {
-    this.locationFilters = [];
-    this.dateFilters = [];
-    this.datasetFilters = [];
-    this.notifyListeners('reset-filters');
-  }
-
-  setLocationsFilter(locations) {
-    this.resetFilters();
-    this.locationFilters = locations.map(location => String(location));
-    this.notifyListeners('location-filter');
-  }
-
-  setDatesFilter(dates) {
-    this.resetFilters();
-    this.dateFilters = dates.map(date => String(date));
-    this.notifyListeners('dates-filter');
-  }
-
-  setDatasetsFilter(datasets) {
-    this.resetFilters();
-    this.datasetFilters = datasets.map(dataset => String(dataset));
-    this.notifyListeners('dataset-filter');
-  }
-
-  toggleDataset(label) {
-    this.workingDatasets.forEach(function (dataset) {
-      if (dataset.label === label) {
-        dataset.isEnabled = !dataset.isEnabled;
-      }
+  if (this.locationFilters && this.locationFilters.length > 0) {
+    let locationFilters = this.locationFilters;
+    enabled = enabled.map(function (dataset) {
+      dataset.data = dataset.data
+        .filter(data => locationFilters.includes(String(data.location))) || [];
+      return dataset;
     });
-    this.notifyListeners('dataset-toggle');
   }
 
-  enableAllDatasets() {
-    this.workingDatasets.forEach(function (dataset) {
-      dataset.isEnabled = true;
+  if (this.dateFilters && this.dateFilters.length > 0) {
+    let dateFilters = this.dateFilters;
+    enabled = enabled.map(function (dataset) {
+      dataset.data = dataset.data
+        .filter(data => dateFilters.includes(String(data.date))) || [];
+      return dataset;
     });
-    this.notifyListeners('dataset-enable-all');
   }
 
-  get enabledDatasets() {
+  return enabled;
+};
 
-    let aCopy = copy(this.workingDatasets);
+/**
+ * Returns the flat version of the collection of enabled datasets.
+ * @returns {[]}
+ */
+DatasetsController.prototype.enabledFlatData = function () {
+  return flatDatasets(this.enabledDatasets());
+};
 
-    let enabled = aCopy
-      .filter(dataset => dataset.isEnabled === true);
+/**
+ * Returns the set of labels of the enabled datasets.
+ * @returns {*[]} The set of labels.
+ */
+DatasetsController.prototype.enabledLabels = function () {
+  return extractLabelsFromDatasets(this.enabledDatasets());
+};
 
-    if (this.datasetFilters && this.datasetFilters.length > 0) {
-      enabled = enabled.filter(dataset => this.datasetFilters.includes(dataset.label));
-    }
+/**
+ * Returns the set of stacks of the enabled datasets.
+ * @returns {*[]} The set of stacks.
+ */
+DatasetsController.prototype.enabledStacks = function () {
+  return extractStacksFromDatasets(this.enabledDatasets());
+};
 
-    if (this.locationFilters && this.locationFilters.length > 0) {
-      let locationFilters = this.locationFilters;
-      enabled = enabled.map(function (dataset) {
-        dataset.data = dataset.data
-          .filter(data => locationFilters.includes(String(data.location))) || [];
-        return dataset;
-      });
-    }
-
-    if (this.dateFilters && this.dateFilters.length > 0) {
-      let dateFilters = this.dateFilters;
-      enabled = enabled.map(function (dataset) {
-        dataset.data = dataset.data
-          .filter(data => dateFilters.includes(String(data.date))) || [];
-        return dataset;
-      });
-    }
-
-    return enabled;
-  }
-
-  get enabledFlatData() {
-    return flatDatasets(this.enabledDatasets);
-  }
-
-  get enabledLabels() {
-    return extractLabelsFromDatasets(this.enabledDatasets);
-  }
-
-  get enabledStacks() {
-    return extractStacksFromDatasets(this.enabledDatasets);
-  }
-
-  get enabledDates() {
-    return extractDatesFromDatasets(this.enabledDatasets);
-  }
-
-  // addListener(listener) {
-  //   this.listeners.push(listener);
-  // }
-  //
-  // removeListener(listener) {
-  //   let index = this.listeners.indexOf(listener);
-  //   if (index === -1) return;
-  //   this.listeners = this.listeners.splice(index, 1);
-  // }
-  //
-  // notifyListeners(reason = 'none') {
-  //   for (let index = 0; index < this.listeners.length; index++) {
-  //     let listener = this.listeners[index];
-  //     if (!listener.update) continue;
-  //     listener.update(this, reason);
-  //   }
-  // }
-}
+/**
+ * Returns the set of dates of the enabled datasets.
+ * @returns {*[]} The set of dates.
+ */
+DatasetsController.prototype.enabledDates = function () {
+  return extractDatesFromDatasets(this.enabledDatasets());
+};

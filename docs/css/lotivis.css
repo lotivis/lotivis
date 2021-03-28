@@ -265,13 +265,13 @@ input[type=checkbox] {
 }
 
 .lotivis-plot-label {
-  fill: black;
+  fill: white;
   text-anchor: start;
   font-size: 12px;
   pointer-events: none;
 }
 
-.popup-underground {
+.lotivis-popup-underground {
   display: none;
   position: fixed;
   z-index: 99991;
@@ -283,12 +283,12 @@ input[type=checkbox] {
   background-color: white;
   background-color: rgba(255, 255, 255, 0.15);
 }
-.popup-underground .lotivis-card {
+.lotivis-popup-underground .lotivis-card {
   background-color: #f0f0f1;
   box-shadow: rgba(0, 0, 0, 0.3) 0 0 60px 0;
 }
 
-.fade-in {
+.lotivis-fade-in {
   animation: fadeIn ease 0.3s;
   -webkit-animation: fadeIn ease 0.3s;
   -moz-animation: fadeIn ease 0.3s;
@@ -336,13 +336,13 @@ input[type=checkbox] {
     opacity: 1;
   }
 }
-.tooltip {
+.lotivis-tooltip {
   position: relative;
   display: inline-block;
   line-height: 1.2;
 }
 
-.tooltip .tooltiptext {
+.lotivis-tooltip .lotivis-tooltiptext {
   visibility: hidden;
   width: 220px;
   background-color: #f0f0f1;
@@ -360,7 +360,7 @@ input[type=checkbox] {
   box-shadow: rgba(0, 0, 0, 0.5) 0 0 30px 0;
 }
 
-.tooltip .tooltiptext::after {
+.lotivis-tooltip .lotivis-tooltiptext::after {
   content: "";
   position: absolute;
   top: 100%;
@@ -371,12 +371,12 @@ input[type=checkbox] {
   border-color: #f0f0f1 transparent transparent transparent;
 }
 
-.tooltip:hover .tooltiptext {
+.lotivis-tooltip:hover .lotivis-tooltiptext {
   visibility: visible;
   opacity: 1;
 }
 
-.underground, .modal-underground, .popup-underground {
+.lotivis-underground, .lotivis-modal-underground, .lotivis-popup-underground {
   display: none;
   position: fixed;
   z-index: 99991;
@@ -386,69 +386,21 @@ input[type=checkbox] {
   height: 100%;
   overflow: scroll;
 }
-.underground .lotivis-card, .modal-underground .lotivis-card, .popup-underground .lotivis-card {
+.lotivis-underground .lotivis-card, .lotivis-modal-underground .lotivis-card, .lotivis-popup-underground .lotivis-card {
   background-color: #f0f0f1;
   box-shadow: rgba(0, 0, 0, 0.3) 0 0 60px 0;
 }
 
-.popup-underground {
+.lotivis-popup-underground {
   background-color: white;
   background-color: rgba(255, 255, 255, 0.15);
 }
 
-.modal-underground {
+.lotivis-modal-underground {
   background-color: white;
   background-color: rgba(255, 255, 255, 0.9);
 }
 
-.fade-in {
-  animation: fadeIn ease 0.3s;
-  -webkit-animation: fadeIn ease 0.3s;
-  -moz-animation: fadeIn ease 0.3s;
-  -o-animation: fadeIn ease 0.3s;
-  -ms-animation: fadeIn ease 0.3s;
-}
-
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-@-moz-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-@-webkit-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-@-o-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-@-ms-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
 .lotivis-tooltip {
   position: absolute;
   padding: 10px;

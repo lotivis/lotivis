@@ -184,6 +184,11 @@ Color.colorsForStack = function (stack, amount = 1) {
   return colors;
 };
 
+/**
+ *
+ * @param till
+ * @returns {*}
+ */
 Color.colorGenerator = function (till) {
   return d3
     .scaleLinear()
@@ -196,15 +201,19 @@ Color.colorGenerator = function (till) {
  */
 class DateAxisRenderer {
 
+  /**
+   * Creates a new instance of DateAxisRenderer.
+   *
+   * @param dateChart The parental date chart.
+   */
   constructor(dateChart) {
 
     /**
-     *
+     * Appends the `left` and `bottom` axis to the date chart.
      */
     this.renderAxis = function () {
-      let config = dateChart.config;
-      let margin = config.margin;
-      console.log('margin', margin);
+      let height = dateChart.config.height;
+      let margin = dateChart.config.margin;
 
       // left
       dateChart.svg
@@ -216,7 +225,7 @@ class DateAxisRenderer {
       dateChart.svg
         .append("g")
         .call(d3.axisBottom(dateChart.xChart))
-        .attr("transform", () => `translate(0,${config.height - margin.bottom})`);
+        .attr("transform", () => `translate(0,${height - margin.bottom})`);
 
     };
   }
@@ -465,11 +474,506 @@ class DateBarsRenderer {
 }
 
 /**
+ *
+ * @class DateGhostBarsRenderer
+ */
+class DateGhostBarsRenderer {
+
+  /**
+   * Creates a new instance of DateGhostBarsRenderer.
+   * @param dateChart
+   */
+  constructor(dateChart) {
+
+    function createID(date) {
+      return `ghost-rect-${String(date).replaceAll('.', '-')}`;
+    }
+
+    this.hideAll = function () {
+      dateChart.svg
+        .selectAll('.lotivis-selection-rect')
+        // .transition()
+        .attr("opacity", 0);
+    };
+
+    function onMouseEnter(event, date) {
+      this.hideAll();
+      let controller = dateChart.datasetController;
+      let id = createID(date);
+
+      dateChart.updateSensible = false;
+      controller.setDatesFilter([date]);
+      dateChart.updateSensible = true;
+      dateChart
+        .svg
+        .select(`#${id}`)
+        // .transition()
+        .attr("opacity", 0.3);
+
+      dateChart.tooltipRenderer.showTooltip(event, date);
+    }
+
+    function onMouserOut(event, date) {
+      this.hideAll();
+      dateChart.tooltipRenderer.hideTooltip(event, date);
+      dateChart.datasetController.resetFilters();
+    }
+
+    this.renderGhostBars = function () {
+      let margin = dateChart.config.margin;
+      let dates = dateChart.datasetController.dates;
+      dateChart
+        .svg
+        .append("g")
+        .selectAll("rect")
+        .data(dates)
+        .enter()
+        .append("rect")
+        .attr("class", 'lotivis-selection-rect')
+        .attr("id", date => createID(date))
+        .attr("opacity", 0)
+        .attr("rx", Constants.barRadius)
+        .attr("ry", Constants.barRadius)
+        .attr("x", (date) => dateChart.xChart(date))
+        .attr("y", margin.top)
+        .attr("width", dateChart.xChart.bandwidth())
+        .attr("height", dateChart.config.height - margin.bottom - margin.top)
+        .on('mouseenter', onMouseEnter.bind(this))
+        .on('mouseout', onMouserOut.bind(this));
+
+    };
+  }
+}
+
+/**
+ * Returns
+ *
+ * @param flattenList
+ * @returns {[]}
+ */
+function combine(flattenList) {
+  let combined = [];
+  for (let index = 0; index < flattenList.length; index++) {
+    let listItem = flattenList[index];
+    let entry = combined.find(function (entryItem) {
+      return entryItem.dataset === listItem.dataset
+        && entryItem.stack === listItem.stack
+        && entryItem.label === listItem.label
+        && entryItem.location === listItem.location
+        && entryItem.date === listItem.date;
+    });
+    if (entry) {
+      entry.value += (listItem.value + 0);
+    } else {
+      let entry = {};
+      if (listItem.label) entry.label = listItem.label;
+      if (listItem.dataset) entry.dataset = listItem.dataset;
+      if (listItem.stack) entry.stack = listItem.stack;
+      if (listItem.location) entry.location = listItem.location;
+      if (listItem.locationTotal) entry.locationTotal = listItem.locationTotal;
+      if (listItem.date) entry.date = listItem.date;
+      if (listItem.dateTotal) entry.dateTotal = listItem.dateTotal;
+      if (listItem.locationName) entry.locationName = listItem.locationName;
+      entry.value = (listItem.value || 0);
+      combined.push(entry);
+    }
+  }
+  return combined;
+}
+
+/**
+ * Returns
+ *
+ * @param flattenList
+ * @returns {[]}
+ */
+function combineByStacks(flattenList) {
+  let combined = [];
+  for (let index = 0; index < flattenList.length; index++) {
+    let listItem = flattenList[index];
+    let entry = combined.find(function (entryItem) {
+      return entryItem.stack === listItem.stack
+        && entryItem.label === listItem.label
+        && entryItem.location === listItem.location
+        && entryItem.date === listItem.date;
+    });
+    if (entry) {
+      entry.value += (listItem.value + 0);
+    } else {
+      let entry = {};
+      if (listItem.label) entry.label = listItem.label;
+      if (listItem.stack) entry.stack = listItem.stack;
+      if (listItem.location) entry.location = listItem.location;
+      if (listItem.locationTotal) entry.locationTotal = listItem.locationTotal;
+      if (listItem.date) entry.date = listItem.date;
+      if (listItem.dateTotal) entry.dateTotal = listItem.dateTotal;
+      if (listItem.locationName) entry.locationName = listItem.locationName;
+      entry.value = (listItem.value || 0);
+      combined.push(entry);
+    }
+  }
+  return combined;
+}
+
+/**
+ *
+ * @param flatData
+ * @returns {[]}
+ */
+function combineByDate(flatData) {
+  let combined = [];
+  for (let index = 0; index < flatData.length; index++) {
+    let listItem = flatData[index];
+    let entry = combined.find(function (entryItem) {
+      return  entryItem.dataset === listItem.dataset
+        && entryItem.stack === listItem.stack
+        && entryItem.label === listItem.label
+        && entryItem.date === listItem.date;
+    });
+    if (entry) {
+      entry.value += (listItem.value + 0);
+    } else {
+      let entry = {};
+      if (listItem.label) entry.label = listItem.label;
+      if (listItem.dataset) entry.dataset = listItem.dataset;
+      if (listItem.stack) entry.stack = listItem.stack;
+      if (listItem.date) entry.date = listItem.date;
+      if (listItem.dateTotal) entry.dateTotal = listItem.dateTotal;
+      if (listItem.locationName) entry.locationName = listItem.locationName;
+      entry.value = (listItem.value || 0);
+      combined.push(entry);
+    }
+  }
+  return combined;
+}
+
+/**
+ *
+ * @param flatData
+ * @returns {[]}
+ */
+function combineByLocation(flatData) {
+  let combined = [];
+  for (let index = 0; index < flatData.length; index++) {
+    let listItem = flatData[index];
+    let entry = combined.find(function (entryItem) {
+      return  entryItem.dataset === listItem.dataset
+        && entryItem.stack === listItem.stack
+        && entryItem.label === listItem.label
+        && entryItem.location === listItem.location;
+    });
+    if (entry) {
+      entry.value += listItem.value;
+    } else {
+      let entry = {};
+      if (listItem.label) entry.label = listItem.label;
+      if (listItem.dataset) entry.dataset = listItem.dataset;
+      if (listItem.stack) entry.stack = listItem.stack;
+      if (listItem.location) entry.location = listItem.location;
+      if (listItem.locationTotal) entry.locationTotal = listItem.locationTotal;
+      if (listItem.locationName) entry.locationName = listItem.locationName;
+      entry.value = listItem.value;
+      combined.push(entry);
+    }
+  }
+  return combined;
+}
+
+/**
+ * Injects and presents a tooltip on a date chart.
+ *
+ * @class DateTooltipRenderer
+ */
+class DateTooltipRenderer {
+
+  /**
+   * Creates a new instance of DateTooltipRenderer.
+   *
+   * @constructor
+   */
+  constructor(dateChart) {
+
+    const tooltip = dateChart
+      .element
+      .append('div')
+      .attr('class', 'lotivis-tooltip')
+      .attr('rx', 5) // corner radius
+      .attr('ry', 5)
+      .style('opacity', 0);
+
+    /**
+     * Returns the size [width, height] of the tooltip.
+     *
+     * @returns {number[]}
+     */
+    function getTooltipSize() {
+      let tooltipWidth = Number(tooltip.style('width').replace('px', ''));
+      let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
+      return [tooltipWidth, tooltipHeight];
+    }
+
+    /**
+     * Calculates and returns the top pixel position for the tooltip.
+     *
+     * @param factor The size factor of the chart.
+     * @param offset The offset of the chart.
+     * @param tooltipSize The size of the tooltip.
+     * @returns {number}
+     */
+    function getTop(factor, offset, tooltipSize) {
+      let top = dateChart.config.margin.top * factor;
+      top += (((dateChart.graphHeight * factor) - tooltipSize[1]) / 2);
+      top += offset[1] - 10;
+      return top;
+    }
+
+    /**
+     * Calculates the x offset to position the tooltip on the left side
+     * of a bar.
+     *
+     * @param date The presented date of selected bar.
+     * @param factor The size factor of the chart.
+     * @param offset The offset of the chart.
+     * @param tooltipSize The size of the tooltip.
+     * @returns {number} The x offset for the tooltip.
+     */
+    function getXLeft(date, factor, offset, tooltipSize) {
+      let x = dateChart.xChart(date) * factor;
+      return x + offset[0] - tooltipSize[0] - 22 - Constants.tooltipOffset;
+    }
+
+    /**
+     * Calculates the x offset to position the tooltip on the right side
+     * of a bar.
+     *
+     * @param date The presented date of selected bar.
+     * @param factor The size factor of the chart.
+     * @param offset The offset of the chart.
+     * @returns {number} The x offset for the tooltip.
+     */
+    function getXRight(date, factor, offset) {
+      let x = dateChart.xChart(date) + dateChart.xChart.bandwidth();
+      x *= factor;
+      x += offset[0] + Constants.tooltipOffset;
+      return x;
+    }
+
+    /**
+     * Returns the HTML content for the given date.
+     *
+     * @param date The date to get the HTML content for.
+     * @returns {string} Return the rendered HTML content.
+     */
+    function getHTMLForDate(date) {
+      let flatData = dateChart.datasetController
+        .enabledFlatData()
+        .filter(item => item.date === date);
+
+      let first = flatData.first();
+      let title;
+      if (first && first.from && first.till) {
+        title = `${first.from} - ${first.till}`;
+      } else {
+        title = `${date}`;
+      }
+
+      let dataHTML = combineByDate(flatData)
+        .filter(item => item.value > 0)
+        .map(function (item) {
+          let color = dateChart.datasetController.getColorForDataset(item.dataset);
+          let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
+          return `${divHTML} ${item.dataset}: <b>${item.value}</b>`;
+        })
+        .join('<br>');
+
+      return `<b>${title}</b><br>${dataHTML}`;
+    }
+
+    /**
+     * Presents the tooltip next to bar presenting the given date.
+     *
+     * @param event The mouse event.
+     * @param date The date which is presented.
+     */
+    this.showTooltip = function (event, date) {
+
+      // set examples content before positioning the tooltip cause the size is
+      // calculated based on the size
+      tooltip.html(getHTMLForDate(date));
+
+      // position tooltip
+      let tooltipSize = getTooltipSize();
+      let factor = dateChart.getElementEffectiveSize()[0] / dateChart.config.width;
+      let offset = dateChart.getElementPosition();
+      let top = getTop(factor, offset, tooltipSize);
+      let left = dateChart.xChart(date);
+
+      // differ tooltip position on bar position
+      if (left > (dateChart.config.width / 2)) {
+        left = getXLeft(date, factor, offset, tooltipSize);
+      } else {
+        left = getXRight(date, factor, offset);
+      }
+
+      // update position and opacity of tooltip
+      tooltip
+        .style('left', `${left}px`)
+        .style('top', `${top}px`)
+        .style('opacity', 1);
+    };
+
+    /**
+     * Hides the tooltip.  Does nothing if tooltips opacity is already 0.
+     */
+    this.hideTooltip = function () {
+      if (+tooltip.style('opacity') === 0) return;
+      tooltip.style('opacity', 0);
+    };
+  }
+}
+
+/**
+ *
+ * @class Chart
+ * @extends Component
+ */
+class Chart extends Component {
+
+  /**
+   * Creates an instance of DiachronicChart.
+   *
+   * @constructor
+   * @param {Component} parent The parental component.
+   */
+  constructor(parent, config) {
+    super(parent);
+
+    if (Object.getPrototypeOf(parent) === String.prototype) {
+      this.selector = parent;
+      this.element = d3.select('#' + parent);
+    } else {
+      this.element = parent;
+      this.element.attr('id', this.selector);
+    }
+
+    this.config = config || {};
+    this.svgSelector = createID();
+    this.updateSensible = true;
+    this.initialize();
+    this.update();
+  }
+
+  initialize() {
+    // empty
+  }
+
+  update() {
+    if (!this.updateSensible) return;
+    this.remove();
+    this.precalculate();
+    this.draw();
+  }
+
+  precalculate() {
+    // empty
+  }
+
+  remove() {
+    // empty
+  }
+
+  draw() {
+    // empty
+  }
+
+  makeUpdateInsensible() {
+    this.updateSensible = false;
+  }
+
+  makeUpdateSensible() {
+    this.updateSensible = true;
+  }
+}
+
+/**
+ * @class DateGridRenderer
+ */
+class DateGridRenderer {
+
+  /**
+   * Creates a new instance of DateGridRenderer.
+   *
+   * @param dateChart
+   */
+  constructor(dateChart) {
+
+    /**
+     *
+     */
+    this.createAxis = function () {
+
+      this.xAxisGrid = d3
+        .axisBottom(dateChart.xChart)
+        .tickSize(-dateChart.graphHeight)
+        .tickFormat('');
+
+      this.yAxisGrid = d3
+        .axisLeft(dateChart.yChart)
+        .tickSize(-dateChart.graphWidth)
+        .tickFormat('')
+        .ticks(20);
+
+    };
+
+    /**
+     *
+     */
+    this.renderGrid = function () {
+      let config = dateChart.config;
+      let color = 'lightgray';
+      let width = '0.5';
+      let opacity = 0.3;
+
+      dateChart.svg
+        .append('g')
+        .attr('class', 'x axis-grid')
+        .attr('transform', 'translate(0,' + (config.height - config.margin.bottom) + ')')
+        .attr('stroke', color)
+        .attr('stroke-width', width)
+        .attr("opacity", opacity)
+        .call(this.xAxisGrid);
+
+      dateChart.svg
+        .append('g')
+        .attr('class', 'y axis-grid')
+        .attr('transform', `translate(${config.margin.left},0)`)
+        .attr('stroke', color)
+        .attr('stroke-width', width)
+        .attr("opacity", opacity)
+        .call(this.yAxisGrid);
+
+    };
+  }
+}
+
+/**
+ * Returns a copy of the passed object.  The copy is created by using the
+ * JSON's `parse` and `stringify` functions.
+ *
+ * @param object The java script object to copy.
+ * @returns {any} The copy of the object.
+ */
+function copy(object) {
+  return JSON.parse(JSON.stringify(object));
+}
+
+/**
  * Returns a flat version of the given dataset collection.
  *
  * @param datasets The collection of datasets.
  * @returns {[]} The array containing the flat data.
  */
+
 function flatDatasets(datasets) {
   let flatData = [];
   datasets.forEach(function (dataset) {
@@ -491,9 +995,10 @@ function flatDataset(dataset) {
     return flatData;
   }
   dataset.data.forEach(item => {
-    item.dataset = dataset.label;
-    item.stack = dataset.stack;
-    flatData.push(item);
+    let newItem = copy(item);
+    newItem.dataset = dataset.label;
+    newItem.stack = dataset.stack;
+    flatData.push(newItem);
   });
   return flatData;
 }
@@ -633,151 +1138,6 @@ function extractLatestDateWithValue(flatData) {
 }
 
 /**
- * Returns a copy of the passed object.  The copy is created by using the
- * JSON's `parse` and `stringify` functions.
- *
- * @param object The java script object to copy.
- * @returns {any} The copy of the object.
- */
-function copy(object) {
-  return JSON.parse(JSON.stringify(object));
-}
-
-/**
- * Returns
- *
- * @param flattenList
- * @returns {[]}
- */
-function combine(flattenList) {
-  let combined = [];
-  for (let index = 0; index < flattenList.length; index++) {
-    let listItem = flattenList[index];
-    let entry = combined.find(function (entryItem) {
-      return entryItem.dataset === listItem.dataset
-        && entryItem.stack === listItem.stack
-        && entryItem.label === listItem.label
-        && entryItem.location === listItem.location
-        && entryItem.date === listItem.date;
-    });
-    if (entry) {
-      entry.value += (listItem.value + 0);
-    } else {
-      let entry = {};
-      if (listItem.label) entry.label = listItem.label;
-      if (listItem.dataset) entry.dataset = listItem.dataset;
-      if (listItem.stack) entry.stack = listItem.stack;
-      if (listItem.location) entry.location = listItem.location;
-      if (listItem.locationTotal) entry.locationTotal = listItem.locationTotal;
-      if (listItem.date) entry.date = listItem.date;
-      if (listItem.dateTotal) entry.dateTotal = listItem.dateTotal;
-      if (listItem.locationName) entry.locationName = listItem.locationName;
-      entry.value = (listItem.value || 0);
-      combined.push(entry);
-    }
-  }
-  return combined;
-}
-
-/**
- * Returns
- *
- * @param flattenList
- * @returns {[]}
- */
-function combineByStacks(flattenList) {
-  let combined = [];
-  for (let index = 0; index < flattenList.length; index++) {
-    let listItem = flattenList[index];
-    let entry = combined.find(function (entryItem) {
-      return entryItem.stack === listItem.stack
-        && entryItem.label === listItem.label
-        && entryItem.location === listItem.location
-        && entryItem.date === listItem.date;
-    });
-    if (entry) {
-      entry.value += (listItem.value + 0);
-    } else {
-      let entry = {};
-      if (listItem.label) entry.label = listItem.label;
-      if (listItem.stack) entry.stack = listItem.stack;
-      if (listItem.location) entry.location = listItem.location;
-      if (listItem.locationTotal) entry.locationTotal = listItem.locationTotal;
-      if (listItem.date) entry.date = listItem.date;
-      if (listItem.dateTotal) entry.dateTotal = listItem.dateTotal;
-      if (listItem.locationName) entry.locationName = listItem.locationName;
-      entry.value = (listItem.value || 0);
-      combined.push(entry);
-    }
-  }
-  return combined;
-}
-
-/**
- *
- * @param flatData
- * @returns {[]}
- */
-function combineByDate(flatData) {
-  let combined = [];
-  for (let index = 0; index < flatData.length; index++) {
-    let listItem = flatData[index];
-    let entry = combined.find(function (entryItem) {
-      return  entryItem.dataset === listItem.dataset
-        && entryItem.stack === listItem.stack
-        && entryItem.label === listItem.label
-        && entryItem.date === listItem.date;
-    });
-    if (entry) {
-      entry.value += (listItem.value + 0);
-    } else {
-      let entry = {};
-      if (listItem.label) entry.label = listItem.label;
-      if (listItem.dataset) entry.dataset = listItem.dataset;
-      if (listItem.stack) entry.stack = listItem.stack;
-      if (listItem.date) entry.date = listItem.date;
-      if (listItem.dateTotal) entry.dateTotal = listItem.dateTotal;
-      if (listItem.locationName) entry.locationName = listItem.locationName;
-      entry.value = (listItem.value || 0);
-      combined.push(entry);
-    }
-  }
-  return combined;
-}
-
-/**
- *
- * @param flatData
- * @returns {[]}
- */
-function combineByLocation(flatData) {
-  let combined = [];
-  for (let index = 0; index < flatData.length; index++) {
-    let listItem = flatData[index];
-    let entry = combined.find(function (entryItem) {
-      return  entryItem.dataset === listItem.dataset
-        && entryItem.stack === listItem.stack
-        && entryItem.label === listItem.label
-        && entryItem.location === listItem.location;
-    });
-    if (entry) {
-      entry.value += listItem.value;
-    } else {
-      let entry = {};
-      if (listItem.label) entry.label = listItem.label;
-      if (listItem.dataset) entry.dataset = listItem.dataset;
-      if (listItem.stack) entry.stack = listItem.stack;
-      if (listItem.location) entry.location = listItem.location;
-      if (listItem.locationTotal) entry.locationTotal = listItem.locationTotal;
-      if (listItem.locationName) entry.locationName = listItem.locationName;
-      entry.value = listItem.value;
-      combined.push(entry);
-    }
-  }
-  return combined;
-}
-
-/**
  *
  * @class DatasetsColorsController
  */
@@ -844,6 +1204,10 @@ class DatasetsController {
     this.dateAccess = function (date) {
       return Date.parse(date);
     };
+
+    this.locationFilters = [];
+    this.dateFilters = [];
+    this.datasetFilters = [];
   }
 
   get flatDataCombinedStacks() {
@@ -893,475 +1257,6 @@ class DatasetsController {
   }
 }
 
-/**
- *
- */
-class DatasetsControllerFilter extends DatasetsController {
-
-  constructor(datasets) {
-    super(datasets);
-    this.listeners = [];
-    this.locationFilters = [];
-    this.dateFilters = [];
-    this.datasetFilters = [];
-  }
-
-  resetFilters() {
-    this.locationFilters = [];
-    this.dateFilters = [];
-    this.datasetFilters = [];
-    this.notifyListeners('reset-filters');
-  }
-
-  setLocationsFilter(locations) {
-    this.resetFilters();
-    this.locationFilters = locations.map(location => String(location));
-    this.notifyListeners('location-filter');
-  }
-
-  setDatesFilter(dates) {
-    this.resetFilters();
-    this.dateFilters = dates.map(date => String(date));
-    this.notifyListeners('dates-filter');
-  }
-
-  setDatasetsFilter(datasets) {
-    this.resetFilters();
-    this.datasetFilters = datasets.map(dataset => String(dataset));
-    this.notifyListeners('dataset-filter');
-  }
-
-  toggleDataset(label) {
-    this.workingDatasets.forEach(function (dataset) {
-      if (dataset.label === label) {
-        dataset.isEnabled = !dataset.isEnabled;
-      }
-    });
-    this.notifyListeners('dataset-toggle');
-  }
-
-  enableAllDatasets() {
-    this.workingDatasets.forEach(function (dataset) {
-      dataset.isEnabled = true;
-    });
-    this.notifyListeners('dataset-enable-all');
-  }
-
-  get enabledDatasets() {
-
-    let aCopy = copy(this.workingDatasets);
-
-    let enabled = aCopy
-      .filter(dataset => dataset.isEnabled === true);
-
-    if (this.datasetFilters && this.datasetFilters.length > 0) {
-      enabled = enabled.filter(dataset => this.datasetFilters.includes(dataset.label));
-    }
-
-    if (this.locationFilters && this.locationFilters.length > 0) {
-      let locationFilters = this.locationFilters;
-      enabled = enabled.map(function (dataset) {
-        dataset.data = dataset.data
-          .filter(data => locationFilters.includes(String(data.location))) || [];
-        return dataset;
-      });
-    }
-
-    if (this.dateFilters && this.dateFilters.length > 0) {
-      let dateFilters = this.dateFilters;
-      enabled = enabled.map(function (dataset) {
-        dataset.data = dataset.data
-          .filter(data => dateFilters.includes(String(data.date))) || [];
-        return dataset;
-      });
-    }
-
-    return enabled;
-  }
-
-  get enabledFlatData() {
-    return flatDatasets(this.enabledDatasets);
-  }
-
-  get enabledLabels() {
-    return extractLabelsFromDatasets(this.enabledDatasets);
-  }
-
-  get enabledStacks() {
-    return extractStacksFromDatasets(this.enabledDatasets);
-  }
-
-  get enabledDates() {
-    return extractDatesFromDatasets(this.enabledDatasets);
-  }
-
-  // addListener(listener) {
-  //   this.listeners.push(listener);
-  // }
-  //
-  // removeListener(listener) {
-  //   let index = this.listeners.indexOf(listener);
-  //   if (index === -1) return;
-  //   this.listeners = this.listeners.splice(index, 1);
-  // }
-  //
-  // notifyListeners(reason = 'none') {
-  //   for (let index = 0; index < this.listeners.length; index++) {
-  //     let listener = this.listeners[index];
-  //     if (!listener.update) continue;
-  //     listener.update(this, reason);
-  //   }
-  // }
-}
-
-/**
- *
- * @class DateGhostBarsRenderer
- */
-class DateGhostBarsRenderer {
-
-  /**
-   * Creates a new instance of DateGhostBarsRenderer.
-   * @param dateChart
-   */
-  constructor(dateChart) {
-
-    function createID(date) {
-      return `ghost-rect-${String(date).replaceAll('.', '-')}`;
-    }
-
-    this.hideAll = function () {
-      dateChart.svg
-        .selectAll('.lotivis-selection-rect')
-        // .transition()
-        .attr("opacity", 0);
-    };
-
-    function onMouseEnter(event, date) {
-      this.hideAll();
-      let controller = dateChart.datasetController;
-      let id = createID(date);
-
-      dateChart.updateSensible = false;
-      controller.setDatesFilter([date]);
-      dateChart.updateSensible = true;
-      dateChart
-        .svg
-        .select(`#${id}`)
-        // .transition()
-        .attr("opacity", 0.3);
-
-      dateChart.tooltipRenderer.showTooltip(event, date);
-    }
-
-    function onMouserOut(event, date) {
-      this.hideAll();
-      dateChart.tooltipRenderer.hideTooltip(event, date);
-      dateChart.datasetController.resetFilters();
-    }
-
-    this.renderGhostBars = function () {
-      let dates = dateChart.datasetController.dates;
-      dateChart
-        .svg
-        .append("g")
-        .selectAll("rect")
-        .data(dates)
-        .enter()
-        .append("rect")
-        .attr("class", 'lotivis-selection-rect')
-        .attr("id", date => createID(date))
-        .attr("opacity", 0)
-        .attr("rx", Constants.barRadius)
-        .attr("ry", Constants.barRadius)
-        .attr("x", (date) => dateChart.xChart(date))
-        .attr("y", dateChart.margin.top)
-        .attr("width", dateChart.xChart.bandwidth())
-        .attr("height", dateChart.height - dateChart.margin.bottom - dateChart.margin.top)
-        .on('mouseenter', onMouseEnter.bind(this))
-        .on('mouseout', onMouserOut.bind(this));
-
-    };
-  }
-}
-
-/**
- * Injects and presents a tooltip on a date chart.
- *
- * @class DateTooltipRenderer
- */
-class DateTooltipRenderer {
-
-  /**
-   * Creates a new instance of DateTooltipRenderer.
-   *
-   * @constructor
-   */
-  constructor(dateChart) {
-
-    const tooltip = dateChart
-      .element
-      .append('div')
-      .attr('class', 'lotivis-tooltip')
-      .attr('rx', 5) // corner radius
-      .attr('ry', 5)
-      .style('opacity', 0);
-
-    /**
-     * Returns the size [width, height] of the tooltip.
-     *
-     * @returns {number[]}
-     */
-    function getTooltipSize() {
-      let tooltipWidth = Number(tooltip.style('width').replace('px', ''));
-      let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
-      return [tooltipWidth, tooltipHeight];
-    }
-
-    /**
-     * Calculates and returns the top pixel position for the tooltip.
-     *
-     * @param factor The size factor of the chart.
-     * @param offset The offset of the chart.
-     * @param tooltipSize The size of the tooltip.
-     * @returns {number}
-     */
-    function getTop(factor, offset, tooltipSize) {
-      let top = dateChart.margin.top * factor;
-      top += (((dateChart.graphHeight * factor) - tooltipSize[1]) / 2);
-      top += offset[1] - 10;
-      return top;
-    }
-
-    /**
-     * Calculates the x offset to position the tooltip on the left side
-     * of a bar.
-     *
-     * @param date The presented date of selected bar.
-     * @param factor The size factor of the chart.
-     * @param offset The offset of the chart.
-     * @param tooltipSize The size of the tooltip.
-     * @returns {number} The x offset for the tooltip.
-     */
-    function getXLeft(date, factor, offset, tooltipSize) {
-      let x = dateChart.xChart(date) * factor;
-      return x + offset[0] - tooltipSize[0] - 22 - Constants.tooltipOffset;
-    }
-
-    /**
-     * Calculates the x offset to position the tooltip on the right side
-     * of a bar.
-     *
-     * @param date The presented date of selected bar.
-     * @param factor The size factor of the chart.
-     * @param offset The offset of the chart.
-     * @returns {number} The x offset for the tooltip.
-     */
-    function getXRight(date, factor, offset) {
-      let x = dateChart.xChart(date) + dateChart.xChart.bandwidth();
-      x *= factor;
-      x += offset[0] + Constants.tooltipOffset;
-      return x;
-    }
-
-    /**
-     * Returns the HTML content for the given date.
-     *
-     * @param date The date to get the HTML content for.
-     * @returns {string} Return the rendered HTML content.
-     */
-    function getHTMLForDate(date) {
-      let flatData = dateChart.datasetController
-        .enabledFlatData
-        .filter(item => item.date === date);
-
-      let first = flatData.first();
-      let title;
-      if (first && first.from && first.till) {
-        title = `${first.from} - ${first.till}`;
-      } else {
-        title = `${date}`;
-      }
-
-      let dataHTML = combineByDate(flatData)
-        .filter(item => item.value > 0)
-        .map(function (item) {
-          let color = dateChart.datasetController.getColorForDataset(item.dataset);
-          let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
-          return `${divHTML} ${item.dataset}: <b>${item.value}</b>`;
-        })
-        .join('<br>');
-
-      return `<b>${title}</b><br>${dataHTML}`;
-    }
-
-    /**
-     * Presents the tooltip next to bar presenting the given date.
-     *
-     * @param event The mouse event.
-     * @param date The date which is presented.
-     */
-    this.showTooltip = function (event, date) {
-
-      // set examples content before positioning the tooltip cause the size is
-      // calculated based on the size
-      tooltip.html(getHTMLForDate(date));
-
-      // position tooltip
-      let tooltipSize = getTooltipSize();
-      let factor = dateChart.getElementEffectiveSize()[0] / dateChart.width;
-      let offset = dateChart.getElementPosition();
-      let top = getTop(factor, offset, tooltipSize);
-      let left = dateChart.xChart(date);
-
-      // differ tooltip position on bar position
-      if (left > (dateChart.width / 2)) {
-        left = getXLeft(date, factor, offset, tooltipSize);
-      } else {
-        left = getXRight(date, factor, offset);
-      }
-
-      // update position and opacity of tooltip
-      tooltip
-        .style('left', `${left}px`)
-        .style('top', `${top}px`)
-        .style('opacity', 1);
-    };
-
-    /**
-     * Hides the tooltip.  Does nothing if tooltips opacity is already 0.
-     */
-    this.hideTooltip = function () {
-      if (+tooltip.style('opacity') === 0) return;
-      tooltip.style('opacity', 0);
-    };
-  }
-}
-
-/**
- *
- * @class Chart
- * @extends Component
- */
-class Chart extends Component {
-
-  /**
-   * Creates an instance of DiachronicChart.
-   *
-   * @constructor
-   * @param {Component} parent The parental component.
-   */
-  constructor(parent, config) {
-    super(parent);
-
-    if (Object.getPrototypeOf(parent) === String.prototype) {
-      this.selector = parent;
-      this.element = d3.select('#' + parent);
-    } else {
-      this.element = parent;
-      this.element.attr('id', this.selector);
-    }
-
-    this.config = config;
-    this.svgSelector = createID();
-    this.updateSensible = true;
-    this.initialize();
-    this.update();
-  }
-
-  initialize() {
-    // empty
-  }
-
-  update() {
-    if (!this.updateSensible) return;
-    this.remove();
-    this.precalculate();
-    this.draw();
-  }
-
-  precalculate() {
-    // empty
-  }
-
-  remove() {
-    // empty
-  }
-
-  draw() {
-    // empty
-  }
-
-  makeUpdateInsensible() {
-    this.updateSensible = false;
-  }
-
-  makeUpdateSensible() {
-    this.updateSensible = true;
-  }
-}
-
-/**
- * @class DateGridRenderer
- */
-class DateGridRenderer {
-
-  /**
-   * Creates a new instance of DateGridRenderer.
-   *
-   * @param dateChart
-   */
-  constructor(dateChart) {
-
-    /**
-     *
-     */
-    this.createAxis = function () {
-
-      this.xAxisGrid = d3
-        .axisBottom(dateChart.xChart)
-        .tickSize(-dateChart.graphHeight)
-        .tickFormat('');
-
-      this.yAxisGrid = d3
-        .axisLeft(dateChart.yChart)
-        .tickSize(-dateChart.graphWidth)
-        .tickFormat('')
-        .ticks(20);
-
-    };
-
-    /**
-     *
-     */
-    this.renderGrid = function () {
-      let config = dateChart.config;
-      let color = 'lightgray';
-      let width = '0.5';
-      let opacity = 0.3;
-
-      dateChart.svg
-        .append('g')
-        .attr('class', 'x axis-grid')
-        .attr('transform', 'translate(0,' + (config.height - config.margin.bottom) + ')')
-        .attr('stroke', color)
-        .attr('stroke-width', width)
-        .attr("opacity", opacity)
-        .call(this.xAxisGrid);
-
-      dateChart.svg
-        .append('g')
-        .attr('class', 'y axis-grid')
-        .attr('transform', `translate(${config.margin.left},0)`)
-        .attr('stroke', color)
-        .attr('stroke-width', width)
-        .attr("opacity", opacity)
-        .call(this.yAxisGrid);
-
-    };
-  }
-}
-
 const defaultConfig = {
   width: 1000,
   height: 600,
@@ -1398,24 +1293,15 @@ class DateChart extends Chart {
   }
 
   initializeDefaultValues() {
-    console.log('defaultConfig.margin', defaultConfig.margin);
-    console.log('theConfig.margin', this.config.margin);
 
-    let theConfig = this.config;
-    let margin = Object.assign(theConfig.margin, defaultConfig.margin);
+    this.config;
+    let margin;
+    margin = Object.assign({}, defaultConfig.margin);
+    margin = Object.assign(margin, this.config.margin);
 
-    console.log('margin', margin.left);
-
-    Object.assign(theConfig, defaultConfig);
-
-
-
-
-    console.log('margin', theConfig.margin);
-
-    theConfig.margin = Object.assign(defaultConfig.margin, theConfig.margin);
-    this.config = theConfig;
-    console.log('this.config 4', this.config);
+    let config = Object.assign({}, defaultConfig);
+    this.config = Object.assign(config, this.config);
+    this.config.margin = margin;
 
     this.datasets = [];
 
@@ -1477,7 +1363,7 @@ class DateChart extends Chart {
 
     this.xStack = d3
       .scaleBand()
-      .domain(this.datasetController.enabledStacks)
+      .domain(this.datasetController.enabledStacks())
       .rangeRound([0, this.xChart.bandwidth()])
       .padding(0.05);
 
@@ -1543,19 +1429,6 @@ class DateChart extends Chart {
       .attr('fill', 'white')
       .attr('opacity', 0);
 
-    // create a background rectangle for receiving mouse enter events
-    // in order to reset the location data filter.
-    // this.background
-    //   .on('mouseenter', function () {
-    //     let controller = this.datasetController;
-    //     let filters = controller.dateFilters;
-    //     if (!filters || filters.length === 0) return;
-    //     this.makeUpdateInsensible();
-    //     controller.setDatesFilter([]);
-    //     this.makeUpdateSensible();
-    //     this.ghostBarsRenderer.hideAll();
-    //   }.bind(this));
-
     this.graph = this.svg
       .append('g')
       .attr('width', this.graphWidth)
@@ -1588,7 +1461,7 @@ class DateChart extends Chart {
    * @param newDatasets
    */
   set datasets(newDatasets) {
-    this.setDatasetController(new DatasetsControllerFilter(newDatasets));
+    this.setDatasetController(new DatasetsController(newDatasets));
   }
 
   /**
@@ -1758,7 +1631,7 @@ class Popup extends Component {
     this.modalBackgroundId = createID();
     this.modalBackground = parent
       .append('div')
-      .classed('popup-underground fade-in', true)
+      .classed('lotivis-popup-underground lotivis-fade-in', true)
       .attr('id', this.modalBackgroundId);
   }
 
@@ -1769,7 +1642,7 @@ class Popup extends Component {
     this.elementId = createID();
     this.element = this.modalBackground
       .append('div')
-      .classed('popup', true)
+      .classed('lotivis-popup', true)
       .attr('id', this.elementId);
   }
 
@@ -1778,7 +1651,7 @@ class Popup extends Component {
    */
   renderCard() {
     this.card = new Card(this.element);
-    this.card.element.classed('popup arrow arrow-right', true);
+    this.card.element.classed('lotivis-popup lotivis-arrow lotivis-arrow-right', true);
   }
 
   /**
@@ -1786,7 +1659,7 @@ class Popup extends Component {
    */
   renderCloseButton() {
     this.closeButton = new Button(this.card.headerRightComponent);
-    this.closeButton.element.classed('button-small', true);
+    this.closeButton.element.classed('lotivis-button-small', true);
     this.closeButton.setText('Close');
   }
 
@@ -2330,7 +2203,6 @@ class ChartCard extends Card {
     this.screenshotButton = new Button(this.headerRightComponent);
     this.screenshotButton.setText('Screenshot');
     this.screenshotButton.element.classed('simple-button', true);
-    this.screenshotButton.setFontAwesomeImage('camera');
     this.screenshotButton.onClick = function (event) {
       this.screenshotButtonAction(event);
     }.bind(this);
@@ -2338,7 +2210,6 @@ class ChartCard extends Card {
     this.moreButton = new Button(this.headerRightComponent);
     this.moreButton.setText('More');
     this.moreButton.element.classed('simple-button', true);
-    this.moreButton.setFontAwesomeImage('ellipsis-h');
     this.moreButton.onClick = function (event) {
       this.presentSettingsPopupAction(event);
     }.bind(this);
@@ -2629,10 +2500,10 @@ class DateChartCard extends ChartCard {
    * @param name
    */
   constructor(selector, name) {
-    super(selector);
-    if (!selector) throw 'No selector specified.';
-    this.selector = selector;
-    this.name = selector;
+    let theSelector = selector || 'date-chart-card';
+    super(theSelector);
+    this.selector = theSelector;
+    this.name = theSelector;
     this.datasets = [];
     this.renderChart();
     this.renderRadioGroup();
@@ -2713,6 +2584,7 @@ class DateChartCard extends ChartCard {
  * @returns {*}
  */
 function removeFeatures(geoJSON, removeCandidates) {
+  if (!Array.isArray(removeCandidates)) return geoJSON;
   let newGeoJSON = geoJSON;
   for (let index = 0; index < removeCandidates.length; index++) {
     let code = removeCandidates[index];
@@ -2794,18 +2666,18 @@ class MapTooltipRenderer {
       .style('opacity', 0);
 
     function featureMapID(feature) {
-      return `lotivis-map-area-${mapChart.featureIDAccessor(feature)}`;
+      return `lotivis-map-area-${mapChart.config.featureIDAccessor(feature)}`;
     }
 
     function htmlTitle(feature) {
-      let featureID = mapChart.featureIDAccessor(feature);
-      let featureName = mapChart.featureNameAccessor(feature);
+      let featureID = mapChart.config.featureIDAccessor(feature);
+      let featureName = mapChart.config.featureNameAccessor(feature);
       return `ID: ${featureID}<br>Name: ${featureName}`;
     }
 
     function htmlValues(feature) {
       let components = [];
-      let featureID = mapChart.featureIDAccessor(feature);
+      let featureID = mapChart.config.featureIDAccessor(feature);
       if (mapChart.datasetController) {
         let flatData = mapChart.datasetController.flatData;
         let combined = combineByLocation(flatData);
@@ -2864,7 +2736,7 @@ class MapTooltipRenderer {
       // svg is presented in dynamic sized view box so we need to get the actual size
       // of the element in order to calculate a scale for the position of the tooltip.
       let effectiveSize = mapChart.getElementEffectiveSize();
-      let factor = effectiveSize[0] / mapChart.width;
+      let factor = effectiveSize[0] / mapChart.config.width;
       let positionOffset = mapChart.getElementPosition();
 
       /**
@@ -2904,7 +2776,7 @@ class MapTooltipRenderer {
       }
 
       let top = 0;
-      if (featureLowerLeft[1] > (mapChart.height / 2)) {
+      if (featureLowerLeft[1] > (mapChart.config.height / 2)) {
         top = getTooltipLocationAbove();
       } else {
         top = getTooltipLocationUnder();
@@ -3064,7 +2936,7 @@ class MapLabelRenderer {
       if (!mapChart.datasetController) return debug_log('no datasetController');
 
       removeLabels();
-      if (!mapChart.isShowLabels) return;
+      if (!mapChart.config.isShowLabels) return;
 
       mapChart.svg
         .selectAll('text')
@@ -3073,7 +2945,7 @@ class MapLabelRenderer {
         .append('text')
         .attr('class', 'lotivis-map-label')
         .text(function (feature) {
-          let featureID = mapChart.featureIDAccessor(feature);
+          let featureID = mapChart.config.featureIDAccessor(feature);
           let dataset = combinedData.find(dataset => equals(dataset.location, featureID));
           return dataset ? formatNumber(dataset.value) : '';
         })
@@ -3083,6 +2955,7 @@ class MapLabelRenderer {
         .attr('y', function (feature) {
           return mapChart.projection(feature.center)[1];
         }.bind(this));
+
     };
   }
 }
@@ -3111,8 +2984,6 @@ class MapDatasetRenderer {
         .selectAll('.lotivis-map-area')
         .style('fill', 'whitesmoke')
         .style('fill-opacity', 1);
-      // .style('fill', style.fill || 'white')
-      // .style('fill-opacity', style['fill-opacity'] || 0);
     }
 
     /**
@@ -3124,7 +2995,6 @@ class MapDatasetRenderer {
 
       let stackNames = mapChart.datasetController.stacks;
       let combinedData = mapChart.combinedData;
-
       resetAreas();
 
       for (let index = 0; index < stackNames.length; index++) {
@@ -3142,9 +3012,8 @@ class MapDatasetRenderer {
 
           mapChart.svg
             .selectAll('.lotivis-map-area')
-            .filter((item) => equals(mapChart.featureIDAccessor(item), locationID))
+            .filter((item) => equals(mapChart.config.featureIDAccessor(item), locationID))
             .style('fill', generator(opacity));
-          // .style('fill-opacity', opacity);
 
         }
       }
@@ -3185,12 +3054,12 @@ class MapGeojsonRenderer {
     }
 
     /**
-     * Renders the `geoJSON` property.
+     * Renders the `presentedGeoJSON` property.
      */
     this.renderGeoJson = function () {
       let geoJSON = mapChart.presentedGeoJSON;
       if (!geoJSON) return debug_log('No Geo JSON file to render.');
-      let idAccessor = mapChart.featureIDAccessor;
+      let idAccessor = mapChart.config.featureIDAccessor;
 
       mapChart.areas = mapChart.svg
         .selectAll('path')
@@ -3267,6 +3136,7 @@ class MapExteriorBorderRenderer {
       if (!self.topojson) return debug_log('Can\'t find topojson lib.  Skip rendering of exterior border.');
       let geoJSON = mapChart.presentedGeoJSON;
       let borders = joinFeatures(geoJSON);
+      if (!borders) return;
       mapChart.svg
         .append('path')
         .datum(borders)
@@ -3353,22 +3223,7 @@ class MapMinimapRenderer {
 
 /**
  *
- * @param str
- * @returns {number}
- */
-function hashCode(str) {
-  let hash = 0, i, chr;
-  for (i = 0; i < str.length; i++) {
-    chr = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
-}
-
-/**
- *
- * @class
+ * @class MapSelectionBoundsRenderer
  */
 class MapSelectionBoundsRenderer {
 
@@ -3384,7 +3239,13 @@ class MapSelectionBoundsRenderer {
       .attr('class', 'lotivis-map-selection-rect')
       .style('fill-opacity', 0);
 
+    /**
+     * Tells this renderer that the mouse moved in an area.
+     * @param event The mouse event.
+     * @param feature The feature (area) that the mouse is now pointing on.
+     */
     this.mouseEnter = function (event, feature) {
+      if (!mapChart.config.drawRectangleAroundSelection) return;
       let projection = mapChart.projection;
       let featureBounds = d3.geoBounds(feature);
       let featureLowerLeft = projection(featureBounds[0]);
@@ -3392,13 +3253,16 @@ class MapSelectionBoundsRenderer {
       let featureBoundsWidth = featureUpperRight[0] - featureLowerLeft[0];
       let featureBoundsHeight = featureLowerLeft[1] - featureUpperRight[1];
       bounds
-        .style('opacity', mapChart.drawRectangleAroundSelection ? 1 : 0)
         .style('width', featureBoundsWidth + 'px')
         .style('height', featureBoundsHeight + 'px')
         .style('x', featureLowerLeft[0])
-        .style('y', featureUpperRight[1]);
+        .style('y', featureUpperRight[1])
+        .style('opacity', 1);
     };
 
+    /**
+     * Tells this renderer that the mouse moved out of an area.
+     */
     this.mouseOut = function () {
       bounds.style('opacity', 0);
     };
@@ -3413,6 +3277,53 @@ class MapSelectionBoundsRenderer {
 }
 
 /**
+ *
+ * @param str
+ * @returns {number}
+ */
+function hashCode(str) {
+  let hash = 0, i, chr;
+  for (i = 0; i < str.length; i++) {
+    chr = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+}
+
+/**
+ *
+ * @type {{}}
+ */
+const defaultMapChartConfig = {
+  width: 1000,
+  height: 1000,
+  margin: {
+    top: Constants.defaultMargin,
+    right: Constants.defaultMargin,
+    bottom: Constants.defaultMargin,
+    left: Constants.defaultMargin
+  },
+  isShowLabels: true,
+  geoJSON: null,
+  departmentsData: [],
+  excludedFeatureCodes: [],
+  drawRectangleAroundSelection: false,
+  featureIDAccessor: function (feature) {
+    if (feature.id) return feature.id;
+    if (feature.properties && feature.properties.id) return feature.properties.id;
+    if (feature.properties && feature.properties.code) return feature.properties.code;
+    return hashCode(feature.properties);
+  },
+  featureNameAccessor: function (feature) {
+    if (feature.name) return feature.name;
+    if (feature.properties && feature.properties.name) return feature.properties.name;
+    if (feature.properties && feature.properties.nom) return feature.properties.nom;
+    return 'Unknown';
+  }
+};
+
+/**
  * A component which renders a geo json with d3.
  *
  * @class MapChart
@@ -3424,9 +3335,10 @@ class MapChart extends Chart {
    * Creates a new instance of MapChart.
    *
    * @param parent The parental component.
+   * @param config The configuration of the map chart.
    */
-  constructor(parent) {
-    super(parent);
+  constructor(parent, config) {
+    super(parent, config);
     this.element = parent
       .append('div')
       .attr('id', this.selector);
@@ -3447,29 +3359,14 @@ class MapChart extends Chart {
    * Initialize with default values.
    */
   initialize() {
-    this.width = 1000;
-    this.height = 1000;
+    let theConfig = this.config;
+    let margin;
+    margin = Object.assign({}, defaultMapChartConfig.margin);
+    margin = Object.assign(margin, theConfig.margin || {});
 
-    this.isShowLabels = true;
-    this.geoJSON = null;
-    this.departmentsData = [];
-    this.excludedFeatureCodes = [];
-    this.updateSensible = true;
-    this.drawRectangleAroundSelection = true;
-
-    this.featureIDAccessor = function (feature) {
-      if (feature.id) return feature.id;
-      if (feature.properties && feature.properties.id) return feature.properties.id;
-      if (feature.properties && feature.properties.code) return feature.properties.code;
-      return hashCode(feature.properties);
-    };
-
-    this.featureNameAccessor = function (feature) {
-      if (feature.name) return feature.name;
-      if (feature.properties && feature.properties.name) return feature.properties.name;
-      if (feature.properties && feature.properties.nom) return feature.properties.nom;
-      return 'Unknown';
-    };
+    let config = Object.assign({}, defaultMapChartConfig);
+    this.config = Object.assign(config, this.config);
+    this.config.margin = margin;
 
     this.projection = d3.geoMercator();
     this.path = d3.geoPath().projection(this.projection);
@@ -3495,12 +3392,12 @@ class MapChart extends Chart {
       .attr('class', 'lotivis-chart-svg lotivis-map')
       // .style('width', this.width)
       // .style('height', this.height);
-      .attr('viewBox', `0 0 ${this.width} ${this.height}`);
+      .attr('viewBox', `0 0 ${this.config.width} ${this.config.height}`);
 
     this.background = this.svg
       .append('rect')
-      .attr('width', this.width)
-      .attr('height', this.height)
+      .attr('width', this.config.width)
+      .attr('height', this.config.height)
       .attr('fill', 'white');
 
     // create a background rectangle for receiving mouse enter events
@@ -3523,7 +3420,7 @@ class MapChart extends Chart {
    * @param geoJSON
    */
   zoomTo(geoJSON) {
-    this.projection.fitSize([this.width, this.height], geoJSON);
+    this.projection.fitSize([this.config.width, this.config.height], geoJSON);
   }
 
   /**
@@ -3534,7 +3431,7 @@ class MapChart extends Chart {
   onSelectFeature(event, feature) {
     if (!feature || !feature.properties) return;
     if (!this.datasetController) return;
-    let locationID = this.featureIDAccessor(feature);
+    let locationID = this.config.featureIDAccessor(feature);
     this.updateSensible = false;
     this.datasetController.setLocationsFilter([locationID]);
     this.updateSensible = true;
@@ -3569,7 +3466,7 @@ class MapChart extends Chart {
    * @param newDatasets
    */
   set datasets(newDatasets) {
-    this.setDatasetController(new DatasetsControllerFilter(newDatasets));
+    this.setDatasetController(new DatasetsController(newDatasets));
   }
 
   /**
@@ -3586,7 +3483,7 @@ class MapChart extends Chart {
    */
   datasetsDidChange() {
     if (!this.datasetController) return;
-    const combinedByStack = combineByStacks(this.datasetController.enabledFlatData);
+    const combinedByStack = combineByStacks(this.datasetController.enabledFlatData());
     this.combinedData = combineByLocation(combinedByStack);
 
     this.svg.remove();
@@ -3743,24 +3640,25 @@ class PlotAxisRenderer {
      * Appends axis on the top, left and bottom of the plot chart.
      */
     this.renderAxis = function () {
+      let margin = plotChart.config.margin;
 
       // top
       plotChart.svg
         .append("g")
         .call(d3.axisTop(plotChart.xChart))
-        .attr("transform", () => `translate(0,${plotChart.margin.top})`);
+        .attr("transform", () => `translate(0,${margin.top})`);
 
       // left
       plotChart.svg
         .append("g")
         .call(d3.axisLeft(plotChart.yChart))
-        .attr("transform", () => `translate(${plotChart.margin.left},0)`);
+        .attr("transform", () => `translate(${margin.left},0)`);
 
       // bottom
       plotChart.svg
         .append("g")
         .call(d3.axisBottom(plotChart.xChart))
-        .attr("transform", () => `translate(0,${plotChart.height - plotChart.margin.bottom})`);
+        .attr("transform", () => `translate(0,${plotChart.height - margin.bottom})`);
 
     };
   }
@@ -3805,8 +3703,8 @@ class PlotBarsRenderer {
       let lastDate = dataset.latestDate;
       let timespan = lastDate - firstDate;
       let colorInterpolator = d3.interpolateRgb(
-        plotChart.configuration.lowColor,
-        plotChart.configuration.highColor
+        plotChart.config.lowColor,
+        plotChart.config.highColor
       );
 
       if (firstDate === lastDate) {
@@ -3841,6 +3739,25 @@ class PlotBarsRenderer {
     }
 
     /**
+     * To be called when the mouse enters a bar on the plot chart.
+     * @param event The mouse event.
+     * @param dataset The represented dataset.
+     */
+    function mouseEnter(event, dataset) {
+      plotChart.tooltipRenderer.showTooltip.bind(plotChart)(event, dataset);
+      plotChart.onSelectDataset(event, dataset);
+    }
+
+    /**
+     * To be called when the mouse leaves a bar on the plot chart.
+     * @param event The mouse event.
+     * @param dataset The represented dataset.
+     */
+    function mouseOut(event, dataset) {
+      plotChart.tooltipRenderer.hideTooltip.bind(plotChart)(event, dataset);
+    }
+
+    /**
      * Draws the bars.
      */
     this.renderBars = function () {
@@ -3864,15 +3781,23 @@ class PlotBarsRenderer {
         .attr('class', 'lotivis-plot-bar')
         .attr("rx", radius)
         .attr("ry", radius)
-        .attr("x", (d) => plotChart.xChart(d.earliestDate || 0))
+        .attr("x", (d) => plotChart.xChart((d.duration < 0) ? d.latestDate : d.earliestDate || 0))
         .attr("y", (d) => plotChart.yChart(d.label))
         .attr("height", plotChart.yChart.bandwidth())
         .attr("id", (d) => 'rect-' + createIDFromDataset(d))
-        .on('mouseenter', plotChart.tooltipRenderer.showTooltip.bind(plotChart))
-        .on('mouseout', plotChart.tooltipRenderer.hideTooltip.bind(plotChart))
+        .on('mouseenter', mouseEnter)
+        .on('mouseout', mouseOut)
         .attr("width", function (data) {
           if (!data.earliestDate || !data.latestDate) return 0;
-          return plotChart.xChart(data.latestDate) - plotChart.xChart(data.earliestDate) + plotChart.xChart.bandwidth();
+          let firstDate, lastDate;
+          if (data.duration < 0) {
+            firstDate = data.latestDate;
+            lastDate = data.earliestDate;
+          } else {
+            firstDate = data.earliestDate;
+            lastDate = data.latestDate;
+          }
+          return plotChart.xChart(lastDate) - plotChart.xChart(firstDate) + plotChart.xChart.bandwidth();
         }.bind(this));
     };
   }
@@ -3945,19 +3870,19 @@ class PlotTooltipRenderer {
      * @param dataset The dataset.
      */
     this.showTooltip = function (event, dataset) {
-
+      if (!plotChart.config.showTooltip) return;
       tooltip.html(getHTMLContentForDataset(dataset));
 
       // position tooltip
       let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
-      let factor = plotChart.getElementEffectiveSize()[0] / plotChart.width;
+      let factor = plotChart.getElementEffectiveSize()[0] / plotChart.config.width;
       let offset = plotChart.getElementPosition();
 
       let top = plotChart.yChart(dataset.label) * factor;
       top += offset[1];
 
-      if ((plotChart.yChart(dataset.label) - plotChart.margin.top) <= (plotChart.graphHeight / 2)) {
-        top += (plotChart.lineHeight * factor) + Constants.tooltipOffset;
+      if ((plotChart.yChart(dataset.label) - plotChart.config.margin.top) <= (plotChart.graphHeight / 2)) {
+        top += (plotChart.config.lineHeight * factor) + Constants.tooltipOffset;
       } else {
         top -= tooltipHeight + 20; // subtract padding
         top -= Constants.tooltipOffset;
@@ -3969,8 +3894,6 @@ class PlotTooltipRenderer {
         .style('left', left + 'px')
         .style('top', top + 'px')
         .style('opacity', 1);
-
-      plotChart.onSelectDataset(event, dataset);
     };
 
     /**
@@ -4008,7 +3931,7 @@ class PlotLabelRenderer {
      * Draws the labels on the bars on the plot chart.
      */
     this.renderLabels = function () {
-      if (!plotChart.isShowLabels) return;
+      if (!plotChart.config.isShowLabels) return;
       let xBandwidth = plotChart.yChart.bandwidth();
       let xChart = plotChart.xChart;
       plotChart.labels = plotChart
@@ -4048,17 +3971,18 @@ class PlotGridRenderer {
      * Adds a grid to the chart.
      */
     this.renderGrid = function () {
+      if (!plotChart.config.drawGrid) return;
 
       plotChart.svg
         .append('g')
         .attr('class', 'lotivis-plot-grid lotivis-plot-grid-x')
-        .attr('transform', 'translate(0,' + (plotChart.height - plotChart.margin.bottom) + ')')
+        .attr('transform', 'translate(0,' + (plotChart.preferredHeight - plotChart.config.margin.bottom) + ')')
         .call(plotChart.xAxisGrid);
 
       plotChart.svg
         .append('g')
         .attr('class', 'lotivis-plot-grid lotivis-plot-grid-y')
-        .attr('transform', `translate(${plotChart.margin.left},0)`)
+        .attr('transform', `translate(${plotChart.config.margin.left},0)`)
         .call(plotChart.yAxisGrid);
 
     };
@@ -4080,36 +4004,210 @@ class PlotBackgroundRenderer {
 }
 
 /**
+ * Enumeration of sorts available in the plot chart.
+ */
+const PlotChartSort = {
+  alphabetically: 'alphabetically',
+  duration: 'duration',
+  intensity: 'intensity',
+  firstDate: 'firstDate'
+};
+
+const defaultPlotChartConfig = {
+  width: 1000,
+  height: 600,
+  margin: {
+    top: Constants.defaultMargin,
+    right: Constants.defaultMargin,
+    bottom: Constants.defaultMargin,
+    left: Constants.defaultMargin
+  },
+  lineHeight: 28,
+  radius: 23,
+  isShowLabels: true,
+  drawGrid: true,
+  showTooltip: true,
+  lowColor: 'rgb(184, 233, 148)',
+  highColor: 'rgb(0, 122, 255)',
+  sort: PlotChartSort.duration
+};
+
+Array.prototype.first = function () {
+  return this[0];
+};
+Array.prototype.last = function () {
+  return this[this.length - 1];
+};
+
+/**
+ * Combines each `ratio` entries to one.
+ * @param datasets The datasets collection.
+ * @param ratio The ratio.
+ */
+function combineDatasetsByRatio(datasets, ratio) {
+  let copied = copy(datasets);
+  for (let index = 0; index < copied.length; index++) {
+    let dataset = copied[index];
+    let data = dataset.data;
+    dataset.data = combineDataByGroupsize(data, ratio);
+    copied[index] = dataset;
+  }
+  return copied;
+}
+
+/**
+ *
+ * @param data
+ * @param ratio
+ */
+function combineDataByGroupsize(data, ratio) {
+  if (!data || data.length <= ratio) return data;
+  let combined = combineByDate(data);
+  let newData = [];
+
+  while (combined.length > 0) {
+    let dateGroup = combined.splice(0, ratio);
+    let firstItem = dateGroup.first();
+    let lastItem = dateGroup.last();
+    let item = {};
+    item.dataset = firstItem.dataset;
+    item.stack = firstItem.stack;
+    item.date = firstItem.date;
+    item.date = firstItem.date;
+    item.from = firstItem.date;
+    item.till = lastItem.date;
+    item.value = sumOfValues(dateGroup);
+    newData.push(item);
+  }
+
+  return newData;
+}
+
+/**
+ *
+ * @param datasets
+ * @param dateAccess
+ * @returns {{date: *}[]}
+ */
+function dateToItemsRelation(datasets, dateAccess) {
+
+  let flatData = flatDatasets(datasets);
+  flatData = combineByDate(flatData);
+
+  let listOfDates = extractDatesFromDatasets(datasets);
+  // verbose_log('listOfDates', listOfDates);
+  listOfDates = listOfDates.reverse();
+  // verbose_log('listOfDates', listOfDates);
+  // listOfDates = listOfDates.sort(function (left, right) {
+  //   return dateAccess(left) - dateAccess(right);
+  // });
+
+  let listOfLabels = extractLabelsFromDatasets(datasets);
+
+  return listOfDates.map(function (date) {
+    let datasetDate = {date: date};
+    flatData
+      .filter(item => item.date === date)
+      .forEach(function (entry) {
+        datasetDate[entry.dataset] = entry.value;
+        datasetDate.total = entry.dateTotal;
+      });
+
+    // add zero values for empty datasets
+    for (let index = 0; index < listOfLabels.length; index++) {
+      let label = listOfLabels[index];
+      if (!datasetDate[label]) {
+        datasetDate[label] = 0;
+      }
+    }
+
+    return datasetDate;
+  });
+}
+
+/**
+ *
+ * @param datasets
+ * @param dateToItemsRelation
+ * @returns {*[]}
+ */
+function createStackModel(controller, datasets, dateToItemsRelation) {
+  let listOfStacks = extractStacksFromDatasets(datasets);
+
+  return listOfStacks.map(function (stackName) {
+
+    let stackCandidates = datasets.filter(function (dataset) {
+      return dataset.stack === stackName
+        || dataset.label === stackName;
+    });
+
+    let candidatesNames = stackCandidates.map(stackCandidate => stackCandidate.label);
+    let candidatesColors = stackCandidates.map(stackCandidate => controller.getColorForDataset(stackCandidate.label));
+
+    let stack = d3
+      .stack()
+      .keys(candidatesNames)
+      (dateToItemsRelation);
+
+    stack.label = stackName;
+    stack.stack = stackName;
+    stack.colors = candidatesColors;
+
+    return stack;
+  });
+}
+
+/**
+ * Returns a new generated plot data view for the current enabled data of dataset of this controller.
+ */
+DatasetsController.prototype.getPlotDataview = function () {
+  let dateAccess = this.dateAccess;
+  let enabledDatasets = this.enabledDatasets();
+  let dataview = {datasets: []};
+  enabledDatasets.forEach(function (dataset) {
+    let newDataset = {};
+    let data = copy(dataset.data);
+    data.forEach(item => item.label = dataset.label);
+    let firstDate = extractEarliestDateWithValue(data);
+    let lastDate = extractLatestDateWithValue(data);
+    newDataset.label = dataset.label;
+    newDataset.stack = dataset.stack;
+    newDataset.earliestDate = firstDate;
+    newDataset.latestDate = lastDate;
+    newDataset.duration = lastDate - firstDate;
+    newDataset.data = combineByDate(data);
+    newDataset.sum = sumOfLabel(data, dataset.label);
+    newDataset.data = data
+      .sort((left, right) => dateAccess(left.date) - dateAccess(right.date));
+
+    dataview.datasets.push(newDataset);
+  });
+  dataview.labelsCount = enabledDatasets.length;
+  return dataview;
+};
+
+/**
  * A lotivis plot chart.
  *
  * @class PlotChart
  * @extends Chart
  */
 class PlotChart extends Chart {
-  radius = 23;
-  isShowLabels = true;
-  configuration = {
-    lowColor: 'rgb(184, 233, 148)',
-    highColor: 'rgb(0, 122, 255)'
-  };
-  sort = PlotChartSort.duration;
 
   /**
    * Initializes this diachronic chart by setting the default values.
    */
   initialize() {
-    this.width = 1000;
-    this.height = 600;
-    this.defaultMargin = 60;
-    this.lineHeight = 28;
-    this.margin = {
-      top: this.defaultMargin,
-      right: this.defaultMargin,
-      bottom: this.defaultMargin,
-      left: this.defaultMargin + 100
-    };
 
-    this.isShowLabels = true;
+    this.config;
+    let margin;
+    margin = Object.assign({}, defaultPlotChartConfig.margin);
+    margin = Object.assign(margin, this.config.margin);
+
+    let config = Object.assign({}, defaultPlotChartConfig);
+    this.config = Object.assign(config, this.config);
+    this.config.margin = margin;
+
     this.createSVG();
     this.backgroundRenderer = new PlotBackgroundRenderer(this);
     this.axisRenderer = new PlotAxisRenderer(this);
@@ -4128,7 +4226,7 @@ class PlotChart extends Chart {
       .attr('id', this.svgSelector)
       .attr('class', 'lotivis-chart-svg')
       .attr('preserveAspectRatio', 'xMidYMid meet')
-      .attr("viewBox", `0 0 ${this.width} ${this.height}`);
+      .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`);
   }
 
   /**
@@ -4142,19 +4240,27 @@ class PlotChart extends Chart {
    *
    */
   precalculate() {
-    let margin = this.margin;
-    let barsCount = 0;
-    if (this.workingDatasets && this.workingDatasets.length > 0) {
-      barsCount = this.workingDatasets.length;
+    if (this.datasetController) {
+      this.datasetController.enabledDatasets();
+      this.dataView = this.datasetController.getPlotDataview();
+    } else {
+      this.dataView = {barsCount: 0};
     }
-    this.height = (barsCount * this.lineHeight) + margin.top + margin.bottom;
-    this.graphWidth = this.width - margin.left - margin.right;
-    this.graphHeight = this.height - margin.top - margin.bottom;
+
+    let margin = this.config.margin;
+    let barsCount = this.dataView.barsCount || 0;
+
+    this.graphWidth = this.config.width - margin.left - margin.right;
+    this.graphHeight = (barsCount * this.config.lineHeight);
+    this.height = this.graphHeight + margin.top + margin.bottom;
+    this.preferredHeight = this.height;
 
     this.svg
-      .attr("viewBox", `0 0 ${this.width} ${this.height}`);
+      .attr("viewBox", `0 0 ${this.config.width} ${this.preferredHeight}`);
 
-    this.datasetsDidChange();
+
+    this.sortDatasets();
+    this.createScales();
   }
 
   /**
@@ -4174,6 +4280,7 @@ class PlotChart extends Chart {
    * Updates the plot chart.
    */
   update(controller, reason) {
+    verbose_log('reason', reason);
     if (!this.updateSensible) return;
     if (reason === 'dates-filter') return;
     this.remove();
@@ -4194,13 +4301,13 @@ class PlotChart extends Chart {
     this.xChart = d3
       .scaleBand()
       .domain(listOfDates)
-      .rangeRound([this.margin.left, this.width - this.margin.right])
+      .rangeRound([this.config.margin.left, this.config.width - this.config.margin.right])
       .paddingInner(0.1);
 
     this.yChart = d3
       .scaleBand()
       .domain(listOfLabels)
-      .rangeRound([this.height - this.margin.bottom, this.margin.top])
+      .rangeRound([this.height - this.config.margin.bottom, this.config.margin.top])
       .paddingInner(0.1);
 
     this.xAxisGrid = d3
@@ -4223,39 +4330,32 @@ class PlotChart extends Chart {
   onSelectDataset(event, dataset) {
     if (!dataset || !dataset.label) return;
     let label = dataset.label;
+    if (this.datasetController.listeners.length === 1) return;
     this.updateSensible = false;
     this.datasetController.setDatasetsFilter([label]);
     this.updateSensible = true;
   }
 
   sortDatasets() {
-    this.workingDatasets = this.workingDatasets.reverse();
+    this.dataView.datasets = this.dataView.datasets.reverse();
     switch (this.sort) {
       case PlotChartSort.alphabetically:
-        this.workingDatasets = this.workingDatasets
+        this.dataView.datasets = this.dataView.datasets
           .sort((set1, set2) => set1.label > set2.label);
         break;
       case PlotChartSort.duration:
-        this.workingDatasets = this.workingDatasets
+        this.dataView.datasets = this.dataView.datasets
           .sort((set1, set2) => set1.duration < set2.duration);
         break;
       case PlotChartSort.intensity:
-        this.workingDatasets = this.workingDatasets
+        this.dataView.datasets = this.dataView.datasets
           .sort((set1, set2) => set1.sum < set2.sum);
         break;
       case PlotChartSort.firstDate:
-        this.workingDatasets = this.workingDatasets
+        this.dataView.datasets = this.dataView.datasets
           .sort((set1, set2) => set1.earliestDate > set2.earliestDate);
         break;
     }
-  }
-
-  set showLabels(newValue) {
-    this.isShowLabels = newValue;
-  }
-
-  get showLabels() {
-    return this.isShowLabels;
   }
 
   /**
@@ -4263,7 +4363,7 @@ class PlotChart extends Chart {
    * @param newDatasets The array of datasets.
    */
   set datasets(newDatasets) {
-    this.setDatasetController(new DatasetsControllerFilter(newDatasets));
+    this.setDatasetController(new DatasetsController(newDatasets));
   }
 
   /**
@@ -4275,32 +4375,8 @@ class PlotChart extends Chart {
   }
 
   /**
-   *
-   */
-  datasetsDidChange() {
-    if (!this.datasetController) return;
-    let datasets = this.datasetController.enabledDatasets;
-    this.workingDatasets = copy(datasets);
-    this.workingDatasets.forEach(function (dataset) {
-      let data = dataset.data;
-      let firstDate = extractEarliestDateWithValue(data);
-      let lastDate = extractLatestDateWithValue(data);
-      let duration = lastDate - firstDate;
-      data.forEach(item => item.label = dataset.label);
-      data = data.sort((left, right) => left.date - right.date);
-      dataset.earliestDate = firstDate;
-      dataset.latestDate = lastDate;
-      dataset.duration = duration;
-      dataset.data = combineByDate(data);
-      dataset.sum = sumOfLabel(data, dataset.label);
-    });
-    this.sortDatasets();
-    this.createScales();
-  }
-
-  /**
-   *
-   * @param newController
+   * Sets the nes datasets controller.
+   * @param newController The dataset controller.
    */
   setDatasetController(newController) {
     this.datasetController = newController;
@@ -4308,16 +4384,6 @@ class PlotChart extends Chart {
     this.update();
   }
 }
-
-/**
- * Enumeration of sorts available in the plot chart.
- */
-const PlotChartSort = {
-  alphabetically: 'alphabetically',
-  duration: 'duration',
-  intensity: 'intensity',
-  firstDate: 'firstDate'
-};
 
 /**
  *
@@ -4464,7 +4530,9 @@ class PlotChartSettingsPopup extends Popup {
    */
   render() {
     this.card.headerRow.append('h3').text('Settings');
-    this.row = this.card.body.append('div').classed('row', true);
+    this.row = this.card.body
+      .append('div')
+      .classed('lotivis-row margin-left margin-right margin-top', true);
     this.renderShowLabelsCheckbox();
   }
 
@@ -4472,16 +4540,17 @@ class PlotChartSettingsPopup extends Popup {
    * Appends the checkboxes the popups content.
    */
   renderShowLabelsCheckbox() {
-    let container = this.row.append('div').classed('col-12 margin-top', true);
+    let container = this.row.append('div').classed('lotivis-margin-top', true);
+
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText('Labels');
     this.showLabelsCheckbox.onClick = function (checked) {
-      this.chart.showLabels = checked;
+      this.chart.config.isShowLabels = checked;
       this.chart.update();
       UrlParameters.getInstance().set(UrlParameters.chartShowLabels, checked);
     }.bind(this);
 
-    let dropdownContainer = this.row.append('div').classed('col-12', true);
+    let dropdownContainer = this.row.append('div').classed('lotivis-col-12', true);
     this.sortDropdown = new Dropdown(dropdownContainer);
     this.sortDropdown.setLabelText('Sort');
     this.sortDropdown.setOptions([
@@ -4501,18 +4570,14 @@ class PlotChartSettingsPopup extends Popup {
    * @returns {{width: number, height: number}}
    */
   preferredSize() {
-    return {
-      width: 240,
-      height: 600
-    };
+    return {width: 240, height: 600};
   }
 
   /**
    * Tells this popup that it is about to be displayed.
    */
   willShow() {
-    verbose_log('this.chart.showLabels', this.chart.showLabels);
-    this.showLabelsCheckbox.setChecked(this.chart.showLabels);
+    this.showLabelsCheckbox.setChecked(this.chart.config.isShowLabels);
     this.sortDropdown.setSelectedOption(this.chart.sort);
   }
 }
@@ -4546,9 +4611,12 @@ class PlotChartCard extends ChartCard {
    * Injects the plot chart in the body of the card.
    */
   injectChart() {
-    this.chart = new PlotChart(this.body);
-    this.chart.margin.left = 120;
-    this.chart.margin.right = 50;
+    this.chart = new PlotChart(this.body, {
+      margin: {
+        left: 120,
+        right: 50
+      }
+    });
   }
 
   /**
@@ -4736,58 +4804,31 @@ class GeoJson {
 }
 
 /**
- *
- * @param datasets
- * @param dateAccess
- * @returns {{date: *}[]}
+ * Appends the given listener to the collection of listeners.
+ * @param listener The listener to add.
  */
-function dateToItemsRelation(datasets, dateAccess) {
-
-  let flatData = flatDatasets(datasets);
-  flatData = combineByDate(flatData);
-
-  let listOfDates = extractDatesFromDatasets(datasets);
-  // verbose_log('listOfDates', listOfDates);
-  listOfDates = listOfDates.reverse();
-  // verbose_log('listOfDates', listOfDates);
-  // listOfDates = listOfDates.sort(function (left, right) {
-  //   return dateAccess(left) - dateAccess(right);
-  // });
-
-  let listOfLabels = extractLabelsFromDatasets(datasets);
-
-  return listOfDates.map(function (date) {
-    let datasetDate = {date: date};
-    flatData
-      .filter(item => item.date === date)
-      .forEach(function (entry) {
-        datasetDate[entry.dataset] = entry.value;
-        datasetDate.total = entry.dateTotal;
-      });
-
-    // add zero values for empty datasets
-    for (let index = 0; index < listOfLabels.length; index++) {
-      let label = listOfLabels[index];
-      if (!datasetDate[label]) {
-        datasetDate[label] = 0;
-      }
-    }
-
-    return datasetDate;
-  });
-}
-
 DatasetsController.prototype.addListener = function (listener) {
+  if (!this.listeners) this.listeners = [];
   this.listeners.push(listener);
 };
 
+/**
+ * Removes the given listern
+ * @param listener
+ */
 DatasetsController.prototype.removeListener = function (listener) {
+  if (!this.listeners) return;
   let index = this.listeners.indexOf(listener);
   if (index === -1) return;
   this.listeners = this.listeners.splice(index, 1);
 };
 
+/**
+ *
+ * @param reason
+ */
 DatasetsController.prototype.notifyListeners = function (reason = 'none') {
+  if (!this.listeners) return;
   for (let index = 0; index < this.listeners.length; index++) {
     let listener = this.listeners[index];
     if (!listener.update) continue;
@@ -4796,87 +4837,135 @@ DatasetsController.prototype.notifyListeners = function (reason = 'none') {
 };
 
 /**
- *
- * @param datasets
- * @param dateToItemsRelation
- * @returns {*[]}
+ * Resets all filters.  Notifies listeners.
  */
-function createStackModel(controller, datasets, dateToItemsRelation) {
-  let listOfStacks = extractStacksFromDatasets(datasets);
+DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
+  this.locationFilters = [];
+  this.dateFilters = [];
+  this.datasetFilters = [];
+  if (!notifyListeners) return;
+  this.notifyListeners('reset-filters');
+};
 
-  return listOfStacks.map(function (stackName) {
+/**
+ * Sets the locations filter.  Notifies listeners.
+ * @param locations The locations to filter.
+ */
+DatasetsController.prototype.setLocationsFilter = function (locations) {
+  this.resetFilters(false);
+  this.locationFilters = locations.map(location => String(location));
+  this.notifyListeners('location-filter');
+};
 
-    let stackCandidates = datasets.filter(function (dataset) {
-      return dataset.stack === stackName
-        || dataset.label === stackName;
-    });
+/**
+ * Sets the dates filter.  Notifies listeners.
+ * @param dates The dates to filter.
+ */
+DatasetsController.prototype.setDatesFilter = function (dates) {
+  this.resetFilters(false);
+  this.dateFilters = dates.map(date => String(date));
+  this.notifyListeners('dates-filter');
+};
 
-    let candidatesNames = stackCandidates.map(stackCandidate => stackCandidate.label);
-    let candidatesColors = stackCandidates.map(stackCandidate => controller.getColorForDataset(stackCandidate.label));
+/**
+ * Sets the datasets filter.  Notifies listeners.
+ * @param datasets The datasets to filter.
+ */
+DatasetsController.prototype.setDatasetsFilter = function (datasets) {
+  this.resetFilters(false);
+  this.datasetFilters = datasets.map(dataset => String(dataset));
+  this.notifyListeners('dataset-filter');
+};
 
-    let stack = d3
-      .stack()
-      .keys(candidatesNames)
-      (dateToItemsRelation);
-
-    stack.label = stackName;
-    stack.stack = stackName;
-    stack.colors = candidatesColors;
-
-    return stack;
+/**
+ * Toggles the enabled of the dataset with the given label.  Notifies listeners.
+ * @param label The label of the dataset.
+ */
+DatasetsController.prototype.toggleDataset = function (label) {
+  this.workingDatasets.forEach(function (dataset) {
+    if (dataset.label === label) {
+      dataset.isEnabled = !dataset.isEnabled;
+    }
   });
-}
-
-Array.prototype.first = function () {
-  return this[0];
-};
-Array.prototype.last = function () {
-  return this[this.length - 1];
+  this.notifyListeners('dataset-toggle');
 };
 
 /**
- * Combines each `ratio` entries to one.
- * @param datasets The datasets collection.
- * @param ratio The ratio.
+ * Enables all datasets.  Notifies listeners.
  */
-function combineDatasetsByRatio(datasets, ratio) {
-  let copied = copy(datasets);
-  for (let index = 0; index < copied.length; index++) {
-    let dataset = copied[index];
-    let data = dataset.data;
-    dataset.data = combineDataByGroupsize(data, ratio);
-    copied[index] = dataset;
-  }
-  return copied;
-}
+DatasetsController.prototype.enableAllDatasets = function () {
+  this.workingDatasets.forEach(function (dataset) {
+    dataset.isEnabled = true;
+  });
+  this.notifyListeners('dataset-enable-all');
+};
 
 /**
- *
- * @param data
- * @param ratio
+ * Returns a newly generated collection containing all enabled datasets.
+ * @returns {*} The collection of enabled datasets.
  */
-function combineDataByGroupsize(data, ratio) {
-  if (!data || data.length <= ratio) return data;
-  let combined = combineByDate(data);
-  let newData = [];
+DatasetsController.prototype.enabledDatasets = function () {
+  let aCopy = copy(this.workingDatasets);
 
-  while (combined.length > 0) {
-    let dateGroup = combined.splice(0, ratio);
-    let firstItem = dateGroup.first();
-    let lastItem = dateGroup.last();
-    let item = {};
-    item.dataset = firstItem.dataset;
-    item.stack = firstItem.stack;
-    item.date = firstItem.date;
-    item.date = firstItem.date;
-    item.from = firstItem.date;
-    item.till = lastItem.date;
-    item.value = sumOfValues(dateGroup);
-    newData.push(item);
+  let enabled = aCopy
+    .filter(dataset => dataset.isEnabled === true);
+
+  if (this.datasetFilters && this.datasetFilters.length > 0) {
+    enabled = enabled.filter(dataset => this.datasetFilters.includes(dataset.label));
   }
 
-  return newData;
-}
+  if (this.locationFilters && this.locationFilters.length > 0) {
+    let locationFilters = this.locationFilters;
+    enabled = enabled.map(function (dataset) {
+      dataset.data = dataset.data
+        .filter(data => locationFilters.includes(String(data.location))) || [];
+      return dataset;
+    });
+  }
+
+  if (this.dateFilters && this.dateFilters.length > 0) {
+    let dateFilters = this.dateFilters;
+    enabled = enabled.map(function (dataset) {
+      dataset.data = dataset.data
+        .filter(data => dateFilters.includes(String(data.date))) || [];
+      return dataset;
+    });
+  }
+
+  return enabled;
+};
+
+/**
+ * Returns the flat version of the collection of enabled datasets.
+ * @returns {[]}
+ */
+DatasetsController.prototype.enabledFlatData = function () {
+  return flatDatasets(this.enabledDatasets());
+};
+
+/**
+ * Returns the set of labels of the enabled datasets.
+ * @returns {*[]} The set of labels.
+ */
+DatasetsController.prototype.enabledLabels = function () {
+  return extractLabelsFromDatasets(this.enabledDatasets());
+};
+
+/**
+ * Returns the set of stacks of the enabled datasets.
+ * @returns {*[]} The set of stacks.
+ */
+DatasetsController.prototype.enabledStacks = function () {
+  return extractStacksFromDatasets(this.enabledDatasets());
+};
+
+/**
+ * Returns the set of dates of the enabled datasets.
+ * @returns {*[]} The set of dates.
+ */
+DatasetsController.prototype.enabledDates = function () {
+  return extractDatesFromDatasets(this.enabledDatasets());
+};
 
 /**
  * Returns a new generated DateDataview for the current enabled data of dataset of this controller.
@@ -4884,7 +4973,7 @@ function combineDataByGroupsize(data, ratio) {
 DatasetsController.prototype.getDateDataview = function () {
   this.dateAccess;
   let workingDatasets = copy(this.workingDatasets);
-  let enabledDatasets = copy(this.enabledDatasets || workingDatasets);
+  let enabledDatasets = copy(this.enabledDatasets() || workingDatasets);
   let dateGroupRatio = 2;
   let dataview = {};
 
@@ -5074,8 +5163,8 @@ exports.RadioGroup = RadioGroup;
 exports.Option = Option;
 
 // date
-exports.TimeChart = DateChart;
-exports.TimeChartCard = DateChartCard;
+exports.DateChart = DateChart;
+exports.DateChartCard = DateChartCard;
 
 // map
 exports.MapChart = MapChart;
@@ -5087,8 +5176,6 @@ exports.PlotChartCard = PlotChartCard;
 
 // datasets
 exports.DatasetController = DatasetsController;
-exports.FilterableDatasetController = DatasetsControllerFilter;
-
 
 // url parameters
 exports.URLParameters = UrlParameters;

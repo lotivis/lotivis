@@ -11,37 +11,39 @@
 <body>
 
 <div class="lotivis-example-container">
-  <div class="row">
-    <div class="col-2">
+  <div class="lotivis-example-row">
+    <div class="lotivis-example-col-2">
       <a href="../index.html">
         <button class="back-button">
           Back
         </button>
       </a>
     </div>
-    <div class="col-8 text-center">
+    <div class="lotivis-example-col-8 text-center">
       <h1>mif, mif', miff, miff', miffs, mifs, mille-f, mi-f, mi-f', 'mif'</h1>
     </div>
-    <div class="col-6">
-      <div id="time-chart-card">
-        <!-- Time Chart Code Here -->
+    <div class="lotivis-example-col-6">
+      <div id="date-chart-card">
+        <!-- Date Chart Code Here -->
       </div>
       <div id="plot-chart-card">
         <!-- Plot Chart Code Here -->
       </div>
     </div>
-    <div class="col-6">
+    <div class="lotivis-example-col-6">
       <div id="map-chart-card">
         <!-- Map Chart Code Here -->
       </div>
     </div>
-    <div class="col-6">
+    <div class="lotivis-example-col-6">
 
     </div>
-    <div class="col-12">
-      <samp id="data">
-        <!-- Data Here -->
-      </samp>
+    <div class="lotivis-example-col-12">
+      <div class="lotivis-example-data">
+        <samp id="data">
+          <!-- Data Here -->
+        </samp>
+      </div>
     </div>
   </div>
 </div>
@@ -52,7 +54,7 @@
 <script>
 
   lotivis.Constants.debug = true;
-  let timeChartCard = new lotivis.TimeChartCard('time-chart-card');
+  let dateChartCard = new lotivis.DateChartCard('date-chart-card');
   let mapChartCard = new lotivis.MapChartCard('map-chart-card');
   mapChartCard.chart.excludedFeatureCodes = ['2A', '2B'];
 
@@ -66,14 +68,14 @@
     })
     .then(function (json) {
 
-      let string = JSON.stringify(json, null, 4);
+      let string = JSON.stringify(json, null, 2);
       let element = document.getElementById('data');
       element.innerHTML = string;
 
-      let controller = new lotivis.FilterableDatasetController(json);
+      let controller = new lotivis.DatasetController(json);
 
-      timeChartCard.chart.setDatasetController(controller);
-      timeChartCard.chart.update();
+      dateChartCard.chart.setDatasetController(controller);
+      dateChartCard.chart.update();
 
       mapChartCard.chart.setDatasetController(controller);
       mapChartCard.chart.update();

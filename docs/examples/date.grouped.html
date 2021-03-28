@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="../css/lotivis.css"/>
   <link rel="stylesheet" href="../css/examples.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <title>Lotivis - Chart</title>
+  <title>Lotivis - Time Chart Grouped</title>
 </head>
 <body>
 
@@ -21,7 +21,7 @@
       </a>
     </div>
     <div class="lotivis-example-col-8 text-center">
-      <h1>Chart</h1>
+      <h1>Date Chart Grouped</h1>
     </div>
     <div class="lotivis-example-col-4">
       <div class="lotivis-example-data">
@@ -43,18 +43,17 @@
 
 <script>
 
-  let timeChartCard = new lotivis.TimeChartCard('date-chart-card');
-  let chart = timeChartCard.chart;
+  let dateChartCard = new lotivis.DateChartCard();
 
   d3
-    .json('/assets/datasets-chart.json')
+    .json('/assets/example-datasets-location-time-grouped.json')
     .then(function (json) {
-      let string = JSON.stringify(json, null, 2);
+      let string = JSON.stringify(json, null, 4);
       let element = document.getElementById('data');
       element.innerHTML = string;
 
-      chart.datasets = json;
-      chart.update();
+      dateChartCard.chart.datasets = json;
+      dateChartCard.chart.update();
     });
 
 </script>

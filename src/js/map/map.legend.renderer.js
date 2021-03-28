@@ -1,4 +1,4 @@
-import {Color} from "../shared/colors";
+import {Color} from "../shared/color";
 import {formatNumber} from "../shared/format";
 
 /**

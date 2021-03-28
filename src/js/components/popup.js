@@ -46,7 +46,7 @@ export class Popup extends Component {
     this.modalBackgroundId = createID();
     this.modalBackground = parent
       .append('div')
-      .classed('popup-underground fade-in', true)
+      .classed('lotivis-popup-underground lotivis-fade-in', true)
       .attr('id', this.modalBackgroundId);
   }
 
@@ -57,7 +57,7 @@ export class Popup extends Component {
     this.elementId = createID();
     this.element = this.modalBackground
       .append('div')
-      .classed('popup', true)
+      .classed('lotivis-popup', true)
       .attr('id', this.elementId);
   }
 
@@ -66,7 +66,7 @@ export class Popup extends Component {
    */
   renderCard() {
     this.card = new Card(this.element);
-    this.card.element.classed('popup arrow arrow-right', true);
+    this.card.element.classed('lotivis-popup lotivis-arrow lotivis-arrow-right', true);
   }
 
   /**
@@ -74,7 +74,7 @@ export class Popup extends Component {
    */
   renderCloseButton() {
     this.closeButton = new Button(this.card.headerRightComponent);
-    this.closeButton.element.classed('button-small', true);
+    this.closeButton.element.classed('lotivis-button-small', true);
     this.closeButton.setText('Close');
   }
 

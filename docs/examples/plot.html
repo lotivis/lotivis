@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../css/lotivis.css"/>
   <link rel="stylesheet" href="../css/examples.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -26,9 +27,11 @@
       <div id="plot-chart-card">
         <!-- Plot Chart Here -->
       </div>
-      <samp id="data">
-        <!-- Data Here -->
-      </samp>
+      <div class="lotivis-example-data">
+        <samp id="data">
+          <!-- Data Here -->
+        </samp>
+      </div>
     </div>
   </div>
 </div>
@@ -45,9 +48,9 @@
     .json('/assets/example-datasets-plot.json')
     .then(function (json) {
 
-      // let string = JSON.stringify(json, null, 4);
-      // let element = document.getElementById('data');
-      // element.innerHTML = string;
+      let string = JSON.stringify(json, null, 4);
+      let element = document.getElementById('data');
+      element.innerHTML = string;
 
       chart.datasets = json;
       chart.update();
