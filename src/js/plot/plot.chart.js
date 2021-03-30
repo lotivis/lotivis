@@ -79,8 +79,6 @@ export class PlotChart extends Chart {
       this.dataView = {datasets: [], barsCount: 0};
     }
 
-    verbose_log('this.dataView', this.dataView);
-
     let margin = this.config.margin;
     let barsCount = this.dataView.labelsCount || 0;
 

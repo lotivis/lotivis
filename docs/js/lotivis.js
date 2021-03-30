@@ -11,6 +11,21 @@ typeof define === 'function' && define.amd ? define(['exports'], factory) :
 }(this, (function (exports) { 'use strict';
 
 /**
+ *
+ * @param str
+ * @returns {number}
+ */
+function hashCode(str) {
+  let hash = 0, i, chr;
+  for (i = 0; i < str.length; i++) {
+    chr = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+}
+
+/**
  * Creates and returns a unique ID.
  */
 var createID;
@@ -20,6 +35,17 @@ var createID;
     return 'lotivis-id-' + uniquePrevious++;
   };
 }());
+
+/**
+ * Creates and returns a unique (save to use for elements) id.  The id is created by calculating the hash of the
+ * dataset's label.
+ * @param dataset The dataset.
+ * @returns {number} The created id.
+ */
+function createIDFromDataset(dataset) {
+  if (!dataset || !dataset.label) return 0;
+  return hashCode(dataset.label);
+}
 
 /**
  * Holds
@@ -37,8 +63,6 @@ const Constants = {
 };
 
 const prefix = '[lotivis]  ';
-
-const verbose_log = console.log;
 
 const debug_log = function (message) {
   if (!Constants.debugLog) return;
@@ -3235,21 +3259,6 @@ class MapSelectionBoundsRenderer {
 
 /**
  *
- * @param str
- * @returns {number}
- */
-function hashCode(str) {
-  let hash = 0, i, chr;
-  for (i = 0; i < str.length; i++) {
-    chr = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
-}
-
-/**
- *
  * @type {{}}
  */
 const defaultMapChartConfig = {
@@ -3281,6 +3290,46 @@ const defaultMapChartConfig = {
 };
 
 /**
+ *
+ * @class MapBackgroundRenderer
+ */
+class MapBackgroundRenderer {
+
+  /**
+   * Creates a new instance of MapBackgroundRenderer.
+   *
+   * @param mapChart The parental map chart.
+   */
+  constructor(mapChart) {
+
+    this.background = mapChart.svg
+      .append('rect')
+      .attr('width', mapChart.config.width)
+      .attr('height', mapChart.config.height)
+      .attr('fill', 'white');
+
+    /**
+     * Appends a background rectangle.
+     */
+    this.render = function () {
+      // create a background rectangle for receiving mouse enter events
+      // in order to reset the location data filter.
+      this.background
+        .on('mouseenter', function () {
+          let controller = mapChart.datasetController;
+          if (!controller) return;
+          let filters = controller.locationFilters;
+          if (!filters || filters.length === 0) return;
+          this.updateSensible = false;
+          controller.setLocationsFilter([]);
+          this.updateSensible = true;
+        }.bind(this));
+
+    };
+  }
+}
+
+/**
  * A component which renders a geo json with d3.
  *
  * @class MapChart
@@ -3302,14 +3351,15 @@ class MapChart extends Chart {
 
     this.initialize();
     this.renderSVG();
-    this.labelRenderer = new MapLabelRenderer(this);
-    this.legendRenderer = new MapLegendRenderer(this);
+    this.backgroundRenderer = new MapBackgroundRenderer(this);
     this.geoJSONRenderer = new MapGeojsonRenderer(this);
     this.datasetRenderer = new MapDatasetRenderer(this);
     this.exteriorBorderRenderer = new MapExteriorBorderRenderer(this);
     this.minimapRenderer = new MapMinimapRenderer(this);
-    this.tooltipRenderer = new MapTooltipRenderer(this);
+    this.labelRenderer = new MapLabelRenderer(this);
+    this.legendRenderer = new MapLegendRenderer(this);
     this.selectionBoundsRenderer = new MapSelectionBoundsRenderer(this);
+    this.tooltipRenderer = new MapTooltipRenderer(this);
   }
 
   /**
@@ -3346,29 +3396,7 @@ class MapChart extends Chart {
       .select(`#${this.selector}`)
       .append('svg')
       .attr('id', this.svgSelector)
-      .attr('class', 'lotivis-chart-svg lotivis-map')
-      // .style('width', this.width)
-      // .style('height', this.height);
       .attr('viewBox', `0 0 ${this.config.width} ${this.config.height}`);
-
-    this.background = this.svg
-      .append('rect')
-      .attr('width', this.config.width)
-      .attr('height', this.config.height)
-      .attr('fill', 'white');
-
-    // create a background rectangle for receiving mouse enter events
-    // in order to reset the location data filter.
-    this.background
-      .on('mouseenter', function () {
-        let controller = this.datasetController;
-        if (!controller) return;
-        let filters = controller.locationFilters;
-        if (!filters || filters.length === 0) return;
-        this.updateSensible = false;
-        controller.setLocationsFilter([]);
-        this.updateSensible = true;
-      }.bind(this));
   }
 
   /**
@@ -3412,15 +3440,15 @@ class MapChart extends Chart {
     if (!this.geoJSON) return;
     // precalculate the center of each feature
     this.geoJSON.features.forEach((feature) => feature.center = d3.geoCentroid(feature));
-    this.presentedGeoJSON = removeFeatures(this.geoJSON, this.excludedFeatureCodes);
+    this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.excludedFeatureCodes);
     this.zoomTo(this.geoJSON);
     this.exteriorBorderRenderer.render();
     this.geoJSONRenderer.renderGeoJson();
   }
 
   /**
-   *
-   * @param newDatasets
+   * Sets the datasets of this map chart.
+   * @param newDatasets The new dataset.
    */
   set datasets(newDatasets) {
     this.setDatasetController(new DatasetsController(newDatasets));
@@ -3622,7 +3650,7 @@ class PlotAxisRenderer {
 }
 
 /**
- * Draws the bar on the plot chart.
+ * Calculates and creates the gradients for the bars of a plot chart.
  *
  * @class PlotGradientCreator
  */
@@ -3639,12 +3667,16 @@ class PlotGradientCreator {
     this.colorGenerator = Color.plotColor(1);
   }
 
-  createGradient(dataset, id) {
+  /**
+   * Creates the gradient for the bar representing the given dataset.
+   * @param dataset The dataset to represent.
+   */
+  createGradient(dataset) {
 
     let max = this.plotChart.dataView.max;
     let gradient = this.plotChart.definitions
       .append("linearGradient")
-      .attr("id", 'lotivis-plot-gradient-' + id)
+      .attr("id", 'lotivis-plot-gradient-' + createIDFromDataset(dataset))
       .attr("x1", "0%")
       .attr("x2", "100%")
       .attr("y1", "0%")
@@ -3654,12 +3686,7 @@ class PlotGradientCreator {
     let dataWithValues = dataset.dataWithValues;
     let count = dataWithValues.length;
     let latestDate = dataset.latestDate;
-    let duration = dataset.duration + 1;
-
-    d3.interpolateRgb(
-      this.plotChart.config.lowColor,
-      this.plotChart.config.highColor
-    );
+    let duration = dataset.duration;
 
     if (!data || data.length === 0) return;
 
@@ -3685,13 +3712,6 @@ class PlotGradientCreator {
         let dateDifference = latestDate - date;
         let value = (dateDifference / duration);
         let datePercentage = (1 - value) * 100;
-
-        if (datePercentage > 100) {
-          verbose_log('dataset', dataset);
-          verbose_log('latestDate', latestDate);
-          verbose_log('date', date);
-          verbose_log('datePercentage', datePercentage);
-        }
 
         gradient
           .append("stop")
@@ -3722,11 +3742,6 @@ class PlotBarsRenderer {
     this.gradientCreator = new PlotGradientCreator(plotChart);
     plotChart.definitions = plotChart.svg.append("defs");
 
-    function createIDFromDataset(dataset) {
-      if (!dataset || !dataset.label) return 0;
-      return hashCode(dataset.label);
-    }
-
     /**
      * To be called when the mouse enters a bar on the plot chart.
      * @param event The mouse event.
@@ -3754,8 +3769,7 @@ class PlotBarsRenderer {
       plotChart.definitions = plotChart.svg.append("defs");
 
       for (let index = 0; index < datasets.length; index++) {
-        let id = createIDFromDataset(datasets[index]);
-        this.gradientCreator.createGradient(datasets[index], id);
+        this.gradientCreator.createGradient(datasets[index]);
       }
 
       plotChart.barsData = plotChart
@@ -4037,8 +4051,10 @@ DatasetsController.prototype.getPlotDataview = function () {
     newDataset.duration = lastDate - firstDate;
     newDataset.data = combineByDate(data);
     newDataset.sum = sumOfLabel(data, dataset.label);
-    newDataset.data = data
+    data = combineByDate(data)
       .sort((left, right) => dateAccess(left.date) - dateAccess(right.date));
+
+    newDataset.data = data;
     newDataset.dataWithValues = data.filter(item => (item.value || 0) > 0);
 
     dataview.datasets.push(newDataset);
@@ -4111,8 +4127,6 @@ class PlotChart extends Chart {
     } else {
       this.dataView = {datasets: [], barsCount: 0};
     }
-
-    verbose_log('this.dataView', this.dataView);
 
     let margin = this.config.margin;
     let barsCount = this.dataView.labelsCount || 0;
@@ -4900,9 +4914,18 @@ function createStackModel(controller, datasets, dateToItemsRelation) {
   });
 }
 
+/**
+ * Returns the first item of the array.
+ * @returns {*} The first item.
+ */
 Array.prototype.first = function () {
   return this[0];
 };
+
+/**
+ * Returns the last item of the array.
+ * @returns {*} The last item.
+ */
 Array.prototype.last = function () {
   return this[this.length - 1];
 };

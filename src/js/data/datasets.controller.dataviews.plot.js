@@ -7,7 +7,6 @@ import {
 } from "../data-juggle/dataset.extract";
 import {combineByDate} from "../data-juggle/dataset.combine";
 import {sumOfLabel} from "../data-juggle/dataset.sum";
-import {verbose_log} from "../shared/debug";
 
 /**
  * Returns a new generated plot data view for the current enabled data of dataset of this controller.
@@ -32,8 +31,10 @@ DatasetsController.prototype.getPlotDataview = function () {
     newDataset.duration = lastDate - firstDate;
     newDataset.data = combineByDate(data);
     newDataset.sum = sumOfLabel(data, dataset.label);
-    newDataset.data = data
+    data = combineByDate(data)
       .sort((left, right) => dateAccess(left.date) - dateAccess(right.date));
+
+    newDataset.data = data;
     newDataset.dataWithValues = data.filter(item => (item.value || 0) > 0);
 
     dataview.datasets.push(newDataset);

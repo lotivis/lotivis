@@ -1,9 +1,8 @@
-import {verbose_log} from "../shared/debug";
-import {hashCode} from "../shared/hash";
 import {Color} from "../shared/color";
+import {createIDFromDataset} from "../shared/selector";
 
 /**
- * Draws the bar on the plot chart.
+ * Calculates and creates the gradients for the bars of a plot chart.
  *
  * @class PlotGradientCreator
  */
@@ -20,12 +19,16 @@ export class PlotGradientCreator {
     this.colorGenerator = Color.plotColor(1);
   }
 
-  createGradient(dataset, id) {
+  /**
+   * Creates the gradient for the bar representing the given dataset.
+   * @param dataset The dataset to represent.
+   */
+  createGradient(dataset) {
 
     let max = this.plotChart.dataView.max;
     let gradient = this.plotChart.definitions
       .append("linearGradient")
-      .attr("id", 'lotivis-plot-gradient-' + id)
+      .attr("id", 'lotivis-plot-gradient-' + createIDFromDataset(dataset))
       .attr("x1", "0%")
       .attr("x2", "100%")
       .attr("y1", "0%")
@@ -35,12 +38,7 @@ export class PlotGradientCreator {
     let dataWithValues = dataset.dataWithValues;
     let count = dataWithValues.length;
     let latestDate = dataset.latestDate;
-    let duration = dataset.duration + 1;
-
-    let colorInterpolator = d3.interpolateRgb(
-      this.plotChart.config.lowColor,
-      this.plotChart.config.highColor
-    );
+    let duration = dataset.duration;
 
     if (!data || data.length === 0) return;
 
@@ -66,13 +64,6 @@ export class PlotGradientCreator {
         let dateDifference = latestDate - date;
         let value = (dateDifference / duration);
         let datePercentage = (1 - value) * 100;
-
-        if (datePercentage > 100) {
-          verbose_log('dataset', dataset);
-          verbose_log('latestDate', latestDate);
-          verbose_log('date', date);
-          verbose_log('datePercentage', datePercentage);
-        }
 
         gradient
           .append("stop")

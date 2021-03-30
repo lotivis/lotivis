@@ -12,6 +12,7 @@ import {MapMinimapRenderer} from "./map.minimap.renderer";
 import {MapSelectionBoundsRenderer} from "./map.selection.bounds.renderer";
 import {defaultMapChartConfig} from "./map.chart.config";
 import {DatasetsController} from "../data/datasets.controller";
+import {MapBackgroundRenderer} from "./map.background.renderer";
 
 /**
  * A component which renders a geo json with d3.
@@ -35,14 +36,15 @@ export class MapChart extends Chart {
 
     this.initialize();
     this.renderSVG();
-    this.labelRenderer = new MapLabelRenderer(this);
-    this.legendRenderer = new MapLegendRenderer(this);
+    this.backgroundRenderer = new MapBackgroundRenderer(this);
     this.geoJSONRenderer = new MapGeojsonRenderer(this);
     this.datasetRenderer = new MapDatasetRenderer(this);
     this.exteriorBorderRenderer = new MapExteriorBorderRenderer(this);
     this.minimapRenderer = new MapMinimapRenderer(this);
-    this.tooltipRenderer = new MapTooltipRenderer(this);
+    this.labelRenderer = new MapLabelRenderer(this);
+    this.legendRenderer = new MapLegendRenderer(this);
     this.selectionBoundsRenderer = new MapSelectionBoundsRenderer(this);
+    this.tooltipRenderer = new MapTooltipRenderer(this);
   }
 
   /**
@@ -79,29 +81,7 @@ export class MapChart extends Chart {
       .select(`#${this.selector}`)
       .append('svg')
       .attr('id', this.svgSelector)
-      .attr('class', 'lotivis-chart-svg lotivis-map')
-      // .style('width', this.width)
-      // .style('height', this.height);
       .attr('viewBox', `0 0 ${this.config.width} ${this.config.height}`);
-
-    this.background = this.svg
-      .append('rect')
-      .attr('width', this.config.width)
-      .attr('height', this.config.height)
-      .attr('fill', 'white');
-
-    // create a background rectangle for receiving mouse enter events
-    // in order to reset the location data filter.
-    this.background
-      .on('mouseenter', function () {
-        let controller = this.datasetController;
-        if (!controller) return;
-        let filters = controller.locationFilters;
-        if (!filters || filters.length === 0) return;
-        this.updateSensible = false;
-        controller.setLocationsFilter([]);
-        this.updateSensible = true;
-      }.bind(this));
   }
 
   /**
@@ -145,15 +125,15 @@ export class MapChart extends Chart {
     if (!this.geoJSON) return;
     // precalculate the center of each feature
     this.geoJSON.features.forEach((feature) => feature.center = d3.geoCentroid(feature));
-    this.presentedGeoJSON = removeFeatures(this.geoJSON, this.excludedFeatureCodes);
+    this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.excludedFeatureCodes);
     this.zoomTo(this.geoJSON);
     this.exteriorBorderRenderer.render();
     this.geoJSONRenderer.renderGeoJson();
   }
 
   /**
-   *
-   * @param newDatasets
+   * Sets the datasets of this map chart.
+   * @param newDatasets The new dataset.
    */
   set datasets(newDatasets) {
     this.setDatasetController(new DatasetsController(newDatasets));

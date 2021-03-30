@@ -1,3 +1,5 @@
+import {hashCode} from "./hash";
+
 /**
  * Creates and returns a unique ID.
  */
@@ -16,4 +18,15 @@ export var createID;
  */
 export function toSaveID(theID) {
   return theID.replaceAll(' ', '-');
+}
+
+/**
+ * Creates and returns a unique (save to use for elements) id.  The id is created by calculating the hash of the
+ * dataset's label.
+ * @param dataset The dataset.
+ * @returns {number} The created id.
+ */
+export function createIDFromDataset(dataset) {
+  if (!dataset || !dataset.label) return 0;
+  return hashCode(dataset.label);
 }

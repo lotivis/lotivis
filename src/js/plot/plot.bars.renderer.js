@@ -1,5 +1,5 @@
-import {hashCode} from "../shared/hash";
 import {PlotGradientCreator} from "./plot.gradient.creator";
+import {createIDFromDataset} from "../shared/selector";
 
 /**
  * Draws the bar on the plot chart.
@@ -19,11 +19,6 @@ export class PlotBarsRenderer {
 
     this.gradientCreator = new PlotGradientCreator(plotChart);
     plotChart.definitions = plotChart.svg.append("defs");
-
-    function createIDFromDataset(dataset) {
-      if (!dataset || !dataset.label) return 0;
-      return hashCode(dataset.label);
-    }
 
     /**
      * To be called when the mouse enters a bar on the plot chart.
@@ -52,8 +47,7 @@ export class PlotBarsRenderer {
       plotChart.definitions = plotChart.svg.append("defs");
 
       for (let index = 0; index < datasets.length; index++) {
-        let id = createIDFromDataset(datasets[index]);
-        this.gradientCreator.createGradient(datasets[index], id);
+        this.gradientCreator.createGradient(datasets[index]);
       }
 
       plotChart.barsData = plotChart
