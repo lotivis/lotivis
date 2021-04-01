@@ -29,23 +29,28 @@ export class Card extends Component {
       .classed('lotivis-card-header', true);
     this.headerRow = this.header
       .append('div')
-      .classed('row', true);
+      .classed('lotivis-row', true);
     this.headerLeftComponent = this.headerRow
       .append('div')
       // .classed('col-lg-2', true)
-      .classed('col-3', true);
+      .classed('lotivis-col-3', true)
+      .classed('lotivis-card-header-left-component', true);
     this.headerCenterComponent = this.headerRow
       .append('div')
       // .classed('col-lg-2', true)
-      .classed('col-6', true);
+      .classed('lotivis-col-6', true)
+      .classed('lotivis-card-header-center-component', true);
     this.headerRightComponent = this.headerRow
       .append('div')
       // .classed('col-lg-10', true)
-      .classed('col-3 button-group', true)
+      .classed('lotivis-col-3', true)
+      .classed('lotivis-card-header-right-component', true)
+      .classed('lotivis-button-group', true)
       .classed('text-end', true);
-    this.titleLabel = this.headerLeftComponent
-      .append('span')
-      .text(this.name);
+    // this.titleLabel = this.headerLeftComponent
+    //   .append('span')
+    //   .text(this.name);
+
   }
 
   createBody() {

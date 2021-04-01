@@ -88,6 +88,21 @@ button:active, a:active {
   padding: 10px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
+.lotivis-card-header .lotivis-card-header-right-component {
+  overflow: visible;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lotivis-card-header .lotivis-card-header-center-component {
+  overflow: visible;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lotivis-card-header .lotivis-card-header-left-component {
+  overflow: visible;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .lotivis-card-body {
   width: 100%;
@@ -95,9 +110,7 @@ button:active, a:active {
 }
 
 .lotivis-card-footer {
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-top: 6px;
+  padding: 10px;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
@@ -143,6 +156,23 @@ button:active, a:active {
 }
 
 .important {
+  color: red;
+}
+
+.lotivis-data-status-label {
+  font-size: 12px;
+}
+
+.lotivis-data-status-text {
+  width: 100%;
+  font-size: 12px;
+}
+
+.lotivis-data-status-success {
+  color: green;
+}
+
+.lotivis-data-status-failure {
   color: red;
 }
 
@@ -212,6 +242,71 @@ input[type=checkbox] {
   opacity: 0.6;
 }
 
+.lotivis-textarea-data {
+  margin: 0;
+  width: 98%;
+  height: 600px;
+  border: 0px solid #cccccc;
+  padding: 5px;
+  font-family: monospace, sans-serif;
+  outline: none;
+}
+
+.lotivis-container {
+  padding: 0 50px 0 50px;
+  margin: auto;
+  max-width: 1200px;
+}
+
+.lotivis-container-full {
+  padding: 0;
+  margin: auto;
+}
+
+.lotivis-row, .lotivis-group {
+  width: 100%;
+  display: inline-flex;
+  flex-wrap: wrap;
+  line-height: 1.1;
+}
+
+.lotivis-col-lg-12, .lotivis-col-12 {
+  width: calc(100% - 10px);
+}
+
+.lotivis-col-lg-8, .lotivis-col-8 {
+  width: calc(66% - 10px);
+}
+
+.lotivis-col-lg-6, .lotivis-col-6 {
+  width: calc(50% - 10px);
+}
+
+.lotivis-col-lg-4, .lotivis-col-4 {
+  width: calc(33% - 10px);
+}
+
+.lotivis-col-lg-3, .lotivis-col-3 {
+  width: calc(25% - 10px);
+}
+
+.lotivis-col-lg-2, .lotivis-col-2 {
+  width: calc(16.6% - 10px);
+}
+
+.lotivis-col-lg-12,
+.lotivis-col-lg-6,
+.lotivis-col-lg-4,
+.lotivis-col-lg-3,
+.lotivis-col-lg-2,
+.lotivis-col-12,
+.lotivis-col-6,
+.lotivis-col-4,
+.lotivis-col-3,
+.lotivis-col-2 {
+  padding: 0 5px;
+}
+
 .lotivis-map-area {
   fill: white;
   fill-opacity: 0;
@@ -265,7 +360,7 @@ input[type=checkbox] {
 }
 
 .lotivis-plot-label {
-  fill: black;
+  fill: white;
   text-anchor: start;
   font-size: 12px;
   pointer-events: none;
@@ -371,12 +466,12 @@ input[type=checkbox] {
   border-color: #f0f0f1 transparent transparent transparent;
 }
 
-.tooltip:hover .tooltiptext {
+.lotivis-tooltip:hover .lotivis-tooltiptext {
   visibility: visible;
   opacity: 1;
 }
 
-.underground, .modal-underground, .popup-underground {
+.lotivis-underground, .lotivis-modal-underground, .lotivis-popup-underground {
   display: none;
   position: fixed;
   z-index: 99991;
@@ -386,69 +481,21 @@ input[type=checkbox] {
   height: 100%;
   overflow: scroll;
 }
-.underground .lotivis-card, .modal-underground .lotivis-card, .popup-underground .lotivis-card {
+.lotivis-underground .lotivis-card, .lotivis-modal-underground .lotivis-card, .lotivis-popup-underground .lotivis-card {
   background-color: #f0f0f1;
   box-shadow: rgba(0, 0, 0, 0.3) 0 0 60px 0;
 }
 
-.popup-underground {
+.lotivis-popup-underground {
   background-color: white;
   background-color: rgba(255, 255, 255, 0.15);
 }
 
-.modal-underground {
+.lotivis-modal-underground {
   background-color: white;
   background-color: rgba(255, 255, 255, 0.9);
 }
 
-.fade-in {
-  animation: fadeIn ease 0.3s;
-  -webkit-animation: fadeIn ease 0.3s;
-  -moz-animation: fadeIn ease 0.3s;
-  -o-animation: fadeIn ease 0.3s;
-  -ms-animation: fadeIn ease 0.3s;
-}
-
-@keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-@-moz-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-@-webkit-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-@-o-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-@-ms-keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
-}
 .lotivis-tooltip {
   position: absolute;
   padding: 10px;

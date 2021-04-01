@@ -12,46 +12,62 @@
 <body>
 
 <div class="lotivis-example-container">
-  <div class="row">
-    <div class="col-2">
+  <div class="lotivis-row">
+    <div class="lotivis-col-2">
       <a href="../index.html">
         <button class="back-button">
           Back
         </button>
       </a>
     </div>
-    <div class="col-8 text-center">
+    <div class="lotivis-col-8 text-center">
       <h1>Upload</h1>
     </div>
-    <div class="col-12">
-      <div class="card">
+    <div class="lotivis-col-6">
+      <div class="lotivis-card">
+        <div class="lotivis-card-header">
+          Data
+        </div>
         <div class="card-body margin-left margin-top margin-bottom">
-          <input id="image-file" type="file" />
+          <input id="data-file" type="file"/>
         </div>
       </div>
     </div>
-    <div class="col-6">
-      <div id="time-chart-card">
-        <!-- Time Chart Code Here -->
+    <div class="lotivis-col-6">
+      <div class="lotivis-card">
+        <div class="lotivis-card-header">
+          Geo JSON
+        </div>
+        <div class="card-body margin-left margin-top margin-bottom">
+          <input id="geojson-file" type="file"/>
+        </div>
+      </div>
+    </div>
+    <div class="lotivis-col-6">
+      <div id="date-chart-card">
+        <!-- Date Chart Code Here -->
       </div>
       <div id="plot-chart-card">
         <!-- Plot Chart Code Here -->
       </div>
     </div>
-    <div class="col-6">
+    <div class="lotivis-col-6">
       <div id="map-chart-card">
         <!-- Map Chart Code Here -->
       </div>
     </div>
-    <div class="col-6">
-      <div class="card margin-top margin-left margin-bottom margin-right" style="overflow:scroll;">
-        <samp id="dataset">
-          <!-- Dataset Here -->
-        </samp>
+    <div class="lotivis-col-6">
+      <div id="dataset-json-card">
+        <!-- Dataset Card Code Here -->
       </div>
     </div>
-    <div class="col-6">
-      <div class="card margin-top margin-left margin-bottom margin-right" style="overflow:scroll;">
+    <div class="lotivis-col-6">
+      <div id="dataset-csv-card">
+        <!-- CSV Card Code Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-6">
+      <div class="lotivis-card lotivis-example-data">
         <samp id="csv">
           <!-- CSV Here -->
         </samp>
@@ -65,11 +81,14 @@
 
 <script>
 
+  lotivis.Constants.debugLog = true;
   let geoJSON = 'https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/2_bundeslaender/4_niedrig.geo.json';
 
-  let timeChartCard = new lotivis.TimeChartCard('time-chart-card');
+  let dateChartCard = new lotivis.DateChartCard();
   let mapChartCard = new lotivis.MapChartCard('map-chart-card');
   let plotChartCard = new lotivis.PlotChartCard('plot-chart-card');
+  let datasetCard = new lotivis.DatasetJsonCard('dataset-json-card');
+  let csvCard = new lotivis.DatasetCSVCard('dataset-csv-card');
 
   d3.json(geoJSON)
     .then(function (json) {
@@ -78,21 +97,18 @@
     })
     .then(function (json) {
 
-      let string = JSON.stringify(json, null, 4);
-      let csvString = lotivis.renderCSV(json);
+      let controller = new lotivis.DatasetController(json);
 
-      document.getElementById('dataset').innerHTML = string;
-      document.getElementById('csv').innerHTML = csvString;
-
-      let controller = new lotivis.FilterableDatasetController(json);
-
-      timeChartCard.chart.setDatasetController(controller);
-      timeChartCard.chart.update();
+      dateChartCard.chart.setDatasetController(controller);
+      dateChartCard.chart.update();
 
       mapChartCard.chart.setDatasetController(controller);
       mapChartCard.chart.update();
 
       plotChartCard.chart.setDatasetController(controller);
+
+      datasetCard.setDatasetController(controller);
+      csvCard.setDatasetController(controller);
 
     });
 

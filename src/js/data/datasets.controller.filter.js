@@ -15,7 +15,7 @@ DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
   this.dateFilters = [];
   this.datasetFilters = [];
   if (!notifyListeners) return;
-  this.notifyListeners('reset-filters');
+  this.notifyListeners(DatasetsController.NotificationReason.resetFilters);
 };
 
 /**
@@ -25,7 +25,7 @@ DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
 DatasetsController.prototype.setLocationsFilter = function (locations) {
   this.resetFilters(false);
   this.locationFilters = locations.map(location => String(location));
-  this.notifyListeners('location-filter');
+  this.notifyListeners(DatasetsController.NotificationReason.locationFilters);
 };
 
 /**
@@ -35,7 +35,7 @@ DatasetsController.prototype.setLocationsFilter = function (locations) {
 DatasetsController.prototype.setDatesFilter = function (dates) {
   this.resetFilters(false);
   this.dateFilters = dates.map(date => String(date));
-  this.notifyListeners('dates-filter');
+  this.notifyListeners(DatasetsController.NotificationReason.dateFilters);
 };
 
 /**
@@ -45,7 +45,7 @@ DatasetsController.prototype.setDatesFilter = function (dates) {
 DatasetsController.prototype.setDatasetsFilter = function (datasets) {
   this.resetFilters(false);
   this.datasetFilters = datasets.map(dataset => String(dataset));
-  this.notifyListeners('dataset-filter');
+  this.notifyListeners(DatasetsController.NotificationReason.filterDataset);
 };
 
 /**

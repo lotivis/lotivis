@@ -88,6 +88,21 @@ button:active, a:active {
   padding: 10px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
+.lotivis-card-header .lotivis-card-header-right-component {
+  overflow: visible;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lotivis-card-header .lotivis-card-header-center-component {
+  overflow: visible;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lotivis-card-header .lotivis-card-header-left-component {
+  overflow: visible;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 .lotivis-card-body {
   width: 100%;
@@ -95,9 +110,7 @@ button:active, a:active {
 }
 
 .lotivis-card-footer {
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-top: 6px;
+  padding: 10px;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
@@ -144,6 +157,45 @@ button:active, a:active {
 
 .important {
   color: red;
+}
+
+.lotivis-data-card {
+  background-color: #F5F5F5;
+}
+.lotivis-data-card .lotivis-data-textarea {
+  padding-top: 10px;
+  color: grey;
+}
+
+.lotivis-data-status-label {
+  font-size: 12px;
+}
+
+.lotivis-data-status-text {
+  font-size: 12px;
+}
+
+.lotivis-data-status-success {
+  color: green;
+}
+
+.lotivis-data-status-failure {
+  margin-top: 10px;
+  border-radius: 8px;
+  background-color: tomato;
+  color: white;
+  padding: 10px;
+  animation: fadeIn ease 0.3s;
+}
+
+.lotivis-data-textarea {
+  background-color: rgba(0, 0, 0, 0);
+  margin: 0;
+  width: 98%;
+  border: 0px solid #cccccc;
+  padding: 5px;
+  font-family: monospace, sans-serif;
+  outline: none;
 }
 
 .lotivis-date-chart-label {
@@ -210,6 +262,61 @@ input[type=checkbox] {
 
 .radio-group label:active {
   opacity: 0.6;
+}
+
+.lotivis-container {
+  padding: 0 50px 0 50px;
+  margin: auto;
+  max-width: 1200px;
+}
+
+.lotivis-container-full {
+  padding: 0;
+  margin: auto;
+}
+
+.lotivis-row, .lotivis-group {
+  width: 100%;
+  display: inline-flex;
+  flex-wrap: wrap;
+  line-height: 1.1;
+}
+
+.lotivis-col-lg-12, .lotivis-col-12 {
+  width: calc(100% - 10px);
+}
+
+.lotivis-col-lg-8, .lotivis-col-8 {
+  width: calc(66% - 10px);
+}
+
+.lotivis-col-lg-6, .lotivis-col-6 {
+  width: calc(50% - 10px);
+}
+
+.lotivis-col-lg-4, .lotivis-col-4 {
+  width: calc(33% - 10px);
+}
+
+.lotivis-col-lg-3, .lotivis-col-3 {
+  width: calc(25% - 10px);
+}
+
+.lotivis-col-lg-2, .lotivis-col-2 {
+  width: calc(16.6% - 10px);
+}
+
+.lotivis-col-lg-12,
+.lotivis-col-lg-6,
+.lotivis-col-lg-4,
+.lotivis-col-lg-3,
+.lotivis-col-lg-2,
+.lotivis-col-12,
+.lotivis-col-6,
+.lotivis-col-4,
+.lotivis-col-3,
+.lotivis-col-2 {
+  padding: 0 5px;
 }
 
 .lotivis-map-area {

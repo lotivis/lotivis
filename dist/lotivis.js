@@ -1,5 +1,5 @@
 /*!
- * lotivis.js v1.0.47
+ * lotivis.js v1.0.48
  * https://github.com/lukasdanckwerth/lotivis#readme
  * (c) 2021 lotivis.js Lukas Danckwerth
  * Released under the MIT License
@@ -11,15 +11,41 @@ typeof define === 'function' && define.amd ? define(['exports'], factory) :
 }(this, (function (exports) { 'use strict';
 
 /**
+ *
+ * @param str
+ * @returns {number}
+ */
+function hashCode(str) {
+  let hash = 0, i, chr;
+  for (i = 0; i < str.length; i++) {
+    chr = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+}
+
+/**
  * Creates and returns a unique ID.
  */
 var createID;
-(function() {
+(function () {
   let uniquePrevious = 0;
-  createID = function() {
+  createID = function () {
     return 'lotivis-id-' + uniquePrevious++;
   };
 }());
+
+/**
+ * Creates and returns a unique (save to use for elements) id.  The id is created by calculating the hash of the
+ * dataset's label.
+ * @param dataset The dataset.
+ * @returns {number} The created id.
+ */
+function createIDFromDataset(dataset) {
+  if (!dataset || !dataset.label) return 0;
+  return hashCode(dataset.label);
+}
 
 /**
  * Holds
@@ -108,7 +134,17 @@ class Component {
   }
 }
 
+/**
+ * Color defined by r,g,b.
+ * @class Color
+ */
 class Color {
+  /**
+   * Creates a new instance of Color.
+   * @param r The red value.
+   * @param g The green value.
+   * @param b The blue value.
+   */
   constructor(r, g, b) {
     this.r = Math.round(r);
     this.g = Math.round(g);
@@ -127,74 +163,6 @@ class Color {
     return new Color(this.r + r, this.g + g, this.b + b);
   }
 }
-
-Color.defaultTint = new Color(0, 122, 255);
-Color.organgeLow = new Color(250, 211, 144);
-Color.organgeHigh = new Color(229, 142, 38);
-Color.redLow = new Color(248, 194, 145);
-Color.redHigh = new Color(183, 21, 64);
-Color.blueLow = new Color(106, 137, 204);
-Color.blueHigh = new Color(12, 36, 97);
-Color.lightBlueLow = new Color(130, 204, 221);
-Color.lightBlueHight = new Color(10, 61, 98);
-Color.greenLow = new Color(184, 233, 148);
-Color.greenHight = new Color(7, 153, 146);
-
-Color.stackColors = [
-  [Color.blueHigh, Color.blueLow],
-  [Color.redHigh, Color.redLow],
-  [Color.greenHight, Color.greenLow],
-  [Color.organgeHigh, Color.organgeLow],
-  [Color.lightBlueHight, Color.lightBlueLow],
-];
-
-Color.randomColor = function () {
-  return "rgb(" +
-    (Math.random() * 255) + ", " +
-    (Math.random() * 255) + "," +
-    (Math.random() * 255) + ")";
-};
-
-Color.colorsForStack = function (stack, amount = 1) {
-  if (!Number.isInteger(stack)) {
-    return [Color.stackColors[0]];
-  }
-
-  let usedAmount = Math.max(amount, 5);
-  let stackColors = Color.stackColors[stack % Color.stackColors.length];
-
-  let highColor = stackColors[0];
-  let lowColor = stackColors[1];
-
-  let redDiff = lowColor.r - highColor.r;
-  let greenDiff = lowColor.g - highColor.g;
-  let blueDiff = lowColor.b - highColor.b;
-
-  let redStep = redDiff / usedAmount;
-  let greenStep = greenDiff / usedAmount;
-  let blueStep = blueDiff / usedAmount;
-
-  let colors = [];
-
-  for (let i = 0; i < amount; i++) {
-    let newColor = highColor.colorAdding(redStep * i, greenStep * i, blueStep * i);
-    colors.push(newColor);
-  }
-
-  return colors;
-};
-
-/**
- *
- * @param till
- * @returns {*}
- */
-Color.colorGenerator = function (till) {
-  return d3
-    .scaleLinear()
-    .domain([0, 1 / 3 * till, 2 / 3 * till, till])
-    .range(['yellow', 'orange', 'red', 'purple']);
-};
 
 /**
  * @class DateAxisRenderer
@@ -1102,7 +1070,7 @@ function toSet(array) {
  * @returns {*} The earliest date.
  */
 function extractEarliestDate(flatData) {
-  return extractDatesFromFlatData(flatData).shift();
+  return extractDatesFromFlatData(flatData).sort().shift();
 }
 
 /**
@@ -1112,8 +1080,7 @@ function extractEarliestDate(flatData) {
  * @returns {*} The earliest date.
  */
 function extractEarliestDateWithValue(flatData) {
-  let withValue = flatData.filter(item => (item.value || 0) > 0);
-  return extractDatesFromFlatData(withValue).shift();
+  return extractDatesFromFlatData(filterWithValue(flatData)).sort().shift();
 }
 
 /**
@@ -1123,7 +1090,7 @@ function extractEarliestDateWithValue(flatData) {
  * @returns {*} The latest date.
  */
 function extractLatestDate(flatData) {
-  return extractDatesFromFlatData(flatData).pop();
+  return extractDatesFromFlatData(flatData).sort().pop();
 }
 
 /**
@@ -1133,8 +1100,17 @@ function extractLatestDate(flatData) {
  * @returns {*} The latest date.
  */
 function extractLatestDateWithValue(flatData) {
-  let withValue = flatData.filter(item => (item.value || 0) > 0);
-  return extractDatesFromFlatData(withValue).pop();
+  return extractDatesFromFlatData(filterWithValue(flatData)).sort().pop();
+}
+
+/**
+ * Returns a filtered collection containing all items which have a valid value greater than 0.
+ *
+ * @param flatData The flat data to filter.
+ * @returns {*} All items with a value greater 0.
+ */
+function filterWithValue(flatData) {
+  return flatData.filter(item => (item.value || 0) > 0);
 }
 
 /**
@@ -1190,25 +1166,33 @@ class DatasetsColorsController {
  */
 class DatasetsController {
 
+  /**
+   * Creates a new instance of DatasetsController
+   * @param datasets The datasets to control.
+   */
   constructor(datasets) {
-    this.datasets = copy(datasets);
-    this.workingDatasets = copy(datasets)
-      .sort((left, right) => left.label > right.label);
-    this.workingDatasets.forEach(dataset => dataset.isEnabled = true);
-    this.flatData = flatDatasets(this.workingDatasets);
-    this.labels = extractLabelsFromDatasets(datasets);
-    this.stacks = extractStacksFromDatasets(datasets);
-    this.dates = extractDatesFromDatasets(datasets);
-    this.locations = extractLocationsFromDatasets(datasets);
-    this.datasetsColorsController = new DatasetsColorsController(this);
-    this.dateAccess = function (date) {
-      return Date.parse(date);
-    };
-
-    this.locationFilters = [];
-    this.dateFilters = [];
-    this.datasetFilters = [];
+    this.setDatasets(datasets);
   }
+
+  // setDatasets(datasets) {
+  //   this.datasets = copy(datasets);
+  //   this.workingDatasets = copy(datasets)
+  //     .sort((left, right) => left.label > right.label);
+  //   this.workingDatasets.forEach(dataset => dataset.isEnabled = true);
+  //   this.flatData = flatDatasets(this.workingDatasets);
+  //   this.labels = extractLabelsFromDatasets(datasets);
+  //   this.stacks = extractStacksFromDatasets(datasets);
+  //   this.dates = extractDatesFromDatasets(datasets);
+  //   this.locations = extractLocationsFromDatasets(datasets);
+  //   this.datasetsColorsController = new DatasetsColorsController(this);
+  //   this.dateAccess = function (date) {
+  //     return Date.parse(date);
+  //   };
+  //
+  //   this.locationFilters = [];
+  //   this.dateFilters = [];
+  //   this.datasetFilters = [];
+  // }
 
   get flatDataCombinedStacks() {
     return combineByStacks(this.flatData);
@@ -1502,23 +1486,28 @@ class Card extends Component {
       .classed('lotivis-card-header', true);
     this.headerRow = this.header
       .append('div')
-      .classed('row', true);
+      .classed('lotivis-row', true);
     this.headerLeftComponent = this.headerRow
       .append('div')
       // .classed('col-lg-2', true)
-      .classed('col-3', true);
+      .classed('lotivis-col-3', true)
+      .classed('lotivis-card-header-left-component', true);
     this.headerCenterComponent = this.headerRow
       .append('div')
       // .classed('col-lg-2', true)
-      .classed('col-6', true);
+      .classed('lotivis-col-6', true)
+      .classed('lotivis-card-header-center-component', true);
     this.headerRightComponent = this.headerRow
       .append('div')
       // .classed('col-lg-10', true)
-      .classed('col-3 button-group', true)
+      .classed('lotivis-col-3', true)
+      .classed('lotivis-card-header-right-component', true)
+      .classed('lotivis-button-group', true)
       .classed('text-end', true);
-    this.titleLabel = this.headerLeftComponent
-      .append('span')
-      .text(this.name);
+    // this.titleLabel = this.headerLeftComponent
+    //   .append('span')
+    //   .text(this.name);
+
   }
 
   createBody() {
@@ -2960,6 +2949,13 @@ class MapLabelRenderer {
   }
 }
 
+Color.colorGenerator = function (till) {
+  return d3
+    .scaleLinear()
+    .domain([0, 1 / 3 * till, 2 / 3 * till, till])
+    .range(['yellow', 'orange', 'red', 'purple']);
+};
+
 /**
  *
  * @class MapDatasetRenderer
@@ -3129,11 +3125,13 @@ class MapExteriorBorderRenderer {
    */
   constructor(mapChart) {
 
+    if (!self.topojson) debug_log('Can\'t find topojson lib.  Skip rendering of exterior border.');
+
     /**
      * Renders the exterior border of the presented geo json.
      */
     this.render = function () {
-      if (!self.topojson) return debug_log('Can\'t find topojson lib.  Skip rendering of exterior border.');
+      if (!self.topojson) return;
       let geoJSON = mapChart.presentedGeoJSON;
       let borders = joinFeatures(geoJSON);
       if (!borders) return;
@@ -3278,21 +3276,6 @@ class MapSelectionBoundsRenderer {
 
 /**
  *
- * @param str
- * @returns {number}
- */
-function hashCode(str) {
-  let hash = 0, i, chr;
-  for (i = 0; i < str.length; i++) {
-    chr = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
-}
-
-/**
- *
  * @type {{}}
  */
 const defaultMapChartConfig = {
@@ -3324,6 +3307,46 @@ const defaultMapChartConfig = {
 };
 
 /**
+ *
+ * @class MapBackgroundRenderer
+ */
+class MapBackgroundRenderer {
+
+  /**
+   * Creates a new instance of MapBackgroundRenderer.
+   *
+   * @param mapChart The parental map chart.
+   */
+  constructor(mapChart) {
+
+    this.background = mapChart.svg
+      .append('rect')
+      .attr('width', mapChart.config.width)
+      .attr('height', mapChart.config.height)
+      .attr('fill', 'white');
+
+    /**
+     * Appends a background rectangle.
+     */
+    this.render = function () {
+      // create a background rectangle for receiving mouse enter events
+      // in order to reset the location data filter.
+      this.background
+        .on('mouseenter', function () {
+          let controller = mapChart.datasetController;
+          if (!controller) return;
+          let filters = controller.locationFilters;
+          if (!filters || filters.length === 0) return;
+          this.updateSensible = false;
+          controller.setLocationsFilter([]);
+          this.updateSensible = true;
+        }.bind(this));
+
+    };
+  }
+}
+
+/**
  * A component which renders a geo json with d3.
  *
  * @class MapChart
@@ -3345,14 +3368,15 @@ class MapChart extends Chart {
 
     this.initialize();
     this.renderSVG();
-    this.labelRenderer = new MapLabelRenderer(this);
-    this.legendRenderer = new MapLegendRenderer(this);
+    this.backgroundRenderer = new MapBackgroundRenderer(this);
     this.geoJSONRenderer = new MapGeojsonRenderer(this);
     this.datasetRenderer = new MapDatasetRenderer(this);
     this.exteriorBorderRenderer = new MapExteriorBorderRenderer(this);
     this.minimapRenderer = new MapMinimapRenderer(this);
-    this.tooltipRenderer = new MapTooltipRenderer(this);
+    this.labelRenderer = new MapLabelRenderer(this);
+    this.legendRenderer = new MapLegendRenderer(this);
     this.selectionBoundsRenderer = new MapSelectionBoundsRenderer(this);
+    this.tooltipRenderer = new MapTooltipRenderer(this);
   }
 
   /**
@@ -3389,29 +3413,7 @@ class MapChart extends Chart {
       .select(`#${this.selector}`)
       .append('svg')
       .attr('id', this.svgSelector)
-      .attr('class', 'lotivis-chart-svg lotivis-map')
-      // .style('width', this.width)
-      // .style('height', this.height);
       .attr('viewBox', `0 0 ${this.config.width} ${this.config.height}`);
-
-    this.background = this.svg
-      .append('rect')
-      .attr('width', this.config.width)
-      .attr('height', this.config.height)
-      .attr('fill', 'white');
-
-    // create a background rectangle for receiving mouse enter events
-    // in order to reset the location data filter.
-    this.background
-      .on('mouseenter', function () {
-        let controller = this.datasetController;
-        if (!controller) return;
-        let filters = controller.locationFilters;
-        if (!filters || filters.length === 0) return;
-        this.updateSensible = false;
-        controller.setLocationsFilter([]);
-        this.updateSensible = true;
-      }.bind(this));
   }
 
   /**
@@ -3455,15 +3457,15 @@ class MapChart extends Chart {
     if (!this.geoJSON) return;
     // precalculate the center of each feature
     this.geoJSON.features.forEach((feature) => feature.center = d3.geoCentroid(feature));
-    this.presentedGeoJSON = removeFeatures(this.geoJSON, this.excludedFeatureCodes);
+    this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.excludedFeatureCodes);
     this.zoomTo(this.geoJSON);
     this.exteriorBorderRenderer.render();
     this.geoJSONRenderer.renderGeoJson();
   }
 
   /**
-   *
-   * @param newDatasets
+   * Sets the datasets of this map chart.
+   * @param newDatasets The new dataset.
    */
   set datasets(newDatasets) {
     this.setDatasetController(new DatasetsController(newDatasets));
@@ -3665,6 +3667,80 @@ class PlotAxisRenderer {
 }
 
 /**
+ * Calculates and creates the gradients for the bars of a plot chart.
+ *
+ * @class PlotGradientCreator
+ */
+class PlotGradientCreator {
+
+  /**
+   * Creates a new instance of PlotGradientCreator.
+   *
+   * @constructor
+   * @param plotChart The parental plot chart.
+   */
+  constructor(plotChart) {
+    this.plotChart = plotChart;
+    this.colorGenerator = Color.plotColor(1);
+  }
+
+  /**
+   * Creates the gradient for the bar representing the given dataset.
+   * @param dataset The dataset to represent.
+   */
+  createGradient(dataset) {
+
+    let max = this.plotChart.dataView.max;
+    let gradient = this.plotChart.definitions
+      .append("linearGradient")
+      .attr("id", 'lotivis-plot-gradient-' + createIDFromDataset(dataset))
+      .attr("x1", "0%")
+      .attr("x2", "100%")
+      .attr("y1", "0%")
+      .attr("y2", "0%");
+
+    let data = dataset.data;
+    let dataWithValues = dataset.dataWithValues;
+    let count = dataWithValues.length;
+    let latestDate = dataset.latestDate;
+    let duration = dataset.duration;
+
+    if (!data || data.length === 0) return;
+
+    if (duration === 0) {
+
+      let item = data[0];
+      let value = item.value;
+      let opacity = value / max;
+
+      gradient
+        .append("stop")
+        .attr("offset", `100%`)
+        .attr("stop-color", this.colorGenerator(opacity));
+
+    } else {
+
+      for (let index = 0; index < count; index++) {
+
+        let item = dataWithValues[index];
+        let date = item.date;
+        let opacity = item.value / max;
+
+        let dateDifference = latestDate - date;
+        let value = (dateDifference / duration);
+        let datePercentage = (1 - value) * 100;
+
+        gradient
+          .append("stop")
+          .attr("offset", `${datePercentage}%`)
+          .attr("stop-color", this.colorGenerator(opacity));
+
+      }
+    }
+  }
+}
+
+/**
  * Draws the bar on the plot chart.
  * @class PlotBarsRenderer
  */
@@ -3680,63 +3756,8 @@ class PlotBarsRenderer {
     // constant for the radius of the drawn bars.
     const radius = 6;
 
-    let definitions = plotChart.svg.append("defs");
-
-    function createIDFromDataset(dataset) {
-      if (!dataset || !dataset.label) return 0;
-      return dataset.label.replaceAll(' ', '-');
-    }
-
-    function createGradient(dataset) {
-      let max = plotChart.datasetController.getMax();
-      let gradient = definitions
-        .append("linearGradient")
-        .attr("id", 'lotivis-plot-gradient-' + createIDFromDataset(dataset))
-        .attr("x1", "0%")
-        .attr("x2", "100%")
-        .attr("y1", "0%")
-        .attr("y2", "0%");
-
-      let data = dataset.data;
-      let count = data.length;
-      let firstDate = dataset.earliestDate;
-      let lastDate = dataset.latestDate;
-      let timespan = lastDate - firstDate;
-      let colorInterpolator = d3.interpolateRgb(
-        plotChart.config.lowColor,
-        plotChart.config.highColor
-      );
-
-      if (firstDate === lastDate) {
-        if (!data || data.length === 0) return;
-        let item = data[0];
-        let value = item.value;
-        let opacity = value / max;
-
-        gradient
-          .append("stop")
-          .attr("offset", `100%`)
-          .attr("stop-color", colorInterpolator(opacity));
-
-      } else {
-
-        for (let index = 0; index < count; index++) {
-
-          let item = data[index];
-          let date = item.date;
-          let opacity = item.value / max;
-
-          let dateDifference = lastDate - date;
-          let datePercentage = (1 - (dateDifference / timespan)) * 100;
-
-          gradient
-            .append("stop")
-            .attr("offset", `${datePercentage}%`)
-            .attr("stop-color", colorInterpolator(opacity));
-
-        }
-      }
-    }
+    this.gradientCreator = new PlotGradientCreator(plotChart);
+    plotChart.definitions = plotChart.svg.append("defs");
 
     /**
      * To be called when the mouse enters a bar on the plot chart.
@@ -3761,11 +3782,11 @@ class PlotBarsRenderer {
      * Draws the bars.
      */
     this.renderBars = function () {
-      let datasets = plotChart.workingDatasets;
-      definitions = plotChart.svg.append("defs");
+      let datasets = plotChart.dataView.datasets;
+      plotChart.definitions = plotChart.svg.append("defs");
 
       for (let index = 0; index < datasets.length; index++) {
-        createGradient(datasets[index]);
+        this.gradientCreator.createGradient(datasets[index]);
       }
 
       plotChart.barsData = plotChart
@@ -3789,15 +3810,7 @@ class PlotBarsRenderer {
         .on('mouseout', mouseOut)
         .attr("width", function (data) {
           if (!data.earliestDate || !data.latestDate) return 0;
-          let firstDate, lastDate;
-          if (data.duration < 0) {
-            firstDate = data.latestDate;
-            lastDate = data.earliestDate;
-          } else {
-            firstDate = data.earliestDate;
-            lastDate = data.latestDate;
-          }
-          return plotChart.xChart(lastDate) - plotChart.xChart(firstDate) + plotChart.xChart.bandwidth();
+          return plotChart.xChart(data.latestDate) - plotChart.xChart(data.earliestDate) + plotChart.xChart.bandwidth();
         }.bind(this));
     };
   }
@@ -4032,131 +4045,6 @@ const defaultPlotChartConfig = {
   sort: PlotChartSort.duration
 };
 
-Array.prototype.first = function () {
-  return this[0];
-};
-Array.prototype.last = function () {
-  return this[this.length - 1];
-};
-
-/**
- * Combines each `ratio` entries to one.
- * @param datasets The datasets collection.
- * @param ratio The ratio.
- */
-function combineDatasetsByRatio(datasets, ratio) {
-  let copied = copy(datasets);
-  for (let index = 0; index < copied.length; index++) {
-    let dataset = copied[index];
-    let data = dataset.data;
-    dataset.data = combineDataByGroupsize(data, ratio);
-    copied[index] = dataset;
-  }
-  return copied;
-}
-
-/**
- *
- * @param data
- * @param ratio
- */
-function combineDataByGroupsize(data, ratio) {
-  if (!data || data.length <= ratio) return data;
-  let combined = combineByDate(data);
-  let newData = [];
-
-  while (combined.length > 0) {
-    let dateGroup = combined.splice(0, ratio);
-    let firstItem = dateGroup.first();
-    let lastItem = dateGroup.last();
-    let item = {};
-    item.dataset = firstItem.dataset;
-    item.stack = firstItem.stack;
-    item.date = firstItem.date;
-    item.date = firstItem.date;
-    item.from = firstItem.date;
-    item.till = lastItem.date;
-    item.value = sumOfValues(dateGroup);
-    newData.push(item);
-  }
-
-  return newData;
-}
-
-/**
- *
- * @param datasets
- * @param dateAccess
- * @returns {{date: *}[]}
- */
-function dateToItemsRelation(datasets, dateAccess) {
-
-  let flatData = flatDatasets(datasets);
-  flatData = combineByDate(flatData);
-
-  let listOfDates = extractDatesFromDatasets(datasets);
-  // verbose_log('listOfDates', listOfDates);
-  listOfDates = listOfDates.reverse();
-  // verbose_log('listOfDates', listOfDates);
-  // listOfDates = listOfDates.sort(function (left, right) {
-  //   return dateAccess(left) - dateAccess(right);
-  // });
-
-  let listOfLabels = extractLabelsFromDatasets(datasets);
-
-  return listOfDates.map(function (date) {
-    let datasetDate = {date: date};
-    flatData
-      .filter(item => item.date === date)
-      .forEach(function (entry) {
-        datasetDate[entry.dataset] = entry.value;
-        datasetDate.total = entry.dateTotal;
-      });
-
-    // add zero values for empty datasets
-    for (let index = 0; index < listOfLabels.length; index++) {
-      let label = listOfLabels[index];
-      if (!datasetDate[label]) {
-        datasetDate[label] = 0;
-      }
-    }
-
-    return datasetDate;
-  });
-}
-
-/**
- *
- * @param datasets
- * @param dateToItemsRelation
- * @returns {*[]}
- */
-function createStackModel(controller, datasets, dateToItemsRelation) {
-  let listOfStacks = extractStacksFromDatasets(datasets);
-
-  return listOfStacks.map(function (stackName) {
-
-    let stackCandidates = datasets.filter(function (dataset) {
-      return dataset.stack === stackName
-        || dataset.label === stackName;
-    });
-
-    let candidatesNames = stackCandidates.map(stackCandidate => stackCandidate.label);
-    let candidatesColors = stackCandidates.map(stackCandidate => controller.getColorForDataset(stackCandidate.label));
-
-    let stack = d3
-      .stack()
-      .keys(candidatesNames)
-      (dateToItemsRelation);
-
-    stack.label = stackName;
-    stack.stack = stackName;
-    stack.colors = candidatesColors;
-
-    return stack;
-  });
-}
-
 /**
  * Returns a new generated plot data view for the current enabled data of dataset of this controller.
  */
@@ -4164,12 +4052,15 @@ DatasetsController.prototype.getPlotDataview = function () {
   let dateAccess = this.dateAccess;
   let enabledDatasets = this.enabledDatasets();
   let dataview = {datasets: []};
+
   enabledDatasets.forEach(function (dataset) {
     let newDataset = {};
     let data = copy(dataset.data);
     data.forEach(item => item.label = dataset.label);
-    let firstDate = extractEarliestDateWithValue(data);
-    let lastDate = extractLatestDateWithValue(data);
+
+    let firstDate = extractEarliestDateWithValue(data) || 0;
+    let lastDate = extractLatestDateWithValue(data) || 0;
+
     newDataset.label = dataset.label;
     newDataset.stack = dataset.stack;
     newDataset.earliestDate = firstDate;
@@ -4177,12 +4068,20 @@ DatasetsController.prototype.getPlotDataview = function () {
     newDataset.duration = lastDate - firstDate;
     newDataset.data = combineByDate(data);
     newDataset.sum = sumOfLabel(data, dataset.label);
-    newDataset.data = data
+    data = combineByDate(data)
       .sort((left, right) => dateAccess(left.date) - dateAccess(right.date));
+
+    newDataset.data = data;
+    newDataset.dataWithValues = data.filter(item => (item.value || 0) > 0);
 
     dataview.datasets.push(newDataset);
   });
-  dataview.labelsCount = enabledDatasets.length;
+
+  dataview.labelsCount = dataview.datasets.length;
+  dataview.dates = extractDatesFromDatasets(dataview.datasets);
+  dataview.labels = extractLabelsFromDatasets(dataview.datasets);
+  dataview.max = this.getMax();
+
   return dataview;
 };
 
@@ -4241,14 +4140,13 @@ class PlotChart extends Chart {
    */
   precalculate() {
     if (this.datasetController) {
-      this.datasetController.enabledDatasets();
       this.dataView = this.datasetController.getPlotDataview();
     } else {
-      this.dataView = {barsCount: 0};
+      this.dataView = {datasets: [], barsCount: 0};
     }
 
     let margin = this.config.margin;
-    let barsCount = this.dataView.barsCount || 0;
+    let barsCount = this.dataView.labelsCount || 0;
 
     this.graphWidth = this.config.width - margin.left - margin.right;
     this.graphHeight = (barsCount * this.config.lineHeight);
@@ -4258,7 +4156,6 @@ class PlotChart extends Chart {
     this.svg
       .attr("viewBox", `0 0 ${this.config.width} ${this.preferredHeight}`);
 
-
     this.sortDatasets();
     this.createScales();
   }
@@ -4267,7 +4164,6 @@ class PlotChart extends Chart {
    * Creates and renders the chart.
    */
   draw() {
-    if (!this.workingDatasets || this.workingDatasets.length === 0) return;
     this.createScales();
     this.backgroundRenderer.render();
     this.gridRenderer.renderGrid();
@@ -4280,7 +4176,6 @@ class PlotChart extends Chart {
    * Updates the plot chart.
    */
   update(controller, reason) {
-    verbose_log('reason', reason);
     if (!this.updateSensible) return;
     if (reason === 'dates-filter') return;
     this.remove();
@@ -4292,21 +4187,16 @@ class PlotChart extends Chart {
    * Creates scales which are used to calculate the x and y positions of bars or circles.
    */
   createScales() {
-    if (!this.workingDatasets || this.workingDatasets.length === 0) return;
-    let listOfDates = extractDatesFromDatasets(this.workingDatasets);
-    let listOfLabels = this.workingDatasets
-      .map(dataset => dataset.label)
-      .reverse();
 
     this.xChart = d3
       .scaleBand()
-      .domain(listOfDates)
+      .domain(this.dataView.dates || [])
       .rangeRound([this.config.margin.left, this.config.width - this.config.margin.right])
       .paddingInner(0.1);
 
     this.yChart = d3
       .scaleBand()
-      .domain(listOfLabels)
+      .domain(this.dataView.labels || [])
       .rangeRound([this.height - this.config.margin.bottom, this.config.margin.top])
       .paddingInner(0.1);
 
@@ -4804,6 +4694,48 @@ class GeoJson {
 }
 
 /**
+ *
+ * @param datasets
+ * @param dateAccess
+ * @returns {{date: *}[]}
+ */
+function dateToItemsRelation(datasets, dateAccess) {
+
+  let flatData = flatDatasets(datasets);
+  flatData = combineByDate(flatData);
+
+  let listOfDates = extractDatesFromDatasets(datasets);
+  // verbose_log('listOfDates', listOfDates);
+  listOfDates = listOfDates.reverse();
+  // verbose_log('listOfDates', listOfDates);
+  // listOfDates = listOfDates.sort(function (left, right) {
+  //   return dateAccess(left) - dateAccess(right);
+  // });
+
+  let listOfLabels = extractLabelsFromDatasets(datasets);
+
+  return listOfDates.map(function (date) {
+    let datasetDate = {date: date};
+    flatData
+      .filter(item => item.date === date)
+      .forEach(function (entry) {
+        datasetDate[entry.dataset] = entry.value;
+        datasetDate.total = entry.dateTotal;
+      });
+
+    // add zero values for empty datasets
+    for (let index = 0; index < listOfLabels.length; index++) {
+      let label = listOfLabels[index];
+      if (!datasetDate[label]) {
+        datasetDate[label] = 0;
+      }
+    }
+
+    return datasetDate;
+  });
+}
+
+/**
  * Appends the given listener to the collection of listeners.
  * @param listener The listener to add.
  */
@@ -4824,16 +4756,26 @@ DatasetsController.prototype.removeListener = function (listener) {
 };
 
 /**
- *
- * @param reason
+ * Notifies all listeners.
+ * @param reason The reason to send to the listener.  Default is 'none'.
  */
-DatasetsController.prototype.notifyListeners = function (reason = 'none') {
+DatasetsController.prototype.notifyListeners = function (reason = DatasetsController.NotificationReason.none) {
   if (!this.listeners) return;
+  verbose_log(`Notifying listeners (${reason}).`);
   for (let index = 0; index < this.listeners.length; index++) {
     let listener = this.listeners[index];
     if (!listener.update) continue;
     listener.update(this, reason);
   }
+};
+
+DatasetsController.NotificationReason = {
+  none: 'none',
+  datasetsUpdate: 'datasets-update',
+  filterDataset: 'dataset-filter',
+  filterDates: 'dates-filter',
+  filterLocations: 'location-filter',
+  resetFilters: 'reset-filters'
 };
 
 /**
@@ -4844,7 +4786,7 @@ DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
   this.dateFilters = [];
   this.datasetFilters = [];
   if (!notifyListeners) return;
-  this.notifyListeners('reset-filters');
+  this.notifyListeners(DatasetsController.NotificationReason.resetFilters);
 };
 
 /**
@@ -4854,7 +4796,7 @@ DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
 DatasetsController.prototype.setLocationsFilter = function (locations) {
   this.resetFilters(false);
   this.locationFilters = locations.map(location => String(location));
-  this.notifyListeners('location-filter');
+  this.notifyListeners(DatasetsController.NotificationReason.locationFilters);
 };
 
 /**
@@ -4864,7 +4806,7 @@ DatasetsController.prototype.setLocationsFilter = function (locations) {
 DatasetsController.prototype.setDatesFilter = function (dates) {
   this.resetFilters(false);
   this.dateFilters = dates.map(date => String(date));
-  this.notifyListeners('dates-filter');
+  this.notifyListeners(DatasetsController.NotificationReason.dateFilters);
 };
 
 /**
@@ -4874,7 +4816,7 @@ DatasetsController.prototype.setDatesFilter = function (dates) {
 DatasetsController.prototype.setDatasetsFilter = function (datasets) {
   this.resetFilters(false);
   this.datasetFilters = datasets.map(dataset => String(dataset));
-  this.notifyListeners('dataset-filter');
+  this.notifyListeners(DatasetsController.NotificationReason.filterDataset);
 };
 
 /**
@@ -4966,6 +4908,157 @@ DatasetsController.prototype.enabledStacks = function () {
 DatasetsController.prototype.enabledDates = function () {
   return extractDatesFromDatasets(this.enabledDatasets());
 };
+
+/**
+ * Updates the datasets of this controller.
+ * @param datasets The new datasets.
+ */
+DatasetsController.prototype.setDatasets = function (datasets) {
+  this.datasets = copy(datasets);
+  this.update();
+};
+
+DatasetsController.prototype.update = function () {
+  if (!this.datasets || !Array.isArray(this.datasets)) return;
+  this.workingDatasets = copy(this.datasets)
+    .sort((left, right) => left.label > right.label);
+  this.workingDatasets.forEach(dataset => dataset.isEnabled = true);
+  this.flatData = flatDatasets(this.workingDatasets);
+  this.labels = extractLabelsFromDatasets(this.datasets);
+  this.stacks = extractStacksFromDatasets(this.datasets);
+  this.dates = extractDatesFromDatasets(this.datasets);
+  this.locations = extractLocationsFromDatasets(this.datasets);
+  this.datasetsColorsController = new DatasetsColorsController(this);
+  this.dateAccess = function (date) {
+    return Date.parse(date);
+  };
+
+  this.locationFilters = [];
+  this.dateFilters = [];
+  this.datasetFilters = [];
+  this.notifyListeners(DatasetsController.NotificationReason.datasetsUpdate);
+};
+
+/**
+ * Appends the given dataset to this controller.
+ * @param additionalDataset The dataset to append.
+ */
+DatasetsController.prototype.add = function (additionalDataset) {
+  if (this.datasets.find(dataset => dataset.label === additionalDataset.label)) {
+    throw new Error(`DatasetsController already contains a dataset with the same label (${additionalDataset.label}).`);
+  }
+
+  this.datasets.push(additionalDataset);
+  this.update();
+};
+
+/**
+ * Removes the dataset with the given label from this controller. Will do nothing if no dataset
+ * with the given label exists.
+ *
+ * @param label The label of the dataset to remove.
+ */
+DatasetsController.prototype.remove = function (label) {
+  if (!this.datasets || !Array.isArray(this.datasets)) return;
+  let candidate = this.datasets.find(dataset => dataset.label === label);
+  if (!candidate) return;
+  let index = this.datasets.indexOf(candidate);
+  if (index < 0) return;
+  this.datasets = this.datasets.splice(index, 1);
+  this.update();
+};
+
+/**
+ *
+ * @param datasets
+ * @param dateToItemsRelation
+ * @returns {*[]}
+ */
+function createStackModel(controller, datasets, dateToItemsRelation) {
+  let listOfStacks = extractStacksFromDatasets(datasets);
+
+  return listOfStacks.map(function (stackName) {
+
+    let stackCandidates = datasets.filter(function (dataset) {
+      return dataset.stack === stackName
+        || dataset.label === stackName;
+    });
+
+    let candidatesNames = stackCandidates.map(stackCandidate => stackCandidate.label);
+    let candidatesColors = stackCandidates.map(stackCandidate => controller.getColorForDataset(stackCandidate.label));
+
+    let stack = d3
+      .stack()
+      .keys(candidatesNames)
+      (dateToItemsRelation);
+
+    stack.label = stackName;
+    stack.stack = stackName;
+    stack.colors = candidatesColors;
+
+    return stack;
+  });
+}
+
+/**
+ * Returns the first item of the array.
+ * @returns {*} The first item.
+ */
+Array.prototype.first = function () {
+  return this[0];
+};
+
+/**
+ * Returns the last item of the array.
+ * @returns {*} The last item.
+ */
+Array.prototype.last = function () {
+  return this[this.length - 1];
+};
+
+/**
+ * Combines each `ratio` entries to one.
+ * @param datasets The datasets collection.
+ * @param ratio The ratio.
+ */
+function combineDatasetsByRatio(datasets, ratio) {
+  let copied = copy(datasets);
+  for (let index = 0; index < copied.length; index++) {
+    let dataset = copied[index];
+    let data = dataset.data;
+    dataset.data = combineDataByGroupsize(data, ratio);
+    copied[index] = dataset;
+  }
+  return copied;
+}
+
+/**
+ *
+ * @param data
+ * @param ratio
+ */
+function combineDataByGroupsize(data, ratio) {
+  if (!data || data.length <= ratio) return data;
+  let combined = combineByDate(data);
+  let newData = [];
+
+  while (combined.length > 0) {
+    let dateGroup = combined.splice(0, ratio);
+    let firstItem = dateGroup.first();
+    let lastItem = dateGroup.last();
+    let item = {};
+    item.dataset = firstItem.dataset;
+    item.stack = firstItem.stack;
+    item.date = firstItem.date;
+    item.date = firstItem.date;
+    item.from = firstItem.date;
+    item.till = lastItem.date;
+    item.value = sumOfValues(dateGroup);
+    newData.push(item);
+  }
+
+  return newData;
+}
 
 /**
  * Returns a new generated DateDataview for the current enabled data of dataset of this controller.
@@ -5151,6 +5244,188 @@ class ModalPopup extends Popup {
   }
 }
 
+Color.defaultTint = new Color(0, 122, 255);
+Color.organgeLow = new Color(250, 211, 144);
+Color.organgeHigh = new Color(229, 142, 38);
+Color.redLow = new Color(248, 194, 145);
+Color.redHigh = new Color(183, 21, 64);
+Color.blueLow = new Color(106, 137, 204);
+Color.blueHigh = new Color(12, 36, 97);
+Color.lightBlueLow = new Color(130, 204, 221);
+Color.lightBlueHight = new Color(10, 61, 98);
+Color.greenLow = new Color(184, 233, 148);
+Color.greenHight = new Color(7, 153, 146);
+Color.stackColors = [
+  [Color.blueHigh, Color.blueLow],
+  [Color.redHigh, Color.redLow],
+  [Color.greenHight, Color.greenLow],
+  [Color.organgeHigh, Color.organgeLow],
+  [Color.lightBlueHight, Color.lightBlueLow],
+];
+
+/**
+ *
+ * @param till
+ * @returns {*}
+ */
+Color.plotColor = function (till) {
+  return d3
+    .scaleLinear()
+    .domain([0, 1 / 2 * till, till])
+    .range(['lightgreen', 'steelblue', 'purple']);
+};
+
+/**
+ * Returns a randomly generated color.
+ * @returns {string}
+ */
+Color.randomColor = function () {
+  return "rgb(" +
+    (Math.random() * 255) + ", " +
+    (Math.random() * 255) + "," +
+    (Math.random() * 255) + ")";
+};
+
+Color.colorsForStack = function (stack, amount = 1) {
+  if (!Number.isInteger(stack)) {
+    return [Color.stackColors[0]];
+  }
+
+  let usedAmount = Math.max(amount, 5);
+  let stackColors = Color.stackColors[stack % Color.stackColors.length];
+
+  let highColor = stackColors[0];
+  let lowColor = stackColors[1];
+
+  let redDiff = lowColor.r - highColor.r;
+  let greenDiff = lowColor.g - highColor.g;
+  let blueDiff = lowColor.b - highColor.b;
+
+  let redStep = redDiff / usedAmount;
+  let greenStep = greenDiff / usedAmount;
+  let blueStep = blueDiff / usedAmount;
+
+  let colors = [];
+
+  for (let i = 0; i < amount; i++) {
+    let newColor = highColor.colorAdding(redStep * i, greenStep * i, blueStep * i);
+    colors.push(newColor);
+  }
+
+  return colors;
+};
+
+function validateDataset(dataset) {
+  if (!dataset) {
+    throw Error(`No dataset given.`);
+  } else if (!dataset.label) {
+    throw Error(`Missing label for dataset. ${dataset}`);
+  } else if (dataset.data && !Array.isArray(dataset.data)) {
+    throw Error(`Invalid data. Property is not an array.`);
+  }
+}
+
+function validateDatasets(datasets) {
+  if (!datasets) {
+    throw Error(`No dataset given.`);
+  } else if (!Array.isArray(datasets)) {
+    throw Error(`Datasets argument is not an array.`);
+  }
+
+  for (let index = 0; index < datasets.length; index++) {
+    let dataset = datasets[index];
+    validateDataset(dataset);
+  }
+}
+
+/**
+ *
+ * @class DatasetJsonCard
+ * @extends Card
+ */
+class DatasetJsonCard extends Card {
+
+  /**
+   * Creates a new instance of DatasetJsonCard.
+   * @param parent The parental element or a selector (id).
+   */
+  constructor(parent) {
+    super(parent);
+
+    this.body.style('overflow', 'scroll');
+    this.footer.style('display', 'block');
+    this.render();
+    this.setHeaderText('Dataset JSON Card');
+  }
+
+  render() {
+
+    this.header.text('');
+    this.headline = this.header
+      .append('div');
+
+    this.textareaID = createID();
+    this.textarea = this.body
+      .append('textarea')
+      .attr('id', this.textareaID)
+      .attr('name', this.textareaID)
+      .attr('class', 'lotivis-textarea-data')
+      .attr('rows', 10);
+
+    // this.statusLabel = this.headerRightComponent
+    //   .append('div')
+    //   .classed('lotivis-data-status-label', true);
+
+    this.statusText = this.header
+      .append('div')
+      .classed('lotivis-data-status-text', true)
+      .classed('lotivis-data-status-failure', true);
+
+    this.element.on('keyup', this.onKeyup.bind(this));
+  }
+
+  getTextareaContent() {
+    return document.getElementById(this.textareaID).value;
+  }
+
+  setHeaderText(newHeaderText) {
+    this.headline.text(newHeaderText);
+  }
+
+  setStatusMessage(newStatusMessage, success = true) {
+    // this.statusLabel
+    //   .classed('lotivis-data-status-success', success)
+    //   .classed('lotivis-data-status-failure', !success)
+    //   .text(success ? `Valid` : `Invalid`);
+    this.statusText.text(newStatusMessage);
+  }
+
+  setDatasetController(newDatasetController) {
+    this.datasetController = newDatasetController;
+    let datasets = this.datasetController.datasets;
+    let content = JSON.stringify(datasets, null, 4);
+    this.textarea.text(content);
+    this.parseContent();
+  }
+
+  onKeyup() {
+    this.parseContent();
+  }
+
+  parseContent() {
+    let content = this.getTextareaContent();
+    try {
+      let parsedDatasets = JSON.parse(content);
+      validateDatasets(parsedDatasets);
+      this.setStatusMessage('', true);
+    } catch (error) {
+      this.setStatusMessage(error, false);
+    }
+  }
+}
+
+exports.Color = Color;
+
 // components
 exports.Component = Component;
 exports.Card = Card;
@@ -5173,6 +5448,9 @@ exports.MapChartCard = MapChartCard;
 // plot
 exports.PlotChart = PlotChart;
 exports.PlotChartCard = PlotChartCard;
+
+// datasets / csv cards
+exports.DatasetJsonCard = DatasetJsonCard;
 
 // datasets
 exports.DatasetController = DatasetsController;

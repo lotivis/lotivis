@@ -16,25 +16,33 @@ import {DatasetsColorsController} from "./datasets.colors.controller";
  */
 export class DatasetsController {
 
+  /**
+   * Creates a new instance of DatasetsController
+   * @param datasets The datasets to control.
+   */
   constructor(datasets) {
-    this.datasets = copy(datasets);
-    this.workingDatasets = copy(datasets)
-      .sort((left, right) => left.label > right.label);
-    this.workingDatasets.forEach(dataset => dataset.isEnabled = true);
-    this.flatData = flatDatasets(this.workingDatasets);
-    this.labels = extractLabelsFromDatasets(datasets);
-    this.stacks = extractStacksFromDatasets(datasets);
-    this.dates = extractDatesFromDatasets(datasets);
-    this.locations = extractLocationsFromDatasets(datasets);
-    this.datasetsColorsController = new DatasetsColorsController(this);
-    this.dateAccess = function (date) {
-      return Date.parse(date);
-    };
-
-    this.locationFilters = [];
-    this.dateFilters = [];
-    this.datasetFilters = [];
+    this.setDatasets(datasets);
   }
+
+  // setDatasets(datasets) {
+  //   this.datasets = copy(datasets);
+  //   this.workingDatasets = copy(datasets)
+  //     .sort((left, right) => left.label > right.label);
+  //   this.workingDatasets.forEach(dataset => dataset.isEnabled = true);
+  //   this.flatData = flatDatasets(this.workingDatasets);
+  //   this.labels = extractLabelsFromDatasets(datasets);
+  //   this.stacks = extractStacksFromDatasets(datasets);
+  //   this.dates = extractDatesFromDatasets(datasets);
+  //   this.locations = extractLocationsFromDatasets(datasets);
+  //   this.datasetsColorsController = new DatasetsColorsController(this);
+  //   this.dateAccess = function (date) {
+  //     return Date.parse(date);
+  //   };
+  //
+  //   this.locationFilters = [];
+  //   this.dateFilters = [];
+  //   this.datasetFilters = [];
+  // }
 
   get flatDataCombinedStacks() {
     return combineByStacks(this.flatData);

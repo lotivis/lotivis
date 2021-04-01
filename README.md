@@ -7,7 +7,6 @@
 ## Documentation
 
 - Getting Started
-- [Examples (hosted on Heroku)](https://lotivis.herokuapp.com/index.html)
 
 You can run these examples as:
 ```bash

@@ -14,11 +14,13 @@ export class MapExteriorBorderRenderer {
    */
   constructor(mapChart) {
 
+    if (!self.topojson) debug_log('Can\'t find topojson lib.  Skip rendering of exterior border.');
+
     /**
      * Renders the exterior border of the presented geo json.
      */
     this.render = function () {
-      if (!self.topojson) return debug_log('Can\'t find topojson lib.  Skip rendering of exterior border.');
+      if (!self.topojson) return;
       let geoJSON = mapChart.presentedGeoJSON;
       let borders = joinFeatures(geoJSON);
       if (!borders) return;

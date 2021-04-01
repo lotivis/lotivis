@@ -64,6 +64,8 @@ const Constants = {
 
 const prefix = '[lotivis]  ';
 
+const verbose_log = console.log;
+
 const debug_log = function (message) {
   if (!Constants.debugLog) return;
   console.log(prefix + message);
@@ -1164,25 +1166,33 @@ class DatasetsColorsController {
  */
 class DatasetsController {
 
+  /**
+   * Creates a new instance of DatasetsController
+   * @param datasets The datasets to control.
+   */
   constructor(datasets) {
-    this.datasets = copy(datasets);
-    this.workingDatasets = copy(datasets)
-      .sort((left, right) => left.label > right.label);
-    this.workingDatasets.forEach(dataset => dataset.isEnabled = true);
-    this.flatData = flatDatasets(this.workingDatasets);
-    this.labels = extractLabelsFromDatasets(datasets);
-    this.stacks = extractStacksFromDatasets(datasets);
-    this.dates = extractDatesFromDatasets(datasets);
-    this.locations = extractLocationsFromDatasets(datasets);
-    this.datasetsColorsController = new DatasetsColorsController(this);
-    this.dateAccess = function (date) {
-      return Date.parse(date);
-    };
-
-    this.locationFilters = [];
-    this.dateFilters = [];
-    this.datasetFilters = [];
+    this.setDatasets(datasets);
   }
+
+  // setDatasets(datasets) {
+  //   this.datasets = copy(datasets);
+  //   this.workingDatasets = copy(datasets)
+  //     .sort((left, right) => left.label > right.label);
+  //   this.workingDatasets.forEach(dataset => dataset.isEnabled = true);
+  //   this.flatData = flatDatasets(this.workingDatasets);
+  //   this.labels = extractLabelsFromDatasets(datasets);
+  //   this.stacks = extractStacksFromDatasets(datasets);
+  //   this.dates = extractDatesFromDatasets(datasets);
+  //   this.locations = extractLocationsFromDatasets(datasets);
+  //   this.datasetsColorsController = new DatasetsColorsController(this);
+  //   this.dateAccess = function (date) {
+  //     return Date.parse(date);
+  //   };
+  //
+  //   this.locationFilters = [];
+  //   this.dateFilters = [];
+  //   this.datasetFilters = [];
+  // }
 
   get flatDataCombinedStacks() {
     return combineByStacks(this.flatData);
@@ -1476,23 +1486,28 @@ class Card extends Component {
       .classed('lotivis-card-header', true);
     this.headerRow = this.header
       .append('div')
-      .classed('row', true);
+      .classed('lotivis-row', true);
     this.headerLeftComponent = this.headerRow
       .append('div')
       // .classed('col-lg-2', true)
-      .classed('col-3', true);
+      .classed('lotivis-col-3', true)
+      .classed('lotivis-card-header-left-component', true);
     this.headerCenterComponent = this.headerRow
       .append('div')
       // .classed('col-lg-2', true)
-      .classed('col-6', true);
+      .classed('lotivis-col-6', true)
+      .classed('lotivis-card-header-center-component', true);
     this.headerRightComponent = this.headerRow
       .append('div')
       // .classed('col-lg-10', true)
-      .classed('col-3 button-group', true)
+      .classed('lotivis-col-3', true)
+      .classed('lotivis-card-header-right-component', true)
+      .classed('lotivis-button-group', true)
       .classed('text-end', true);
-    this.titleLabel = this.headerLeftComponent
-      .append('span')
-      .text(this.name);
+    // this.titleLabel = this.headerLeftComponent
+    //   .append('span')
+    //   .text(this.name);
+
   }
 
   createBody() {
@@ -2616,6 +2631,14 @@ function equals(value1, value2) {
   return String(value1) === String(value2);
 }
 
+
+function objectsEqual(obj1, obj2) {
+  if (obj1 === obj2) return true;
+  let string1 = JSON.stringify(obj1);
+  let string2 = JSON.stringify(obj2);
+  return string1 === string2;
+}
+
 /**
  *
  * @class MapTooltipRenderer
@@ -3110,11 +3133,13 @@ class MapExteriorBorderRenderer {
    */
   constructor(mapChart) {
 
+    if (!self.topojson) debug_log('Can\'t find topojson lib.  Skip rendering of exterior border.');
+
     /**
      * Renders the exterior border of the presented geo json.
      */
     this.render = function () {
-      if (!self.topojson) return debug_log('Can\'t find topojson lib.  Skip rendering of exterior border.');
+      if (!self.topojson) return;
       let geoJSON = mapChart.presentedGeoJSON;
       let borders = joinFeatures(geoJSON);
       if (!borders) return;
@@ -4739,16 +4764,26 @@ DatasetsController.prototype.removeListener = function (listener) {
 };
 
 /**
- *
- * @param reason
+ * Notifies all listeners.
+ * @param reason The reason to send to the listener.  Default is 'none'.
  */
-DatasetsController.prototype.notifyListeners = function (reason = 'none') {
+DatasetsController.prototype.notifyListeners = function (reason = DatasetsController.NotificationReason.none) {
   if (!this.listeners) return;
+  verbose_log(`Notifying listeners (${reason}).`);
   for (let index = 0; index < this.listeners.length; index++) {
     let listener = this.listeners[index];
     if (!listener.update) continue;
     listener.update(this, reason);
   }
+};
+
+DatasetsController.NotificationReason = {
+  none: 'none',
+  datasetsUpdate: 'datasets-update',
+  filterDataset: 'dataset-filter',
+  filterDates: 'dates-filter',
+  filterLocations: 'location-filter',
+  resetFilters: 'reset-filters'
 };
 
 /**
@@ -4759,7 +4794,7 @@ DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
   this.dateFilters = [];
   this.datasetFilters = [];
   if (!notifyListeners) return;
-  this.notifyListeners('reset-filters');
+  this.notifyListeners(DatasetsController.NotificationReason.resetFilters);
 };
 
 /**
@@ -4769,7 +4804,7 @@ DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
 DatasetsController.prototype.setLocationsFilter = function (locations) {
   this.resetFilters(false);
   this.locationFilters = locations.map(location => String(location));
-  this.notifyListeners('location-filter');
+  this.notifyListeners(DatasetsController.NotificationReason.locationFilters);
 };
 
 /**
@@ -4779,7 +4814,7 @@ DatasetsController.prototype.setLocationsFilter = function (locations) {
 DatasetsController.prototype.setDatesFilter = function (dates) {
   this.resetFilters(false);
   this.dateFilters = dates.map(date => String(date));
-  this.notifyListeners('dates-filter');
+  this.notifyListeners(DatasetsController.NotificationReason.dateFilters);
 };
 
 /**
@@ -4789,7 +4824,7 @@ DatasetsController.prototype.setDatesFilter = function (dates) {
 DatasetsController.prototype.setDatasetsFilter = function (datasets) {
   this.resetFilters(false);
   this.datasetFilters = datasets.map(dataset => String(dataset));
-  this.notifyListeners('dataset-filter');
+  this.notifyListeners(DatasetsController.NotificationReason.filterDataset);
 };
 
 /**
@@ -4880,6 +4915,65 @@ DatasetsController.prototype.enabledStacks = function () {
  */
 DatasetsController.prototype.enabledDates = function () {
   return extractDatesFromDatasets(this.enabledDatasets());
+};
+
+/**
+ * Updates the datasets of this controller.
+ * @param datasets The new datasets.
+ */
+DatasetsController.prototype.setDatasets = function (datasets) {
+  this.datasets = copy(datasets);
+  this.update();
+};
+
+DatasetsController.prototype.update = function () {
+  if (!this.datasets || !Array.isArray(this.datasets)) return;
+  this.workingDatasets = copy(this.datasets)
+    .sort((left, right) => left.label > right.label);
+  this.workingDatasets.forEach(dataset => dataset.isEnabled = true);
+  this.flatData = flatDatasets(this.workingDatasets);
+  this.labels = extractLabelsFromDatasets(this.datasets);
+  this.stacks = extractStacksFromDatasets(this.datasets);
+  this.dates = extractDatesFromDatasets(this.datasets);
+  this.locations = extractLocationsFromDatasets(this.datasets);
+  this.datasetsColorsController = new DatasetsColorsController(this);
+  this.dateAccess = function (date) {
+    return Date.parse(date);
+  };
+
+  this.locationFilters = [];
+  this.dateFilters = [];
+  this.datasetFilters = [];
+  this.notifyListeners(DatasetsController.NotificationReason.datasetsUpdate);
+};
+
+/**
+ * Appends the given dataset to this controller.
+ * @param additionalDataset The dataset to append.
+ */
+DatasetsController.prototype.add = function (additionalDataset) {
+  if (this.datasets.find(dataset => dataset.label === additionalDataset.label)) {
+    throw new Error(`DatasetsController already contains a dataset with the same label (${additionalDataset.label}).`);
+  }
+
+  this.datasets.push(additionalDataset);
+  this.update();
+};
+
+/**
+ * Removes the dataset with the given label from this controller. Will do nothing if no dataset
+ * with the given label exists.
+ *
+ * @param label The label of the dataset to remove.
+ */
+DatasetsController.prototype.remove = function (label) {
+  if (!this.datasets || !Array.isArray(this.datasets)) return;
+  let candidate = this.datasets.find(dataset => dataset.label === label);
+  if (!candidate) return;
+  let index = this.datasets.indexOf(candidate);
+  if (index < 0) return;
+  this.datasets = this.datasets.splice(index, 1);
+  this.update();
 };
 
 /**
@@ -5002,37 +5096,144 @@ DatasetsController.prototype.getDateDataview = function () {
  *
  * @param datasets
  */
-function renderCsv(datasets) {
+function renderCSV(datasets) {
   let flatData = flatDatasets(datasets);
-  let csvContent = 'label,value,date,location\n';
+  let headlines = ['label', 'stack', 'value', 'date', 'location'];
+  let csvContent = `${headlines.join(',')}\n`;
   for (let index = 0; index < flatData.length; index++) {
     let data = flatData[index];
-    csvContent += `${data.dataset || 'Unknown'},${data.value || '0'},`;
-    csvContent += `${data.date || ''},${data.location || ''}\n`;
+    let components = [];
+    components.push(data.dataset || 'Unknown');
+    components.push(data.stack || '');
+    components.push(data.value || '0');
+    components.push(data.date || '');
+    components.push(data.location || '');
+    csvContent += `"${components.join(`","`)}"\n`;
   }
   return csvContent;
 }
 
 /**
- * Returns the last path component of the given url.
- * @param url The url with components.
- * @returns {string} The last path component.
+ * Returns a new generated CSV Dataview for the current enabled data of dataset of this controller.
  */
-function getFilename(url) {
-  return url.substring(url.lastIndexOf('/') + 1);
+DatasetsController.prototype.getCSVDataview = function () {
+  let datasets = copy(this.datasets);
+  let dataview = {};
+  dataview.flatData = flatDatasets(datasets);
+  dataview.csv = renderCSV(datasets);
+  return dataview;
+};
+
+/*
+Following code from:
+https://gist.github.com/Jezternz/c8e9fafc2c114e079829974e3764db75
+
+We use this function to save parse a CSV file.
+ */
+
+const csvStringToArray = strData => {
+  const objPattern = new RegExp(("(\\,|\\r?\\n|\\r|^)(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^\\,\\r\\n]*))"), "gi");
+  let arrMatches = null, arrData = [[]];
+  while (arrMatches = objPattern.exec(strData)) {
+    if (arrMatches[1].length && arrMatches[1] !== ",") arrData.push([]);
+    arrData[arrData.length - 1].push(arrMatches[2] ?
+      arrMatches[2].replace(new RegExp("\"\"", "g"), "\"") :
+      arrMatches[3]);
+  }
+  return arrData;
+};
+
+function createDatasets(flatData) {
+  let datasetsByLabel = {};
+  for (let itemIndex = 0; itemIndex < flatData.length; itemIndex++) {
+    let item = flatData[itemIndex];
+    let dataset = datasetsByLabel[item.label];
+    if (dataset) {
+      dataset.data.push({
+        date: item.date,
+        location: item.location,
+        value: item.value
+      });
+    } else {
+      datasetsByLabel[item.label] = {
+        label: item.label,
+        stack: item.stack,
+        data: [{
+          date: item.date,
+          location: item.location,
+          value: item.value
+        }]
+      };
+    }
+  }
+
+  let datasets = [];
+  let properties = Object.getOwnPropertyNames(datasetsByLabel);
+
+  for (let index = 0; index < properties.length; index++) {
+    let label = properties[index];
+    if (label.length === 0) continue;
+    datasets.push(datasetsByLabel[label]);
+  }
+
+  return datasets;
 }
 
-/**
- * Returns a new version of the given string by trimming the given char from the beginning and the end of the string.
- * @param string The string to be trimmed.
- * @param character The character to trim.
- * @returns {string} The trimmed version of the string.
- */
-function trimByChar(string, character) {
-  const saveString = String(string);
-  const first = [...saveString].findIndex(char => char !== character);
-  const last = [...saveString].reverse().findIndex(char => char !== character);
-  return saveString.substring(first, string.length - last);
+function parseCSV2(text) {
+  let flatData = [];
+  let arrays = csvStringToArray(text);
+  let headlines = arrays.shift();
+
+  for (let lineIndex = 0; lineIndex < arrays.length; lineIndex++) {
+    let lineArray = arrays[lineIndex];
+    flatData.push({
+      label: lineArray[0],
+      stack: lineArray[1],
+      value: lineArray[2],
+      date: lineArray[3],
+      location: lineArray[4]
+    });
+  }
+
+  let datasets = createDatasets(flatData);
+  datasets.csv = {
+    content: text,
+    headlines: headlines,
+    lines: arrays,
+  };
+
+  // let lines = text.split('\n');
+  // let headline = lines.shift();
+  // let headlines = headline.split(',');
+  // headlines.shift(); // drop first column
+
+  // for (let index = 0; index < headlines.length; index++) {
+  //   datasets.push({
+  //     label: trimByChar(headlines[index], "\""),
+  //     stack: trimByChar(headlines[index], "\""),
+  //     data: []
+  //   });
+  // }
+
+  // for (let index = 0; index < lines.length; index++) {
+  //   let line = String(lines[index]);
+  //   let components = line.split(',');
+  //   if (components.length < 2) continue;
+  //   let date = components.shift();
+  //
+  //   for (let componentIndex = 0; componentIndex < components.length; componentIndex++) {
+  //     let dataset = datasets[componentIndex];
+  //     let data = dataset.data;
+  //     data.push({
+  //       date: trimByChar(date, "\""),
+  //       value: Number(trimByChar(components[componentIndex], "\""))
+  //     });
+  //     dataset.data = data;
+  //     datasets[componentIndex] = dataset;
+  //   }
+  // }
+
+  return datasets;
 }
 
 /**
@@ -5041,54 +5242,15 @@ function trimByChar(string, character) {
  * @param extractItemBlock
  * @returns {Promise<[]>}
  */
-function parseCsv(
+function fetchCSV(
   url,
   extractItemBlock = function (components) {
     return {date: components[0], value: components[1]};
   }) {
 
-  getFilename(url);
-  let datasets = [];
-
   return fetch(url)
-    .then(function (response) {
-      return response.text();
-    })
-    .then(function (text) {
-      datasets.csv = text;
-      let lines = text.split('\n');
-      let headline = lines.shift();
-      let headlines = headline.split(',');
-      headlines.shift(); // drop first column
-
-      for (let index = 0; index < headlines.length; index++) {
-        datasets.push({
-          label: trimByChar(headlines[index], "\""),
-          stack: trimByChar(headlines[index], "\""),
-          data: []
-        });
-      }
-
-      for (let index = 0; index < lines.length; index++) {
-        let line = String(lines[index]);
-        let components = line.split(',');
-        if (components.length < 2) continue;
-        let date = components.shift();
-
-        for (let componentIndex = 0; componentIndex < components.length; componentIndex++) {
-          let dataset = datasets[componentIndex];
-          let data = dataset.data;
-          data.push({
-            date: trimByChar(date, "\""),
-            value: Number(trimByChar(components[componentIndex], "\""))
-          });
-          dataset.data = data;
-          datasets[componentIndex] = dataset;
-        }
-      }
-
-      return datasets;
-    });
+    .then(response => response.text())
+    .then(parseCSV2);
 }
 
 /**
@@ -5229,6 +5391,249 @@ Color.colorsForStack = function (stack, amount = 1) {
   return colors;
 };
 
+function validateDataset(dataset) {
+  if (!dataset) {
+    throw Error(`No dataset given.`);
+  } else if (!dataset.label) {
+    throw Error(`Missing label for dataset. ${dataset}`);
+  } else if (dataset.data && !Array.isArray(dataset.data)) {
+    throw Error(`Invalid data. Property is not an array. Dataset: ${dataset.label}`);
+  }
+}
+
+function validateDatasets(datasets) {
+  if (!datasets) {
+    throw Error(`No dataset given.`);
+  } else if (!Array.isArray(datasets)) {
+    throw Error(`Datasets argument is not an array.`);
+  }
+
+  for (let index = 0; index < datasets.length; index++) {
+    let dataset = datasets[index];
+    validateDataset(dataset);
+  }
+}
+
+/**
+ *
+ * @class DatasetCard
+ * @extends Card
+ */
+class DatasetCard extends Card {
+
+  /**
+   * Creates a new instance of DatasetCard.
+   * @param parent The parental element or a selector (id).
+   */
+  constructor(parent) {
+    super(parent);
+    this.updateSensible = true;
+    this.body.style('overflow', 'scroll');
+    this.footer.style('display', 'block');
+    this.render();
+    this.setHeaderText('Dataset Card');
+  }
+
+  render() {
+    this.element.classed('lotivis-data-card', true);
+
+    this.header.text('');
+    this.headline = this.header.append('div');
+
+    this.textareaID = createID();
+    this.textarea = this.body
+      .append('textarea')
+      .attr('id', this.textareaID)
+      .attr('name', this.textareaID)
+      .attr('class', 'lotivis-data-textarea');
+
+    this.statusText = this.header
+      .append('div')
+      .style(`display`, `none`)
+      .classed('lotivis-data-status-text', true)
+      .classed('lotivis-data-status-failure', true);
+
+    this.element.on('keyup', this.onKeyup.bind(this));
+  }
+
+  getTextareaContent() {
+    return document.getElementById(this.textareaID).value;
+  }
+
+  setHeaderText(newHeaderText) {
+    this.headline.text(newHeaderText);
+  }
+
+  setStatusMessage(newStatusMessage, success = true) {
+    this.statusText
+      .text(newStatusMessage)
+      .style(`display`, newStatusMessage === "" ? `none` : `block`);
+  }
+
+  setDatasetController(newDatasetController) {
+    this.datasetController = newDatasetController;
+    this.datasetController.addListener(this);
+    this.updateContent(false);
+  }
+
+  onKeyup() {
+    this.tryParse();
+  }
+
+  update(datasetsController, reason) {
+    if (!this.updateSensible) return console.log(`Skipping update due to not update sensible (Reason: ${reason}).`);
+    this.updateContent(false);
+  }
+
+  updateContent(updateController = true) {
+    // empty
+  }
+
+  tryParse() {
+    let content = this.getTextareaContent();
+    let numberOfRows = content.split("\n").length;
+
+    this.textarea.style('height', null);
+    this.textarea.attr('rows', numberOfRows);
+    this.setStatusMessage('', true);
+
+    try {
+      let parsedDatasets = parseCSV2(content);
+      validateDatasets(parsedDatasets);
+
+      if (!update) return;
+      if (!this.datasetController) return;
+
+      this.updateSensible = false;
+      this.datasetController.setDatasets(parsedDatasets);
+      this.updateSensible = true;
+
+    } catch (error) {
+      this.setStatusMessage(error, false);
+    }
+  }
+
+  setDatasets(datasets) {
+    // empty
+  }
+
+  /**
+   * Returns the
+   */
+  getParsedDatasets() {
+    // empty
+  }
+}
+
+/**
+ * A card containing a textarea which contains the JSON text of a dataset collection.
+ *
+ * @class DatasetJsonCard
+ * @extends DatasetCard
+ */
+class DatasetJsonCard extends DatasetCard {
+
+  /**
+   * Creates a new instance of DatasetJsonCard.
+   * @param parent The parental element or a selector (id).
+   */
+  constructor(parent) {
+    super(parent);
+    this.setHeaderText('Dataset JSON Card');
+    this.cachedDatasets = "";
+  }
+
+  /**
+   *
+   * @override
+   * @param updateController
+   * @returns {*}
+   */
+  updateContent(updateController=true) {
+    let datasets = this.datasetController.datasets;
+    let content = JSON.stringify(datasets, null, 2);
+    this.textarea.text(content);
+    this.parseContent(updateController);
+  }
+
+  /**
+   *
+   * @param update
+   */
+  parseContent(update=true) {
+    let content = this.getTextareaContent();
+    let numberOfRows = content.split("\n").length;
+    this.textarea.style('height', null);
+    this.textarea.attr('rows', numberOfRows);
+    this.setStatusMessage('', true);
+
+    try {
+
+      let parsedDatasets = JSON.parse(content.trim());
+      let equal = objectsEqual(this.cachedDatasets, parsedDatasets);
+      if (equal) return;
+      this.cachedDatasets = parsedDatasets;
+      validateDatasets(parsedDatasets);
+
+      if (!update) return;
+      if (!this.datasetController) return;
+      this.updateSensible = false;
+      this.datasetController.setDatasets(parsedDatasets);
+      this.updateSensible = true;
+
+    } catch (error) {
+      this.setStatusMessage(error, false);
+    }
+  }
+}
+
+/**
+ *
+ * @class DatasetCSVCard
+ * @extends Card
+ */
+class DatasetCSVCard extends DatasetCard {
+
+  /**
+   * Creates a new instance of DatasetCSVCard.
+   * @param parent The parental element or a selector (id).
+   */
+  constructor(parent) {
+    super(parent);
+    this.setHeaderText('Dataset CSV Card');
+  }
+
+  updateContent(updateController = true) {
+    let csvDataview = this.datasetController.getCSVDataview();
+    this.textarea.text(csvDataview.csv);
+    this.parseContent(updateController);
+  }
+
+  parseContent(update = true) {
+    let content = this.getTextareaContent();
+    let numberOfRows = content.split("\n").length;
+
+    this.textarea.style('height', null);
+    this.textarea.attr('rows', numberOfRows);
+    this.setStatusMessage('', true);
+
+    try {
+      let parsedDatasets = parseCSV2(content);
+      validateDatasets(parsedDatasets);
+
+      if (!update) return;
+      if (!this.datasetController) return;
+
+      this.updateSensible = false;
+      this.datasetController.setDatasets(parsedDatasets);
+      this.updateSensible = true;
+
+    } catch (error) {
+      this.setStatusMessage(error, false);
+    }
+  }
+}
+
 exports.Color = Color;
 
 // components
@@ -5254,6 +5659,10 @@ exports.MapChartCard = MapChartCard;
 exports.PlotChart = PlotChart;
 exports.PlotChartCard = PlotChartCard;
 
+// datasets / csv cards
+exports.DatasetJsonCard = DatasetJsonCard;
+exports.DatasetCSVCard = DatasetCSVCard;
+
 // datasets
 exports.DatasetController = DatasetsController;
 
@@ -5265,8 +5674,8 @@ exports.GeoJson = GeoJson;
 exports.Feature = Feature;
 exports.joinFeatures = joinFeatures;
 
-exports.renderCSV = renderCsv;
-exports.parseCSV = parseCsv;
+exports.renderCSV = renderCSV;
+exports.parseCSV = fetchCSV;
 
 exports.createGeoJSON = createGeoJSON;
 

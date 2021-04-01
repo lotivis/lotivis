@@ -7,3 +7,11 @@
 export function equals(value1, value2) {
   return String(value1) === String(value2);
 }
+
+
+export function objectsEqual(obj1, obj2) {
+  if (obj1 === obj2) return true;
+  let string1 = JSON.stringify(obj1);
+  let string2 = JSON.stringify(obj2);
+  return string1 === string2;
+}

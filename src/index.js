@@ -44,10 +44,13 @@ import {UrlParameters} from "./js/shared/url.parameters";
 import {DatasetsController} from "./js/data/datasets.controller";
 import "./js/data/datasets.controller.listeners";
 import "./js/data/datasets.controller.filter";
+import "./js/data/datasets.controller.update";
 import "./js/data/datasets.controller.dataviews.date";
 import "./js/data/datasets.controller.dataviews.plot";
-import {renderCsv} from "./js/parse/render.csv";
-import {parseCsv} from "./js/parse/parse.csv";
+import "./js/data/datasets.controller.dataviews.map";
+import "./js/data/datasets.controller.dataview.csv";
+import {renderCSV} from "./js/parse/renderCSV";
+import {fetchCSV} from "./js/parse/fetchCSV";
 import {createGeoJSON} from "./js/geojson-juggle/create.geojson";
 import {Card} from "./js/components/card";
 import {Checkbox} from "./js/components/checkbox";
@@ -68,6 +71,8 @@ import './js/shared/color.map';
 import './js/shared/color.plot';
 import './js/shared/color.random';
 import './js/shared/color.stack';
+import {DatasetJsonCard} from "./js/data.card/dataset.json.card";
+import {DatasetCSVCard} from "./js/data.card/dataset.csv.card";
 
 exports.Color = Color;
 
@@ -94,6 +99,10 @@ exports.MapChartCard = MapChartCard;
 exports.PlotChart = PlotChart;
 exports.PlotChartCard = PlotChartCard;
 
+// datasets / csv cards
+exports.DatasetJsonCard = DatasetJsonCard;
+exports.DatasetCSVCard = DatasetCSVCard;
+
 // datasets
 exports.DatasetController = DatasetsController;
 
@@ -105,8 +114,8 @@ exports.GeoJson = GeoJson;
 exports.Feature = Feature;
 exports.joinFeatures = joinFeatures;
 
-exports.renderCSV = renderCsv;
-exports.parseCSV = parseCsv;
+exports.renderCSV = renderCSV;
+exports.parseCSV = fetchCSV;
 
 exports.createGeoJSON = createGeoJSON;
 

@@ -1,0 +1,41 @@
+
+.lotivis-data-card {
+  background-color: #F5F5F5;
+
+  .lotivis-data-textarea {
+    padding-top: 10px;
+    color: grey;
+  }
+}
+
+.lotivis-data-status-label {
+  font-size: 12px;
+}
+
+.lotivis-data-status-text {
+  font-size: 12px;
+}
+
+.lotivis-data-status-success {
+  color: green;
+}
+
+.lotivis-data-status-failure {
+  margin-top: 10px;
+  border-radius: $radius;
+  background-color: tomato;
+  color: white;
+  padding: 10px;
+  animation: fadeIn ease 0.3s;
+}
+
+.lotivis-data-textarea {
+  background-color: rgba(0, 0, 0, 0);
+  margin: 0;
+  width: 98%;
+  //height: 600px;
+  border: 0px solid #cccccc;
+  padding: 5px;
+  font-family: monospace, sans-serif;
+  outline: none;
+}

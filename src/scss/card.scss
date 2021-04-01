@@ -9,8 +9,26 @@
 }
 
 .lotivis-card-header {
-  padding: 10px;
+  padding: $small-border;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+  .lotivis-card-header-right-component {
+    overflow: visible;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lotivis-card-header-center-component {
+    overflow: visible;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lotivis-card-header-left-component {
+    overflow: visible;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 .lotivis-card-body {
@@ -19,8 +37,6 @@
 }
 
 .lotivis-card-footer {
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-top: 6px;
+  padding: $small-border;
   border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
