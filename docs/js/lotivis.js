@@ -2063,7 +2063,7 @@ UrlParameters.searchSensitivity = 'search-sensitivity';
 UrlParameters.startYear = 'start-year';
 UrlParameters.endYear = 'end-year';
 
-UrlParameters.showTestData = 'show-test-data';
+UrlParameters.showTestData = 'show-data';
 
 /**
  *
@@ -5102,6 +5102,10 @@ DatasetsController.prototype.getDateDataview = function () {
   return dataview;
 };
 
+function surroundWithQuotationMarks(input) {
+  return `"${input}"`;
+}
+
 /**
  *
  * @param datasets
@@ -5113,12 +5117,12 @@ function renderCSV(datasets) {
   for (let index = 0; index < flatData.length; index++) {
     let data = flatData[index];
     let components = [];
-    components.push(data.dataset || 'Unknown');
-    components.push(data.stack || '');
+    components.push(surroundWithQuotationMarks(data.dataset || 'Unknown'));
+    components.push(surroundWithQuotationMarks(data.stack || ''));
     components.push(data.value || '0');
-    components.push(data.date || '');
-    components.push(data.location || '');
-    csvContent += `"${components.join(`","`)}"\n`;
+    components.push(surroundWithQuotationMarks(data.date || ''));
+    components.push(surroundWithQuotationMarks(data.location || ''));
+    csvContent += `${components.join(`,`)}\n`;
   }
   return csvContent;
 }
@@ -5709,6 +5713,7 @@ exports.joinFeatures = joinFeatures;
 
 exports.renderCSV = renderCSV;
 exports.parseCSV = fetchCSV;
+exports.parseCSV2 = parseCSV2;
 
 exports.createGeoJSON = createGeoJSON;
 

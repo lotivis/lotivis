@@ -1,6 +1,6 @@
 const assert = require('assert');
-const dataset = require('./test-data/test.dataset.location.time.json');
-const datasets = require('./test-data/test.datasets.location.time.json');
+const dataset = require('./data/sample.dataset.1.json');
+const datasets = require('./data/sample.datasets.1.json');
 const lotivis = require('../dist/lotivis');
 
 describe('dataset extract', function() {

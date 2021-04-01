@@ -50,7 +50,7 @@ import "./js/data/datasets.controller.dataviews.plot";
 import "./js/data/datasets.controller.dataviews.map";
 import "./js/data/datasets.controller.dataview.csv";
 import {renderCSV} from "./js/parse/renderCSV";
-import {fetchCSV} from "./js/parse/fetchCSV";
+import {fetchCSV, parseCSV2} from "./js/parse/fetchCSV";
 import {createGeoJSON} from "./js/geojson.juggle/create.geojson";
 import {Card} from "./js/components/card";
 import {Checkbox} from "./js/components/checkbox";
@@ -116,6 +116,7 @@ exports.joinFeatures = joinFeatures;
 
 exports.renderCSV = renderCSV;
 exports.parseCSV = fetchCSV;
+exports.parseCSV2 = parseCSV2;
 
 exports.createGeoJSON = createGeoJSON;
 

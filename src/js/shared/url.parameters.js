@@ -80,4 +80,4 @@ UrlParameters.searchSensitivity = 'search-sensitivity';
 UrlParameters.startYear = 'start-year';
 UrlParameters.endYear = 'end-year';
 
-UrlParameters.showTestData = 'show-test-data';
+UrlParameters.showTestData = 'show-data';

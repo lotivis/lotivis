@@ -159,12 +159,19 @@ button:active, a:active {
   color: red;
 }
 
+.lotivis-data-card {
+  background-color: #F5F5F5;
+}
+.lotivis-data-card .lotivis-data-textarea {
+  padding-top: 10px;
+  color: grey;
+}
+
 .lotivis-data-status-label {
   font-size: 12px;
 }
 
 .lotivis-data-status-text {
-  width: 100%;
   font-size: 12px;
 }
 
@@ -173,7 +180,22 @@ button:active, a:active {
 }
 
 .lotivis-data-status-failure {
-  color: red;
+  margin-top: 10px;
+  border-radius: 8px;
+  background-color: tomato;
+  color: white;
+  padding: 10px;
+  animation: fadeIn ease 0.3s;
+}
+
+.lotivis-data-textarea {
+  background-color: rgba(0, 0, 0, 0);
+  margin: 0;
+  width: 98%;
+  border: 0px solid #cccccc;
+  padding: 5px;
+  font-family: monospace, sans-serif;
+  outline: none;
 }
 
 .lotivis-date-chart-label {
@@ -240,16 +262,6 @@ input[type=checkbox] {
 
 .radio-group label:active {
   opacity: 0.6;
-}
-
-.lotivis-textarea-data {
-  margin: 0;
-  width: 98%;
-  height: 600px;
-  border: 0px solid #cccccc;
-  padding: 5px;
-  font-family: monospace, sans-serif;
-  outline: none;
 }
 
 .lotivis-container {
