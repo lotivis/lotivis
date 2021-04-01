@@ -1,10 +1,9 @@
 import {Card} from "../components/card";
-import {validateDatasets} from "../data-juggle/dataset.validate";
 import {parseCSV2} from "../parse/fetchCSV";
 import {DatasetCard} from "./dataset.card";
 
 /**
- *
+ * Presents the CSV version of datasets.  The presented CSV can be edited.
  * @class DatasetCSVCard
  * @extends Card
  */
@@ -19,33 +18,12 @@ export class DatasetCSVCard extends DatasetCard {
     this.setHeaderText('Dataset CSV Card');
   }
 
-  updateContent(updateController = true) {
-    let csvDataview = this.datasetController.getCSVDataview();
-    this.textarea.text(csvDataview.csv);
-    this.parseContent(updateController);
+  textToDatasets(text) {
+    if (text === "") return [];
+    return parseCSV2(text);
   }
 
-  parseContent(update = true) {
-    let content = this.getTextareaContent();
-    let numberOfRows = content.split("\n").length;
-
-    this.textarea.style('height', null);
-    this.textarea.attr('rows', numberOfRows);
-    this.setStatusMessage('', true);
-
-    try {
-      let parsedDatasets = parseCSV2(content);
-      validateDatasets(parsedDatasets);
-
-      if (!update) return;
-      if (!this.datasetController) return;
-
-      this.updateSensible = false;
-      this.datasetController.setDatasets(parsedDatasets);
-      this.updateSensible = true;
-
-    } catch (error) {
-      this.setStatusMessage(error, false);
-    }
+  datasetsToText(datasets) {
+    return this.datasetController.getCSVDataview().csv;
   }
 }

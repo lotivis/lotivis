@@ -1,6 +1,6 @@
 import {DatasetsController} from "./datasets.controller";
 import {copy} from "../shared/copy";
-import {flatDatasets} from "../data-juggle/dataset.flat";
+import {flatDatasets} from "../data.juggle/dataset.flat";
 import {renderCSV} from "../parse/renderCSV";
 
 /**

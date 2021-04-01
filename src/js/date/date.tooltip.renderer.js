@@ -1,4 +1,4 @@
-import {combineByDate} from "../data-juggle/dataset.combine";
+import {combineByDate} from "../data.juggle/dataset.combine";
 import {Constants} from "../shared/constants";
 import {verbose_log} from "../shared/debug";
 

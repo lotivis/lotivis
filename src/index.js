@@ -12,13 +12,13 @@ import {Option} from "./js/components/option";
 import {
   flatDataset,
   flatDatasets
-} from "./js/data-juggle/dataset.flat";
+} from "./js/data.juggle/dataset.flat";
 import {
   combine,
   combineByDate,
   combineByLocation,
   combineByStacks
-} from "./js/data-juggle/dataset.combine";
+} from "./js/data.juggle/dataset.combine";
 import {
   extractDatesFromDatasets,
   extractDatesFromFlatData,
@@ -32,14 +32,14 @@ import {
   extractLocationsFromFlatData,
   extractStacksFromDatasets,
   extractStacksFromFlatData
-} from "./js/data-juggle/dataset.extract";
+} from "./js/data.juggle/dataset.extract";
 import {
   sumOfDataset,
   sumOfStack
-} from "./js/data-juggle/dataset.sum";
+} from "./js/data.juggle/dataset.sum";
 import {
   dateToItemsRelation
-} from "./js/data-juggle/dataset.relations";
+} from "./js/data.juggle/dataset.relations";
 import {UrlParameters} from "./js/shared/url.parameters";
 import {DatasetsController} from "./js/data/datasets.controller";
 import "./js/data/datasets.controller.listeners";
@@ -51,19 +51,19 @@ import "./js/data/datasets.controller.dataviews.map";
 import "./js/data/datasets.controller.dataview.csv";
 import {renderCSV} from "./js/parse/renderCSV";
 import {fetchCSV} from "./js/parse/fetchCSV";
-import {createGeoJSON} from "./js/geojson-juggle/create.geojson";
+import {createGeoJSON} from "./js/geojson.juggle/create.geojson";
 import {Card} from "./js/components/card";
 import {Checkbox} from "./js/components/checkbox";
 import {ModalPopup} from "./js/components/modal.popup";
 import {ChartCard} from "./js/components/chart.card";
 import {Dropdown} from "./js/components/dropdown";
 import {Popup} from "./js/components/popup";
-import {joinFeatures} from "./js/geojson-juggle/join.features";
+import {joinFeatures} from "./js/geojson.juggle/join.features";
 import {Constants} from "./js/shared/constants";
 import {
   combineDatasetsByRatio,
   combineDataByGroupsize
-} from "./js/data-juggle/dataset.combine.ratio";
+} from "./js/data.juggle/dataset.combine.ratio";
 
 import {Color} from "./js/shared/color";
 import './js/shared/color.defaults';

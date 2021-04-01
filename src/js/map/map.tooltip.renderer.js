@@ -1,4 +1,4 @@
-import {combineByLocation} from "../data-juggle/dataset.combine";
+import {combineByLocation} from "../data.juggle/dataset.combine";
 import {Color} from "../shared/color";
 import {styleForCSSClass} from "../shared/style";
 import {formatNumber} from "../shared/format";
@@ -167,6 +167,7 @@ export class MapTooltipRenderer {
         .style('stroke-width', style['stroke-width'] || '0.7')
         .style('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4');
       tooltip.style('opacity', 0);
+
     };
 
     /**

@@ -1,12 +1,12 @@
 import {DatasetsController} from "./datasets.controller";
 import {copy} from "../shared/copy";
-import {flatDatasets} from "../data-juggle/dataset.flat";
+import {flatDatasets} from "../data.juggle/dataset.flat";
 import {
   extractDatesFromDatasets,
   extractLabelsFromDatasets,
   extractLocationsFromDatasets,
   extractStacksFromDatasets
-} from "../data-juggle/dataset.extract";
+} from "../data.juggle/dataset.extract";
 import {DatasetsColorsController} from "./datasets.colors.controller";
 
 /**

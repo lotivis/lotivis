@@ -3,9 +3,9 @@ import {
   extractDatesFromDatasets,
   extractEarliestDateWithValue,
   extractLatestDateWithValue
-} from "../data-juggle/dataset.extract";
-import {combineByDate} from "../data-juggle/dataset.combine";
-import {sumOfLabel} from "../data-juggle/dataset.sum";
+} from "../data.juggle/dataset.extract";
+import {combineByDate} from "../data.juggle/dataset.combine";
+import {sumOfLabel} from "../data.juggle/dataset.sum";
 import {PlotAxisRenderer} from "./plot.axis.renderer";
 import {copy} from "../shared/copy";
 import {PlotBarsRenderer} from "./plot.bars.renderer";

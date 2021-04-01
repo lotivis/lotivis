@@ -1,4 +1,4 @@
-import {joinFeatures} from "../geojson-juggle/join.features";
+import {joinFeatures} from "../geojson.juggle/join.features";
 import {debug_log} from "../shared/debug";
 
 /**

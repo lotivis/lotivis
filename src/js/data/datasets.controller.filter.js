@@ -2,10 +2,12 @@ import {
   extractDatesFromDatasets,
   extractLabelsFromDatasets,
   extractStacksFromDatasets
-} from "../data-juggle/dataset.extract";
+} from "../data.juggle/dataset.extract";
 import {DatasetsController} from "./datasets.controller";
-import {flatDatasets} from "../data-juggle/dataset.flat";
+import {flatDatasets} from "../data.juggle/dataset.flat";
 import {copy} from "../shared/copy";
+import {objectsEqual} from "../shared/equal";
+import {debug_log} from "../shared/debug";
 
 /**
  * Resets all filters.  Notifies listeners.
@@ -23,8 +25,12 @@ DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
  * @param locations The locations to filter.
  */
 DatasetsController.prototype.setLocationsFilter = function (locations) {
+  let stringVersions = locations.map(location => String(location));
+  if (objectsEqual(this.locationFilters, stringVersions)) {
+    return debug_log(`Date filters not changed.`);
+  }
   this.resetFilters(false);
-  this.locationFilters = locations.map(location => String(location));
+  this.locationFilters = stringVersions;
   this.notifyListeners(DatasetsController.NotificationReason.locationFilters);
 };
 
@@ -33,8 +39,12 @@ DatasetsController.prototype.setLocationsFilter = function (locations) {
  * @param dates The dates to filter.
  */
 DatasetsController.prototype.setDatesFilter = function (dates) {
+  let stringVersions = dates.map(date => String(date));
+  if (objectsEqual(this.dateFilters, stringVersions)) {
+    return debug_log(`Date filters not changed.`);
+  }
   this.resetFilters(false);
-  this.dateFilters = dates.map(date => String(date));
+  this.dateFilters = stringVersions;
   this.notifyListeners(DatasetsController.NotificationReason.dateFilters);
 };
 
@@ -43,8 +53,12 @@ DatasetsController.prototype.setDatesFilter = function (dates) {
  * @param datasets The datasets to filter.
  */
 DatasetsController.prototype.setDatasetsFilter = function (datasets) {
+  let stringVersions = datasets.map(dataset => String(dataset));
+  if (objectsEqual(this.datasetFilters, stringVersions)) {
+    return debug_log(`Dataset filters not changed.`);
+  }
   this.resetFilters(false);
-  this.datasetFilters = datasets.map(dataset => String(dataset));
+  this.datasetFilters = stringVersions;
   this.notifyListeners(DatasetsController.NotificationReason.filterDataset);
 };
 

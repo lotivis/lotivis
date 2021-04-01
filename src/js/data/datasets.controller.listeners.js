@@ -1,5 +1,5 @@
 import {DatasetsController} from "./datasets.controller";
-import {verbose_log} from "../shared/debug";
+import {debug_log, verbose_log} from "../shared/debug";
 
 /**
  * Appends the given listener to the collection of listeners.
@@ -26,8 +26,7 @@ DatasetsController.prototype.removeListener = function (listener) {
  * @param reason The reason to send to the listener.  Default is 'none'.
  */
 DatasetsController.prototype.notifyListeners = function (reason = DatasetsController.NotificationReason.none) {
-  if (!this.listeners) return;
-  verbose_log(`Notifying listeners (${reason}).`)
+  if (!this.listeners) return debug_log(`No listeners to notify.`);
   for (let index = 0; index < this.listeners.length; index++) {
     let listener = this.listeners[index];
     if (!listener.update) continue;

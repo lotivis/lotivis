@@ -1,5 +1,6 @@
 import {csvStringToArray} from "../shared/csv.to.array";
-import {createDatasets} from "../data-juggle/dataset.create";
+import {createDatasets} from "../data.juggle/dataset.create";
+import {trimByChar} from "../shared/trim";
 
 export function parseCSV2(text) {
   let flatData = [];
@@ -7,11 +8,11 @@ export function parseCSV2(text) {
   let headlines = arrays.shift();
 
   for (let lineIndex = 0; lineIndex < arrays.length; lineIndex++) {
-    let lineArray = arrays[lineIndex];
+    let lineArray = arrays[lineIndex].map(element => trimByChar(element, `"`));
     flatData.push({
       label: lineArray[0],
       stack: lineArray[1],
-      value: lineArray[2],
+      value: +lineArray[2],
       date: lineArray[3],
       location: lineArray[4]
     });

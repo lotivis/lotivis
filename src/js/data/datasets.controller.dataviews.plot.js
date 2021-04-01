@@ -4,9 +4,9 @@ import {
   extractDatesFromDatasets,
   extractEarliestDateWithValue, extractLabelsFromDatasets,
   extractLatestDateWithValue
-} from "../data-juggle/dataset.extract";
-import {combineByDate} from "../data-juggle/dataset.combine";
-import {sumOfLabel} from "../data-juggle/dataset.sum";
+} from "../data.juggle/dataset.extract";
+import {combineByDate} from "../data.juggle/dataset.combine";
+import {sumOfLabel} from "../data.juggle/dataset.sum";
 
 /**
  * Returns a new generated plot data view for the current enabled data of dataset of this controller.

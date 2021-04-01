@@ -64,8 +64,6 @@ const Constants = {
 
 const prefix = '[lotivis]  ';
 
-const verbose_log = console.log;
-
 const debug_log = function (message) {
   if (!Constants.debugLog) return;
   console.log(prefix + message);
@@ -2801,6 +2799,7 @@ class MapTooltipRenderer {
         .style('stroke-width', style['stroke-width'] || '0.7')
         .style('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4');
       tooltip.style('opacity', 0);
+
     };
 
     /**
@@ -3327,20 +3326,19 @@ class MapBackgroundRenderer {
    */
   constructor(mapChart) {
 
-    this.background = mapChart.svg
-      .append('rect')
-      .attr('width', mapChart.config.width)
-      .attr('height', mapChart.config.height)
-      .attr('fill', 'white');
-
     /**
      * Appends a background rectangle.
      */
     this.render = function () {
       // create a background rectangle for receiving mouse enter events
       // in order to reset the location data filter.
-      this.background
+      mapChart.svg
+        .append('rect')
+        .attr('width', mapChart.config.width)
+        .attr('height', mapChart.config.height)
+        .attr('fill', 'white')
         .on('mouseenter', function () {
+
           let controller = mapChart.datasetController;
           if (!controller) return;
           let filters = controller.locationFilters;
@@ -3348,8 +3346,8 @@ class MapBackgroundRenderer {
           this.updateSensible = false;
           controller.setLocationsFilter([]);
           this.updateSensible = true;
-        }.bind(this));
 
+        }.bind(this));
     };
   }
 }
@@ -3504,6 +3502,7 @@ class MapChart extends Chart {
       this.geoJSONDidChange();
     }
 
+    this.backgroundRenderer.render();
     this.exteriorBorderRenderer.render();
     this.geoJSONRenderer.renderGeoJson();
     this.tooltipRenderer.raise();
@@ -4768,8 +4767,7 @@ DatasetsController.prototype.removeListener = function (listener) {
  * @param reason The reason to send to the listener.  Default is 'none'.
  */
 DatasetsController.prototype.notifyListeners = function (reason = DatasetsController.NotificationReason.none) {
-  if (!this.listeners) return;
-  verbose_log(`Notifying listeners (${reason}).`);
+  if (!this.listeners) return debug_log(`No listeners to notify.`);
   for (let index = 0; index < this.listeners.length; index++) {
     let listener = this.listeners[index];
     if (!listener.update) continue;
@@ -4802,8 +4800,12 @@ DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
  * @param locations The locations to filter.
  */
 DatasetsController.prototype.setLocationsFilter = function (locations) {
+  let stringVersions = locations.map(location => String(location));
+  if (objectsEqual(this.locationFilters, stringVersions)) {
+    return debug_log(`Date filters not changed.`);
+  }
   this.resetFilters(false);
-  this.locationFilters = locations.map(location => String(location));
+  this.locationFilters = stringVersions;
   this.notifyListeners(DatasetsController.NotificationReason.locationFilters);
 };
 
@@ -4812,8 +4814,12 @@ DatasetsController.prototype.setLocationsFilter = function (locations) {
  * @param dates The dates to filter.
  */
 DatasetsController.prototype.setDatesFilter = function (dates) {
+  let stringVersions = dates.map(date => String(date));
+  if (objectsEqual(this.dateFilters, stringVersions)) {
+    return debug_log(`Date filters not changed.`);
+  }
   this.resetFilters(false);
-  this.dateFilters = dates.map(date => String(date));
+  this.dateFilters = stringVersions;
   this.notifyListeners(DatasetsController.NotificationReason.dateFilters);
 };
 
@@ -4822,8 +4828,12 @@ DatasetsController.prototype.setDatesFilter = function (dates) {
  * @param datasets The datasets to filter.
  */
 DatasetsController.prototype.setDatasetsFilter = function (datasets) {
+  let stringVersions = datasets.map(dataset => String(dataset));
+  if (objectsEqual(this.datasetFilters, stringVersions)) {
+    return debug_log(`Dataset filters not changed.`);
+  }
   this.resetFilters(false);
-  this.datasetFilters = datasets.map(dataset => String(dataset));
+  this.datasetFilters = stringVersions;
   this.notifyListeners(DatasetsController.NotificationReason.filterDataset);
 };
 
@@ -5179,17 +5189,30 @@ function createDatasets(flatData) {
   return datasets;
 }
 
+/**
+ * Returns a new version of the given string by trimming the given char from the beginning and the end of the string.
+ * @param string The string to be trimmed.
+ * @param character The character to trim.
+ * @returns {string} The trimmed version of the string.
+ */
+function trimByChar(string, character) {
+  const saveString = String(string);
+  const first = [...saveString].findIndex(char => char !== character);
+  const last = [...saveString].reverse().findIndex(char => char !== character);
+  return saveString.substring(first, saveString.length - last);
+}
+
 function parseCSV2(text) {
   let flatData = [];
   let arrays = csvStringToArray(text);
   let headlines = arrays.shift();
 
   for (let lineIndex = 0; lineIndex < arrays.length; lineIndex++) {
-    let lineArray = arrays[lineIndex];
+    let lineArray = arrays[lineIndex].map(element => trimByChar(element, `"`));
     flatData.push({
       label: lineArray[0],
       stack: lineArray[1],
-      value: lineArray[2],
+      value: +lineArray[2],
       date: lineArray[3],
       location: lineArray[4]
     });
@@ -5434,6 +5457,9 @@ class DatasetCard extends Card {
     this.setHeaderText('Dataset Card');
   }
 
+  /**
+   * Appends the component to this card.
+   */
   render() {
     this.element.classed('lotivis-data-card', true);
 
@@ -5453,75 +5479,138 @@ class DatasetCard extends Card {
       .classed('lotivis-data-status-text', true)
       .classed('lotivis-data-status-failure', true);
 
-    this.element.on('keyup', this.onKeyup.bind(this));
+    this.textarea.on('keyup', this.onKeyup.bind(this));
   }
 
+  /**
+   * Returns the text of the textarea.
+   * @returns {*} The text of the textarea.
+   */
   getTextareaContent() {
-    return document.getElementById(this.textareaID).value;
+    return document.getElementById(this.textareaID).value || "";
   }
 
+  setTextareaContent(newContent) {
+    let textarea = document.getElementById(this.textareaID);
+    if (!textarea) return;
+    textarea.value = newContent;
+  }
+
+  /**
+   * Sets the text of the headline.
+   * @param newHeaderText The new headline text.
+   */
   setHeaderText(newHeaderText) {
     this.headline.text(newHeaderText);
   }
 
-  setStatusMessage(newStatusMessage, success = true) {
+  /**
+   * Sets the text of the status label.  If text is empty the status label will be hide.
+   * @param newStatusMessage The new status message.
+   */
+  setStatusMessage(newStatusMessage) {
     this.statusText
       .text(newStatusMessage)
       .style(`display`, newStatusMessage === "" ? `none` : `block`);
   }
 
+  /**
+   * Sets the dataset controller.
+   * @param newDatasetController
+   */
   setDatasetController(newDatasetController) {
     this.datasetController = newDatasetController;
     this.datasetController.addListener(this);
-    this.updateContent(false);
+    this.updateContentsOfTextarea();
   }
 
+  /**
+   * Tells this dataset card that a 'keyup'-event occurred in the textarea.
+   */
   onKeyup() {
-    this.tryParse();
+    this.updateDatasetsOfController.bind(this)(true);
   }
 
+  /**
+   * Tells thi dataset card that the datasets of the datasets controller has changed.
+   * @param datasetsController The datasets controller.
+   * @param reason The reason of the update.
+   */
   update(datasetsController, reason) {
-    if (!this.updateSensible) return console.log(`Skipping update due to not update sensible (Reason: ${reason}).`);
-    this.updateContent(false);
+    if (!this.updateSensible) return debug_log(`Skipping update due to not update sensible (Reason: ${reason}).`);
+    this.updateContentsOfTextarea();
   }
 
-  updateContent(updateController = true) {
-    // empty
-  }
+  /**
+   * Tells
+   * @param notifyController A boolean value indicating whether the datasets controller should be notified about the
+   * update.
+   */
+  updateDatasetsOfController(notifyController = false) {
 
-  tryParse() {
     let content = this.getTextareaContent();
-    let numberOfRows = content.split("\n").length;
-
-    this.textarea.style('height', null);
-    this.textarea.attr('rows', numberOfRows);
     this.setStatusMessage('', true);
 
     try {
-      let parsedDatasets = parseCSV2(content);
+
+      // will throw an error if parsing is not possible
+      let parsedDatasets = this.textToDatasets(content);
+
+      // will throw an error if parsed datasets aren't valid.
       validateDatasets(parsedDatasets);
 
-      if (!update) return;
-      if (!this.datasetController) return;
+      if (notifyController === true) {
 
-      this.updateSensible = false;
-      this.datasetController.setDatasets(parsedDatasets);
-      this.updateSensible = true;
+        if (!this.datasetController) {
+          return debug_log(`No datasets controller.`);
+        }
+
+        if (objectsEqual(this.cachedDatasets, parsedDatasets)) {
+          return debug_log(`No changes in datasets.`);
+        }
+
+        this.cachedDatasets = parsedDatasets;
+        this.updateSensible = false;
+        this.datasetController.setDatasets(parsedDatasets);
+        this.updateSensible = true;
+      }
 
     } catch (error) {
+      debug_log(`error ${error}`);
       this.setStatusMessage(error, false);
     }
   }
 
-  setDatasets(datasets) {
-    // empty
+  /**
+   * Tells this datasets card to update the content of the textarea by rendering the datasets to text.
+   */
+  updateContentsOfTextarea() {
+    if (!this.datasetController || !this.datasetController.datasets) return;
+    let datasets = this.datasetController.datasets;
+    let content = this.datasetsToText(datasets);
+    let numberOfRows = content.split(`\n`).length;
+    this.textarea.attr('rows', numberOfRows);
+    this.setTextareaContent(content);
+    this.cachedDatasets = datasets;
   }
 
   /**
-   * Returns the
+   * Returns the parsed datasets from the content of the textarea.  Will throw an exception if parsing is not possible.
+   * Subclasses should override.
+   * @param text The text to parse to datasets.
+   * @return {*}
    */
-  getParsedDatasets() {
-    // empty
+  textToDatasets(text) {
+    throw new Error(`Subclasses should override.`);
+  }
+
+  /**
+   * Sets the content of the textarea by rendering the given datasets to text.  Subclasses should override.
+   * @param datasets The datasets to render.
+   * @return {*}
+   */
+  datasetsToText(datasets) {
+    throw new Error(`Subclasses should override.`);
   }
 }
 
@@ -5540,55 +5629,20 @@ class DatasetJsonCard extends DatasetCard {
   constructor(parent) {
     super(parent);
     this.setHeaderText('Dataset JSON Card');
-    this.cachedDatasets = "";
   }
 
-  /**
-   *
-   * @override
-   * @param updateController
-   * @returns {*}
-   */
-  updateContent(updateController=true) {
-    let datasets = this.datasetController.datasets;
-    let content = JSON.stringify(datasets, null, 2);
-    this.textarea.text(content);
-    this.parseContent(updateController);
+  textToDatasets(text) {
+    if (text === "") return [];
+    return JSON.parse(text.trim());
   }
 
-  /**
-   *
-   * @param update
-   */
-  parseContent(update=true) {
-    let content = this.getTextareaContent();
-    let numberOfRows = content.split("\n").length;
-    this.textarea.style('height', null);
-    this.textarea.attr('rows', numberOfRows);
-    this.setStatusMessage('', true);
-
-    try {
-
-      let parsedDatasets = JSON.parse(content.trim());
-      let equal = objectsEqual(this.cachedDatasets, parsedDatasets);
-      if (equal) return;
-      this.cachedDatasets = parsedDatasets;
-      validateDatasets(parsedDatasets);
-
-      if (!update) return;
-      if (!this.datasetController) return;
-      this.updateSensible = false;
-      this.datasetController.setDatasets(parsedDatasets);
-      this.updateSensible = true;
-
-    } catch (error) {
-      this.setStatusMessage(error, false);
-    }
+  datasetsToText(datasets) {
+    return JSON.stringify(datasets, null, 2);
   }
 }
 
 /**
- *
+ * Presents the CSV version of datasets.  The presented CSV can be edited.
  * @class DatasetCSVCard
  * @extends Card
  */
@@ -5603,34 +5657,13 @@ class DatasetCSVCard extends DatasetCard {
     this.setHeaderText('Dataset CSV Card');
   }
 
-  updateContent(updateController = true) {
-    let csvDataview = this.datasetController.getCSVDataview();
-    this.textarea.text(csvDataview.csv);
-    this.parseContent(updateController);
+  textToDatasets(text) {
+    if (text === "") return [];
+    return parseCSV2(text);
   }
 
-  parseContent(update = true) {
-    let content = this.getTextareaContent();
-    let numberOfRows = content.split("\n").length;
-
-    this.textarea.style('height', null);
-    this.textarea.attr('rows', numberOfRows);
-    this.setStatusMessage('', true);
-
-    try {
-      let parsedDatasets = parseCSV2(content);
-      validateDatasets(parsedDatasets);
-
-      if (!update) return;
-      if (!this.datasetController) return;
-
-      this.updateSensible = false;
-      this.datasetController.setDatasets(parsedDatasets);
-      this.updateSensible = true;
-
-    } catch (error) {
-      this.setStatusMessage(error, false);
-    }
+  datasetsToText(datasets) {
+    return this.datasetController.getCSVDataview().csv;
   }
 }
 

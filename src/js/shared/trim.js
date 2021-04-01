@@ -8,5 +8,5 @@ export function trimByChar(string, character) {
   const saveString = String(string);
   const first = [...saveString].findIndex(char => char !== character);
   const last = [...saveString].reverse().findIndex(char => char !== character);
-  return saveString.substring(first, string.length - last);
+  return saveString.substring(first, saveString.length - last);
 }

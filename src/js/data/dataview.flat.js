@@ -1,4 +1,4 @@
-import {flatDatasets} from "../data-juggle/dataset.flat";
+import {flatDatasets} from "../data.juggle/dataset.flat";
 
 /**
  *

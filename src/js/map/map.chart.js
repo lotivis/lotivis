@@ -1,13 +1,13 @@
 import {Chart} from '../components/chart';
-import {combineByLocation, combineByStacks} from '../data-juggle/dataset.combine';
-import {removeFeatures} from "../geojson-juggle/remove.features";
+import {combineByLocation, combineByStacks} from '../data.juggle/dataset.combine';
+import {removeFeatures} from "../geojson.juggle/remove.features";
 import {MapTooltipRenderer} from "./map.tooltip.renderer";
 import {MapLegendRenderer} from "./map.legend.renderer";
 import {MapLabelRenderer} from "./map.label.renderer";
 import {MapDatasetRenderer} from "./map.dataset.renderer";
 import {MapGeojsonRenderer} from "./map.geojson.renderer";
 import {MapExteriorBorderRenderer} from "./map.exterior.border.renderer";
-import {createGeoJSON} from "../geojson-juggle/create.geojson";
+import {createGeoJSON} from "../geojson.juggle/create.geojson";
 import {MapMinimapRenderer} from "./map.minimap.renderer";
 import {MapSelectionBoundsRenderer} from "./map.selection.bounds.renderer";
 import {defaultMapChartConfig} from "./map.chart.config";
@@ -164,6 +164,7 @@ export class MapChart extends Chart {
       this.geoJSONDidChange();
     }
 
+    this.backgroundRenderer.render();
     this.exteriorBorderRenderer.render();
     this.geoJSONRenderer.renderGeoJson();
     this.tooltipRenderer.raise();
