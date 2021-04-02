@@ -1,13 +1,14 @@
 import {Card} from "../components/card";
 import {DatasetCard} from "./dataset.card";
-import {parseCSV} from "../data.parse/parse.csv";
+import {parseCSVDate} from "../data.parse/parse.csv.date";
+import {renderCSVDate} from "../data.render/render.csv.date";
 
 /**
  * Presents the CSV version of datasets.  The presented CSV can be edited.
- * @class DatasetCSVCard
+ * @class DatasetCSVDateCard
  * @extends Card
  */
-export class DatasetCSVCard extends DatasetCard {
+export class DatasetCSVDateCard extends DatasetCard {
 
   /**
    * Creates a new instance of DatasetCSVCard.
@@ -20,10 +21,10 @@ export class DatasetCSVCard extends DatasetCard {
 
   textToDatasets(text) {
     if (text === "") return [];
-    return parseCSV(text);
+    return parseCSVDate(text);
   }
 
   datasetsToText(datasets) {
-    return this.datasetController.getCSVDataview().csv;
+    return renderCSVDate(datasets);
   }
 }

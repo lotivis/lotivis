@@ -45,12 +45,11 @@ import {DatasetsController} from "./js/data/datasets.controller";
 import "./js/data/datasets.controller.listeners";
 import "./js/data/datasets.controller.filter";
 import "./js/data/datasets.controller.update";
-import "./js/data/datasets.controller.dataviews.date";
-import "./js/data/datasets.controller.dataviews.plot";
-import "./js/data/datasets.controller.dataviews.map";
-import "./js/data/datasets.controller.dataview.csv";
-import {renderCSV} from "./js/parse/renderCSV";
-import {fetchCSV, parseCSV2} from "./js/parse/fetchCSV";
+import "./js/dataview/dataviews.date";
+import "./js/dataview/dataviews.plot";
+import "./js/dataview/dataviews.map";
+import {renderCSV} from "./js/data.render/render.csv";
+import {fetchCSV} from "./js/data.parse/fetchCSV";
 import {createGeoJSON} from "./js/geojson.juggle/create.geojson";
 import {Card} from "./js/components/card";
 import {Checkbox} from "./js/components/checkbox";
@@ -64,7 +63,6 @@ import {
   combineDatasetsByRatio,
   combineDataByGroupsize
 } from "./js/data.juggle/dataset.combine.ratio";
-
 import {Color} from "./js/shared/color";
 import './js/shared/color.defaults';
 import './js/shared/color.map';
@@ -73,6 +71,10 @@ import './js/shared/color.random';
 import './js/shared/color.stack';
 import {DatasetJsonCard} from "./js/data.card/dataset.json.card";
 import {DatasetCSVCard} from "./js/data.card/dataset.csv.card";
+import {parseCSV} from "./js/data.parse/parse.csv";
+import {parseCSVDate} from "./js/data.parse/parse.csv.date";
+import {DatasetCSVDateCard} from "./js/data.card/dataset.csv.date.card";
+import {equals, objectsEqual} from "./js/shared/equal";
 
 exports.Color = Color;
 
@@ -102,6 +104,7 @@ exports.PlotChartCard = PlotChartCard;
 // datasets / csv cards
 exports.DatasetJsonCard = DatasetJsonCard;
 exports.DatasetCSVCard = DatasetCSVCard;
+exports.DatasetCSVDateCard = DatasetCSVDateCard;
 
 // datasets
 exports.DatasetController = DatasetsController;
@@ -115,22 +118,21 @@ exports.Feature = Feature;
 exports.joinFeatures = joinFeatures;
 
 exports.renderCSV = renderCSV;
-exports.parseCSV = fetchCSV;
-exports.parseCSV2 = parseCSV2;
+exports.fetchCSV = fetchCSV;
+exports.parseCSV = parseCSV;
+exports.parseCSVDate = parseCSVDate;
 
 exports.createGeoJSON = createGeoJSON;
 
 // data juggling
-exports.flatDataset = flatDataset;
 exports.flatDatasets = flatDatasets;
+exports.flatDataset = flatDataset;
 exports.combine = combine;
 exports.combineByStacks = combineByStacks;
 exports.combineByDate = combineByDate;
 exports.combineByLocation = combineByLocation;
-
 exports.combineDataByGroupsize = combineDataByGroupsize;
 exports.combineDatasetsByRatio = combineDatasetsByRatio;
-
 exports.extractLabelsFromDatasets = extractLabelsFromDatasets;
 exports.extractLabelsFromFlatData = extractLabelsFromFlatData;
 exports.extractStacksFromDatasets = extractStacksFromDatasets;
@@ -146,6 +148,9 @@ exports.extractLatestDateWithValue = extractLatestDateWithValue;
 exports.sumOfDataset = sumOfDataset;
 exports.sumOfStack = sumOfStack;
 exports.dateToItemsRelations = dateToItemsRelation;
+
+exports.equals = equals;
+exports.objectsEqual = objectsEqual;
 
 // constants
 exports.Constants = Constants;

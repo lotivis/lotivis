@@ -11,14 +11,14 @@ typeof define === 'function' && define.amd ? define(['exports'], factory) :
 }(this, (function (exports) { 'use strict';
 
 /**
- *
- * @param str
- * @returns {number}
+ * Returns the hash of the given string.
+ * @param aString The string to create the hash of.
+ * @returns {number} The hash of the given string.
  */
-function hashCode(str) {
+function hashCode(aString) {
   let hash = 0, i, chr;
-  for (i = 0; i < str.length; i++) {
-    chr = str.charCodeAt(i);
+  for (i = 0; i < aString.length; i++) {
+    chr = aString.charCodeAt(i);
     hash = ((hash << 5) - hash) + chr;
     hash |= 0; // Convert to 32bit integer
   }
@@ -298,11 +298,11 @@ function sumOfValues(flatData) {
 
 class DateLegendRenderer {
 
-  constructor(timeChart) {
+  constructor(dateChart) {
 
     this.renderNormalLegend = function () {
-      let config = timeChart.config;
-      let controller = timeChart.datasetController;
+      let config = dateChart.config;
+      let controller = dateChart.datasetController;
       let datasets = controller.workingDatasets;
       let datasetNames = controller.labels;
       let circleRadius = 6;
@@ -312,7 +312,7 @@ class DateLegendRenderer {
         .domain(datasetNames)
         .rangeRound([config.margin.left, config.width - config.margin.right]);
 
-      let legends = timeChart.graph
+      let legends = dateChart.graph
         .selectAll('.legend')
         .data(datasets)
         .enter();
@@ -322,7 +322,7 @@ class DateLegendRenderer {
         .attr('class', 'lotivis-date-chart-legend-label')
         .attr("font-size", 13)
         .attr("x", (item) => xLegend(item.label) - 30)
-        .attr("y", timeChart.graphHeight + labelMargin)
+        .attr("y", dateChart.graphHeight + labelMargin)
         .style('cursor', 'pointer')
         .style("fill", function (item) {
           return controller.getColorForDataset(item.label);
@@ -334,7 +334,7 @@ class DateLegendRenderer {
           let components = event.target.innerHTML.split(' (');
           components.pop();
           let label = components.join(" (");
-          timeChart.toggleDataset(label);
+          dateChart.toggleDataset(label);
         }.bind(this));
 
       legends
@@ -342,7 +342,7 @@ class DateLegendRenderer {
         .attr('class', 'lotivis-date-chart-legend-circle')
         .attr("r", circleRadius)
         .attr("cx", (item) => xLegend(item.label) - (circleRadius * 2) - 30)
-        .attr("cy", timeChart.graphHeight + labelMargin - circleRadius + 2)
+        .attr("cy", dateChart.graphHeight + labelMargin - circleRadius + 2)
         .style("stroke", (item) => controller.getColorForDataset(item.label))
         .style("fill", function (item) {
           return item.isEnabled ? controller.getColorForDataset(item.label) : 'white';
@@ -350,16 +350,16 @@ class DateLegendRenderer {
     };
 
     this.renderCombinedStacksLegend = function () {
-      let stackNames = timeChart.datasetController.stacks;
+      let stackNames = dateChart.datasetController.stacks;
       let circleRadius = 6;
       let labelMargin = 50;
 
       let xLegend = d3
         .scaleBand()
         .domain(stackNames)
-        .rangeRound([timeChart.margin.left, timeChart.width - timeChart.margin.right]);
+        .rangeRound([dateChart.margin.left, dateChart.width - dateChart.margin.right]);
 
-      let legends = timeChart
+      let legends = dateChart
         .graph
         .selectAll('.lotivis-date-chart-legend-label')
         .data(stackNames)
@@ -371,21 +371,21 @@ class DateLegendRenderer {
         .attr("font-size", 23)
         .attr("x", (item) => xLegend(item) - 30)
         .attr("y", function () {
-          return timeChart.graphHeight + labelMargin;
+          return dateChart.graphHeight + labelMargin;
         }.bind(this))
         .style('cursor', 'pointer')
         .style("fill", function (item, index) {
           return Color.colorsForStack(index)[0].rgbString();
         }.bind(this))
         .text(function (item) {
-          return `${item} (${sumOfStack(timeChart.flatData, item)})`;
+          return `${item} (${sumOfStack(dateChart.flatData, item)})`;
         }.bind(this));
 
       legends
         .append("circle")
         .attr("r", circleRadius)
         .attr("cx", item => xLegend(item) - (circleRadius * 2) - 30)
-        .attr("cy", timeChart.graphHeight + labelMargin - circleRadius + 2)
+        .attr("cy", dateChart.graphHeight + labelMargin - circleRadius + 2)
         .style('cursor', 'pointer')
         .style("stroke", function (item, index) {
           return Color.colorsForStack(index)[0].rgbString();
@@ -467,9 +467,12 @@ class DateGhostBarsRenderer {
       let controller = dateChart.datasetController;
       let id = createID(date);
 
-      dateChart.updateSensible = false;
-      controller.setDatesFilter([date]);
-      dateChart.updateSensible = true;
+      if (dateChart.config.sendsNotifications) {
+        dateChart.updateSensible = false;
+        controller.setDatesFilter([date]);
+        dateChart.updateSensible = true;
+      }
+
       dateChart
         .svg
         .select(`#${id}`)
@@ -482,7 +485,10 @@ class DateGhostBarsRenderer {
     function onMouserOut(event, date) {
       this.hideAll();
       dateChart.tooltipRenderer.hideTooltip(event, date);
-      dateChart.datasetController.resetFilters();
+
+      if (dateChart.config.sendsNotifications) {
+        dateChart.datasetController.resetFilters();
+      }
     }
 
     this.renderGhostBars = function () {
@@ -924,7 +930,7 @@ class DateGridRenderer {
 
 /**
  * Returns a copy of the passed object.  The copy is created by using the
- * JSON's `parse` and `stringify` functions.
+ * JSON's `data.parse` and `stringify` functions.
  *
  * @param object The java script object to copy.
  * @returns {any} The copy of the object.
@@ -1184,7 +1190,7 @@ class DatasetsController {
   //   this.locations = extractLocationsFromDatasets(datasets);
   //   this.datasetsColorsController = new DatasetsColorsController(this);
   //   this.dateAccess = function (date) {
-  //     return Date.parse(date);
+  //     return Date.data.parse(date);
   //   };
   //
   //   this.locationFilters = [];
@@ -1250,6 +1256,7 @@ const defaultConfig = {
   },
   showLabels: true,
   combineStacks: false,
+  sendsNotifications: true,
   numberFormat: Intl.NumberFormat('de-DE', {
     maximumFractionDigits: 3
   }),
@@ -1424,7 +1431,13 @@ class DateChart extends Chart {
    * @param label The label of the dataset.
    */
   toggleDataset(label) {
-    this.datasetController.toggleDataset(label);
+    console.log('toggleDataset');
+    if (this.config.sendsNotifications) {
+      this.datasetController.toggleDataset(label);
+    } else {
+      this.datasetController.toggleDataset(label, false);
+      this.update();
+    }
   }
 
   /**
@@ -2277,13 +2290,6 @@ class ChartCard extends Card {
   }
 }
 
-/**
- * Creates an PNG image from the given svg element and initiates a download of the PNG image.
- *
- * @param selector The id of the svg element.
- * @param filename The name of file which is downloaded.
- */
-
 // http://bl.ocks.org/Rokotyan/0556f8facbaf344507cdc45dc3622177
 
 /**
@@ -2623,17 +2629,22 @@ function formatNumber(number) {
  * Compares the string version of each oof the two given values for equality.
  * @param value1 The first value to compare.
  * @param value2 The second value to compare.
- * @returns {boolean} True if the string versions are equal, false if not.
+ * @returns {boolean} `True` if the string versions are equal, `false` if not.
  */
 function equals(value1, value2) {
   return String(value1) === String(value2);
 }
 
-
-function objectsEqual(obj1, obj2) {
-  if (obj1 === obj2) return true;
-  let string1 = JSON.stringify(obj1);
-  let string2 = JSON.stringify(obj2);
+/**
+ * Returns a Boolean value indicating whether the JSON string version of the given two objects are equal.
+ * @param object1 The first object to compare.
+ * @param object2 The second object to compare.
+ * @returns {boolean} `True` if the JSON strings of the given objects are equal,`false` if not.
+ */
+function objectsEqual(object1, object2) {
+  if (object1 === object2) return true;
+  let string1 = JSON.stringify(object1);
+  let string2 = JSON.stringify(object2);
   return string1 === string2;
 }
 
@@ -4838,15 +4849,17 @@ DatasetsController.prototype.setDatasetsFilter = function (datasets) {
 };
 
 /**
- * Toggles the enabled of the dataset with the given label.  Notifies listeners.
+ * Toggles the enabled of the dataset with the given label.
  * @param label The label of the dataset.
+ * @param notifyListeners A boolean value indicating whether to notify the listeners.  Default is `true`.
  */
-DatasetsController.prototype.toggleDataset = function (label) {
+DatasetsController.prototype.toggleDataset = function (label, notifyListeners=true) {
   this.workingDatasets.forEach(function (dataset) {
     if (dataset.label === label) {
       dataset.isEnabled = !dataset.isEnabled;
     }
   });
+  if (!notifyListeners) return;
   this.notifyListeners('dataset-toggle');
 };
 
@@ -5102,13 +5115,18 @@ DatasetsController.prototype.getDateDataview = function () {
   return dataview;
 };
 
-function surroundWithQuotationMarks(input) {
-  return `"${input}"`;
+/**
+ * Returns the given string with a quotation mark in the left and right.
+ * @param aString The string to surround by quotation marks.
+ * @returns {string} The string surrounded by quotation marks.
+ */
+function surroundWithQuotationMarks(aString) {
+  return `"${aString}"`;
 }
 
 /**
- *
- * @param datasets
+ * Returns the CSV string of the given datasets.
+ * @param datasets The datasets to create the CSV of.
  */
 function renderCSV(datasets) {
   let flatData = flatDatasets(datasets);
@@ -5127,22 +5145,11 @@ function renderCSV(datasets) {
   return csvContent;
 }
 
-/**
- * Returns a new generated CSV Dataview for the current enabled data of dataset of this controller.
- */
-DatasetsController.prototype.getCSVDataview = function () {
-  let datasets = copy(this.datasets);
-  let dataview = {};
-  dataview.flatData = flatDatasets(datasets);
-  dataview.csv = renderCSV(datasets);
-  return dataview;
-};
-
 /*
 Following code from:
 https://gist.github.com/Jezternz/c8e9fafc2c114e079829974e3764db75
 
-We use this function to save parse a CSV file.
+We use this function to save data.parse a CSV file.
  */
 
 const csvStringToArray = strData => {
@@ -5156,6 +5163,19 @@ const csvStringToArray = strData => {
   }
   return arrData;
 };
+
+/**
+ * Returns a new version of the given string by trimming the given char from the beginning and the end of the string.
+ * @param string The string to be trimmed.
+ * @param character The character to trim.
+ * @returns {string} The trimmed version of the string.
+ */
+function trimByChar(string, character) {
+  const saveString = String(string);
+  const first = [...saveString].findIndex(char => char !== character);
+  const last = [...saveString].reverse().findIndex(char => char !== character);
+  return saveString.substring(first, saveString.length - last);
+}
 
 function createDatasets(flatData) {
   let datasetsByLabel = {};
@@ -5193,20 +5213,7 @@ function createDatasets(flatData) {
   return datasets;
 }
 
-/**
- * Returns a new version of the given string by trimming the given char from the beginning and the end of the string.
- * @param string The string to be trimmed.
- * @param character The character to trim.
- * @returns {string} The trimmed version of the string.
- */
-function trimByChar(string, character) {
-  const saveString = String(string);
-  const first = [...saveString].findIndex(char => char !== character);
-  const last = [...saveString].reverse().findIndex(char => char !== character);
-  return saveString.substring(first, saveString.length - last);
-}
-
-function parseCSV2(text) {
+function parseCSV(text) {
   let flatData = [];
   let arrays = csvStringToArray(text);
   let headlines = arrays.shift();
@@ -5228,38 +5235,6 @@ function parseCSV2(text) {
     headlines: headlines,
     lines: arrays,
   };
-
-  // let lines = text.split('\n');
-  // let headline = lines.shift();
-  // let headlines = headline.split(',');
-  // headlines.shift(); // drop first column
-
-  // for (let index = 0; index < headlines.length; index++) {
-  //   datasets.push({
-  //     label: trimByChar(headlines[index], "\""),
-  //     stack: trimByChar(headlines[index], "\""),
-  //     data: []
-  //   });
-  // }
-
-  // for (let index = 0; index < lines.length; index++) {
-  //   let line = String(lines[index]);
-  //   let components = line.split(',');
-  //   if (components.length < 2) continue;
-  //   let date = components.shift();
-  //
-  //   for (let componentIndex = 0; componentIndex < components.length; componentIndex++) {
-  //     let dataset = datasets[componentIndex];
-  //     let data = dataset.data;
-  //     data.push({
-  //       date: trimByChar(date, "\""),
-  //       value: Number(trimByChar(components[componentIndex], "\""))
-  //     });
-  //     dataset.data = data;
-  //     datasets[componentIndex] = dataset;
-  //   }
-  // }
-
   return datasets;
 }
 
@@ -5277,7 +5252,7 @@ function fetchCSV(
 
   return fetch(url)
     .then(response => response.text())
-    .then(parseCSV2);
+    .then(parseCSV);
 }
 
 /**
@@ -5498,6 +5473,8 @@ class DatasetCard extends Card {
     let textarea = document.getElementById(this.textareaID);
     if (!textarea) return;
     textarea.value = newContent;
+    let numberOfRows = newContent.split(`\n`).length;
+    this.textarea.attr('rows', numberOfRows);
   }
 
   /**
@@ -5592,8 +5569,6 @@ class DatasetCard extends Card {
     if (!this.datasetController || !this.datasetController.datasets) return;
     let datasets = this.datasetController.datasets;
     let content = this.datasetsToText(datasets);
-    let numberOfRows = content.split(`\n`).length;
-    this.textarea.attr('rows', numberOfRows);
     this.setTextareaContent(content);
     this.cachedDatasets = datasets;
   }
@@ -5601,7 +5576,7 @@ class DatasetCard extends Card {
   /**
    * Returns the parsed datasets from the content of the textarea.  Will throw an exception if parsing is not possible.
    * Subclasses should override.
-   * @param text The text to parse to datasets.
+   * @param text The text to data.parse to datasets.
    * @return {*}
    */
   textToDatasets(text) {
@@ -5663,11 +5638,110 @@ class DatasetCSVCard extends DatasetCard {
 
   textToDatasets(text) {
     if (text === "") return [];
-    return parseCSV2(text);
+    return parseCSV(text);
   }
 
   datasetsToText(datasets) {
     return this.datasetController.getCSVDataview().csv;
+  }
+}
+
+/**
+ * Returns a collection of datasets parsed from the given CSV content.
+ * @param text The CSV content.
+ * @returns {[]} The parsed datasets.
+ */
+function parseCSVDate(text) {
+  let arrays = csvStringToArray(text);
+  let datasetLabels = arrays.shift();
+  datasetLabels.shift();
+  let datasets = [];
+  let minLineLength = datasetLabels.length;
+
+  for (let index = 0; index < datasetLabels.length; index++) {
+    datasets.push({
+      label: datasetLabels[index],
+      data: []
+    });
+  }
+
+  for (let lineIndex = 0; lineIndex < arrays.length; lineIndex++) {
+    let lineArray = arrays[lineIndex].map(element => trimByChar(element, `"`));
+    if (lineArray.length < minLineLength) continue;
+
+    let date = lineArray.shift();
+
+    for (let columnIndex = 0; columnIndex < lineArray.length; columnIndex++) {
+      let value = lineArray[columnIndex];
+      datasets[columnIndex].data.push({
+        date: date,
+        value: value
+      });
+    }
+  }
+
+  datasets.csv = {
+    content: text,
+    headlines: datasetLabels.push(),
+    lines: arrays,
+  };
+
+  return datasets;
+}
+
+/**
+ *
+ * @param datasets
+ */
+function renderCSVDate(datasets) {
+  let dateRelation = dateToItemsRelation(datasets);
+  let labels = extractLabelsFromDatasets(datasets);
+  let headlines = ['date'];
+
+  for (let labelIndex = 0; labelIndex < labels.length; labelIndex++) {
+    headlines.push(labels[labelIndex]);
+  }
+
+  let csvContent = `${headlines.join(',')}\n`;
+
+  for (let index = 0; index < dateRelation.length; index++) {
+    let dateRow = dateRelation[index];
+    let csvRow = `${dateRow.date}`;
+
+    for (let labelIndex = 0; labelIndex < labels.length; labelIndex++) {
+      let label = labels[labelIndex];
+      csvRow += `,${dateRow[label]}`;
+    }
+
+    csvContent += `${csvRow}\n`;
+  }
+
+  return csvContent;
+}
+
+/**
+ * Presents the CSV version of datasets.  The presented CSV can be edited.
+ * @class DatasetCSVDateCard
+ * @extends Card
+ */
+class DatasetCSVDateCard extends DatasetCard {
+
+  /**
+   * Creates a new instance of DatasetCSVCard.
+   * @param parent The parental element or a selector (id).
+   */
+  constructor(parent) {
+    super(parent);
+    this.setHeaderText('Dataset CSV Card');
+  }
+
+  textToDatasets(text) {
+    if (text === "") return [];
+    return parseCSVDate(text);
+  }
+
+  datasetsToText(datasets) {
+    return renderCSVDate(datasets);
   }
 }
 
@@ -5699,6 +5773,7 @@ exports.PlotChartCard = PlotChartCard;
 // datasets / csv cards
 exports.DatasetJsonCard = DatasetJsonCard;
 exports.DatasetCSVCard = DatasetCSVCard;
+exports.DatasetCSVDateCard = DatasetCSVDateCard;
 
 // datasets
 exports.DatasetController = DatasetsController;
@@ -5712,22 +5787,21 @@ exports.Feature = Feature;
 exports.joinFeatures = joinFeatures;
 
 exports.renderCSV = renderCSV;
-exports.parseCSV = fetchCSV;
-exports.parseCSV2 = parseCSV2;
+exports.fetchCSV = fetchCSV;
+exports.parseCSV = parseCSV;
+exports.parseCSVDate = parseCSVDate;
 
 exports.createGeoJSON = createGeoJSON;
 
 // data juggling
-exports.flatDataset = flatDataset;
 exports.flatDatasets = flatDatasets;
+exports.flatDataset = flatDataset;
 exports.combine = combine;
 exports.combineByStacks = combineByStacks;
 exports.combineByDate = combineByDate;
 exports.combineByLocation = combineByLocation;
-
 exports.combineDataByGroupsize = combineDataByGroupsize;
 exports.combineDatasetsByRatio = combineDatasetsByRatio;
-
 exports.extractLabelsFromDatasets = extractLabelsFromDatasets;
 exports.extractLabelsFromFlatData = extractLabelsFromFlatData;
 exports.extractStacksFromDatasets = extractStacksFromDatasets;
@@ -5743,6 +5817,9 @@ exports.extractLatestDateWithValue = extractLatestDateWithValue;
 exports.sumOfDataset = sumOfDataset;
 exports.sumOfStack = sumOfStack;
 exports.dateToItemsRelations = dateToItemsRelation;
+
+exports.equals = equals;
+exports.objectsEqual = objectsEqual;
 
 // constants
 exports.Constants = Constants;

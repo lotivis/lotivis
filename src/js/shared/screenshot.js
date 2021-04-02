@@ -1,11 +1,3 @@
-/**
- * Creates an PNG image from the given svg element and initiates a download of the PNG image.
- *
- * @param selector The id of the svg element.
- * @param filename The name of file which is downloaded.
- */
-import {verbose_log} from "./debug";
-
 // http://bl.ocks.org/Rokotyan/0556f8facbaf344507cdc45dc3622177
 
 /**

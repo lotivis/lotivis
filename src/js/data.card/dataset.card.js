@@ -61,6 +61,8 @@ export class DatasetCard extends Card {
     let textarea = document.getElementById(this.textareaID);
     if (!textarea) return;
     textarea.value = newContent;
+    let numberOfRows = newContent.split(`\n`).length;
+    this.textarea.attr('rows', numberOfRows);
   }
 
   /**
@@ -155,8 +157,6 @@ export class DatasetCard extends Card {
     if (!this.datasetController || !this.datasetController.datasets) return;
     let datasets = this.datasetController.datasets;
     let content = this.datasetsToText(datasets);
-    let numberOfRows = content.split(`\n`).length;
-    this.textarea.attr('rows', numberOfRows);
     this.setTextareaContent(content);
     this.cachedDatasets = datasets;
   }
@@ -164,7 +164,7 @@ export class DatasetCard extends Card {
   /**
    * Returns the parsed datasets from the content of the textarea.  Will throw an exception if parsing is not possible.
    * Subclasses should override.
-   * @param text The text to parse to datasets.
+   * @param text The text to data.parse to datasets.
    * @return {*}
    */
   textToDatasets(text) {

@@ -17,7 +17,7 @@ import {defaultPlotChartConfig} from "./plot.chart.config";
 import {PlotChartSort} from "./plot.chart.sort";
 import {verbose_log} from "../shared/debug";
 import {DatasetsController} from "../data/datasets.controller";
-import "../data/datasets.controller.dataviews.plot";
+import "../dataview/dataviews.plot";
 
 /**
  * A lotivis plot chart.

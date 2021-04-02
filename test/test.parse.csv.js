@@ -3,7 +3,7 @@ const fs = require('fs');
 const lotivis = require('../dist/lotivis');
 let csvDataset;
 
-describe('parse csv', function () {
+describe('data.parse csv', function () {
 
   before(function (done) {
     fs.readFile(
@@ -18,7 +18,7 @@ describe('parse csv', function () {
   });
 
   it('parses a csv file', function () {
-    let parsedDatasets = lotivis.parseCSV2(csvDataset);
+    let parsedDatasets = lotivis.parseCSV(csvDataset);
     assert.strictEqual(parsedDatasets.length, 1);
     assert.strictEqual(parsedDatasets[0].label, 'dataset_1');
     assert.strictEqual(parsedDatasets[0].data.length, 10);

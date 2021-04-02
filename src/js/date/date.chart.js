@@ -21,6 +21,7 @@ const defaultConfig = {
   },
   showLabels: true,
   combineStacks: false,
+  sendsNotifications: true,
   numberFormat: Intl.NumberFormat('de-DE', {
     maximumFractionDigits: 3
   }),
@@ -195,7 +196,13 @@ export class DateChart extends Chart {
    * @param label The label of the dataset.
    */
   toggleDataset(label) {
-    this.datasetController.toggleDataset(label);
+    console.log('toggleDataset');
+    if (this.config.sendsNotifications) {
+      this.datasetController.toggleDataset(label);
+    } else {
+      this.datasetController.toggleDataset(label, false);
+      this.update();
+    }
   }
 
   /**

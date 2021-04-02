@@ -29,9 +29,12 @@ export class DateGhostBarsRenderer {
       let controller = dateChart.datasetController;
       let id = createID(date);
 
-      dateChart.updateSensible = false;
-      controller.setDatesFilter([date]);
-      dateChart.updateSensible = true;
+      if (dateChart.config.sendsNotifications) {
+        dateChart.updateSensible = false;
+        controller.setDatesFilter([date]);
+        dateChart.updateSensible = true;
+      }
+
       dateChart
         .svg
         .select(`#${id}`)
@@ -44,7 +47,10 @@ export class DateGhostBarsRenderer {
     function onMouserOut(event, date) {
       this.hideAll();
       dateChart.tooltipRenderer.hideTooltip(event, date);
-      dateChart.datasetController.resetFilters();
+
+      if (dateChart.config.sendsNotifications) {
+        dateChart.datasetController.resetFilters();
+      }
     }
 
     this.renderGhostBars = function () {

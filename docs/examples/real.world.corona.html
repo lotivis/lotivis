@@ -10,20 +10,20 @@
 </head>
 <body>
 
-<div class="lotivis-example-container" style="overflow: scroll; overflow-scrolling: auto;">
-  <div class="lotivis-example-row">
-    <div class="lotivis-example-col-2">
+<div class="lotivis-container">
+  <div class="lotivis-row">
+    <div class="lotivis-col-2">
       <a href="../index.html">
         <button class="back-button">
           Back
         </button>
       </a>
     </div>
-    <div class="lotivis-example-col-8 text-center">
+    <div class="lotivis-col-8 text-center">
       <h1>Corona-Zahlen Zeitverlauf</h1>
     </div>
-    <div class="lotivis-example-col-12">
-      <div class="lotivis-card" style="overflow: scroll;">
+    <div class="lotivis-col-12">
+      <div class="lotivis-card">
         <div class="lotivis-card-header">
           <div id="dropdown-group-size">
             <!-- Dropdown Code Here -->
@@ -38,11 +38,9 @@
         </div>
       </div>
     </div>
-    <div class="lotivis-example-col-12">
-      <div class="lotivis-example-data">
-        <samp id="data">
-          <!-- Data Here -->
-        </samp>
+    <div class="lotivis-col-12">
+      <div id="csv-card">
+        <!-- CSV Card Here -->
       </div>
     </div>
   </div>
@@ -53,16 +51,23 @@
 
 <script>
 
-  let timeChart = new lotivis.DateChart('date-chart', {
+  lotivis.Constants.debugLog = true;
+  let csvCard = new lotivis.DatasetCSVDateCard('csv-card');
+  let dateChart = new lotivis.DateChart('date-chart', {
     height: 500,
     width: 2000,
     margin: {
       top: 20
     },
+    sendsNotifications: false,
     dateAccess: function (date) {
-      verbose_log('dateAccess', date);
+      console.log('dateAccess', date);
     }
   });
+
+  let datasetsController = new lotivis.DatasetController([]);
+  dateChart.setDatasetController(datasetsController);
+  csvCard.setDatasetController(datasetsController);
 
   let dropdown = new lotivis.Dropdown.create(
     'dropdown-group-size',                                // selector
@@ -92,28 +97,24 @@
   );
 
   let originalDatasets = [];
-  let url = 'https://phpefi.schleswig-holstein.de/corona/data202011/cvd_sh_verlauf.csv';
-  lotivis
-    .parseCSV(url, function (components) {
-      return {date: components[0], value: components[1]};
-    })
-    .then(function (datasets) {
+  // let url = 'https://phpefi.schleswig-holstein.de/corona/data202011/cvd_sh_verlauf.csv';
+  let url = '/assets/cvd_sh_verlauf.csv';
 
-      for (let i = 0; i < datasets.length; i++) {
-        datasets[i].data = datasets[i].data.reverse();
-      }
+  fetch(url)
+    .then(response => response.text())
+    .then(function (rawCSV) {
 
-      originalDatasets = datasets;
-      updateGroupSize(7);
-      document.getElementById('data').innerText = datasets.csv;
+      let datasets = lotivis.parseCSVDate(rawCSV);
+
+      datasetsController.setDatasets(datasets);
+      csvCard.updateDatasetsOfController(true);
+
     })
-    .catch(function (error) {
-      console.log(error);
-    });
+    .catch(console.error);
 
   function updateGroupSize(newGroupSize) {
-    timeChart.datasets = lotivis.combineDatasetsByRatio(originalDatasets, newGroupSize);
-    timeChart.update();
+    dateChart.datasets = lotivis.combineDatasetsByRatio(originalDatasets, newGroupSize);
+    dateChart.update();
   }
 
 </script>

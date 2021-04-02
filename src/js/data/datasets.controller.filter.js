@@ -63,15 +63,17 @@ DatasetsController.prototype.setDatasetsFilter = function (datasets) {
 };
 
 /**
- * Toggles the enabled of the dataset with the given label.  Notifies listeners.
+ * Toggles the enabled of the dataset with the given label.
  * @param label The label of the dataset.
+ * @param notifyListeners A boolean value indicating whether to notify the listeners.  Default is `true`.
  */
-DatasetsController.prototype.toggleDataset = function (label) {
+DatasetsController.prototype.toggleDataset = function (label, notifyListeners=true) {
   this.workingDatasets.forEach(function (dataset) {
     if (dataset.label === label) {
       dataset.isEnabled = !dataset.isEnabled;
     }
   });
+  if (!notifyListeners) return;
   this.notifyListeners('dataset-toggle');
 };
 

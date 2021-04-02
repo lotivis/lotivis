@@ -1,12 +1,17 @@
 import {flatDatasets} from "../data.juggle/dataset.flat";
 
-function surroundWithQuotationMarks(input) {
-  return `"${input}"`;
+/**
+ * Returns the given string with a quotation mark in the left and right.
+ * @param aString The string to surround by quotation marks.
+ * @returns {string} The string surrounded by quotation marks.
+ */
+function surroundWithQuotationMarks(aString) {
+  return `"${aString}"`;
 }
 
 /**
- *
- * @param datasets
+ * Returns the CSV string of the given datasets.
+ * @param datasets The datasets to create the CSV of.
  */
 export function renderCSV(datasets) {
   let flatData = flatDatasets(datasets);
