@@ -1,5 +1,5 @@
 const assert = require('assert');
-const selectorFile = require('../src/js/shared/selector');
+const arrayExtension = require('../src/js/shared/extension.array');
 
 describe('arrays', function () {
 

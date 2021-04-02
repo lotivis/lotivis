@@ -1,5 +1,5 @@
 import {combineByDate} from "./dataset.combine";
-import '../shared/arrays';
+import '../shared/extension.array';
 import {sumOfValues} from "./dataset.sum";
 import {copy} from "../shared/copy";
 
