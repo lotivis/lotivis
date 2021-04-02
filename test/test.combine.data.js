@@ -1,11 +1,11 @@
 const assert = require('assert');
-const dataset = require('./data/sample.dataset.1.json');
-const datasets = require('./data/sample.datasets.1.json');
-const lotivis = require('../dist/lotivis');
+const samples = require("./sample.data");
+const lotivis = require('../dist/lotivis.tests');
 
 describe('dataset', function() {
 
   describe('#datasetCombine dataset', function() {
+    let dataset = samples.readJSON('sample.dataset.1.json');
     let flat = lotivis.flatDataset(dataset);
     let combined = lotivis.combine(flat);
 
@@ -19,6 +19,7 @@ describe('dataset', function() {
   });
 
   describe('#datasetCombine datasets', function() {
+    let datasets = samples.readJSON('sample.datasets.1.json');
     let flat = lotivis.flatDatasets(datasets);
     let combined = lotivis.combine(flat);
 
@@ -28,6 +29,7 @@ describe('dataset', function() {
   });
 
   describe('#datasetCombine datasets by stack', function() {
+    let datasets = samples.readJSON('sample.datasets.1.json');
     let flat = lotivis.flatDatasets(datasets);
     let combined = lotivis.combineByStacks(flat);
 
@@ -37,6 +39,7 @@ describe('dataset', function() {
   });
 
   describe('#datasetCombine datasets by date', function() {
+    let datasets = samples.readJSON('sample.datasets.1.json');
     let flat = lotivis.flatDatasets(datasets);
     let combined = lotivis.combineByDate(flat);
 
@@ -46,6 +49,7 @@ describe('dataset', function() {
   });
 
   describe('#datasetCombine datasets by location', function() {
+    let datasets = samples.readJSON('sample.datasets.1.json');
     let flat = lotivis.flatDatasets(datasets);
     let combined = lotivis.combineByLocation(flat);
 

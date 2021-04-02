@@ -1,4 +1,4 @@
-import {Color} from "../shared/color";
+import {Color} from "../color/color";
 import {DateAxisRenderer} from "./date.axis.renderer";
 import {DateLabelRenderer} from "./date.label.renderer";
 import {DateLegendRenderer} from "./date.legend.renderer";

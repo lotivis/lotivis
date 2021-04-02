@@ -1,27 +1,12 @@
 const assert = require('assert');
-const dataset = require('./data/sample.dataset.1.json');
-const datasets = require('./data/sample.datasets.1.json');
-const lotivis = require('../dist/lotivis');
+const samples = require('./sample.data');
+const lotivis = require('../dist/lotivis.tests');
 
 describe('dataset', function() {
 
-  describe('#validate dataset', function() {
-
-    it('should have label \"dataset_1\"', function() {
-      assert.strictEqual(dataset.label, 'dataset_1');
-    });
-
-    it('should have stack \"dataset_1\"', function() {
-      assert.strictEqual(dataset.stack, 'dataset_1');
-    });
-
-    it('should have ten data entries', function () {
-      assert.strictEqual(dataset.data.length, 10);
-    });
-
-  });
-
   describe('#flat dataset', function() {
+
+    let dataset = samples.readJSON('sample.dataset.1.json');
     let flat = lotivis.flatDataset(dataset);
 
     it('should have the right length', function() {
@@ -36,6 +21,7 @@ describe('dataset', function() {
   });
 
   describe('#flat datasets', function() {
+    let datasets = samples.readJSON('sample.datasets.1.json');
     let flat = lotivis.flatDatasets(datasets);
 
     it('should have the right length', function() {

@@ -36,7 +36,7 @@ export class DatasetsController {
   //   this.locations = extractLocationsFromDatasets(datasets);
   //   this.datasetsColorsController = new DatasetsColorsController(this);
   //   this.dateAccess = function (date) {
-  //     return Date.data.parse(date);
+  //     return Date.samples.parse(date);
   //   };
   //
   //   this.locationFilters = [];

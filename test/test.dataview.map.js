@@ -1,5 +1,5 @@
 const assert = require('assert');
-const lotivis = require('../dist/lotivis');
+const lotivis = require('../dist/lotivis.tests');
 
 describe('dataview.map', function () {
 

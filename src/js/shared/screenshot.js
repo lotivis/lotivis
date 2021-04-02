@@ -101,8 +101,8 @@ function getSVGString(svgNode) {
  */
 function svgString2Image(svgString, width, height, callback) {
 
-  // Convert SVG string to data URL
-  let imageSource = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+  // Convert SVG string to samples URL
+  let imageSource = 'samples:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
 
   let canvas = document.createElement("canvas");
   canvas.width = width;
@@ -143,9 +143,9 @@ function getOriginalSizeOfSVG(svgElement) {
 }
 
 /**
- * Creates and appends an anchor linked to the given data which is then immediately clicked.
+ * Creates and appends an anchor linked to the given samples which is then immediately clicked.
  *
- * @param data The data to be downloaded.
+ * @param data The samples to be downloaded.
  * @param filename The name of the file.
  */
 function downloadData(data, filename) {

@@ -1,10 +1,22 @@
-import {verbose_log} from "../shared/debug";
-
+/**
+ * Returns a dataset collection created from the given flat samples collection.
+ * @param flatData The flat samples collection.
+ * @returns {[]} A collection of datasets.
+ */
 export function createDatasets(flatData) {
   let datasetsByLabel = {};
+
   for (let itemIndex = 0; itemIndex < flatData.length; itemIndex++) {
     let item = flatData[itemIndex];
-    let dataset = datasetsByLabel[item.label];
+
+    if (!validateDataItem(item)) {
+      console.log('item');
+      console.log(item);
+    }
+
+    let label = item.dataset || item.label;
+    let dataset = datasetsByLabel[label];
+
     if (dataset) {
       dataset.data.push({
         date: item.date,
@@ -12,8 +24,8 @@ export function createDatasets(flatData) {
         value: item.value
       });
     } else {
-      datasetsByLabel[item.label] = {
-        label: item.label,
+      datasetsByLabel[label] = {
+        label: label,
         stack: item.stack,
         data: [{
           date: item.date,
@@ -25,13 +37,17 @@ export function createDatasets(flatData) {
   }
 
   let datasets = [];
-  let properties = Object.getOwnPropertyNames(datasetsByLabel);
+  let labels = Object.getOwnPropertyNames(datasetsByLabel);
 
-  for (let index = 0; index < properties.length; index++) {
-    let label = properties[index];
+  for (let index = 0; index < labels.length; index++) {
+    let label = labels[index];
     if (label.length === 0) continue;
     datasets.push(datasetsByLabel[label]);
   }
 
   return datasets;
+}
+
+function validateDataItem(item) {
+  return (item.label || item.dataset) && item.date && item.location && (item.value || item.value === 0)  ;
 }

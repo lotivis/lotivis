@@ -5,7 +5,7 @@ import {copy} from "../shared/copy";
 import {combineDatasetsByRatio} from "../data.juggle/dataset.combine.ratio";
 
 /**
- * Returns a new generated DateDataview for the current enabled data of dataset of this controller.
+ * Returns a new generated DateDataview for the current enabled samples of dataset of this controller.
  */
 DatasetsController.prototype.getDateDataview = function () {
   let dateAccess = this.dateAccess;

@@ -1,24 +1,12 @@
 const assert = require('assert');
-const fs = require('fs');
-const lotivis = require('../dist/lotivis');
-let csvDataset;
+const samples = require('./sample.data');
+const lotivis = require('../dist/lotivis.tests');
 
-describe('data.parse csv', function () {
-
-  before(function (done) {
-    fs.readFile(
-      'test/data/sample.csv.dataset.1.csv',
-      'utf8',
-      function (error, fileContents) {
-        if (error) throw error;
-        csvDataset = fileContents;
-        done();
-      }
-    );
-  });
+describe('samples.parse csv', function () {
 
   it('parses a csv file', function () {
-    let parsedDatasets = lotivis.parseCSV(csvDataset);
+    let csvContent = samples.read('sample.csv.dataset.1.csv');
+    let parsedDatasets = lotivis.parseCSV(csvContent);
     assert.strictEqual(parsedDatasets.length, 1);
     assert.strictEqual(parsedDatasets[0].label, 'dataset_1');
     assert.strictEqual(parsedDatasets[0].data.length, 10);

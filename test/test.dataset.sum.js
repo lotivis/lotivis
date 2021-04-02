@@ -1,10 +1,11 @@
 const assert = require('assert');
-const datasets = require('./data/sample.datasets.1.json');
-const lotivis = require('../dist/lotivis');
+const samples = require('./sample.data');
+const lotivis = require('../dist/lotivis.tests');
 
 describe('dataset sum', function() {
 
   it('calcs the correct sum for datasets', function() {
+    let datasets = samples.readJSON('sample.datasets.1.json');
     let flatData = lotivis.flatDatasets(datasets);
     let sumOfDataset1 = lotivis.sumOfDataset(flatData, 'dataset_1');
     let sumOfDataset2 = lotivis.sumOfDataset(flatData, 'dataset_2');
@@ -15,6 +16,7 @@ describe('dataset sum', function() {
   });
 
   it('calcs the correct sum for stacks', function() {
+    let datasets = samples.readJSON('sample.datasets.1.json');
     let flatData = lotivis.flatDatasets(datasets);
     let sumOfDataset1 = lotivis.sumOfStack(flatData, 'dataset_1');
     let sumOfDataset2 = lotivis.sumOfStack(flatData, 'dataset_2, dataset_3');

@@ -1,4 +1,4 @@
-import {Color} from "../shared/color";
+import {Color} from "../color/color";
 import {createIDFromDataset} from "../shared/selector";
 
 /**

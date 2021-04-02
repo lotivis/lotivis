@@ -28,7 +28,7 @@ export class DatasetCard extends Card {
    * Appends the component to this card.
    */
   render() {
-    this.element.classed('lotivis-data-card', true);
+    this.element.classed('lotivis-samples-card', true);
 
     this.header.text('');
     this.headline = this.header.append('div');
@@ -38,13 +38,13 @@ export class DatasetCard extends Card {
       .append('textarea')
       .attr('id', this.textareaID)
       .attr('name', this.textareaID)
-      .attr('class', 'lotivis-data-textarea');
+      .attr('class', 'lotivis-samples-textarea');
 
     this.statusText = this.header
       .append('div')
       .style(`display`, `none`)
-      .classed('lotivis-data-status-text', true)
-      .classed('lotivis-data-status-failure', true);
+      .classed('lotivis-samples-status-text', true)
+      .classed('lotivis-samples-status-failure', true);
 
     this.textarea.on('keyup', this.onKeyup.bind(this));
   }
@@ -164,7 +164,7 @@ export class DatasetCard extends Card {
   /**
    * Returns the parsed datasets from the content of the textarea.  Will throw an exception if parsing is not possible.
    * Subclasses should override.
-   * @param text The text to data.parse to datasets.
+   * @param text The text to samples.parse to datasets.
    * @return {*}
    */
   textToDatasets(text) {

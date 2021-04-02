@@ -38,5 +38,20 @@ module.exports = [
       name: 'lotivis',
       file: 'docs/css/lotivis.css',
     },
-  }
+  },
+  // Tests
+  {
+    input: 'src/index.tests.js',
+    plugins: [ resolve() ],
+    output: {
+      sourcemap: true,
+      name: 'lotivis',
+      file: 'dist/lotivis.tests.js',
+      banner,
+      format: 'umd',
+      esModule: false,
+      exports: "named",
+      indent: false,
+    },
+  },
 ];

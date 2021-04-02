@@ -4,10 +4,13 @@
  * @param flattenList
  * @returns {[]}
  */
+import {copy} from "../shared/copy";
+
 export function combine(flattenList) {
   let combined = [];
-  for (let index = 0; index < flattenList.length; index++) {
-    let listItem = flattenList[index];
+  let copiedList = copy(flattenList);
+  for (let index = 0; index < copiedList.length; index++) {
+    let listItem = copiedList[index];
     let entry = combined.find(function (entryItem) {
       return entryItem.dataset === listItem.dataset
         && entryItem.stack === listItem.stack

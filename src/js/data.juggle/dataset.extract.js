@@ -4,7 +4,7 @@ import {flatDatasets} from "./dataset.flat";
  * Returns the set of dataset names from the given dataset collection.
  *
  * @param datasets The collection of datasets.
- * @returns {[]} The array containing the flat data.
+ * @returns {[]} The array containing the flat samples.
  */
 export function extractLabelsFromDatasets(datasets) {
   return toSet(datasets.map(dataset => dataset.label || 'unknown'));
@@ -15,7 +15,7 @@ export function extractLabelsFromDatasets(datasets) {
  * Will fallback on dataset property if stack property isn't present.
  *
  * @param datasets The collection of datasets.
- * @returns {[]} The array containing the flat data.
+ * @returns {[]} The array containing the flat samples.
  */
 export function extractStacksFromDatasets(datasets) {
   return toSet(datasets.map(dataset => dataset.stack || dataset.label || 'unknown'));
@@ -42,21 +42,21 @@ export function extractLocationsFromDatasets(datasets) {
 }
 
 /**
- * Returns the set of dataset names from the given flat data array.
+ * Returns the set of dataset names from the given flat samples array.
  *
- * @param flatData The flat data array.
- * @returns {[]} The array containing the flat data.
+ * @param flatData The flat samples array.
+ * @returns {[]} The array containing the flat samples.
  */
 export function extractLabelsFromFlatData(flatData) {
   return toSet(flatData.map(item => item.dataset || 'unknown'));
 }
 
 /**
- * Returns the set of stacks from the given flat data array.
+ * Returns the set of stacks from the given flat samples array.
  * Will fallback on dataset property if stack property isn't present.
  *
- * @param flatData The flat data array.
- * @returns {[]} The array containing the flat data.
+ * @param flatData The flat samples array.
+ * @returns {[]} The array containing the flat samples.
  */
 export function extractStacksFromFlatData(flatData) {
   return toSet(flatData.map(item => item.stack || item.dataset || 'unknown'));
@@ -65,7 +65,7 @@ export function extractStacksFromFlatData(flatData) {
 /**
  * Returns the set of dates from the given dataset collection.
  *
- * @param flatData The flat data array.
+ * @param flatData The flat samples array.
  * @returns {[]} The set containing the dates.
  */
 export function extractDatesFromFlatData(flatData) {
@@ -75,7 +75,7 @@ export function extractDatesFromFlatData(flatData) {
 /**
  * Returns the set of locations from the given dataset collection.
  *
- * @param flatData The flat data array.
+ * @param flatData The flat samples array.
  * @returns {[]} The set containing the locations.
  */
 export function extractLocationsFromFlatData(flatData) {
@@ -95,7 +95,7 @@ function toSet(array) {
 /**
  * Returns the earliest date occurring in the flat array of items.
  *
- * @param flatData The flat data array.
+ * @param flatData The flat samples array.
  * @returns {*} The earliest date.
  */
 export function extractEarliestDate(flatData) {
@@ -105,7 +105,7 @@ export function extractEarliestDate(flatData) {
 /**
  * Returns the earliest date occurring in the flat array of items.
  *
- * @param flatData The flat data array.
+ * @param flatData The flat samples array.
  * @returns {*} The earliest date.
  */
 export function extractEarliestDateWithValue(flatData) {
@@ -115,7 +115,7 @@ export function extractEarliestDateWithValue(flatData) {
 /**
  * Returns the latest date occurring in the flat array of items.
  *
- * @param flatData The flat data array.
+ * @param flatData The flat samples array.
  * @returns {*} The latest date.
  */
 export function extractLatestDate(flatData) {
@@ -125,7 +125,7 @@ export function extractLatestDate(flatData) {
 /**
  * Returns the latest date occurring in the flat array of items.
  *
- * @param flatData The flat data array.
+ * @param flatData The flat samples array.
  * @returns {*} The latest date.
  */
 export function extractLatestDateWithValue(flatData) {
@@ -135,7 +135,7 @@ export function extractLatestDateWithValue(flatData) {
 /**
  * Returns a filtered collection containing all items which have a valid value greater than 0.
  *
- * @param flatData The flat data to filter.
+ * @param flatData The flat samples to filter.
  * @returns {*} All items with a value greater 0.
  */
 export function filterWithValue(flatData) {

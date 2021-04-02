@@ -1,5 +1,5 @@
 import {sumOfStack} from "../data.juggle/dataset.sum";
-import {Color} from "../shared/color";
+import {Color} from "../color/color";
 
 export class DateLegendRenderer {
 

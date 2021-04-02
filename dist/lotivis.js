@@ -11,6 +11,121 @@ typeof define === 'function' && define.amd ? define(['exports'], factory) :
 }(this, (function (exports) { 'use strict';
 
 /**
+ * Color defined by r,g,b.
+ * @class Color
+ */
+class Color {
+
+  /**
+   * Creates a new instance of Color.
+   * @param r The red value.
+   * @param g The green value.
+   * @param b The blue value.
+   */
+  constructor(r, g, b) {
+    console.log('r', r);
+    console.log('g', g);
+    console.log('b', b);
+    if ((r || r === 0) && (g || g === 0) && (b || b === 0)) {
+      this.initialize(r, g, b);
+    } else if (typeof r === `object`) {
+      this.initialize(r.r, r.g, r.b);
+    } else if (r) ; else if (r) {
+      this.initialize(r, r, r);
+    } else {
+      throw new Error(`Invalid argument: ${r}`);
+    }
+  }
+
+  initialize(r, g, b) {
+    this.r = Math.round(r);
+    this.g = Math.round(g);
+    this.b = Math.round(b);
+  }
+
+  rgbString() {
+    return `rgb(${this.r},${this.g},${this.b})`;
+  }
+
+  toString() {
+    return this.rgbString();
+  }
+
+  colorAdding(r, g, b) {
+    return new Color(this.r + r, this.g + g, this.b + b);
+  }
+}
+
+Color.defaultTint = new Color(0, 122, 255);
+Color.organgeLow = new Color(250, 211, 144);
+Color.organgeHigh = new Color(229, 142, 38);
+Color.redLow = new Color(248, 194, 145);
+Color.redHigh = new Color(183, 21, 64);
+Color.blueLow = new Color(106, 137, 204);
+Color.blueHigh = new Color(12, 36, 97);
+Color.lightBlueLow = new Color(130, 204, 221);
+Color.lightBlueHight = new Color(10, 61, 98);
+Color.greenLow = new Color(184, 233, 148);
+Color.greenHight = new Color(7, 153, 146);
+Color.stackColors = [
+  [Color.blueHigh, Color.blueLow],
+  [Color.redHigh, Color.redLow],
+  [Color.greenHight, Color.greenLow],
+  [Color.organgeHigh, Color.organgeLow],
+  [Color.lightBlueHight, Color.lightBlueLow],
+];
+
+Color.colorGenerator = function (till) {
+  return d3
+    .scaleLinear()
+    .domain([0, 1 / 3 * till, 2 / 3 * till, till])
+    .range(['yellow', 'orange', 'red', 'purple']);
+};
+
+/**
+ *
+ * @param till
+ * @returns {*}
+ */
+Color.plotColor = function (till) {
+  return d3
+    .scaleLinear()
+    .domain([0, 1 / 2 * till, till])
+    .range(['lightgreen', 'steelblue', 'purple']);
+};
+
+/**
+ * Returns a randomly generated color.
+ * @returns {string}
+ */
+Color.randomColor = function () {
+  return "rgb(" +
+    (Math.random() * 255) + ", " +
+    (Math.random() * 255) + "," +
+    (Math.random() * 255) + ")";
+};
+
+/**
+ * Returns a randomly generated color.
+ * @returns {[]}
+ */
+Color.colorsForStack = function (stackNumber, amount) {
+  let colorCouple = Color.stackColors[stackNumber % Color.stackColors.length];
+  let colorGenerator = d3
+    .scaleLinear()
+    .domain([0, amount])
+    .range([colorCouple[0], colorCouple[1]]);
+
+  let colors = [];
+  for (let i = 0; i < amount; i++) {
+    let color = colorGenerator(i);
+    colors.push(new Color(color));
+  }
+
+  return colors;
+};
+
+/**
  * Returns the hash of the given string.
  * @param aString The string to create the hash of.
  * @returns {number} The hash of the given string.
@@ -133,36 +248,6 @@ class Component {
 }
 
 /**
- * Color defined by r,g,b.
- * @class Color
- */
-class Color {
-  /**
-   * Creates a new instance of Color.
-   * @param r The red value.
-   * @param g The green value.
-   * @param b The blue value.
-   */
-  constructor(r, g, b) {
-    this.r = Math.round(r);
-    this.g = Math.round(g);
-    this.b = Math.round(b);
-  }
-
-  rgbString() {
-    return `rgb(${this.r},${this.g},${this.b})`;
-  }
-
-  toString() {
-    return this.rgbString();
-  }
-
-  colorAdding(r, g, b) {
-    return new Color(this.r + r, this.g + g, this.b + b);
-  }
-}
-
-/**
  * @class DateAxisRenderer
  */
 class DateAxisRenderer {
@@ -252,9 +337,9 @@ class DateLabelRenderer {
 }
 
 /**
- * Returns the sum of data values for the given dataset.
+ * Returns the sum of samples values for the given dataset.
  *
- * @param flatData The flat data array.
+ * @param flatData The flat samples array.
  * @param dataset The dataset name.
  * @returns {*} The sum.
  */
@@ -263,9 +348,9 @@ function sumOfDataset(flatData, dataset) {
 }
 
 /**
- * Returns the sum of data values for the given label.
+ * Returns the sum of samples values for the given label.
  *
- * @param flatData The flat data array.
+ * @param flatData The flat samples array.
  * @param label The label.
  * @returns {*} The sum.
  */
@@ -274,9 +359,9 @@ function sumOfLabel(flatData, label) {
 }
 
 /**
- * Returns the sum of data values for the given stack.
+ * Returns the sum of samples values for the given stack.
  *
- * @param flatData The flat data array.
+ * @param flatData The flat samples array.
  * @param stack The stack name.
  * @returns {*} The sum.
  */
@@ -518,40 +603,21 @@ class DateGhostBarsRenderer {
 }
 
 /**
+ * Returns a copy of the passed object.  The copy is created by using the
+ * JSON's `parse` and `stringify` functions.
+ * @param object The java script object to copy.
+ * @returns {any} The copy of the object.
+ */
+function copy(object) {
+  return JSON.parse(JSON.stringify(object));
+}
+
+/**
  * Returns
  *
  * @param flattenList
  * @returns {[]}
  */
-function combine(flattenList) {
-  let combined = [];
-  for (let index = 0; index < flattenList.length; index++) {
-    let listItem = flattenList[index];
-    let entry = combined.find(function (entryItem) {
-      return entryItem.dataset === listItem.dataset
-        && entryItem.stack === listItem.stack
-        && entryItem.label === listItem.label
-        && entryItem.location === listItem.location
-        && entryItem.date === listItem.date;
-    });
-    if (entry) {
-      entry.value += (listItem.value + 0);
-    } else {
-      let entry = {};
-      if (listItem.label) entry.label = listItem.label;
-      if (listItem.dataset) entry.dataset = listItem.dataset;
-      if (listItem.stack) entry.stack = listItem.stack;
-      if (listItem.location) entry.location = listItem.location;
-      if (listItem.locationTotal) entry.locationTotal = listItem.locationTotal;
-      if (listItem.date) entry.date = listItem.date;
-      if (listItem.dateTotal) entry.dateTotal = listItem.dateTotal;
-      if (listItem.locationName) entry.locationName = listItem.locationName;
-      entry.value = (listItem.value || 0);
-      combined.push(entry);
-    }
-  }
-  return combined;
-}
 
 /**
  * Returns
@@ -929,40 +995,32 @@ class DateGridRenderer {
 }
 
 /**
- * Returns a copy of the passed object.  The copy is created by using the
- * JSON's `parse` and `stringify` functions.
- * @param object The java script object to copy.
- * @returns {any} The copy of the object.
- */
-function copy(object) {
-  return JSON.parse(JSON.stringify(object));
-}
-
-/**
  * Returns a flat version of the given dataset collection.
  *
  * @param datasets The collection of datasets.
- * @returns {[]} The array containing the flat data.
+ * @returns {[]} The array containing the flat samples.
  */
-
 function flatDatasets(datasets) {
   let flatData = [];
-  datasets.forEach(function (dataset) {
-    flatData = flatData.concat(flatDataset(dataset));
-  });
+  let datasetsCopy = datasets;
+  for (let datasetIndex = 0; datasetIndex < datasetsCopy.length; datasetIndex++) {
+    let dataset = datasetsCopy[datasetIndex];
+    let flatDataChunk = flatDataset(dataset);
+    flatData = flatData.concat(flatDataChunk);
+  }
   return flatData;
 }
 
 /**
- * Returns an array containing the flat data of the given dataset.
+ * Returns an array containing the flat samples of the given dataset.
  *
- * @param dataset The dataset with data.
- * @returns {[]} The array containing the flat data.
+ * @param dataset The dataset with samples.
+ * @returns {[]} The array containing the flat samples.
  */
 function flatDataset(dataset) {
   let flatData = [];
   if (!dataset.data) {
-    console.log('Lotivis: Flat data for dataset without data requested. Will return an empty array.');
+    console.log('Lotivis: Flat samples for dataset without samples requested. Will return an empty array.');
     return flatData;
   }
   dataset.data.forEach(item => {
@@ -978,7 +1036,7 @@ function flatDataset(dataset) {
  * Returns the set of dataset names from the given dataset collection.
  *
  * @param datasets The collection of datasets.
- * @returns {[]} The array containing the flat data.
+ * @returns {[]} The array containing the flat samples.
  */
 function extractLabelsFromDatasets(datasets) {
   return toSet(datasets.map(dataset => dataset.label || 'unknown'));
@@ -989,7 +1047,7 @@ function extractLabelsFromDatasets(datasets) {
  * Will fallback on dataset property if stack property isn't present.
  *
  * @param datasets The collection of datasets.
- * @returns {[]} The array containing the flat data.
+ * @returns {[]} The array containing the flat samples.
  */
 function extractStacksFromDatasets(datasets) {
   return toSet(datasets.map(dataset => dataset.stack || dataset.label || 'unknown'));
@@ -1016,30 +1074,9 @@ function extractLocationsFromDatasets(datasets) {
 }
 
 /**
- * Returns the set of dataset names from the given flat data array.
- *
- * @param flatData The flat data array.
- * @returns {[]} The array containing the flat data.
- */
-function extractLabelsFromFlatData(flatData) {
-  return toSet(flatData.map(item => item.dataset || 'unknown'));
-}
-
-/**
- * Returns the set of stacks from the given flat data array.
- * Will fallback on dataset property if stack property isn't present.
- *
- * @param flatData The flat data array.
- * @returns {[]} The array containing the flat data.
- */
-function extractStacksFromFlatData(flatData) {
-  return toSet(flatData.map(item => item.stack || item.dataset || 'unknown'));
-}
-
-/**
  * Returns the set of dates from the given dataset collection.
  *
- * @param flatData The flat data array.
+ * @param flatData The flat samples array.
  * @returns {[]} The set containing the dates.
  */
 function extractDatesFromFlatData(flatData) {
@@ -1049,7 +1086,7 @@ function extractDatesFromFlatData(flatData) {
 /**
  * Returns the set of locations from the given dataset collection.
  *
- * @param flatData The flat data array.
+ * @param flatData The flat samples array.
  * @returns {[]} The set containing the locations.
  */
 function extractLocationsFromFlatData(flatData) {
@@ -1069,17 +1106,7 @@ function toSet(array) {
 /**
  * Returns the earliest date occurring in the flat array of items.
  *
- * @param flatData The flat data array.
- * @returns {*} The earliest date.
- */
-function extractEarliestDate(flatData) {
-  return extractDatesFromFlatData(flatData).sort().shift();
-}
-
-/**
- * Returns the earliest date occurring in the flat array of items.
- *
- * @param flatData The flat data array.
+ * @param flatData The flat samples array.
  * @returns {*} The earliest date.
  */
 function extractEarliestDateWithValue(flatData) {
@@ -1089,17 +1116,7 @@ function extractEarliestDateWithValue(flatData) {
 /**
  * Returns the latest date occurring in the flat array of items.
  *
- * @param flatData The flat data array.
- * @returns {*} The latest date.
- */
-function extractLatestDate(flatData) {
-  return extractDatesFromFlatData(flatData).sort().pop();
-}
-
-/**
- * Returns the latest date occurring in the flat array of items.
- *
- * @param flatData The flat data array.
+ * @param flatData The flat samples array.
  * @returns {*} The latest date.
  */
 function extractLatestDateWithValue(flatData) {
@@ -1109,7 +1126,7 @@ function extractLatestDateWithValue(flatData) {
 /**
  * Returns a filtered collection containing all items which have a valid value greater than 0.
  *
- * @param flatData The flat data to filter.
+ * @param flatData The flat samples to filter.
  * @returns {*} All items with a value greater 0.
  */
 function filterWithValue(flatData) {
@@ -1189,7 +1206,7 @@ class DatasetsController {
   //   this.locations = extractLocationsFromDatasets(datasets);
   //   this.datasetsColorsController = new DatasetsColorsController(this);
   //   this.dateAccess = function (date) {
-  //     return Date.data.parse(date);
+  //     return Date.samples.parse(date);
   //   };
   //
   //   this.locationFilters = [];
@@ -2075,7 +2092,7 @@ UrlParameters.searchSensitivity = 'search-sensitivity';
 UrlParameters.startYear = 'start-year';
 UrlParameters.endYear = 'end-year';
 
-UrlParameters.showTestData = 'show-data';
+UrlParameters.showTestData = 'show-samples';
 
 /**
  *
@@ -2392,8 +2409,8 @@ function getSVGString(svgNode) {
  */
 function svgString2Image(svgString, width, height, callback) {
 
-  // Convert SVG string to data URL
-  let imageSource = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+  // Convert SVG string to samples URL
+  let imageSource = 'samples:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
 
   let canvas = document.createElement("canvas");
   canvas.width = width;
@@ -2434,9 +2451,9 @@ function getOriginalSizeOfSVG(svgElement) {
 }
 
 /**
- * Creates and appends an anchor linked to the given data which is then immediately clicked.
+ * Creates and appends an anchor linked to the given samples which is then immediately clicked.
  *
- * @param data The data to be downloaded.
+ * @param data The samples to be downloaded.
  * @param filename The name of the file.
  */
 function downloadData(data, filename) {
@@ -2966,13 +2983,6 @@ class MapLabelRenderer {
   }
 }
 
-Color.colorGenerator = function (till) {
-  return d3
-    .scaleLinear()
-    .domain([0, 1 / 3 * till, 2 / 3 * till, till])
-    .range(['yellow', 'orange', 'red', 'purple']);
-};
-
 /**
  *
  * @class MapDatasetRenderer
@@ -3341,7 +3351,7 @@ class MapBackgroundRenderer {
      */
     this.render = function () {
       // create a background rectangle for receiving mouse enter events
-      // in order to reset the location data filter.
+      // in order to reset the location samples filter.
       mapChart.svg
         .append('rect')
         .attr('width', mapChart.config.width)
@@ -4063,7 +4073,7 @@ const defaultPlotChartConfig = {
 };
 
 /**
- * Returns a new generated plot data view for the current enabled data of dataset of this controller.
+ * Returns a new generated plot samples view for the current enabled samples of dataset of this controller.
  */
 DatasetsController.prototype.getPlotDataview = function () {
   let dateAccess = this.dateAccess;
@@ -4711,48 +4721,6 @@ class GeoJson {
 }
 
 /**
- *
- * @param datasets
- * @param dateAccess
- * @returns {{date: *}[]}
- */
-function dateToItemsRelation(datasets, dateAccess) {
-
-  let flatData = flatDatasets(datasets);
-  flatData = combineByDate(flatData);
-
-  let listOfDates = extractDatesFromDatasets(datasets);
-  // verbose_log('listOfDates', listOfDates);
-  listOfDates = listOfDates.reverse();
-  // verbose_log('listOfDates', listOfDates);
-  // listOfDates = listOfDates.sort(function (left, right) {
-  //   return dateAccess(left) - dateAccess(right);
-  // });
-
-  let listOfLabels = extractLabelsFromDatasets(datasets);
-
-  return listOfDates.map(function (date) {
-    let datasetDate = {date: date};
-    flatData
-      .filter(item => item.date === date)
-      .forEach(function (entry) {
-        datasetDate[entry.dataset] = entry.value;
-        datasetDate.total = entry.dateTotal;
-      });
-
-    // add zero values for empty datasets
-    for (let index = 0; index < listOfLabels.length; index++) {
-      let label = listOfLabels[index];
-      if (!datasetDate[label]) {
-        datasetDate[label] = 0;
-      }
-    }
-
-    return datasetDate;
-  });
-}
-
-/**
  * Appends the given listener to the collection of listeners.
  * @param listener The listener to add.
  */
@@ -5001,6 +4969,48 @@ DatasetsController.prototype.remove = function (label) {
 /**
  *
  * @param datasets
+ * @param dateAccess
+ * @returns {{date: *}[]}
+ */
+function dateToItemsRelation(datasets, dateAccess) {
+
+  let flatData = flatDatasets(datasets);
+  flatData = combineByDate(flatData);
+
+  let listOfDates = extractDatesFromDatasets(datasets);
+  // verbose_log('listOfDates', listOfDates);
+  listOfDates = listOfDates.reverse();
+  // verbose_log('listOfDates', listOfDates);
+  // listOfDates = listOfDates.sort(function (left, right) {
+  //   return dateAccess(left) - dateAccess(right);
+  // });
+
+  let listOfLabels = extractLabelsFromDatasets(datasets);
+
+  return listOfDates.map(function (date) {
+    let datasetDate = {date: date};
+    flatData
+      .filter(item => item.date === date)
+      .forEach(function (entry) {
+        datasetDate[entry.dataset] = entry.value;
+        datasetDate.total = entry.dateTotal;
+      });
+
+    // add zero values for empty datasets
+    for (let index = 0; index < listOfLabels.length; index++) {
+      let label = listOfLabels[index];
+      if (!datasetDate[label]) {
+        datasetDate[label] = 0;
+      }
+    }
+
+    return datasetDate;
+  });
+}
+
+/**
+ *
+ * @param datasets
  * @param dateToItemsRelation
  * @returns {*[]}
  */
@@ -5069,7 +5079,7 @@ function combineDatasetsByRatio(datasets, ratio) {
  */
 function combineDataByGroupsize(data, ratio) {
   if (!data || data.length <= ratio) return data;
-  let combined = combineByDate(data);
+  let combined = combineByDate(copy(data));
   let newData = [];
 
   while (combined.length > 0) {
@@ -5091,7 +5101,7 @@ function combineDataByGroupsize(data, ratio) {
 }
 
 /**
- * Returns a new generated DateDataview for the current enabled data of dataset of this controller.
+ * Returns a new generated DateDataview for the current enabled samples of dataset of this controller.
  */
 DatasetsController.prototype.getDateDataview = function () {
   this.dateAccess;
@@ -5113,146 +5123,6 @@ DatasetsController.prototype.getDateDataview = function () {
   });
   return dataview;
 };
-
-/**
- * Returns the given string with a quotation mark in the left and right.
- * @param aString The string to surround by quotation marks.
- * @returns {string} The string surrounded by quotation marks.
- */
-function surroundWithQuotationMarks(aString) {
-  return `"${aString}"`;
-}
-
-/**
- * Returns the CSV string of the given datasets.
- * @param datasets The datasets to create the CSV of.
- */
-function renderCSV(datasets) {
-  let flatData = flatDatasets(datasets);
-  let headlines = ['label', 'stack', 'value', 'date', 'location'];
-  let csvContent = `${headlines.join(',')}\n`;
-  for (let index = 0; index < flatData.length; index++) {
-    let data = flatData[index];
-    let components = [];
-    components.push(surroundWithQuotationMarks(data.dataset || 'Unknown'));
-    components.push(surroundWithQuotationMarks(data.stack || ''));
-    components.push(data.value || '0');
-    components.push(surroundWithQuotationMarks(data.date || ''));
-    components.push(surroundWithQuotationMarks(data.location || ''));
-    csvContent += `${components.join(`,`)}\n`;
-  }
-  return csvContent;
-}
-
-/*
-Following code from:
-https://gist.github.com/Jezternz/c8e9fafc2c114e079829974e3764db75
-
-We use this function to save data.parse a CSV file.
- */
-
-const csvStringToArray = strData => {
-  const objPattern = new RegExp(("(\\,|\\r?\\n|\\r|^)(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^\\,\\r\\n]*))"), "gi");
-  let arrMatches = null, arrData = [[]];
-  while (arrMatches = objPattern.exec(strData)) {
-    if (arrMatches[1].length && arrMatches[1] !== ",") arrData.push([]);
-    arrData[arrData.length - 1].push(arrMatches[2] ?
-      arrMatches[2].replace(new RegExp("\"\"", "g"), "\"") :
-      arrMatches[3]);
-  }
-  return arrData;
-};
-
-/**
- * Returns a new version of the given string by trimming the given char from the beginning and the end of the string.
- * @param string The string to be trimmed.
- * @param character The character to trim.
- * @returns {string} The trimmed version of the string.
- */
-function trimByChar(string, character) {
-  const saveString = String(string);
-  const first = [...saveString].findIndex(char => char !== character);
-  const last = [...saveString].reverse().findIndex(char => char !== character);
-  return saveString.substring(first, saveString.length - last);
-}
-
-function createDatasets(flatData) {
-  let datasetsByLabel = {};
-  for (let itemIndex = 0; itemIndex < flatData.length; itemIndex++) {
-    let item = flatData[itemIndex];
-    let dataset = datasetsByLabel[item.label];
-    if (dataset) {
-      dataset.data.push({
-        date: item.date,
-        location: item.location,
-        value: item.value
-      });
-    } else {
-      datasetsByLabel[item.label] = {
-        label: item.label,
-        stack: item.stack,
-        data: [{
-          date: item.date,
-          location: item.location,
-          value: item.value
-        }]
-      };
-    }
-  }
-
-  let datasets = [];
-  let properties = Object.getOwnPropertyNames(datasetsByLabel);
-
-  for (let index = 0; index < properties.length; index++) {
-    let label = properties[index];
-    if (label.length === 0) continue;
-    datasets.push(datasetsByLabel[label]);
-  }
-
-  return datasets;
-}
-
-function parseCSV(text) {
-  let flatData = [];
-  let arrays = csvStringToArray(text);
-  let headlines = arrays.shift();
-
-  for (let lineIndex = 0; lineIndex < arrays.length; lineIndex++) {
-    let lineArray = arrays[lineIndex].map(element => trimByChar(element, `"`));
-    flatData.push({
-      label: lineArray[0],
-      stack: lineArray[1],
-      value: +lineArray[2],
-      date: lineArray[3],
-      location: lineArray[4]
-    });
-  }
-
-  let datasets = createDatasets(flatData);
-  datasets.csv = {
-    content: text,
-    headlines: headlines,
-    lines: arrays,
-  };
-  return datasets;
-}
-
-/**
- *
- * @param url
- * @param extractItemBlock
- * @returns {Promise<[]>}
- */
-function fetchCSV(
-  url,
-  extractItemBlock = function (components) {
-    return {date: components[0], value: components[1]};
-  }) {
-
-  return fetch(url)
-    .then(response => response.text())
-    .then(parseCSV);
-}
 
 /**
  *
@@ -5321,48 +5191,6 @@ class ModalPopup extends Popup {
   }
 }
 
-Color.defaultTint = new Color(0, 122, 255);
-Color.organgeLow = new Color(250, 211, 144);
-Color.organgeHigh = new Color(229, 142, 38);
-Color.redLow = new Color(248, 194, 145);
-Color.redHigh = new Color(183, 21, 64);
-Color.blueLow = new Color(106, 137, 204);
-Color.blueHigh = new Color(12, 36, 97);
-Color.lightBlueLow = new Color(130, 204, 221);
-Color.lightBlueHight = new Color(10, 61, 98);
-Color.greenLow = new Color(184, 233, 148);
-Color.greenHight = new Color(7, 153, 146);
-Color.stackColors = [
-  [Color.blueHigh, Color.blueLow],
-  [Color.redHigh, Color.redLow],
-  [Color.greenHight, Color.greenLow],
-  [Color.organgeHigh, Color.organgeLow],
-  [Color.lightBlueHight, Color.lightBlueLow],
-];
-
-/**
- *
- * @param till
- * @returns {*}
- */
-Color.plotColor = function (till) {
-  return d3
-    .scaleLinear()
-    .domain([0, 1 / 2 * till, till])
-    .range(['lightgreen', 'steelblue', 'purple']);
-};
-
-/**
- * Returns a randomly generated color.
- * @returns {string}
- */
-Color.randomColor = function () {
-  return "rgb(" +
-    (Math.random() * 255) + ", " +
-    (Math.random() * 255) + "," +
-    (Math.random() * 255) + ")";
-};
-
 function validateDataset(dataset) {
   if (!dataset) {
     throw Error(`No dataset given.`);
@@ -5410,7 +5238,7 @@ class DatasetCard extends Card {
    * Appends the component to this card.
    */
   render() {
-    this.element.classed('lotivis-data-card', true);
+    this.element.classed('lotivis-samples-card', true);
 
     this.header.text('');
     this.headline = this.header.append('div');
@@ -5420,13 +5248,13 @@ class DatasetCard extends Card {
       .append('textarea')
       .attr('id', this.textareaID)
       .attr('name', this.textareaID)
-      .attr('class', 'lotivis-data-textarea');
+      .attr('class', 'lotivis-samples-textarea');
 
     this.statusText = this.header
       .append('div')
       .style(`display`, `none`)
-      .classed('lotivis-data-status-text', true)
-      .classed('lotivis-data-status-failure', true);
+      .classed('lotivis-samples-status-text', true)
+      .classed('lotivis-samples-status-failure', true);
 
     this.textarea.on('keyup', this.onKeyup.bind(this));
   }
@@ -5546,7 +5374,7 @@ class DatasetCard extends Card {
   /**
    * Returns the parsed datasets from the content of the textarea.  Will throw an exception if parsing is not possible.
    * Subclasses should override.
-   * @param text The text to data.parse to datasets.
+   * @param text The text to samples.parse to datasets.
    * @return {*}
    */
   textToDatasets(text) {
@@ -5588,6 +5416,125 @@ class DatasetJsonCard extends DatasetCard {
   datasetsToText(datasets) {
     return JSON.stringify(datasets, null, 2);
   }
+}
+
+/*
+Following code from:
+https://gist.github.com/Jezternz/c8e9fafc2c114e079829974e3764db75
+
+We use this function to save samples.parse a CSV file.
+ */
+
+const csvStringToArray = strData => {
+  const objPattern = new RegExp(("(\\,|\\r?\\n|\\r|^)(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^\\,\\r\\n]*))"), "gi");
+  let arrMatches = null, arrData = [[]];
+  while (arrMatches = objPattern.exec(strData)) {
+    if (arrMatches[1].length && arrMatches[1] !== ",") arrData.push([]);
+    arrData[arrData.length - 1].push(arrMatches[2] ?
+      arrMatches[2].replace(new RegExp("\"\"", "g"), "\"") :
+      arrMatches[3]);
+  }
+  return arrData;
+};
+
+/**
+ * Returns a new version of the given string by trimming the given char from the beginning and the end of the string.
+ * @param string The string to be trimmed.
+ * @param character The character to trim.
+ * @returns {string} The trimmed version of the string.
+ */
+function trimByChar(string, character) {
+  const saveString = String(string);
+  const first = [...saveString].findIndex(char => char !== character);
+  const last = [...saveString].reverse().findIndex(char => char !== character);
+  return saveString.substring(first, saveString.length - last);
+}
+
+/**
+ * Returns a dataset collection created from the given flat samples collection.
+ * @param flatData The flat samples collection.
+ * @returns {[]} A collection of datasets.
+ */
+function createDatasets(flatData) {
+  let datasetsByLabel = {};
+
+  for (let itemIndex = 0; itemIndex < flatData.length; itemIndex++) {
+    let item = flatData[itemIndex];
+
+    if (!validateDataItem(item)) {
+      console.log('item');
+      console.log(item);
+    }
+
+    let label = item.dataset || item.label;
+    let dataset = datasetsByLabel[label];
+
+    if (dataset) {
+      dataset.data.push({
+        date: item.date,
+        location: item.location,
+        value: item.value
+      });
+    } else {
+      datasetsByLabel[label] = {
+        label: label,
+        stack: item.stack,
+        data: [{
+          date: item.date,
+          location: item.location,
+          value: item.value
+        }]
+      };
+    }
+  }
+
+  let datasets = [];
+  let labels = Object.getOwnPropertyNames(datasetsByLabel);
+
+  for (let index = 0; index < labels.length; index++) {
+    let label = labels[index];
+    if (label.length === 0) continue;
+    datasets.push(datasetsByLabel[label]);
+  }
+
+  return datasets;
+}
+
+function validateDataItem(item) {
+  return (item.label || item.dataset) && item.date && item.location && (item.value || item.value === 0)  ;
+}
+
+function parseCSV(text) {
+  let flatData = [];
+  let arrays = csvStringToArray(text);
+  let headlines = arrays.shift();
+
+  for (let lineIndex = 0; lineIndex < arrays.length; lineIndex++) {
+
+    let lineArray = arrays[lineIndex].map(element => trimByChar(element, `"`));
+
+    if (lineArray.length < 5) {
+      debug_log(`Skipping row: ${lineArray}`);
+      continue;
+    }
+
+    flatData.push({
+      label: lineArray[0],
+      stack: lineArray[1],
+      value: +lineArray[2],
+      date: lineArray[3],
+      location: lineArray[4]
+    });
+  }
+
+  let datasets = createDatasets(flatData);
+  datasets.csv = {
+    content: text,
+    headlines: headlines,
+    lines: arrays,
+  };
+
+  return datasets;
 }
 
 /**
@@ -5715,6 +5662,7 @@ class DatasetCSVDateCard extends DatasetCard {
   }
 }
 
+// colors
 exports.Color = Color;
 
 // components
@@ -5754,42 +5702,6 @@ exports.URLParameters = UrlParameters;
 // geo json
 exports.GeoJson = GeoJson;
 exports.Feature = Feature;
-exports.joinFeatures = joinFeatures;
-
-exports.renderCSV = renderCSV;
-exports.fetchCSV = fetchCSV;
-exports.parseCSV = parseCSV;
-exports.parseCSVDate = parseCSVDate;
-
-exports.createGeoJSON = createGeoJSON;
-
-// data juggling
-exports.flatDatasets = flatDatasets;
-exports.flatDataset = flatDataset;
-exports.combine = combine;
-exports.combineByStacks = combineByStacks;
-exports.combineByDate = combineByDate;
-exports.combineByLocation = combineByLocation;
-exports.combineDataByGroupsize = combineDataByGroupsize;
-exports.combineDatasetsByRatio = combineDatasetsByRatio;
-exports.extractLabelsFromDatasets = extractLabelsFromDatasets;
-exports.extractLabelsFromFlatData = extractLabelsFromFlatData;
-exports.extractStacksFromDatasets = extractStacksFromDatasets;
-exports.extractStacksFromFlatData = extractStacksFromFlatData;
-exports.extractDatesFromDatasets = extractDatesFromDatasets;
-exports.extractDatesFromFlatData = extractDatesFromFlatData;
-exports.extractLocationsFromDatasets = extractLocationsFromDatasets;
-exports.extractLocationsFromFlatData = extractLocationsFromFlatData;
-exports.extractEarliestDate = extractEarliestDate;
-exports.extractEarliestDateWithValue = extractEarliestDateWithValue;
-exports.extractLatestDate = extractLatestDate;
-exports.extractLatestDateWithValue = extractLatestDateWithValue;
-exports.sumOfDataset = sumOfDataset;
-exports.sumOfStack = sumOfStack;
-exports.dateToItemsRelations = dateToItemsRelation;
-
-exports.equals = equals;
-exports.objectsEqual = objectsEqual;
 
 // constants
 exports.Constants = Constants;

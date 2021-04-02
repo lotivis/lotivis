@@ -1,29 +1,32 @@
+import {copy} from "../shared/copy";
+
 /**
  * Returns a flat version of the given dataset collection.
  *
  * @param datasets The collection of datasets.
- * @returns {[]} The array containing the flat data.
+ * @returns {[]} The array containing the flat samples.
  */
-import {copy} from "../shared/copy";
-
 export function flatDatasets(datasets) {
   let flatData = [];
-  datasets.forEach(function (dataset) {
-    flatData = flatData.concat(flatDataset(dataset));
-  });
+  let datasetsCopy = datasets;
+  for (let datasetIndex = 0; datasetIndex < datasetsCopy.length; datasetIndex++) {
+    let dataset = datasetsCopy[datasetIndex];
+    let flatDataChunk = flatDataset(dataset);
+    flatData = flatData.concat(flatDataChunk);
+  }
   return flatData;
 }
 
 /**
- * Returns an array containing the flat data of the given dataset.
+ * Returns an array containing the flat samples of the given dataset.
  *
- * @param dataset The dataset with data.
- * @returns {[]} The array containing the flat data.
+ * @param dataset The dataset with samples.
+ * @returns {[]} The array containing the flat samples.
  */
 export function flatDataset(dataset) {
   let flatData = [];
   if (!dataset.data) {
-    console.log('Lotivis: Flat data for dataset without data requested. Will return an empty array.');
+    console.log('Lotivis: Flat samples for dataset without samples requested. Will return an empty array.');
     return flatData;
   }
   dataset.data.forEach(item => {

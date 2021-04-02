@@ -1,7 +1,7 @@
 /**
- * Returns the sum of data values for the given dataset.
+ * Returns the sum of samples values for the given dataset.
  *
- * @param flatData The flat data array.
+ * @param flatData The flat samples array.
  * @param dataset The dataset name.
  * @returns {*} The sum.
  */
@@ -10,9 +10,9 @@ export function sumOfDataset(flatData, dataset) {
 }
 
 /**
- * Returns the sum of data values for the given label.
+ * Returns the sum of samples values for the given label.
  *
- * @param flatData The flat data array.
+ * @param flatData The flat samples array.
  * @param label The label.
  * @returns {*} The sum.
  */
@@ -21,9 +21,9 @@ export function sumOfLabel(flatData, label) {
 }
 
 /**
- * Returns the sum of data values for the given stack.
+ * Returns the sum of samples values for the given stack.
  *
- * @param flatData The flat data array.
+ * @param flatData The flat samples array.
  * @param stack The stack name.
  * @returns {*} The sum.
  */

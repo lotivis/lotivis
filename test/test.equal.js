@@ -1,5 +1,5 @@
 const assert = require('assert');
-const lotivis = require('../dist/lotivis');
+const lotivis = require('../dist/lotivis.tests');
 
 describe('equals', function () {
 
@@ -40,6 +40,7 @@ describe('equals', function () {
   });
 
 });
+
 
 describe('objectEquals', function () {
 

@@ -16,7 +16,7 @@ export class MapBackgroundRenderer {
      */
     this.render = function () {
       // create a background rectangle for receiving mouse enter events
-      // in order to reset the location data filter.
+      // in order to reset the location samples filter.
       mapChart.svg
         .append('rect')
         .attr('width', mapChart.config.width)
