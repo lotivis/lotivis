@@ -15,8 +15,9 @@ export class ChartCard extends Card {
    *
    * @param parent The parental component.
    */
-  constructor(parent) {
+  constructor(parent, config) {
     super(parent);
+    this.config = config;
     this.injectButtons();
     this.injectRadioGroup();
     this.injectChart();
@@ -24,7 +25,6 @@ export class ChartCard extends Card {
 
   /**
    * Creates and injects the chart.
-   *
    * Should be overridden by subclasses.
    */
   injectChart() {

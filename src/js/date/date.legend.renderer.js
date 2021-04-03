@@ -1,5 +1,6 @@
 import {sumOfStack} from "../data.juggle/dataset.sum";
 import {Color} from "../color/color";
+import "../color/color.stacks";
 
 export class DateLegendRenderer {
 
@@ -62,7 +63,7 @@ export class DateLegendRenderer {
       let xLegend = d3
         .scaleBand()
         .domain(stackNames)
-        .rangeRound([dateChart.margin.left, dateChart.width - dateChart.margin.right]);
+        .rangeRound([dateChart.config.margin.left, dateChart.config.width - dateChart.config.margin.right]);
 
       let legends = dateChart
         .graph
@@ -83,7 +84,7 @@ export class DateLegendRenderer {
           return Color.colorsForStack(index)[0].rgbString();
         }.bind(this))
         .text(function (item) {
-          return `${item} (${sumOfStack(dateChart.flatData, item)})`;
+          return `${item} (${sumOfStack(dateChart.datasetController.flatData, item)})`;
         }.bind(this));
 
       legends

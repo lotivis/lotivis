@@ -5,29 +5,25 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../css/lotivis.css"/>
-  <link rel="stylesheet" href="../css/examples.css"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <title>Lotivis - Map Data</title>
 </head>
 <body>
 
-<div class="lotivis-example-container">
-  <div class="row">
-    <div class="col-2">
-      <a href="../index.html">
-        <button class="back-button">
-          Back
-        </button>
+<div class="lotivis-container">
+  <div class="lotivis-row">
+    <div class="lotivis-col-2">
+      <a class="lotivis-anchor-back" href="../index.html">
+        Back
       </a>
     </div>
-    <div class="col-8 text-center">
+    <div class="lotivis-col-8 lotivis-headline">
       <h1>Map Data</h1>
     </div>
-    <div class="col-12">
+    <div class="lotivis-col-12">
       <div id="map-chart-card">
         <!-- Map Chart Here -->
       </div>
-      <div class="col-12">
+      <div class="lotivis-col-12">
         <samp id="data">
           <!-- Data Here -->
         </samp>
@@ -43,9 +39,10 @@
 
 <script>
 
-  const geoJsonURL = '/assets/Departements.geojson';
-  const geoJsonURLGermany = '/assets/Germany.geojson';
+  // print debug messages
+  lotivis.debug(true);
 
+  const geoJsonURL = '/assets/departements.geojson';
   const mapChartCard = new lotivis.MapChartCard('map-chart-card');
   const chart = mapChartCard.chart;
 
@@ -70,7 +67,7 @@
     .then(function (datasetsAndGeoJSON) {
       let rawGeoJSON = datasetsAndGeoJSON.pop();
       let datasets = datasetsAndGeoJSON;
-      chart.setGeoJSON(new lotivis.GeoJson(rawGeoJSON));
+      chart.setGeoJSON(rawGeoJSON);
       mapChartCard.setDatasets(datasets);
     });
 

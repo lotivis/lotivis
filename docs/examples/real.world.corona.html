@@ -5,21 +5,18 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../css/lotivis.css"/>
-  <link rel="stylesheet" href="../css/examples.css"/>
-  <title>Lotivis - Corona-Zahlen Zeitverlauf</title>
+  <title>Lotivis Examples - Corona-Zahlen Zeitverlauf</title>
 </head>
 <body>
 
 <div class="lotivis-container">
   <div class="lotivis-row">
     <div class="lotivis-col-2">
-      <a href="../index.html">
-        <button class="back-button">
-          Back
-        </button>
+      <a class="lotivis-anchor-back" href="../index.html">
+        Back
       </a>
     </div>
-    <div class="lotivis-col-8 text-center">
+    <div class="lotivis-col-8 lotivis-headline">
       <h1>Corona-Zahlen Zeitverlauf</h1>
     </div>
     <div class="lotivis-col-12">
@@ -51,7 +48,7 @@
 
 <script>
 
-  lotivis.Constants.debugLog = true;
+  lotivis.debug(true);
   let csvCard = new lotivis.DatasetCSVDateCard('csv-card');
   let dateChart = new lotivis.DateChart('date-chart', {
     height: 500,

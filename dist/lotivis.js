@@ -106,7 +106,7 @@ Color.randomColor = function () {
  * Returns a randomly generated color.
  * @returns {[]}
  */
-Color.colorsForStack = function (stackNumber, amount) {
+Color.colorsForStack = function (stackNumber, amount = 1) {
   let colorCouple = Color.stackColors[stackNumber % Color.stackColors.length];
   let colorGenerator = d3
     .scaleLinear()
@@ -171,7 +171,9 @@ const GlobalConfig = {
   // A Boolean value indicating whether the debug logging is enabled.
   debug: true,
   // A string which is used as prefix for download.
-  downloadFilePrefix: 'lotivis'
+  downloadFilePrefix: 'lotivis',
+  // A string which is used as separator between components when creating a file name.
+  filenameSeparator: '_'
 };
 
 // export const debug_log = function (message) {
@@ -449,7 +451,7 @@ class DateLegendRenderer {
       let xLegend = d3
         .scaleBand()
         .domain(stackNames)
-        .rangeRound([dateChart.margin.left, dateChart.width - dateChart.margin.right]);
+        .rangeRound([dateChart.config.margin.left, dateChart.config.width - dateChart.config.margin.right]);
 
       let legends = dateChart
         .graph
@@ -470,7 +472,7 @@ class DateLegendRenderer {
           return Color.colorsForStack(index)[0].rgbString();
         }.bind(this))
         .text(function (item) {
-          return `${item} (${sumOfStack(dateChart.flatData, item)})`;
+          return `${item} (${sumOfStack(dateChart.datasetController.flatData, item)})`;
         }.bind(this));
 
       legends
@@ -505,6 +507,7 @@ class DateBarsRenderer {
      * @param stackIndex
      */
     this.renderBars = function (stack, stackIndex) {
+      let isCombineStacks = timeChart.config.combineStacks;
       let colors = timeChart.datasetController.getColorsForStack(stack.stack);
       timeChart
         .svg
@@ -514,7 +517,7 @@ class DateBarsRenderer {
         .enter()
         .append("g")
         .attr("fill", function (stackData, index) {
-          if (timeChart.isCombineStacks) {
+          if (isCombineStacks) {
             return colors[0].rgbString();
           } else {
             return stack.colors[index].rgbString();
@@ -525,8 +528,8 @@ class DateBarsRenderer {
         .enter()
         .append("rect")
         .attr('class', 'lotivis-date-chart-bar')
-        .attr("rx", timeChart.isCombineStacks ? 0 : GlobalConfig.barRadius)
-        .attr("ry", timeChart.isCombineStacks ? 0 : GlobalConfig.barRadius)
+        .attr("rx", isCombineStacks ? 0 : GlobalConfig.barRadius)
+        .attr("ry", isCombineStacks ? 0 : GlobalConfig.barRadius)
         .attr("x", (d) => timeChart.xChart(d.data.date) + timeChart.xStack(stack.label))
         .attr("y", (d) => timeChart.yChart(d[1]))
         .attr("width", timeChart.xStack.bandwidth())
@@ -1071,7 +1074,7 @@ class DatasetsController {
    * Returns a string that can be used as filename for downloads.
    */
   getFilename() {
-    this.labels;
+    return this.labels.join(',');
   }
 }
 
@@ -1084,7 +1087,7 @@ const defaultConfig = {
     bottom: GlobalConfig.defaultMargin,
     left: GlobalConfig.defaultMargin
   },
-  showLabels: true,
+  showLabels: false,
   combineStacks: false,
   sendsNotifications: true,
   numberFormat: Intl.NumberFormat('de-DE', {
@@ -1113,7 +1116,8 @@ class DateChart extends Chart {
 
   initializeDefaultValues() {
 
-    this.config;
+    let theConfig = this.config;
+    lotivis_log(`[lotivis]  `, theConfig);
     let margin;
     margin = Object.assign({}, defaultConfig.margin);
     margin = Object.assign(margin, this.config.margin);
@@ -1128,9 +1132,8 @@ class DateChart extends Chart {
     this.type = 'bar'; // DateChart.ChartType.Bar;
     // this.valueType = 'relative';
 
-    this.isShowLabels = false;
-    this.isCombineStacks = false;
-    this.updateSensible = true;
+    // this.isShowLabels = false;
+    // this.updateSensible = true;
 
     this.numberFormat = new Intl.NumberFormat('de-DE', {
       maximumFractionDigits: 3
@@ -1214,7 +1217,9 @@ class DateChart extends Chart {
     this.gridRenderer.renderGrid();
     this.ghostBarsRenderer.renderGhostBars();
 
-    if (this.isCombineStacks) {
+    lotivis_log(`[lotivis]  `, this.config);
+
+    if (this.config.combineStacks) {
       this.legendRenderer.renderCombinedStacksLegend();
     } else {
       this.legendRenderer.renderNormalLegend();
@@ -1223,7 +1228,7 @@ class DateChart extends Chart {
     for (let index = 0; index < this.dataview.datasetStacksPresented.length; index++) {
       let stack = this.dataview.datasetStacksPresented[index];
       this.barsRenderer.renderBars(stack, index);
-      if (this.isShowLabels === false) continue;
+      if (this.config.showLabels === false) continue;
       this.labelRenderer.renderBarLabels(stack, index);
     }
   }
@@ -1369,6 +1374,7 @@ class Card extends Component {
       .classed('lotivis-card-body', true);
     this.content = this.body
       .append('div')
+      .classed('lotivis-card-body-content', true)
       .attr('id', 'content');
   }
 
@@ -1973,9 +1979,9 @@ class DateChartSettingsPopup extends Popup {
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText('Labels');
     this.showLabelsCheckbox.onClick = function (checked) {
-      this.diachronicChart.isShowLabels = checked;
+      this.diachronicChart.config.showLabels = checked;
       this.diachronicChart.update();
-      UrlParameters.getInstance().set(UrlParameters.chartShowLabels, checked);
+      UrlParameters.getInstance().set(UrlParameters.chartShowLabels + this.selector, checked);
     }.bind(this);
   }
 
@@ -1984,9 +1990,9 @@ class DateChartSettingsPopup extends Popup {
     this.combineStacksCheckbox = new Checkbox(container);
     this.combineStacksCheckbox.setText('Combine Stacks');
     this.combineStacksCheckbox.onClick = function (checked) {
-      this.diachronicChart.isCombineStacks = checked;
+      this.diachronicChart.config.combineStacks = checked;
       this.diachronicChart.update();
-      UrlParameters.getInstance().set(UrlParameters.chartCombineStacks, checked);
+      UrlParameters.getInstance().set(UrlParameters.chartCombineStacks + this.selector, checked);
     }.bind(this);
   }
 
@@ -2001,7 +2007,7 @@ class DateChartSettingsPopup extends Popup {
     this.typeRadioGroup.onChange = function (value) {
       this.diachronicChart.type = value;
       this.diachronicChart.update();
-      UrlParameters.getInstance().set(UrlParameters.chartType, value);
+      UrlParameters.getInstance().set(UrlParameters.chartType + this.selector, value);
     }.bind(this);
   }
 
@@ -2037,8 +2043,9 @@ class ChartCard extends Card {
    *
    * @param parent The parental component.
    */
-  constructor(parent) {
+  constructor(parent, config) {
     super(parent);
+    this.config = config;
     this.injectButtons();
     this.injectRadioGroup();
     this.injectChart();
@@ -2046,7 +2053,6 @@ class ChartCard extends Card {
 
   /**
    * Creates and injects the chart.
-   *
    * Should be overridden by subclasses.
    */
   injectChart() {
@@ -2141,12 +2147,6 @@ class ChartCard extends Card {
 }
 
 /**
- * Returns the last path component of the given url.
- * @param url The url with components.
- * @returns {string} The last path component.
- */
-
-/**
  * Appends the given string in extension to the given string filename if filename not already ends with this extension.
  * @param filename A string with or without an extension.
  * @param extension The extension the filename will end with.
@@ -2156,6 +2156,15 @@ function appendExtensionIfNeeded(filename, extension) {
   if (extension === '' || extension === '.') return filename;
   extension = extension.startsWith(".") ? extension : `.${extension}`;
   return filename.endsWith(extension) ? filename : `${filename}${extension}`;
+}
+
+function createDownloadFilename() {
+  let components = [GlobalConfig.downloadFilePrefix];
+  let separator = GlobalConfig.filenameSeparator;
+  for (let i = 0; i < arguments.length; i++) {
+    components.push(String(arguments[i]));
+  }
+  return components.join(separator);
 }
 
 // http://bl.ocks.org/Rokotyan/0556f8facbaf344507cdc45dc3622177
@@ -2374,26 +2383,22 @@ class DateChartCard extends ChartCard {
    */
   constructor(selector, config) {
     let theSelector = selector || 'date-chart-card';
-    super(theSelector);
+    super(theSelector, config);
     this.selector = theSelector;
     this.name = theSelector;
     this.datasets = [];
     this.renderChart();
     this.renderRadioGroup();
+    this.setHeaderText((config && config.name) ? config.name : 'Date');
     this.applyURLParameters();
-    this.setHeaderText('Date');
   }
 
   /**
    *
    */
   renderChart() {
-    this.chart = new DateChart(this.body, {
-      margin: {
-        left: 50,
-        right: 50
-      }
-    });
+    this.chart = new DateChart(this.chartID, this.config || {});
+    this.chartID = this.chart.selector;
   }
 
   /**
@@ -2421,12 +2426,14 @@ class DateChartCard extends ChartCard {
    *
    */
   applyURLParameters() {
+    lotivis_log(`[lotivis]  `, this.selector);
+    lotivis_log(`[lotivis]  `, this.chartID);
     this.chart.type = UrlParameters.getInstance()
-      .getString(UrlParameters.chartType, 'bar');
-    this.chart.isShowLabels = UrlParameters.getInstance()
-      .getBoolean(UrlParameters.chartShowLabels, false);
-    this.chart.isCombineStacks = UrlParameters.getInstance()
-      .getBoolean(UrlParameters.chartCombineStacks, false);
+      .getString(UrlParameters.chartType + this.selector, 'bar');
+    this.chart.config.showLabels = UrlParameters.getInstance()
+      .getBoolean(UrlParameters.chartShowLabels + this.selector, this.chart.config.showLabels);
+    this.chart.config.combineStacks = UrlParameters.getInstance()
+      .getBoolean(UrlParameters.chartCombineStacks + this.selector, this.chart.config.combineStacks);
   }
 
   /**
@@ -2445,9 +2452,9 @@ class DateChartCard extends ChartCard {
    * @override
    */
   screenshotButtonAction() {
-    let labels = this.chart.datasetController.labels;
-    let name = labels.join(',') + '-date-chart';
-    downloadImage(this.chart.svgSelector, name);
+    let filename = this.chart.datasetController.getFilename();
+    let downloadFilename = createDownloadFilename(filename, `date-chart`);
+    downloadImage(this.chart.svgSelector, downloadFilename);
   }
 }
 
@@ -3376,6 +3383,137 @@ class MapBackgroundRenderer {
 }
 
 /**
+ * @class Geometry
+ */
+class Geometry {
+
+  /**
+   * Creates a new instance of Geometry.
+   *
+   * @param source
+   */
+  constructor(source) {
+    this.type = source.type;
+    this.coordinates = source.coordinates;
+  }
+}
+
+/**
+ *
+ * @class Feature
+ */
+class Feature {
+
+  constructor(source) {
+    this.type = source.type;
+    this.properties = source.properties;
+    this.geometry = new Geometry(source.geometry);
+  }
+}
+
+/**
+ *
+ * @class GeoJson
+ */
+class GeoJson {
+
+  constructor(source) {
+    this.type = source.type;
+    this.features = [];
+
+    if (source.features) {
+      for (let index = 0; index < source.features.length; index++) {
+        let featureSource = source.features[index];
+        let feature = new Feature(featureSource);
+        this.features.push(feature);
+      }
+    } else {
+      this.properties = source.properties;
+      this.geometry = new Geometry(source.geometry);
+    }
+  }
+
+  getCenter() {
+    let allCoordinates = this.extractAllCoordinates();
+    console.log('allCoordinates.length: ' + allCoordinates.length);
+    let latitudeSum = 0;
+    let longitudeSum = 0;
+
+    allCoordinates.forEach(function (coordinates) {
+      latitudeSum += coordinates[1];
+      longitudeSum += coordinates[0];
+    });
+
+    return [
+      latitudeSum / allCoordinates.length,
+      longitudeSum / allCoordinates.length
+    ];
+  }
+
+  extractGeometryCollection() {
+    let geometryCollection = [];
+    if (this.type === 'Feature') {
+      geometryCollection.push(this.geometry);
+    } else if (this.type === 'FeatureCollection') {
+      this.features.forEach(feature => geometryCollection.push(feature.geometry));
+    } else if (this.type === 'GeometryCollection') {
+      this.geometries.forEach(geometry => geometryCollection.push(geometry));
+    } else {
+      throw new Error('The geoJSON is not valid.');
+    }
+    return geometryCollection;
+  }
+
+  extractAllCoordinates() {
+    let geometryCollection = this.extractGeometryCollection();
+    let coordinatesCollection = [];
+
+    geometryCollection.forEach(item => {
+
+      let coordinates = item.coordinates;
+      let type = item.type;
+
+      if (type === 'Point') {
+        console.log("Point: " + coordinates.length);
+        coordinatesCollection.push(coordinates);
+      } else if (type === 'MultiPoint') {
+        console.log("MultiPoint: " + coordinates.length);
+        coordinates.forEach(coordinate => coordinatesCollection.push(coordinate));
+      } else if (type === 'LineString') {
+        console.log("LineString: " + coordinates.length);
+        coordinates.forEach(coordinate => coordinatesCollection.push(coordinate));
+      } else if (type === 'Polygon') {
+        coordinates.forEach(function (polygonCoordinates) {
+          polygonCoordinates.forEach(function (coordinate) {
+            coordinatesCollection.push(coordinate);
+          });
+        });
+      } else if (type === 'MultiLineString') {
+        coordinates.forEach(function (featureCoordinates) {
+          featureCoordinates.forEach(function (polygonCoordinates) {
+            polygonCoordinates.forEach(function (coordinate) {
+              coordinatesCollection.push(coordinate);
+            });
+          });
+        });
+      } else if (type === 'MultiPolygon') {
+        coordinates.forEach(function (featureCoordinates) {
+          featureCoordinates.forEach(function (polygonCoordinates) {
+            polygonCoordinates.forEach(function (coordinate) {
+              coordinatesCollection.push(coordinate);
+            });
+          });
+        });
+      } else {
+        throw new Error('The geoJSON is not valid.');
+      }
+    });
+
+    return coordinatesCollection;
+  }
+}
+
+/**
  * A component which renders a geo json with d3.
  *
  * @class MapChart
@@ -3474,7 +3612,12 @@ class MapChart extends Chart {
    * @param newGeoJSON
    */
   setGeoJSON(newGeoJSON) {
-    this.geoJSON = newGeoJSON;
+    if (typeof newGeoJSON === 'object' && newGeoJSON.prototype === 'GeoJSON') {
+      this.geoJSON = newGeoJSON;
+    } else {
+      this.geoJSON = new GeoJson(newGeoJSON);
+    }
+
     this.presentedGeoJSON = newGeoJSON;
     this.geoJSONDidChange();
   }
@@ -3561,16 +3704,12 @@ class MapChartSettingsPopup extends Popup {
    * @override
    */
   render() {
-    this.card
-      .headerRow
-      .append('h3')
-      .text('Settings');
-
+    this.card.setHeaderText('Settings');
     this.row = this
       .card
-      .body
+      .content
       .append('div')
-      .classed('row', true);
+      .classed('lotivis-row', true);
 
     this.renderShowLabelsCheckbox();
   }
@@ -3579,7 +3718,7 @@ class MapChartSettingsPopup extends Popup {
    * Injects a checkbox to toggle the visibility of the labels of the map chart.
    */
   renderShowLabelsCheckbox() {
-    let container = this.row.append('div').classed('col-12 margin-top', true);
+    let container = this.row.append('div').classed('lotivis-col-12', true);
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText('Labels');
     this.showLabelsCheckbox.onClick = function (checked) {
@@ -3623,7 +3762,7 @@ class MapChartCard extends ChartCard {
   constructor(parent, config) {
     super(parent);
     this.config = config;
-    this.setHeaderText(config.name || 'Map');
+    this.setHeaderText('Map');
   }
 
   /**
@@ -3638,12 +3777,9 @@ class MapChartCard extends ChartCard {
    * @override
    */
   screenshotButtonAction() {
-    let labels = ['unknown'];
-    if (this.chart.datasetController) {
-      labels = this.chart.datasetController.labels;
-    }
-    let name = labels.join(',') + '-map-chart';
-    downloadImage(this.chart.svgSelector, name);
+    let filename = this.chart.datasetController.getFilename();
+    let downloadFilename = createDownloadFilename(filename, `map-chart`);
+    downloadImage(this.chart.svgSelector, downloadFilename);
   }
 
   /**
@@ -4522,7 +4658,7 @@ class PlotChartCard extends ChartCard {
    */
   constructor(selector, config) {
     let theSelector = selector || 'plot-chart-card';
-    super(theSelector);
+    super(theSelector, config);
     this.selector = selector;
     this.name = selector;
     this.datasets = [];
@@ -4590,140 +4726,9 @@ class PlotChartCard extends ChartCard {
    * @override
    */
   screenshotButtonAction() {
-    let labels = this.chart.datasetController.labels;
-    let name = labels.join(',') + '-plot-chart';
-    downloadImage(this.chart.svgSelector, name);
-  }
-}
-
-/**
- * @class Geometry
- */
-class Geometry {
-
-  /**
-   * Creates a new instance of Geometry.
-   *
-   * @param source
-   */
-  constructor(source) {
-    this.type = source.type;
-    this.coordinates = source.coordinates;
-  }
-}
-
-/**
- *
- * @class Feature
- */
-class Feature {
-
-  constructor(source) {
-    this.type = source.type;
-    this.properties = source.properties;
-    this.geometry = new Geometry(source.geometry);
-  }
-}
-
-/**
- *
- * @class GeoJson
- */
-class GeoJson {
-
-  constructor(source) {
-    this.type = source.type;
-    this.features = [];
-
-    if (source.features) {
-      for (let index = 0; index < source.features.length; index++) {
-        let featureSource = source.features[index];
-        let feature = new Feature(featureSource);
-        this.features.push(feature);
-      }
-    } else {
-      this.properties = source.properties;
-      this.geometry = new Geometry(source.geometry);
-    }
-  }
-
-  getCenter() {
-    let allCoordinates = this.extractAllCoordinates();
-    console.log('allCoordinates.length: ' + allCoordinates.length);
-    let latitudeSum = 0;
-    let longitudeSum = 0;
-
-    allCoordinates.forEach(function (coordinates) {
-      latitudeSum += coordinates[1];
-      longitudeSum += coordinates[0];
-    });
-
-    return [
-      latitudeSum / allCoordinates.length,
-      longitudeSum / allCoordinates.length
-    ];
-  }
-
-  extractGeometryCollection() {
-    let geometryCollection = [];
-    if (this.type === 'Feature') {
-      geometryCollection.push(this.geometry);
-    } else if (this.type === 'FeatureCollection') {
-      this.features.forEach(feature => geometryCollection.push(feature.geometry));
-    } else if (this.type === 'GeometryCollection') {
-      this.geometries.forEach(geometry => geometryCollection.push(geometry));
-    } else {
-      throw new Error('The geoJSON is not valid.');
-    }
-    return geometryCollection;
-  }
-
-  extractAllCoordinates() {
-    let geometryCollection = this.extractGeometryCollection();
-    let coordinatesCollection = [];
-
-    geometryCollection.forEach(item => {
-
-      let coordinates = item.coordinates;
-      let type = item.type;
-
-      if (type === 'Point') {
-        console.log("Point: " + coordinates.length);
-        coordinatesCollection.push(coordinates);
-      } else if (type === 'MultiPoint') {
-        console.log("MultiPoint: " + coordinates.length);
-        coordinates.forEach(coordinate => coordinatesCollection.push(coordinate));
-      } else if (type === 'LineString') {
-        console.log("LineString: " + coordinates.length);
-        coordinates.forEach(coordinate => coordinatesCollection.push(coordinate));
-      } else if (type === 'Polygon') {
-        coordinates.forEach(function (polygonCoordinates) {
-          polygonCoordinates.forEach(function (coordinate) {
-            coordinatesCollection.push(coordinate);
-          });
-        });
-      } else if (type === 'MultiLineString') {
-        coordinates.forEach(function (featureCoordinates) {
-          featureCoordinates.forEach(function (polygonCoordinates) {
-            polygonCoordinates.forEach(function (coordinate) {
-              coordinatesCollection.push(coordinate);
-            });
-          });
-        });
-      } else if (type === 'MultiPolygon') {
-        coordinates.forEach(function (featureCoordinates) {
-          featureCoordinates.forEach(function (polygonCoordinates) {
-            polygonCoordinates.forEach(function (coordinate) {
-              coordinatesCollection.push(coordinate);
-            });
-          });
-        });
-      } else {
-        throw new Error('The geoJSON is not valid.');
-      }
-    });
-
-    return coordinatesCollection;
+    let filename = this.chart.datasetController.getFilename();
+    let downloadFilename = createDownloadFilename(filename, `plot-chart`);
+    downloadImage(this.chart.svgSelector, downloadFilename);
   }
 }
 
@@ -5306,14 +5311,7 @@ class DatasetCard extends Card {
    * Appends the component to this card.
    */
   render() {
-    this.element.classed('lotivis-data-card', true);
-    this.statusText = this.headerRow
-      .append('div')
-      .style(`display`, `none`)
-      .classed('lotivis-col-12', true)
-      .classed('lotivis-data-status-text', true)
-      .classed('lotivis-data-status-failure', true);
-
+    // this.element.classed('lotivis-data-card', true);
     this.textareaID = createID();
     this.textarea = this.body
       .append('textarea')
@@ -5335,8 +5333,9 @@ class DatasetCard extends Card {
     this.tooltip = this
       .element
       .append('div')
-      .attr('class', 'lotivis-data-card-status-tooltip lotivis-data-status-failure');
-    this.tooltip.text('def');
+      .style('opacity', 0)
+      .style('display', `none`)
+      .attr('class', 'lotivis-data-card-status-tooltip');
   }
 
   /**
@@ -5345,6 +5344,7 @@ class DatasetCard extends Card {
   hideTooltip() {
     if (+this.tooltip.style('opacity') === 0) return;
     this.tooltip.style('opacity', 0);
+    this.tooltip.style('display', `none`);
   };
 
   /**
@@ -5364,8 +5364,9 @@ class DatasetCard extends Card {
     if (!textarea) return;
     textarea.value = newContent;
     if (typeof newContent !== 'string') return;
-    let numberOfRows = newContent.split(`\n`).length;
-    this.textarea.attr('rows', numberOfRows);
+    // let numberOfRows = newContent.split(`\n`).length;
+    // this.textarea.attr('rows', numberOfRows);
+    this.textarea.attr('rows', 30);
   }
 
   /**
@@ -5373,14 +5374,9 @@ class DatasetCard extends Card {
    * @param newStatusMessage The new status message.
    */
   setStatusMessage(newStatusMessage) {
-    if (newStatusMessage) {
-      this.showTooltip();
-    } else {
-      this.statusText.text('');
-    }
-    this.statusText
-      .text(newStatusMessage)
-      .style(`display`, newStatusMessage === "" ? `none` : `block`);
+    this.tooltip.text(newStatusMessage);
+    this.tooltip.style('opacity', newStatusMessage === "" ? 0 : 1);
+    this.tooltip.style('display', newStatusMessage === "" ? `none` : `block`);
   }
 
   /**
@@ -5490,14 +5486,13 @@ class DatasetCard extends Card {
 
 /**
  * A card containing a textarea which contains the JSON text of a dataset collection.
- *
- * @class DatasetsJsonCard
+ * @class DatasetJSONCard
  * @extends DatasetCard
  */
-class DatasetsJsonCard extends DatasetCard {
+class DatasetJSONCard extends DatasetCard {
 
   /**
-   * Creates a new instance of DatasetJsonCard.
+   * Creates a new instance of DatasetJSONCard.
    * @param parent The parental element or a selector (id).
    */
   constructor(parent = 'datasets-json-card') {
@@ -5506,7 +5501,9 @@ class DatasetsJsonCard extends DatasetCard {
   }
 
   download(content) {
-    downloadJSON(content, 'dataset.json');
+    let filename = this.datasetController.getFilename();
+    let downloadFilename = createDownloadFilename(filename, `datasets`);
+    downloadJSON(content, downloadFilename);
   }
 
   textToDatasets(text) {
@@ -5685,7 +5682,9 @@ class DatasetCSVCard extends DatasetCard {
   }
 
   download(content) {
-    downloadCSV(content, 'dataset.json');
+    let filename = this.datasetController.getFilename();
+    let downloadFilename = createDownloadFilename(filename, `datasets`);
+    downloadCSV(content, downloadFilename);
   }
 
   textToDatasets(text) {
@@ -5788,7 +5787,9 @@ class DatasetCSVDateCard extends DatasetCard {
   }
 
   download(content) {
-    downloadCSV(content, 'dataset.csv');
+    let filename = this.datasetController.getFilename();
+    let downloadFilename = createDownloadFilename(filename, `datasets`);
+    downloadCSV(content, downloadFilename);
   }
 
   textToDatasets(text) {
@@ -5828,7 +5829,8 @@ exports.PlotChart = PlotChart;
 exports.PlotChartCard = PlotChartCard;
 
 // datasets / csv cards
-exports.DatasetJsonCard = DatasetsJsonCard;
+exports.DatasetCard = DatasetCard;
+exports.DatasetJSONCard = DatasetJSONCard;
 exports.DatasetCSVCard = DatasetCSVCard;
 exports.DatasetCSVDateCard = DatasetCSVDateCard;
 
@@ -5839,8 +5841,12 @@ exports.DatasetController = DatasetsController;
 exports.URLParameters = UrlParameters;
 
 // geo json
-exports.GeoJson = GeoJson;
-exports.Feature = Feature;
+// exports.GeoJson = GeoJson;
+// exports.Feature = Feature;
+
+// parse
+exports.parseCSV = parseCSV;
+exports.parseCSVDate = parseCSVDate;
 
 // constants
 exports.config = GlobalConfig;

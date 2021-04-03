@@ -3,6 +3,7 @@ import {DatasetCard} from "./dataset.card";
 import {parseCSVDate} from "../data.parse/parse.csv.date";
 import {renderCSVDate} from "../data.render/render.csv.date";
 import {downloadCSV} from "../shared/download";
+import {createDownloadFilename} from "../shared/filname";
 
 /**
  * Presents the CSV version of datasets.  The presented CSV can be edited.
@@ -21,7 +22,9 @@ export class DatasetCSVDateCard extends DatasetCard {
   }
 
   download(content) {
-    downloadCSV(content, 'dataset.csv');
+    let filename = this.datasetController.getFilename();
+    let downloadFilename = createDownloadFilename(filename, `datasets`);
+    downloadCSV(content, downloadFilename);
   }
 
   textToDatasets(text) {

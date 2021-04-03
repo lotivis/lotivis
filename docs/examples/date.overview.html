@@ -5,7 +5,7 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../css/lotivis.css"/>
-  <title>Lotivis - Time Chart Grouped</title>
+  <title>Lotivis Examples - Date Chart Overview</title>
 </head>
 <body>
 
@@ -17,11 +17,19 @@
       </a>
     </div>
     <div class="lotivis-col-8 lotivis-headline">
-      <h1>Date Chart Grouped</h1>
+      <h1>Date Chart Overview</h1>
     </div>
-    <div class="lotivis-col-8">
-      <div id="date-chart-card">
-        <!-- Date Chart Code Here -->
+    <div class="lotivis-col-4">
+      <div id="date-chart-card-1">
+        <!-- Date Chart 1 Code Here -->
+      </div>
+      <div id="date-chart-card-3">
+        <!-- Date Chart 3 Code Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-4">
+      <div id="date-chart-card-2">
+        <!-- Date Chart 2 Code Here -->
       </div>
     </div>
     <div class="lotivis-col-4">
@@ -40,16 +48,22 @@
   lotivis.debug(true);
 
   let datasetsCard = new lotivis.DatasetJSONCard();
-  let dateChartCard = new lotivis.DateChartCard();
+  let dateChartCard1 = new lotivis.DateChartCard('date-chart-card-1', {name: 'Standard'});
+  let dateChartCard2 = new lotivis.DateChartCard('date-chart-card-2', {name: 'Labels on', showLabels: true});
+  let dateChartCard3 = new lotivis.DateChartCard('date-chart-card-3', {name: 'Combine Stacks', combineStacks: true});
 
-  fetch('/assets/example-datasets-location-time-grouped.json')
+  fetch('/assets/example-datasets-location-time-grouped-stacked.json')
     .then(response => response.text())
     .then(text => JSON.parse(text))
     .then(function (json) {
 
       let datasetsController = new lotivis.DatasetController(json);
-      dateChartCard.chart.setDatasetController(datasetsController);
-      datasetsCard.setDatasetController(datasetsController);
+      datasetsController.register([
+        dateChartCard1.chart,
+        dateChartCard2.chart,
+        dateChartCard3.chart,
+        datasetsCard
+      ]);
 
     });
 

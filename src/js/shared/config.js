@@ -10,5 +10,7 @@ export const GlobalConfig = {
   // A Boolean value indicating whether the debug logging is enabled.
   debug: true,
   // A string which is used as prefix for download.
-  downloadFilePrefix: 'lotivis'
+  downloadFilePrefix: 'lotivis',
+  // A string which is used as separator between components when creating a file name.
+  filenameSeparator: '_'
 };

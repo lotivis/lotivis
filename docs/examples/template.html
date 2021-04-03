@@ -5,43 +5,37 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../css/lotivis.css"/>
-  <link rel="stylesheet" href="../css/examples.css"/>
-  <title>Headline</title>
+  <title>___HEADLINE___</title>
 </head>
 <body>
 
-<div class="lotivis-example-container">
+<div class="lotivis-container">
   <div class="row">
-    <div class="col-2">
-      <a href="../index.html">
-        <button class="back-button">
-          Back
-        </button>
+    <div class="lotivis-col-2">
+      <a class="lotivis-anchor-back" href="../index.html">
+        Back
       </a>
     </div>
-    <div class="col-8 text-center">
+    <div class="lotivis-col-8 lotivis-headline">
       <h1>Headline</h1>
     </div>
-    <div class="col-6">
-      <div id="time-chart-card">
-        <!-- Time Chart Code Here -->
+    <div class="lotivis-col-6">
+      <div id="date-chart-card">
+        <!-- Date Chart Card Here -->
       </div>
       <div id="plot-chart-card">
-        <!-- Plot Chart Code Here -->
+        <!-- Plot Chart Card Here -->
       </div>
     </div>
-    <div class="col-6">
+    <div class="lotivis-col-6">
       <div id="map-chart-card">
-        <!-- Map Chart Code Here -->
+        <!-- Map Chart Card Here -->
       </div>
     </div>
-    <div class="col-6">
-
-    </div>
-    <div class="col-12">
-      <samp id="data">
-        <!-- Data Here -->
-      </samp>
+    <div class="lotivis-col-6">
+      <div id="data-card">
+        <!-- Map Chart Card Here -->
+      </div>
     </div>
   </div>
 </div>
@@ -51,7 +45,7 @@
 
 <script>
 
-  lotivis.Constants.debug = true;
+  lotivis.debug(true);
 
 </script>
 

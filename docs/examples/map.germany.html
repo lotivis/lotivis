@@ -5,30 +5,26 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../css/lotivis.css"/>
-  <link rel="stylesheet" href="../css/examples.css"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <title>Lotivis - Map Simple</title>
 </head>
 <body>
 
-<div class="lotivis-example-container">
-  <div class="row">
-    <div class="col-2">
-      <a href="../index.html">
-        <button class="back-button">
-          Back
-        </button>
+<div class="lotivis-container">
+  <div class="lotivis-row">
+    <div class="lotivis-col-2">
+      <a class="lotivis-anchor-back" href="../index.html">
+        Back
       </a>
     </div>
-    <div class="col-8 text-center">
+    <div class="lotivis-col-8 lotivis-headline">
       <h1>Map Data</h1>
     </div>
-    <div class="col-12">
+    <div class="lotivis-col-12">
       <div id="map-chart-card">
 
       </div>
     </div>
-    <div class="col-12">
+    <div class="lotivis-wcol-12">
       <div id="radio">
 
       </div>
@@ -42,6 +38,9 @@
 <script src="../js/lotivis.js"></script>
 
 <script>
+
+  // print debug messages
+  lotivis.debug(true);
 
   const geoJsonURLGermany = '/assets/Germany.geojson';
   const mapChartCard = new lotivis.MapChartCard('map-chart-card');

@@ -37,7 +37,9 @@
 
 <script>
 
-  let datasetsCard = new lotivis.DatasetJsonCard();
+  lotivis.debug(true);
+
+  let datasetsCard = new lotivis.DatasetJSONCard();
   let dateChartCard = new lotivis.DateChartCard();
 
   fetch('/assets/example-datasets-location-time-stacked.json')

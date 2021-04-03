@@ -1,3 +1,5 @@
+import {GlobalConfig} from "./config";
+
 /**
  * Returns the last path component of the given url.
  * @param url The url with components.
@@ -17,4 +19,13 @@ export function appendExtensionIfNeeded(filename, extension) {
   if (extension === '' || extension === '.') return filename;
   extension = extension.startsWith(".") ? extension : `.${extension}`;
   return filename.endsWith(extension) ? filename : `${filename}${extension}`;
+}
+
+export function createDownloadFilename() {
+  let components = [GlobalConfig.downloadFilePrefix];
+  let separator = GlobalConfig.filenameSeparator;
+  for (let i = 0; i < arguments.length; i++) {
+    components.push(String(arguments[i]));
+  }
+  return components.join(separator);
 }

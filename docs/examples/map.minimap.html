@@ -5,32 +5,23 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../css/lotivis.css"/>
-  <link rel="stylesheet" href="../css/examples.css"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <title>Lotivis - Map Data</title>
 </head>
 <body>
 
-<div class="lotivis-example-container">
-  <div class="row">
-    <div class="col-2">
-      <a href="../index.html">
-        <button class="back-button">
-          Back
-        </button>
+<div class="lotivis-container">
+  <div class="lotivis-row">
+    <div class="lotivis-col-2">
+      <a class="lotivis-anchor-back" href="../index.html">
+        Back
       </a>
     </div>
-    <div class="col-8 text-center">
+    <div class="lotivis-col-8 lotivis-headline">
       <h1>Map Data</h1>
     </div>
-    <div class="col-12">
+    <div class="lotivis-col-12">
       <div id="map-chart-card">
-        <!-- Map Chart Here -->
-      </div>
-      <div class="col-12">
-        <samp id="data">
-          <!-- Data Here -->
-        </samp>
+        <!-- Map Chart Card Here -->
       </div>
     </div>
   </div>
@@ -43,18 +34,14 @@
 
 <script>
 
+  lotivis.debug(true);
   const mapChartCard = new lotivis.MapChartCard('map-chart-card');
-  mapChartCard.chart.excludedFeatureCodes = ['2A', '2B'];
+  mapChartCard.chart.config.excludedFeatureCodes = ['2A', '2B'];
   mapChartCard.chart.minimapFeatureCodes = ['75', '92', '93', '94'];
 
-  d3.json('../assets/Departements.geojson')
+  d3.json('../assets/departements.geojson')
     .then(function (rawGeoJSON) {
-
-      let geoJSON = new lotivis.GeoJson(rawGeoJSON);
-      // let newGeoJSON = lotivis.joinFeatures(geoJSON, geoJSON.features);
-
-      mapChartCard.chart.setGeoJSON(geoJSON);
-
+      mapChartCard.chart.setGeoJSON(rawGeoJSON);
     });
 
 </script>

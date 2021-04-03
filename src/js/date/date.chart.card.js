@@ -6,6 +6,8 @@ import {RadioGroup} from "../components/radio.group";
 import {Option} from "../components/option";
 import {ChartCard} from "../components/chart.card";
 import {downloadImage} from "../shared/download";
+import {createDownloadFilename} from "../shared/filname";
+import {lotivis_log} from "../shared/debug";
 
 /**
  *
@@ -22,26 +24,22 @@ export class DateChartCard extends ChartCard {
    */
   constructor(selector, config) {
     let theSelector = selector || 'date-chart-card';
-    super(theSelector);
+    super(theSelector, config);
     this.selector = theSelector;
     this.name = theSelector;
     this.datasets = [];
     this.renderChart();
     this.renderRadioGroup();
+    this.setHeaderText((config && config.name) ? config.name : 'Date');
     this.applyURLParameters();
-    this.setHeaderText('Date');
   }
 
   /**
    *
    */
   renderChart() {
-    this.chart = new DateChart(this.body, {
-      margin: {
-        left: 50,
-        right: 50
-      }
-    });
+    this.chart = new DateChart(this.body, this.config || {});
+    this.chartID = this.chart.selector;
   }
 
   /**
@@ -70,11 +68,11 @@ export class DateChartCard extends ChartCard {
    */
   applyURLParameters() {
     this.chart.type = UrlParameters.getInstance()
-      .getString(UrlParameters.chartType, 'bar');
-    this.chart.isShowLabels = UrlParameters.getInstance()
-      .getBoolean(UrlParameters.chartShowLabels, false);
-    this.chart.isCombineStacks = UrlParameters.getInstance()
-      .getBoolean(UrlParameters.chartCombineStacks, false);
+      .getString(UrlParameters.chartType + this.chartID, 'bar');
+    this.chart.config.showLabels = UrlParameters.getInstance()
+      .getBoolean(UrlParameters.chartShowLabels + this.chartID, this.chart.config.showLabels);
+    this.chart.config.combineStacks = UrlParameters.getInstance()
+      .getBoolean(UrlParameters.chartCombineStacks + this.chartID, this.chart.config.combineStacks);
   }
 
   /**
@@ -93,8 +91,8 @@ export class DateChartCard extends ChartCard {
    * @override
    */
   screenshotButtonAction() {
-    let labels = this.chart.datasetController.labels;
-    let name = labels.join(',') + '-date-chart';
-    downloadImage(this.chart.svgSelector, name);
+    let filename = this.chart.datasetController.getFilename();
+    let downloadFilename = createDownloadFilename(filename, `date-chart`);
+    downloadImage(this.chart.svgSelector, downloadFilename);
   }
 }

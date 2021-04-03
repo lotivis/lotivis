@@ -53,6 +53,7 @@ export class DatasetCard extends Card {
       .element
       .append('div')
       .style('opacity', 0)
+      .style('display', `none`)
       .attr('class', 'lotivis-data-card-status-tooltip');
   }
 
@@ -62,6 +63,7 @@ export class DatasetCard extends Card {
   hideTooltip() {
     if (+this.tooltip.style('opacity') === 0) return;
     this.tooltip.style('opacity', 0);
+    this.tooltip.style('display', `none`);
   };
 
   /**
@@ -81,8 +83,9 @@ export class DatasetCard extends Card {
     if (!textarea) return;
     textarea.value = newContent;
     if (typeof newContent !== 'string') return;
-    let numberOfRows = newContent.split(`\n`).length;
-    this.textarea.attr('rows', numberOfRows);
+    // let numberOfRows = newContent.split(`\n`).length;
+    // this.textarea.attr('rows', numberOfRows);
+    this.textarea.attr('rows', 30);
   }
 
   /**
@@ -92,6 +95,7 @@ export class DatasetCard extends Card {
   setStatusMessage(newStatusMessage) {
     this.tooltip.text(newStatusMessage);
     this.tooltip.style('opacity', newStatusMessage === "" ? 0 : 1);
+    this.tooltip.style('display', newStatusMessage === "" ? `none` : `block`);
   }
 
   /**

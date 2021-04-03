@@ -13,6 +13,8 @@ import {MapSelectionBoundsRenderer} from "./map.selection.bounds.renderer";
 import {defaultMapChartConfig} from "./map.chart.config";
 import {DatasetsController} from "../data/datasets.controller";
 import {MapBackgroundRenderer} from "./map.background.renderer";
+import {GeoJson} from "../geojson/geojson";
+import {lotivis_log} from "../shared/debug";
 
 /**
  * A component which renders a geo json with d3.
@@ -113,7 +115,12 @@ export class MapChart extends Chart {
    * @param newGeoJSON
    */
   setGeoJSON(newGeoJSON) {
-    this.geoJSON = newGeoJSON;
+    if (typeof newGeoJSON === 'object' && newGeoJSON.prototype === 'GeoJSON') {
+      this.geoJSON = newGeoJSON;
+    } else {
+      this.geoJSON = new GeoJson(newGeoJSON);
+    }
+
     this.presentedGeoJSON = newGeoJSON;
     this.geoJSONDidChange();
   }

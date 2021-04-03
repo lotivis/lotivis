@@ -71,6 +71,7 @@ export class Card extends Component {
       .classed('lotivis-card-body', true);
     this.content = this.body
       .append('div')
+      .classed('lotivis-card-body-content', true)
       .attr('id', 'content');
   }
 

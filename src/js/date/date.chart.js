@@ -9,6 +9,7 @@ import {Chart} from "../components/chart";
 import {DateGridRenderer} from "./date.grid.renderer";
 import {DatasetsController} from "../data/datasets.controller";
 import {GlobalConfig} from "../shared/config";
+import {lotivis_log} from "../shared/debug";
 
 const defaultConfig = {
   width: 1000,
@@ -19,7 +20,7 @@ const defaultConfig = {
     bottom: GlobalConfig.defaultMargin,
     left: GlobalConfig.defaultMargin
   },
-  showLabels: true,
+  showLabels: false,
   combineStacks: false,
   sendsNotifications: true,
   numberFormat: Intl.NumberFormat('de-DE', {
@@ -49,6 +50,7 @@ export class DateChart extends Chart {
   initializeDefaultValues() {
 
     let theConfig = this.config;
+    lotivis_log(`[lotivis]  `, theConfig);
     let margin;
     margin = Object.assign({}, defaultConfig.margin);
     margin = Object.assign(margin, this.config.margin);
@@ -63,9 +65,8 @@ export class DateChart extends Chart {
     this.type = 'bar'; // DateChart.ChartType.Bar;
     // this.valueType = 'relative';
 
-    this.isShowLabels = false;
-    this.isCombineStacks = false;
-    this.updateSensible = true;
+    // this.isShowLabels = false;
+    // this.updateSensible = true;
 
     this.numberFormat = new Intl.NumberFormat('de-DE', {
       maximumFractionDigits: 3
@@ -149,7 +150,9 @@ export class DateChart extends Chart {
     this.gridRenderer.renderGrid();
     this.ghostBarsRenderer.renderGhostBars();
 
-    if (this.isCombineStacks) {
+    lotivis_log(`[lotivis]  `, this.config);
+
+    if (this.config.combineStacks) {
       this.legendRenderer.renderCombinedStacksLegend();
     } else {
       this.legendRenderer.renderNormalLegend();
@@ -158,7 +161,7 @@ export class DateChart extends Chart {
     for (let index = 0; index < this.dataview.datasetStacksPresented.length; index++) {
       let stack = this.dataview.datasetStacksPresented[index];
       this.barsRenderer.renderBars(stack, index);
-      if (this.isShowLabels === false) continue;
+      if (this.config.showLabels === false) continue;
       this.labelRenderer.renderBarLabels(stack, index);
     }
   }

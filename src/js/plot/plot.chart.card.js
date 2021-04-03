@@ -6,6 +6,7 @@ import {ChartCard} from "../components/chart.card";
 import {PlotChart} from "./plot.chart";
 import {PlotChartSettingsPopup} from "./plot.chart.settings.popup";
 import {downloadImage} from "../shared/download";
+import {createDownloadFilename} from "../shared/filname";
 
 /**
  * A card containing a plot chart.
@@ -23,7 +24,7 @@ export class PlotChartCard extends ChartCard {
    */
   constructor(selector, config) {
     let theSelector = selector || 'plot-chart-card';
-    super(theSelector);
+    super(theSelector, config);
     this.selector = selector;
     this.name = selector;
     this.datasets = [];
@@ -91,8 +92,8 @@ export class PlotChartCard extends ChartCard {
    * @override
    */
   screenshotButtonAction() {
-    let labels = this.chart.datasetController.labels;
-    let name = labels.join(',') + '-plot-chart';
-    downloadImage(this.chart.svgSelector, name);
+    let filename = this.chart.datasetController.getFilename();
+    let downloadFilename = createDownloadFilename(filename, `plot-chart`);
+    downloadImage(this.chart.svgSelector, downloadFilename);
   }
 }

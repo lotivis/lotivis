@@ -9,7 +9,7 @@ body {
   text-decoration: none;
   color: #333;
 }
-.lotivis-container a:hover, .lotivis-container-full a:hover {
+.lotivis-container a:hover, .lotivis-container a:visited:hover, .lotivis-container-full a:hover, .lotivis-container-full a:visited:hover {
   color: dodgerblue;
 }
 .lotivis-container a:active, .lotivis-container-full a:active {
@@ -135,6 +135,9 @@ button.lotivis-button-round:active {
 .lotivis-card-body {
   width: 100%;
 }
+.lotivis-card-body .lotivis-card-body-content {
+  margin: 5px;
+}
 
 .lotivis-card-footer {
   padding: 10px;
@@ -222,7 +225,7 @@ button.lotivis-button-round:active {
 .lotivis-data-textarea {
   background-color: rgba(0, 0, 0, 0);
   margin: 0;
-  width: 95%;
+  width: 96%;
   border: 0 solid #cccccc;
   padding: 5px;
   font-family: monospace, sans-serif;
@@ -263,8 +266,12 @@ button.lotivis-button-round:active {
   fill: dodgerblue;
 }
 
-.lotivis-menu a {
-  color: dodgerblue;
+.lotivis-menu a, .lotivis-menu a:visited {
+  color: #333;
+}
+.lotivis-menu a::after {
+  content: "→";
+  margin: 0 0 0 5px;
 }
 
 input[type=radio] {

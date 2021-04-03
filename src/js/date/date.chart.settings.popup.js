@@ -34,9 +34,9 @@ export class DateChartSettingsPopup extends Popup {
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText('Labels');
     this.showLabelsCheckbox.onClick = function (checked) {
-      this.diachronicChart.isShowLabels = checked;
+      this.diachronicChart.config.showLabels = checked;
       this.diachronicChart.update();
-      UrlParameters.getInstance().set(UrlParameters.chartShowLabels, checked);
+      UrlParameters.getInstance().set(UrlParameters.chartShowLabels + this.selector, checked);
     }.bind(this);
   }
 
@@ -45,9 +45,9 @@ export class DateChartSettingsPopup extends Popup {
     this.combineStacksCheckbox = new Checkbox(container);
     this.combineStacksCheckbox.setText('Combine Stacks');
     this.combineStacksCheckbox.onClick = function (checked) {
-      this.diachronicChart.isCombineStacks = checked;
+      this.diachronicChart.config.combineStacks = checked;
       this.diachronicChart.update();
-      UrlParameters.getInstance().set(UrlParameters.chartCombineStacks, checked);
+      UrlParameters.getInstance().set(UrlParameters.chartCombineStacks + this.selector, checked);
     }.bind(this);
   }
 
@@ -62,7 +62,7 @@ export class DateChartSettingsPopup extends Popup {
     this.typeRadioGroup.onChange = function (value) {
       this.diachronicChart.type = value;
       this.diachronicChart.update();
-      UrlParameters.getInstance().set(UrlParameters.chartType, value);
+      UrlParameters.getInstance().set(UrlParameters.chartType + this.selector, value);
     }.bind(this);
   }
 

@@ -30,11 +30,14 @@ import {ChartCard} from "./js/components/chart.card";
 import {Dropdown} from "./js/components/dropdown";
 import {Popup} from "./js/components/popup";
 
-import {DatasetsJsonCard} from "./js/data.card/datasets.json.card";
+import {DatasetCard} from "./js/data.card/dataset.card";
+import {DatasetJSONCard} from "./js/data.card/datasets.json.card";
 import {DatasetCSVCard} from "./js/data.card/dataset.csv.card";
 import {DatasetCSVDateCard} from "./js/data.card/dataset.csv.date.card";
 import {GlobalConfig} from "./js/shared/config";
 import {debug} from "./js/shared/debug";
+import {parseCSV} from "./js/data.parse/parse.csv";
+import {parseCSVDate} from "./js/data.parse/parse.csv.date";
 
 // colors
 exports.Color = Color;
@@ -63,7 +66,8 @@ exports.PlotChart = PlotChart;
 exports.PlotChartCard = PlotChartCard;
 
 // datasets / csv cards
-exports.DatasetJsonCard = DatasetsJsonCard;
+exports.DatasetCard = DatasetCard;
+exports.DatasetJSONCard = DatasetJSONCard;
 exports.DatasetCSVCard = DatasetCSVCard;
 exports.DatasetCSVDateCard = DatasetCSVDateCard;
 
@@ -74,8 +78,12 @@ exports.DatasetController = DatasetsController;
 exports.URLParameters = UrlParameters;
 
 // geo json
-exports.GeoJson = GeoJson;
-exports.Feature = Feature;
+// exports.GeoJson = GeoJson;
+// exports.Feature = Feature;
+
+// parse
+exports.parseCSV = parseCSV;
+exports.parseCSVDate = parseCSVDate;
 
 // constants
 exports.config = GlobalConfig;

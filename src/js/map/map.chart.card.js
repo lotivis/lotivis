@@ -2,6 +2,7 @@ import {MapChart} from "./map.chart";
 import {MapChartSettingsPopup} from "./map.chart.settings.popup";
 import {ChartCard} from "../components/chart.card";
 import {downloadImage} from "../shared/download";
+import {createDownloadFilename} from "../shared/filname";
 
 /**
  *
@@ -19,7 +20,7 @@ export class MapChartCard extends ChartCard {
   constructor(parent, config) {
     super(parent);
     this.config = config;
-    this.setHeaderText(config.name || 'Map');
+    this.setHeaderText('Map');
   }
 
   /**
@@ -34,12 +35,9 @@ export class MapChartCard extends ChartCard {
    * @override
    */
   screenshotButtonAction() {
-    let labels = ['unknown'];
-    if (this.chart.datasetController) {
-      labels = this.chart.datasetController.labels;
-    }
-    let name = labels.join(',') + '-map-chart';
-    downloadImage(this.chart.svgSelector, name);
+    let filename = this.chart.datasetController.getFilename();
+    let downloadFilename = createDownloadFilename(filename, `map-chart`);
+    downloadImage(this.chart.svgSelector, downloadFilename);
   }
 
   /**

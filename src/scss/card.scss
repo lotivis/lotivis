@@ -39,6 +39,10 @@
 
 .lotivis-card-body {
   width: 100%;
+
+  .lotivis-card-body-content {
+    margin: $spacing;
+  }
 }
 
 .lotivis-card-footer {

@@ -5,7 +5,7 @@
     color: $primary-text-color;
   }
 
-  a:hover {
+  a:hover, a:visited:hover {
     color: $tint-color;
   }
 

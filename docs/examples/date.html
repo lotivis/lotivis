@@ -9,7 +9,7 @@
 </head>
 <body>
 
-<div class="lotivis-container">
+<div class="lotivis-container-full">
   <div class="lotivis-row">
     <div class="lotivis-col-2">
       <a class="lotivis-anchor-back" href="../index.html">
@@ -37,7 +37,9 @@
 
 <script>
 
-  let datasetsCard = new lotivis.DatasetJsonCard();
+  lotivis.debug(true);
+
+  let datasetsCard = new lotivis.DatasetJSONCard();
   let dateChartCard = new lotivis.DateChartCard();
 
   fetch('/assets/datasets-chart.json')

@@ -65,6 +65,6 @@ export class DatasetsController {
    * Returns a string that can be used as filename for downloads.
    */
   getFilename() {
-    let labels = this.labels;
+    return this.labels.join(',');
   }
 }

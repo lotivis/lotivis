@@ -4,7 +4,7 @@ import {Color} from "./color";
  * Returns a randomly generated color.
  * @returns {[]}
  */
-Color.colorsForStack = function (stackNumber, amount) {
+Color.colorsForStack = function (stackNumber, amount = 1) {
   let colorCouple = Color.stackColors[stackNumber % Color.stackColors.length];
   let colorGenerator = d3
     .scaleLinear()

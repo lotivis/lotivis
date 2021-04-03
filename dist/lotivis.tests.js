@@ -625,7 +625,7 @@ class DatasetsController {
    * Returns a string that can be used as filename for downloads.
    */
   getFilename() {
-    this.labels;
+    return this.labels.join(',');
   }
 }
 
@@ -1536,12 +1536,6 @@ function renderCSVDate(datasets) {
 
   return csvContent;
 }
-
-/**
- * Returns the last path component of the given url.
- * @param url The url with components.
- * @returns {string} The last path component.
- */
 
 /**
  * Appends the given string in extension to the given string filename if filename not already ends with this extension.

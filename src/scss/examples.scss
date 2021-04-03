@@ -1,6 +1,11 @@
 
 .lotivis-menu {
-  a {
-    color: $tint-color;
+  a, a:visited {
+    color: $primary-text-color;
+  }
+
+  a::after {
+    content: '\2192';
+    margin: 0 0 0 $spacing;
   }
 }
