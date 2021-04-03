@@ -651,6 +651,37 @@ function copy(object) {
  * @returns {[]}
  */
 
+function combine(flattenList) {
+  let combined = [];
+  let copiedList = copy(flattenList);
+  for (let index = 0; index < copiedList.length; index++) {
+    let listItem = copiedList[index];
+    let entry = combined.find(function (entryItem) {
+      return entryItem.dataset === listItem.dataset
+        && entryItem.stack === listItem.stack
+        && entryItem.label === listItem.label
+        && entryItem.location === listItem.location
+        && entryItem.date === listItem.date;
+    });
+    if (entry) {
+      entry.value += (listItem.value + 0);
+    } else {
+      let entry = {};
+      if (listItem.label) entry.label = listItem.label;
+      if (listItem.dataset) entry.dataset = listItem.dataset;
+      if (listItem.stack) entry.stack = listItem.stack;
+      if (listItem.location) entry.location = listItem.location;
+      if (listItem.locationTotal) entry.locationTotal = listItem.locationTotal;
+      if (listItem.date) entry.date = listItem.date;
+      if (listItem.dateTotal) entry.dateTotal = listItem.dateTotal;
+      if (listItem.locationName) entry.locationName = listItem.locationName;
+      entry.value = (listItem.value || 0);
+      combined.push(entry);
+    }
+  }
+  return combined;
+}
+
 /**
  * Returns
  *
@@ -1115,7 +1146,12 @@ class DateChart extends Chart {
   precalculateHelpData() {
     if (!this.datasetController) return;
     let groupSize = this.config.groupSize || 1;
-    this.dataview = this.datasetController.getDateDataview(groupSize);
+
+    if (this.config.combineStacks) {
+      this.dataview = this.datasetController.getDateDataviewCombinedStacks(groupSize);
+    } else {
+      this.dataview = this.datasetController.getDateDataview(groupSize);
+    }
   }
 
   /**
@@ -1937,9 +1973,9 @@ class DateChartSettingsPopup extends Popup {
 
   loadValues() {
     this.showLabelsCheckbox.setChecked(this.diachronicChart.isShowLabels);
-    console.log('this.diachronicChart.showLabels: ' + this.diachronicChart.isShowLabels);
+    // console.log('this.diachronicChart.showLabels: ' + this.diachronicChart.isShowLabels);
     this.combineStacksCheckbox.setChecked(this.diachronicChart.isCombineStacks);
-    console.log('this.diachronicChart.combineGroups: ' + this.diachronicChart.isCombineStacks);
+    // console.log('this.diachronicChart.combineGroups: ' + this.diachronicChart.isCombineStacks);
     this.typeRadioGroup.setSelectedOption(this.diachronicChart.type);
   }
 }
@@ -4123,11 +4159,7 @@ const defaultPlotChartConfig = {
   sort: PlotChartSort.duration
 };
 
-const DefaultDateAccess = function (date) {
-  console.log(date);
-  // throw new Error('Here');
-  return date;
-};
+const DefaultDateAccess = (date) => date;
 
 let warned = false;
 const FormattedDateAccess = function (dateString) {
@@ -5218,6 +5250,105 @@ DatasetsController.prototype.getDateDataview = function (groupSize) {
 };
 
 /**
+ * Returns a dataset collection created from the given flat samples collection.
+ * @param flatData The flat samples collection.
+ * @returns {[]} A collection of datasets.
+ */
+function createDatasets(flatData) {
+  let datasetsByLabel = {};
+
+  for (let itemIndex = 0; itemIndex < flatData.length; itemIndex++) {
+    let item = flatData[itemIndex];
+
+    if (!validateDataItem(item)) ;
+
+    let label = item.dataset || item.label;
+    let dataset = datasetsByLabel[label];
+
+    if (dataset) {
+      dataset.data.push({
+        date: item.date,
+        location: item.location,
+        value: item.value
+      });
+    } else {
+      datasetsByLabel[label] = {
+        label: label,
+        stack: item.stack,
+        data: [{
+          date: item.date,
+          location: item.location,
+          value: item.value
+        }]
+      };
+    }
+  }
+
+  let datasets = [];
+  let labels = Object.getOwnPropertyNames(datasetsByLabel);
+
+  for (let index = 0; index < labels.length; index++) {
+    let label = labels[index];
+    if (label.length === 0) continue;
+    datasets.push(datasetsByLabel[label]);
+  }
+
+  return datasets;
+}
+
+function validateDataItem(item) {
+  return (item.label || item.dataset) && item.date && item.location && (item.value || item.value === 0)  ;
+}
+
+/**
+ * Returns a new generated DateDataview for the current enabled samples of dataset of this controller.
+ */
+DatasetsController.prototype.getDateDataviewCombinedStacks = function (groupSize) {
+  this.dateAccess;
+  let workingDatasets = copy(this.workingDatasets);
+  let enabledDatasets = copy(this.enabledDatasets() || workingDatasets);
+  let dataview = {};
+  let saveGroupSize = groupSize || 1;
+
+  workingDatasets.forEach(function (dataset) {
+    dataset.label = dataset.stack || dataset.label;
+  });
+
+  enabledDatasets.forEach(function (dataset) {
+    dataset.label = dataset.stack || dataset.label;
+  });
+
+  workingDatasets = createDatasets(combine(flatDatasets(workingDatasets)));
+  enabledDatasets = createDatasets(combine(flatDatasets(enabledDatasets)));
+
+  dataview.groupSize = saveGroupSize;
+  if (saveGroupSize <= 1) {
+    dataview.datasets = workingDatasets;
+    dataview.enabledDatasets = enabledDatasets;
+  } else {
+    workingDatasets = combineDatasetsByRatio(workingDatasets, saveGroupSize);
+    enabledDatasets = combineDatasetsByRatio(enabledDatasets, saveGroupSize);
+    dataview.datasets = workingDatasets;
+  }
+
+  dataview.dateToItemsRelation = dateToItemsRelation(workingDatasets);
+  dataview.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets);
+  dataview.datasetStacks = createStackModel(this, workingDatasets, dataview.dateToItemsRelation);
+  dataview.datasetStacksPresented = createStackModel(this, enabledDatasets, dataview.dateToItemsRelationPresented);
+
+  dataview.max = d3.max(dataview.datasetStacksPresented, function (stack) {
+    return d3.max(stack, function (series) {
+      return d3.max(series.map(item => item['1']));
+    });
+  });
+
+  dataview.dates = extractDatesFromDatasets(enabledDatasets);
+  dataview.enabledStacks = this.enabledStacks();
+
+  return dataview;
+};
+
+/**
  * Sets a new datasets controller.  The chart is updated automatically.
  * @param newController The new datasets controller.
  */
@@ -5594,60 +5725,6 @@ function trimByChar(string, character) {
   const first = [...saveString].findIndex(char => char !== character);
   const last = [...saveString].reverse().findIndex(char => char !== character);
   return saveString.substring(first, saveString.length - last);
-}
-
-/**
- * Returns a dataset collection created from the given flat samples collection.
- * @param flatData The flat samples collection.
- * @returns {[]} A collection of datasets.
- */
-function createDatasets(flatData) {
-  let datasetsByLabel = {};
-
-  for (let itemIndex = 0; itemIndex < flatData.length; itemIndex++) {
-    let item = flatData[itemIndex];
-
-    if (!validateDataItem(item)) {
-      console.log('item');
-      console.log(item);
-    }
-
-    let label = item.dataset || item.label;
-    let dataset = datasetsByLabel[label];
-
-    if (dataset) {
-      dataset.data.push({
-        date: item.date,
-        location: item.location,
-        value: item.value
-      });
-    } else {
-      datasetsByLabel[label] = {
-        label: label,
-        stack: item.stack,
-        data: [{
-          date: item.date,
-          location: item.location,
-          value: item.value
-        }]
-      };
-    }
-  }
-
-  let datasets = [];
-  let labels = Object.getOwnPropertyNames(datasetsByLabel);
-
-  for (let index = 0; index < labels.length; index++) {
-    let label = labels[index];
-    if (label.length === 0) continue;
-    datasets.push(datasetsByLabel[label]);
-  }
-
-  return datasets;
-}
-
-function validateDataItem(item) {
-  return (item.label || item.dataset) && item.date && item.location && (item.value || item.value === 0)  ;
 }
 
 function parseCSV(text) {

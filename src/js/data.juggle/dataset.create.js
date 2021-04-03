@@ -10,8 +10,8 @@ export function createDatasets(flatData) {
     let item = flatData[itemIndex];
 
     if (!validateDataItem(item)) {
-      console.log('item');
-      console.log(item);
+      // console.log('item');
+      // console.log(item);
     }
 
     let label = item.dataset || item.label;

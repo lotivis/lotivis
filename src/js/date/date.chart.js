@@ -94,7 +94,12 @@ export class DateChart extends Chart {
   precalculateHelpData() {
     if (!this.datasetController) return;
     let groupSize = this.config.groupSize || 1;
-    this.dataview = this.datasetController.getDateDataview(groupSize);
+
+    if (this.config.combineStacks) {
+      this.dataview = this.datasetController.getDateDataviewCombinedStacks(groupSize);
+    } else {
+      this.dataview = this.datasetController.getDateDataview(groupSize);
+    }
   }
 
   /**

@@ -2,13 +2,6 @@ import {extractLabelsFromDatasets} from "../data.juggle/dataset.extract";
 import {dateToItemsRelation} from "../data.juggle/dataset.relations";
 
 /**
- * Returns the given string surrounded by quotation marks.
- * @param input A string.
- * @returns {string} The string with quotation marks.
- */
-const surroundWithQuotationMarks = (input) => `"${input}"`;
-
-/**
  *
  * @param datasets
  */

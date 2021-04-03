@@ -72,9 +72,9 @@ export class DateChartSettingsPopup extends Popup {
 
   loadValues() {
     this.showLabelsCheckbox.setChecked(this.diachronicChart.isShowLabels);
-    console.log('this.diachronicChart.showLabels: ' + this.diachronicChart.isShowLabels);
+    // console.log('this.diachronicChart.showLabels: ' + this.diachronicChart.isShowLabels);
     this.combineStacksCheckbox.setChecked(this.diachronicChart.isCombineStacks);
-    console.log('this.diachronicChart.combineGroups: ' + this.diachronicChart.isCombineStacks);
+    // console.log('this.diachronicChart.combineGroups: ' + this.diachronicChart.isCombineStacks);
     this.typeRadioGroup.setSelectedOption(this.diachronicChart.type);
   }
 }

@@ -651,6 +651,37 @@ function copy(object) {
  * @returns {[]}
  */
 
+function combine(flattenList) {
+  let combined = [];
+  let copiedList = copy(flattenList);
+  for (let index = 0; index < copiedList.length; index++) {
+    let listItem = copiedList[index];
+    let entry = combined.find(function (entryItem) {
+      return entryItem.dataset === listItem.dataset
+        && entryItem.stack === listItem.stack
+        && entryItem.label === listItem.label
+        && entryItem.location === listItem.location
+        && entryItem.date === listItem.date;
+    });
+    if (entry) {
+      entry.value += (listItem.value + 0);
+    } else {
+      let entry = {};
+      if (listItem.label) entry.label = listItem.label;
+      if (listItem.dataset) entry.dataset = listItem.dataset;
+      if (listItem.stack) entry.stack = listItem.stack;
+      if (listItem.location) entry.location = listItem.location;
+      if (listItem.locationTotal) entry.locationTotal = listItem.locationTotal;
+      if (listItem.date) entry.date = listItem.date;
+      if (listItem.dateTotal) entry.dateTotal = listItem.dateTotal;
+      if (listItem.locationName) entry.locationName = listItem.locationName;
+      entry.value = (listItem.value || 0);
+      combined.push(entry);
+    }
+  }
+  return combined;
+}
+
 /**
  * Returns
  *
@@ -1114,7 +1145,14 @@ class DateChart extends Chart {
    */
   precalculateHelpData() {
     if (!this.datasetController) return;
-    this.dataview = this.datasetController.getDateDataview();
+    let groupSize = this.config.groupSize || 1;
+
+    console.log('this.config.combineStacks', this.config.combineStacks);
+    if (this.config.combineStacks) {
+      this.dataview = this.datasetController.getDateDataviewCombinedStacks(groupSize);
+    } else {
+      this.dataview = this.datasetController.getDateDataview(groupSize);
+    }
   }
 
   /**
@@ -1123,17 +1161,17 @@ class DateChart extends Chart {
   createScales() {
     let config = this.config;
     let margin = config.margin;
-    if (!this.datasetController) return;
+    if (!this.dataview) return;
 
     this.xChart = d3
       .scaleBand()
-      .domain(this.datasetController.dates)
+      .domain(this.dataview.dates)
       .rangeRound([margin.left, config.width - margin.right])
       .paddingInner(0.1);
 
     this.xStack = d3
       .scaleBand()
-      .domain(this.datasetController.enabledStacks())
+      .domain(this.dataview.enabledStacks)
       .rangeRound([0, this.xChart.bandwidth()])
       .padding(0.05);
 
@@ -3067,18 +3105,43 @@ function toSet(array) {
  * @param flatData The flat samples array.
  * @returns {*} The earliest date.
  */
-function extractEarliestDateWithValue(flatData) {
-  return extractDatesFromFlatData(filterWithValue(flatData)).sort().shift();
+function extractEarliestDate(flatData, dateAccess = (date) => date) {
+  return extractDatesFromFlatData(flatData)
+    .sort((left, right) => dateAccess(left) - dateAccess(right)).shift();
+}
+
+/**
+ * Returns the earliest date occurring in the flat array of items.
+ *
+ * @param flatData The flat samples array.
+ * @param dateAccess
+ * @returns {*} The earliest date.
+ */
+function extractEarliestDateWithValue(flatData, dateAccess = (date) => date) {
+  return extractEarliestDate(filterWithValue(flatData), dateAccess);
 }
 
 /**
  * Returns the latest date occurring in the flat array of items.
  *
  * @param flatData The flat samples array.
+ * @param dateAccess
  * @returns {*} The latest date.
  */
-function extractLatestDateWithValue(flatData) {
-  return extractDatesFromFlatData(filterWithValue(flatData)).sort().pop();
+function extractLatestDate(flatData, dateAccess = (date) => date) {
+  return extractDatesFromFlatData(flatData)
+    .sort((left, right) => dateAccess(left) - dateAccess(right)).pop();
+}
+
+/**
+ * Returns the latest date occurring in the flat array of items.
+ *
+ * @param flatData The flat samples array.
+ * @param dateAccess
+ * @returns {*} The latest date.
+ */
+function extractLatestDateWithValue(flatData, dateAccess = (date) => date) {
+  return extractLatestDate(filterWithValue(flatData), dateAccess);
 }
 
 /**
@@ -3902,7 +3965,7 @@ class PlotTooltipRenderer {
       components.push('Start: ' + dataset.earliestDate);
       components.push('End: ' + dataset.latestDate);
       components.push('');
-      components.push('Items: ' + dataset.data.map(item => item.value).reduce((acc, next) => acc + next, 0));
+      components.push('Items: ' + dataset.data.map(item => item.value).reduce((acc, next) => +acc + +next, 0));
       components.push('');
 
       let filtered = dataset.data.filter(item => item.value !== 0);
@@ -4974,7 +5037,8 @@ DatasetsController.prototype.update = function () {
   this.flatData = flatDatasets(this.workingDatasets);
   this.labels = extractLabelsFromDatasets(this.datasets);
   this.stacks = extractStacksFromDatasets(this.datasets);
-  this.dates = extractDatesFromDatasets(this.datasets);
+  this.dates = extractDatesFromDatasets(this.datasets)
+    .sort((left, right) => dateAccess(left) - dateAccess(right));
   this.locations = extractLocationsFromDatasets(this.datasets);
   this.datasetsColorsController = new DatasetsColorsController(this);
   // this.dateAccess = function (date) {
@@ -5107,29 +5171,187 @@ Array.prototype.last = function () {
 };
 
 /**
+ * Combines each `ratio` entries to one.
+ * @param datasets The datasets collection.
+ * @param ratio The ratio.
+ */
+function combineDatasetsByRatio(datasets, ratio) {
+  let copied = copy(datasets);
+  for (let index = 0; index < copied.length; index++) {
+    let dataset = copied[index];
+    let data = dataset.data;
+    dataset.data = combineDataByGroupsize(data, ratio);
+    copied[index] = dataset;
+  }
+  return copied;
+}
+
+/**
+ *
+ * @param data
+ * @param ratio
+ */
+function combineDataByGroupsize(data, ratio) {
+  if (!data || data.length <= ratio) return data;
+  if (ratio <= 1) return data;
+
+  let combined = combineByDate(copy(data));
+  let newData = [];
+
+  while (combined.length > 0) {
+    let dateGroup = combined.splice(0, ratio);
+    let firstItem = dateGroup.first() || {};
+    let lastItem = dateGroup.last() || {};
+    let item = {};
+    item.dataset = firstItem.dataset;
+    item.label = firstItem.label;
+    item.stack = firstItem.stack;
+    item.date = firstItem.date;
+    item.date = firstItem.date;
+    item.from = firstItem.date;
+    item.till = lastItem.date;
+    item.value = sumOfValues(dateGroup);
+    newData.push(item);
+  }
+
+  return newData;
+}
+
+/**
  * Returns a new generated DateDataview for the current enabled samples of dataset of this controller.
  */
-DatasetsController.prototype.getDateDataview = function () {
+DatasetsController.prototype.getDateDataview = function (groupSize) {
   this.dateAccess;
   let workingDatasets = copy(this.workingDatasets);
   let enabledDatasets = copy(this.enabledDatasets() || workingDatasets);
-  let dateGroupRatio = 2;
   let dataview = {};
+  let saveGroupSize = groupSize || 1;
 
-  dataview.dateGroupRatio = dateGroupRatio;
-  // dataview.datasets = combineDatasetsByRatio(workingDatasets, dateGroupRatio);
-  dataview.datasets = workingDatasets;
+  dataview.groupSize = saveGroupSize;
+  if (saveGroupSize <= 1) {
+    dataview.datasets = workingDatasets;
+    dataview.enabledDatasets = enabledDatasets;
+  } else {
+    workingDatasets = combineDatasetsByRatio(workingDatasets, saveGroupSize);
+    enabledDatasets = combineDatasetsByRatio(enabledDatasets, saveGroupSize);
+    dataview.datasets = workingDatasets;
+  }
+
   dataview.dateToItemsRelation = dateToItemsRelation(workingDatasets);
   dataview.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets);
   dataview.datasetStacks = createStackModel(this, workingDatasets, dataview.dateToItemsRelation);
   dataview.datasetStacksPresented = createStackModel(this, enabledDatasets, dataview.dateToItemsRelationPresented);
+
   dataview.max = d3.max(dataview.datasetStacksPresented, function (stack) {
     return d3.max(stack, function (series) {
       return d3.max(series.map(item => item['1']));
     });
   });
 
-  console.log(dataview);
+  dataview.dates = extractDatesFromDatasets(enabledDatasets);
+  dataview.enabledStacks = this.enabledStacks();
+
+  return dataview;
+};
+
+/**
+ * Returns a dataset collection created from the given flat samples collection.
+ * @param flatData The flat samples collection.
+ * @returns {[]} A collection of datasets.
+ */
+function createDatasets(flatData) {
+  let datasetsByLabel = {};
+
+  for (let itemIndex = 0; itemIndex < flatData.length; itemIndex++) {
+    let item = flatData[itemIndex];
+
+    if (!validateDataItem(item)) {
+      console.log('item');
+      console.log(item);
+    }
+
+    let label = item.dataset || item.label;
+    let dataset = datasetsByLabel[label];
+
+    if (dataset) {
+      dataset.data.push({
+        date: item.date,
+        location: item.location,
+        value: item.value
+      });
+    } else {
+      datasetsByLabel[label] = {
+        label: label,
+        stack: item.stack,
+        data: [{
+          date: item.date,
+          location: item.location,
+          value: item.value
+        }]
+      };
+    }
+  }
+
+  let datasets = [];
+  let labels = Object.getOwnPropertyNames(datasetsByLabel);
+
+  for (let index = 0; index < labels.length; index++) {
+    let label = labels[index];
+    if (label.length === 0) continue;
+    datasets.push(datasetsByLabel[label]);
+  }
+
+  return datasets;
+}
+
+function validateDataItem(item) {
+  return (item.label || item.dataset) && item.date && item.location && (item.value || item.value === 0)  ;
+}
+
+/**
+ * Returns a new generated DateDataview for the current enabled samples of dataset of this controller.
+ */
+DatasetsController.prototype.getDateDataviewCombinedStacks = function (groupSize) {
+  this.dateAccess;
+  let workingDatasets = copy(this.workingDatasets);
+  let enabledDatasets = copy(this.enabledDatasets() || workingDatasets);
+  let dataview = {};
+  let saveGroupSize = groupSize || 1;
+
+  workingDatasets.forEach(function (dataset) {
+    dataset.label = dataset.stack || dataset.label;
+  });
+
+  enabledDatasets.forEach(function (dataset) {
+    dataset.label = dataset.stack || dataset.label;
+  });
+
+  workingDatasets = createDatasets(combine(flatDatasets(workingDatasets)));
+  enabledDatasets = createDatasets(combine(flatDatasets(enabledDatasets)));
+
+  dataview.groupSize = saveGroupSize;
+  if (saveGroupSize <= 1) {
+    dataview.datasets = workingDatasets;
+    dataview.enabledDatasets = enabledDatasets;
+  } else {
+    workingDatasets = combineDatasetsByRatio(workingDatasets, saveGroupSize);
+    enabledDatasets = combineDatasetsByRatio(enabledDatasets, saveGroupSize);
+    dataview.datasets = workingDatasets;
+  }
+
+  dataview.dateToItemsRelation = dateToItemsRelation(workingDatasets);
+  dataview.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets);
+  dataview.datasetStacks = createStackModel(this, workingDatasets, dataview.dateToItemsRelation);
+  dataview.datasetStacksPresented = createStackModel(this, enabledDatasets, dataview.dateToItemsRelationPresented);
+
+  dataview.max = d3.max(dataview.datasetStacksPresented, function (stack) {
+    return d3.max(stack, function (series) {
+      return d3.max(series.map(item => item['1']));
+    });
+  });
+
+  dataview.dates = extractDatesFromDatasets(enabledDatasets);
+  dataview.enabledStacks = this.enabledStacks();
 
   return dataview;
 };
@@ -5511,60 +5733,6 @@ function trimByChar(string, character) {
   const first = [...saveString].findIndex(char => char !== character);
   const last = [...saveString].reverse().findIndex(char => char !== character);
   return saveString.substring(first, saveString.length - last);
-}
-
-/**
- * Returns a dataset collection created from the given flat samples collection.
- * @param flatData The flat samples collection.
- * @returns {[]} A collection of datasets.
- */
-function createDatasets(flatData) {
-  let datasetsByLabel = {};
-
-  for (let itemIndex = 0; itemIndex < flatData.length; itemIndex++) {
-    let item = flatData[itemIndex];
-
-    if (!validateDataItem(item)) {
-      console.log('item');
-      console.log(item);
-    }
-
-    let label = item.dataset || item.label;
-    let dataset = datasetsByLabel[label];
-
-    if (dataset) {
-      dataset.data.push({
-        date: item.date,
-        location: item.location,
-        value: item.value
-      });
-    } else {
-      datasetsByLabel[label] = {
-        label: label,
-        stack: item.stack,
-        data: [{
-          date: item.date,
-          location: item.location,
-          value: item.value
-        }]
-      };
-    }
-  }
-
-  let datasets = [];
-  let labels = Object.getOwnPropertyNames(datasetsByLabel);
-
-  for (let index = 0; index < labels.length; index++) {
-    let label = labels[index];
-    if (label.length === 0) continue;
-    datasets.push(datasetsByLabel[label]);
-  }
-
-  return datasets;
-}
-
-function validateDataItem(item) {
-  return (item.label || item.dataset) && item.date && item.location && (item.value || item.value === 0)  ;
 }
 
 function parseCSV(text) {

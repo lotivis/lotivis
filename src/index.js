@@ -19,6 +19,7 @@ import "./js/data/datasets.controller.listeners";
 import "./js/data/datasets.controller.filter";
 import "./js/data/datasets.controller.update";
 import "./js/dataview/dataview.date";
+import "./js/dataview/dataview.date.combined.stacks";
 import "./js/dataview/dataview.plot";
 import "./js/dataview/dataview.map";
 import {Chart} from "./js/components/chart";

@@ -8,11 +8,7 @@ export function LogOnlyOnce(id, message) {
   lotivis_log(`[lotivis]  Warning only once! ${message}`);
 }
 
-export const DefaultDateAccess = function (date) {
-  console.log(date);
-  // throw new Error('Here');
-  return date;
-};
+export const DefaultDateAccess = (date) => date;
 
 let warned = false;
 export const FormattedDateAccess = function (dateString) {

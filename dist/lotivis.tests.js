@@ -685,11 +685,7 @@ function dateToItemsRelation(datasets, dateAccess) {
   });
 }
 
-const DefaultDateAccess = function (date) {
-  console.log(date);
-  // throw new Error('Here');
-  return date;
-};
+const DefaultDateAccess = (date) => date;
 const FormattedDateAccess = function (dateString) {
   let value = Date.parse(dateString);
 
@@ -1372,10 +1368,7 @@ function createDatasets(flatData) {
   for (let itemIndex = 0; itemIndex < flatData.length; itemIndex++) {
     let item = flatData[itemIndex];
 
-    if (!validateDataItem(item)) {
-      console.log('item');
-      console.log(item);
-    }
+    if (!validateDataItem(item)) ;
 
     let label = item.dataset || item.label;
     let dataset = datasetsByLabel[label];
