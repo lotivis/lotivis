@@ -42,7 +42,6 @@ import {renderCSV} from "./js/data.render/render.csv";
 import {fetchCSV} from "./js/data.parse/fetch.csv";
 import {createGeoJSON} from "./js/geojson.juggle/create.geojson";
 import {joinFeatures} from "./js/geojson.juggle/join.features";
-import {Constants} from "./js/shared/constants";
 import {
   combineDatasetsByRatio,
   combineDataByGroupsize
@@ -57,6 +56,7 @@ import {equals, objectsEqual} from "./js/shared/equal";
 import {renderCSVDate} from "./js/data.render/render.csv.date";
 import {createDatasets} from "./js/data.juggle/dataset.create";
 import {copy} from "./js/shared/copy";
+import {appendExtensionIfNeeded} from "./js/shared/filname";
 
 exports.DatasetController = DatasetsController;
 exports.GeoJson = GeoJson;
@@ -95,5 +95,6 @@ exports.createDatasets = createDatasets;
 exports.equals = equals;
 exports.objectsEqual = objectsEqual;
 exports.copy = copy;
+exports.appendExtensionIfNeeded = appendExtensionIfNeeded;
 
 export default exports;

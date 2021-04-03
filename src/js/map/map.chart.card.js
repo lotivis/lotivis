@@ -1,7 +1,7 @@
 import {MapChart} from "./map.chart";
 import {MapChartSettingsPopup} from "./map.chart.settings.popup";
 import {ChartCard} from "../components/chart.card";
-import {downloadImage} from "../shared/screenshot";
+import {downloadImage} from "../shared/download";
 
 /**
  *
@@ -14,16 +14,19 @@ export class MapChartCard extends ChartCard {
    * Creates a new instance of MapChartCard.
    *
    * @param parent The parental component.
+   * @param config The config of the map chart.
    */
-  constructor(parent) {
+  constructor(parent, config) {
     super(parent);
+    this.config = config;
+    this.setHeaderText(config.name || 'Map');
   }
 
   /**
    * Creates and injects the map chart.
    */
-  injectMapChart() {
-    this.chart = new MapChart(this.body);
+  injectChart() {
+    this.chart = new MapChart(this.body, this.config);
   }
 
   /**

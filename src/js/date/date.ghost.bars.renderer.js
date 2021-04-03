@@ -1,10 +1,10 @@
-import {verbose_log} from "../shared/debug";
-import {Constants} from "../shared/constants";
-
 /**
  *
  * @class DateGhostBarsRenderer
  */
+import {GlobalConfig} from "../shared/config";
+
+
 export class DateGhostBarsRenderer {
 
   /**
@@ -66,8 +66,8 @@ export class DateGhostBarsRenderer {
         .attr("class", 'lotivis-selection-rect')
         .attr("id", date => createID(date))
         .attr("opacity", 0)
-        .attr("rx", Constants.barRadius)
-        .attr("ry", Constants.barRadius)
+        .attr("rx", GlobalConfig.barRadius)
+        .attr("ry", GlobalConfig.barRadius)
         .attr("x", (date) => dateChart.xChart(date))
         .attr("y", margin.top)
         .attr("width", dateChart.xChart.bandwidth())

@@ -7,7 +7,7 @@ import {DatasetsController} from "./datasets.controller";
 import {flatDatasets} from "../data.juggle/dataset.flat";
 import {copy} from "../shared/copy";
 import {objectsEqual} from "../shared/equal";
-import {debug_log} from "../shared/debug";
+import {lotivis_log} from "../shared/debug";
 
 /**
  * Resets all filters.  Notifies listeners.
@@ -27,7 +27,7 @@ DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
 DatasetsController.prototype.setLocationsFilter = function (locations) {
   let stringVersions = locations.map(location => String(location));
   if (objectsEqual(this.locationFilters, stringVersions)) {
-    return debug_log(`Date filters not changed.`);
+    return lotivis_log(`[lotivis]  Date filters not changed.`);
   }
   this.resetFilters(false);
   this.locationFilters = stringVersions;
@@ -41,7 +41,7 @@ DatasetsController.prototype.setLocationsFilter = function (locations) {
 DatasetsController.prototype.setDatesFilter = function (dates) {
   let stringVersions = dates.map(date => String(date));
   if (objectsEqual(this.dateFilters, stringVersions)) {
-    return debug_log(`Date filters not changed.`);
+    return lotivis_log(`[lotivis]  Date filters not changed.`);
   }
   this.resetFilters(false);
   this.dateFilters = stringVersions;
@@ -55,7 +55,7 @@ DatasetsController.prototype.setDatesFilter = function (dates) {
 DatasetsController.prototype.setDatasetsFilter = function (datasets) {
   let stringVersions = datasets.map(dataset => String(dataset));
   if (objectsEqual(this.datasetFilters, stringVersions)) {
-    return debug_log(`Dataset filters not changed.`);
+    return lotivis_log(`[lotivis]  Dataset filters not changed.`);
   }
   this.resetFilters(false);
   this.datasetFilters = stringVersions;

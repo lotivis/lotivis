@@ -1,5 +1,5 @@
 import {joinFeatures} from "../geojson.juggle/join.features";
-import {debug_log} from "../shared/debug";
+import {lotivis_log} from "../shared/debug";
 
 /**
  *
@@ -14,7 +14,7 @@ export class MapExteriorBorderRenderer {
    */
   constructor(mapChart) {
 
-    if (!self.topojson) debug_log('Can\'t find topojson lib.  Skip rendering of exterior border.');
+    if (!self.topojson) lotivis_log('[lotivis]  Can\'t find topojson lib.  Skip rendering of exterior border.');
 
     /**
      * Renders the exterior border of the presented geo json.

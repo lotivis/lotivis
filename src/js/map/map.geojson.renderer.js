@@ -1,8 +1,8 @@
+import {lotivis_log} from "../shared/debug";
+
 /**
  * @class MapGeojsonRenderer
  */
-import {debug_log} from "../shared/debug";
-
 export class MapGeojsonRenderer {
 
   /**
@@ -36,7 +36,7 @@ export class MapGeojsonRenderer {
      */
     this.renderGeoJson = function () {
       let geoJSON = mapChart.presentedGeoJSON;
-      if (!geoJSON) return debug_log('No Geo JSON file to render.');
+      if (!geoJSON) return lotivis_log('No Geo JSON file to render.');
       let idAccessor = mapChart.config.featureIDAccessor;
 
       mapChart.areas = mapChart.svg

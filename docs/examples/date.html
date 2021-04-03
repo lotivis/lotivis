@@ -5,33 +5,28 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../css/lotivis.css"/>
-  <link rel="stylesheet" href="../css/examples.css"/>
   <title>Lotivis - Chart</title>
 </head>
 <body>
 
-<div class="lotivis-example-container">
-  <div class="lotivis-example-row">
-    <div class="lotivis-example-col-2">
-      <a href="../index.html">
-        <button class="back-button">
-          Back
-        </button>
+<div class="lotivis-container">
+  <div class="lotivis-row">
+    <div class="lotivis-col-2">
+      <a class="lotivis-anchor-back" href="../index.html">
+        Back
       </a>
     </div>
-    <div class="lotivis-example-col-8 text-center">
-      <h1>Chart</h1>
+    <div class="lotivis-col-8 lotivis-headline">
+      <h1>Date Data</h1>
     </div>
-    <div class="lotivis-example-col-4">
-      <div class="lotivis-example-data">
-        <samp id="data">
-          <!-- Data Here -->
-        </samp>
-      </div>
-    </div>
-    <div class="lotivis-example-col-8">
+    <div class="lotivis-col-8">
       <div id="date-chart-card">
         <!-- Date Chart Code Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-4">
+      <div id="datasets-json-card">
+        <!-- Dataset Chart Here -->
       </div>
     </div>
   </div>
@@ -42,17 +37,18 @@
 
 <script>
 
+  let datasetsCard = new lotivis.DatasetJsonCard();
   let dateChartCard = new lotivis.DateChartCard();
 
-  d3
-    .json('/assets/datasets-chart.json')
+  fetch('/assets/datasets-chart.json')
+    .then(response => response.text())
+    .then(text => JSON.parse(text))
     .then(function (json) {
-      let string = JSON.stringify(json, null, 2);
-      let element = document.getElementById('data');
-      element.innerHTML = string;
 
-      dateChartCard.chart.datasets = json;
-      dateChartCard.chart.update();
+      let datasetsController = new lotivis.DatasetController(json);
+      dateChartCard.chart.setDatasetController(datasetsController);
+      datasetsCard.setDatasetController(datasetsController);
+
     });
 
 </script>

@@ -7,7 +7,7 @@ import {
   extractLocationsFromDatasets,
   extractStacksFromDatasets
 } from "../data.juggle/dataset.extract";
-import {DatasetsColorsController} from "./datasets.colors.controller";
+import {DatasetsColorsController} from "./datasets.controller.colors";
 
 /**
  * Updates the datasets of this controller.

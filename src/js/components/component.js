@@ -6,7 +6,6 @@ import {verbose_log} from "../shared/debug";
  * @class Component
  */
 export class Component {
-  element;
 
   /**
    *

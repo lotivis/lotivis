@@ -1,5 +1,5 @@
-import {Constants} from "../shared/constants";
 import {hashCode} from "../shared/hash";
+import {GlobalConfig} from "../shared/config";
 
 /**
  *
@@ -9,10 +9,10 @@ export const defaultMapChartConfig = {
   width: 1000,
   height: 1000,
   margin: {
-    top: Constants.defaultMargin,
-    right: Constants.defaultMargin,
-    bottom: Constants.defaultMargin,
-    left: Constants.defaultMargin
+    top: GlobalConfig.defaultMargin,
+    right: GlobalConfig.defaultMargin,
+    bottom: GlobalConfig.defaultMargin,
+    left: GlobalConfig.defaultMargin
   },
   isShowLabels: true,
   geoJSON: null,

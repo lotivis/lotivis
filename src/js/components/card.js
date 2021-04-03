@@ -19,6 +19,7 @@ export class Card extends Component {
       .append('div')
       .classed('lotivis-card', true);
     this.createHeader();
+    this.injectTitleLabel();
     this.createBody();
     this.createFooter();
   }
@@ -51,6 +52,17 @@ export class Card extends Component {
     //   .append('span')
     //   .text(this.name);
 
+  }
+
+  injectTitleLabel() {
+    this.titleLabel = this.headerLeftComponent
+      .append('div')
+      .classed('lotivis-title-label', true)
+      .text('Hello');
+  }
+
+  setHeaderText(newTitle) {
+    this.titleLabel.text(newTitle);
   }
 
   createBody() {

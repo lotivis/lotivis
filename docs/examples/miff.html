@@ -5,44 +5,36 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../css/lotivis.css"/>
-  <link rel="stylesheet" href="../css/examples.css"/>
   <title>Lotivis - mif, mif', miff, miff', miffs, mifs, mille-f, mi-f, mi-f', 'mif'</title>
 </head>
 <body>
 
-<div class="lotivis-example-container">
-  <div class="lotivis-example-row">
-    <div class="lotivis-example-col-2">
-      <a href="../index.html">
-        <button class="back-button">
-          Back
-        </button>
+<div class="lotivis-container-full">
+  <div class="lotivis-row">
+    <div class="lotivis-col-2">
+      <a class="lotivis-anchor-back" href="../index.html">
+        Back
       </a>
     </div>
-    <div class="lotivis-example-col-8 text-center">
+    <div class="lotivis-col-8 lotivis-headline">
       <h1>mif, mif', miff, miff', miffs, mifs, mille-f, mi-f, mi-f', 'mif'</h1>
     </div>
-    <div class="lotivis-example-col-6">
+    <div class="lotivis-col-6">
       <div id="date-chart-card">
-        <!-- Date Chart Code Here -->
+        <!-- Date Chart Card Here -->
       </div>
       <div id="plot-chart-card">
-        <!-- Plot Chart Code Here -->
+        <!-- Plot Chart Card Here -->
       </div>
     </div>
-    <div class="lotivis-example-col-6">
+    <div class="lotivis-col-6">
       <div id="map-chart-card">
-        <!-- Map Chart Code Here -->
+        <!-- Map Chart Card Here -->
       </div>
     </div>
-    <div class="lotivis-example-col-6">
-
-    </div>
-    <div class="lotivis-example-col-12">
-      <div class="lotivis-example-data">
-        <samp id="data">
-          <!-- Data Here -->
-        </samp>
+    <div class="lotivis-col-12">
+      <div id="datasets-json-card">
+        <!-- Datasets JSON Card Here -->
       </div>
     </div>
   </div>
@@ -53,12 +45,13 @@
 
 <script>
 
-  lotivis.Constants.debug = true;
-  let dateChartCard = new lotivis.DateChartCard('date-chart-card');
-  let mapChartCard = new lotivis.MapChartCard('map-chart-card');
-  mapChartCard.chart.excludedFeatureCodes = ['2A', '2B'];
-
-  let plotChartCard = new lotivis.PlotChartCard('plot-chart-card');
+  lotivis.debug(true);
+  let datasetsJSONCard = new lotivis.DatasetJsonCard();
+  let dateChartCard = new lotivis.DateChartCard();
+  let plotChartCard = new lotivis.PlotChartCard();
+  let mapChartCard = new lotivis.MapChartCard('map-chart-card', {
+    excludedFeatureCodes: ['2A', '2B']
+  });
 
   d3.json('../assets/Departements.geojson')
     .then(function (json) {
@@ -68,19 +61,13 @@
     })
     .then(function (json) {
 
-      let string = JSON.stringify(json, null, 2);
-      let element = document.getElementById('data');
-      element.innerHTML = string;
-
       let controller = new lotivis.DatasetController(json);
-
-      dateChartCard.chart.setDatasetController(controller);
-      dateChartCard.chart.update();
-
-      mapChartCard.chart.setDatasetController(controller);
-      mapChartCard.chart.update();
-
-      plotChartCard.chart.setDatasetController(controller);
+      controller.register([
+        dateChartCard.chart,
+        mapChartCard.chart,
+        plotChartCard.chart,
+        datasetsJSONCard
+      ])
 
     });
 

@@ -512,9 +512,12 @@ function sumOfValues(flatData) {
     .reduce((acc, next) => acc + next, 0);
 }
 
-const debug_log = function (message) {
-  return;
-};
+// export const debug_log = function (message) {
+//   if (!GlobalConfig.debugLog) return;
+//   console.log(prefix + message);
+// };
+
+var lotivis_log = () => null;
 
 /**
  *
@@ -559,100 +562,7 @@ function dateToItemsRelation(datasets, dateAccess) {
 }
 
 /**
- * Color defined by r,g,b.
- * @class Color
- */
-class Color {
-
-  /**
-   * Creates a new instance of Color.
-   * @param r The red value.
-   * @param g The green value.
-   * @param b The blue value.
-   */
-  constructor(r, g, b) {
-    console.log('r', r);
-    console.log('g', g);
-    console.log('b', b);
-    if ((r || r === 0) && (g || g === 0) && (b || b === 0)) {
-      this.initialize(r, g, b);
-    } else if (typeof r === `object`) {
-      this.initialize(r.r, r.g, r.b);
-    } else if (r) ; else if (r) {
-      this.initialize(r, r, r);
-    } else {
-      throw new Error(`Invalid argument: ${r}`);
-    }
-  }
-
-  initialize(r, g, b) {
-    this.r = Math.round(r);
-    this.g = Math.round(g);
-    this.b = Math.round(b);
-  }
-
-  rgbString() {
-    return `rgb(${this.r},${this.g},${this.b})`;
-  }
-
-  toString() {
-    return this.rgbString();
-  }
-
-  colorAdding(r, g, b) {
-    return new Color(this.r + r, this.g + g, this.b + b);
-  }
-}
-
-/**
- *
- * @class DatasetsColorsController
- */
-class DatasetsColorsController {
-
-  /**
-   * Creates a new instance of DatasetsColorsController.
-   *
-   * @param controller
-   */
-  constructor(controller) {
-
-    let datasets = controller.workingDatasets;
-    let stacks = controller.stacks;
-    let labelToColor = {};
-    let stackToColors = {};
-
-    for (let sIndex = 0; sIndex < stacks.length; sIndex++) {
-      let stack = stacks[sIndex];
-
-      // filter datasets for stack
-      let filtered = datasets.filter(function (dataset) {
-        return dataset.label === stack || dataset.stack === stack;
-      });
-
-      let colors = Color.colorsForStack(sIndex, filtered.length);
-      stackToColors[stack] = colors;
-      for (let dIndex = 0; dIndex < filtered.length; dIndex++) {
-        labelToColor[filtered[dIndex].label] = colors[dIndex];
-      }
-    }
-
-    this.colorForDataset = function (label) {
-      return labelToColor[label] || Color.defaultTint;
-    };
-
-    this.colorForStack = function (stack) {
-      return stackToColors[stack][0] || Color.defaultTint;
-    };
-
-    this.colorsForStack = function (stack) {
-      return stackToColors[stack] || [];
-    };
-  }
-}
-
-/**
- *
+ * Controls a collection of datasets.
  * @class DatasetsController
  */
 class DatasetsController {
@@ -664,26 +574,6 @@ class DatasetsController {
   constructor(datasets) {
     this.setDatasets(datasets);
   }
-
-  // setDatasets(datasets) {
-  //   this.datasets = copy(datasets);
-  //   this.workingDatasets = copy(datasets)
-  //     .sort((left, right) => left.label > right.label);
-  //   this.workingDatasets.forEach(dataset => dataset.isEnabled = true);
-  //   this.flatData = flatDatasets(this.workingDatasets);
-  //   this.labels = extractLabelsFromDatasets(datasets);
-  //   this.stacks = extractStacksFromDatasets(datasets);
-  //   this.dates = extractDatesFromDatasets(datasets);
-  //   this.locations = extractLocationsFromDatasets(datasets);
-  //   this.datasetsColorsController = new DatasetsColorsController(this);
-  //   this.dateAccess = function (date) {
-  //     return Date.samples.parse(date);
-  //   };
-  //
-  //   this.locationFilters = [];
-  //   this.dateFilters = [];
-  //   this.datasetFilters = [];
-  // }
 
   get flatDataCombinedStacks() {
     return combineByStacks(this.flatData);
@@ -730,6 +620,13 @@ class DatasetsController {
   getColorsForStack(stack) {
     return this.datasetsColorsController.colorsForStack(stack);
   }
+
+  /**
+   * Returns a string that can be used as filename for downloads.
+   */
+  getFilename() {
+    this.labels;
+  }
 }
 
 /**
@@ -742,8 +639,8 @@ DatasetsController.prototype.addListener = function (listener) {
 };
 
 /**
- * Removes the given listern
- * @param listener
+ * Removes the given listener from the collection of listeners.
+ * @param listener The listener to remove.
  */
 DatasetsController.prototype.removeListener = function (listener) {
   if (!this.listeners) return;
@@ -757,11 +654,24 @@ DatasetsController.prototype.removeListener = function (listener) {
  * @param reason The reason to send to the listener.  Default is 'none'.
  */
 DatasetsController.prototype.notifyListeners = function (reason = DatasetsController.NotificationReason.none) {
-  if (!this.listeners) return debug_log();
+  if (!this.listeners) return lotivis_log();
   for (let index = 0; index < this.listeners.length; index++) {
     let listener = this.listeners[index];
     if (!listener.update) continue;
     listener.update(this, reason);
+  }
+};
+
+/**
+ * Sets this controller to all of the given listeners via the `setDatasetsController` function.
+ * @param listeners A collection of listeners.
+ */
+DatasetsController.prototype.register = function (listeners) {
+  if (!Array.isArray(listeners)) return;
+  for (let index = 0; index < listeners.length; index++) {
+    let listener = listeners[index];
+    if (!listener.setDatasetController) continue;
+    listener.setDatasetController(this);
   }
 };
 
@@ -815,7 +725,7 @@ DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
 DatasetsController.prototype.setLocationsFilter = function (locations) {
   let stringVersions = locations.map(location => String(location));
   if (objectsEqual(this.locationFilters, stringVersions)) {
-    return debug_log();
+    return lotivis_log();
   }
   this.resetFilters(false);
   this.locationFilters = stringVersions;
@@ -829,7 +739,7 @@ DatasetsController.prototype.setLocationsFilter = function (locations) {
 DatasetsController.prototype.setDatesFilter = function (dates) {
   let stringVersions = dates.map(date => String(date));
   if (objectsEqual(this.dateFilters, stringVersions)) {
-    return debug_log();
+    return lotivis_log();
   }
   this.resetFilters(false);
   this.dateFilters = stringVersions;
@@ -843,7 +753,7 @@ DatasetsController.prototype.setDatesFilter = function (dates) {
 DatasetsController.prototype.setDatasetsFilter = function (datasets) {
   let stringVersions = datasets.map(dataset => String(dataset));
   if (objectsEqual(this.datasetFilters, stringVersions)) {
-    return debug_log();
+    return lotivis_log();
   }
   this.resetFilters(false);
   this.datasetFilters = stringVersions;
@@ -941,6 +851,96 @@ DatasetsController.prototype.enabledStacks = function () {
 DatasetsController.prototype.enabledDates = function () {
   return extractDatesFromDatasets(this.enabledDatasets());
 };
+
+/**
+ * Color defined by r,g,b.
+ * @class Color
+ */
+class Color {
+
+  /**
+   * Creates a new instance of Color.
+   * @param r The red value.
+   * @param g The green value.
+   * @param b The blue value.
+   */
+  constructor(r, g, b) {
+    if ((r || r === 0) && (g || g === 0) && (b || b === 0)) {
+      this.initialize(r, g, b);
+    } else if (typeof r === `object`) {
+      this.initialize(r.r, r.g, r.b);
+    } else if (r) ; else if (r) {
+      this.initialize(r, r, r);
+    } else {
+      throw new Error(`Invalid argument: ${r}`);
+    }
+  }
+
+  initialize(r, g, b) {
+    this.r = Math.round(r);
+    this.g = Math.round(g);
+    this.b = Math.round(b);
+  }
+
+  rgbString() {
+    return `rgb(${this.r},${this.g},${this.b})`;
+  }
+
+  toString() {
+    return this.rgbString();
+  }
+
+  colorAdding(r, g, b) {
+    return new Color(this.r + r, this.g + g, this.b + b);
+  }
+}
+
+/**
+ *
+ * @class DatasetsColorsController
+ */
+class DatasetsColorsController {
+
+  /**
+   * Creates a new instance of DatasetsColorsController.
+   *
+   * @param controller
+   */
+  constructor(controller) {
+
+    let datasets = controller.workingDatasets;
+    let stacks = controller.stacks;
+    let labelToColor = {};
+    let stackToColors = {};
+
+    for (let sIndex = 0; sIndex < stacks.length; sIndex++) {
+      let stack = stacks[sIndex];
+
+      // filter datasets for stack
+      let filtered = datasets.filter(function (dataset) {
+        return dataset.label === stack || dataset.stack === stack;
+      });
+
+      let colors = Color.colorsForStack(sIndex, filtered.length);
+      stackToColors[stack] = colors;
+      for (let dIndex = 0; dIndex < filtered.length; dIndex++) {
+        labelToColor[filtered[dIndex].label] = colors[dIndex];
+      }
+    }
+
+    this.colorForDataset = function (label) {
+      return labelToColor[label] || Color.defaultTint;
+    };
+
+    this.colorForStack = function (stack) {
+      return stackToColors[stack][0] || Color.defaultTint;
+    };
+
+    this.colorsForStack = function (stack) {
+      return stackToColors[stack] || [];
+    };
+  }
+}
 
 /**
  * Updates the datasets of this controller.
@@ -1537,6 +1537,24 @@ function renderCSVDate(datasets) {
   return csvContent;
 }
 
+/**
+ * Returns the last path component of the given url.
+ * @param url The url with components.
+ * @returns {string} The last path component.
+ */
+
+/**
+ * Appends the given string in extension to the given string filename if filename not already ends with this extension.
+ * @param filename A string with or without an extension.
+ * @param extension The extension the filename will end with.
+ * @returns {*|string} The filename with the given extension.
+ */
+function appendExtensionIfNeeded(filename, extension) {
+  if (extension === '' || extension === '.') return filename;
+  extension = extension.startsWith(".") ? extension : `.${extension}`;
+  return filename.endsWith(extension) ? filename : `${filename}${extension}`;
+}
+
 exports.DatasetController = DatasetsController;
 exports.GeoJson = GeoJson;
 exports.Feature = Feature;
@@ -1574,6 +1592,7 @@ exports.createDatasets = createDatasets;
 exports.equals = equals;
 exports.objectsEqual = objectsEqual;
 exports.copy = copy;
+exports.appendExtensionIfNeeded = appendExtensionIfNeeded;
 
 var exports$1 = exports;
 

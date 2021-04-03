@@ -1,8 +1,9 @@
 import {Card} from "../components/card";
 import {createID} from "../shared/selector";
 import {validateDatasets} from "../data.juggle/dataset.validate";
-import {debug_log} from "../shared/debug";
+import {lotivis_log} from "../shared/debug";
 import {objectsEqual} from "../shared/equal";
+import {Button} from "../components/button";
 
 /**
  *
@@ -19,8 +20,9 @@ export class DatasetCard extends Card {
     super(parent);
     this.updateSensible = true;
     this.body.style('overflow', 'scroll');
-    this.footer.style('display', 'block');
+    // this.footer.style('display', 'block');
     this.render();
+    this.injectStatusTooltip();
     this.setHeaderText('Dataset Card');
   }
 
@@ -28,26 +30,39 @@ export class DatasetCard extends Card {
    * Appends the component to this card.
    */
   render() {
-    this.element.classed('lotivis-samples-card', true);
-
-    this.header.text('');
-    this.headline = this.header.append('div');
-
+    // this.element.classed('lotivis-data-card', true);
     this.textareaID = createID();
     this.textarea = this.body
       .append('textarea')
       .attr('id', this.textareaID)
       .attr('name', this.textareaID)
-      .attr('class', 'lotivis-samples-textarea');
-
-    this.statusText = this.header
-      .append('div')
-      .style(`display`, `none`)
-      .classed('lotivis-samples-status-text', true)
-      .classed('lotivis-samples-status-failure', true);
+      .attr('class', 'lotivis-data-textarea');
 
     this.textarea.on('keyup', this.onKeyup.bind(this));
+
+    this.downloadButton = new Button(this.headerRightComponent);
+    this.downloadButton.setText('Download');
+    this.downloadButton.onClick = function (event) {
+      let content = this.getTextareaContent();
+      this.download(content);
+    }.bind(this);
   }
+
+  injectStatusTooltip() {
+    this.tooltip = this
+      .element
+      .append('div')
+      .style('opacity', 0)
+      .attr('class', 'lotivis-data-card-status-tooltip');
+  }
+
+  /**
+   * Hides the tooltip.  Does nothing if tooltips opacity is already 0.
+   */
+  hideTooltip() {
+    if (+this.tooltip.style('opacity') === 0) return;
+    this.tooltip.style('opacity', 0);
+  };
 
   /**
    * Returns the text of the textarea.
@@ -57,20 +72,17 @@ export class DatasetCard extends Card {
     return document.getElementById(this.textareaID).value || "";
   }
 
+  /**
+   * Sets the text of the textarea.
+   * @param newContent The text for the textarea.
+   */
   setTextareaContent(newContent) {
     let textarea = document.getElementById(this.textareaID);
     if (!textarea) return;
     textarea.value = newContent;
+    if (typeof newContent !== 'string') return;
     let numberOfRows = newContent.split(`\n`).length;
     this.textarea.attr('rows', numberOfRows);
-  }
-
-  /**
-   * Sets the text of the headline.
-   * @param newHeaderText The new headline text.
-   */
-  setHeaderText(newHeaderText) {
-    this.headline.text(newHeaderText);
   }
 
   /**
@@ -78,9 +90,8 @@ export class DatasetCard extends Card {
    * @param newStatusMessage The new status message.
    */
   setStatusMessage(newStatusMessage) {
-    this.statusText
-      .text(newStatusMessage)
-      .style(`display`, newStatusMessage === "" ? `none` : `block`);
+    this.tooltip.text(newStatusMessage);
+    this.tooltip.style('opacity', newStatusMessage === "" ? 0 : 1);
   }
 
   /**
@@ -106,7 +117,7 @@ export class DatasetCard extends Card {
    * @param reason The reason of the update.
    */
   update(datasetsController, reason) {
-    if (!this.updateSensible) return debug_log(`Skipping update due to not update sensible (Reason: ${reason}).`);
+    if (!this.updateSensible) return lotivis_log(`[lotivis]  Skipping update due to not update sensible (Reason: ${reason}).`);
     this.updateContentsOfTextarea();
   }
 
@@ -131,11 +142,11 @@ export class DatasetCard extends Card {
       if (notifyController === true) {
 
         if (!this.datasetController) {
-          return debug_log(`No datasets controller.`);
+          return lotivis_log(`[lotivis]  No datasets controller.`);
         }
 
         if (objectsEqual(this.cachedDatasets, parsedDatasets)) {
-          return debug_log(`No changes in datasets.`);
+          return lotivis_log(`[lotivis]  No changes in datasets.`);
         }
 
         this.cachedDatasets = parsedDatasets;
@@ -145,7 +156,7 @@ export class DatasetCard extends Card {
       }
 
     } catch (error) {
-      debug_log(`error ${error}`);
+      lotivis_log(`[lotivis]  ERROR: ${error}`);
       this.setStatusMessage(error, false);
     }
   }
@@ -159,6 +170,13 @@ export class DatasetCard extends Card {
     let content = this.datasetsToText(datasets);
     this.setTextareaContent(content);
     this.cachedDatasets = datasets;
+  }
+
+  /**
+   * Initiates a download of the content of the textarea.
+   */
+  download(content) {
+    throw new Error(`Subclasses should override.`);
   }
 
   /**

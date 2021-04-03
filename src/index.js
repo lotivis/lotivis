@@ -29,11 +29,12 @@ import {ModalPopup} from "./js/components/modal.popup";
 import {ChartCard} from "./js/components/chart.card";
 import {Dropdown} from "./js/components/dropdown";
 import {Popup} from "./js/components/popup";
-import {Constants} from "./js/shared/constants";
 
-import {DatasetJsonCard} from "./js/data.card/dataset.json.card";
+import {DatasetsJsonCard} from "./js/data.card/datasets.json.card";
 import {DatasetCSVCard} from "./js/data.card/dataset.csv.card";
 import {DatasetCSVDateCard} from "./js/data.card/dataset.csv.date.card";
+import {GlobalConfig} from "./js/shared/config";
+import {debug} from "./js/shared/debug";
 
 // colors
 exports.Color = Color;
@@ -62,7 +63,7 @@ exports.PlotChart = PlotChart;
 exports.PlotChartCard = PlotChartCard;
 
 // datasets / csv cards
-exports.DatasetJsonCard = DatasetJsonCard;
+exports.DatasetJsonCard = DatasetsJsonCard;
 exports.DatasetCSVCard = DatasetCSVCard;
 exports.DatasetCSVDateCard = DatasetCSVDateCard;
 
@@ -77,6 +78,7 @@ exports.GeoJson = GeoJson;
 exports.Feature = Feature;
 
 // constants
-exports.Constants = Constants;
+exports.config = GlobalConfig;
+exports.debug = debug;
 
 export default exports;

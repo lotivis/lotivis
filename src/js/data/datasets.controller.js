@@ -1,17 +1,8 @@
-import {
-  extractDatesFromDatasets,
-  extractLabelsFromDatasets,
-  extractLocationsFromDatasets,
-  extractStacksFromDatasets
-} from "../data.juggle/dataset.extract";
-import {flatDatasets} from "../data.juggle/dataset.flat";
-import {copy} from "../shared/copy";
 import {combineByDate, combineByLocation, combineByStacks} from "../data.juggle/dataset.combine";
 import {sumOfDataset, sumOfLabel, sumOfStack} from "../data.juggle/dataset.sum";
-import {DatasetsColorsController} from "./datasets.colors.controller";
 
 /**
- *
+ * Controls a collection of datasets.
  * @class DatasetsController
  */
 export class DatasetsController {
@@ -23,26 +14,6 @@ export class DatasetsController {
   constructor(datasets) {
     this.setDatasets(datasets);
   }
-
-  // setDatasets(datasets) {
-  //   this.datasets = copy(datasets);
-  //   this.workingDatasets = copy(datasets)
-  //     .sort((left, right) => left.label > right.label);
-  //   this.workingDatasets.forEach(dataset => dataset.isEnabled = true);
-  //   this.flatData = flatDatasets(this.workingDatasets);
-  //   this.labels = extractLabelsFromDatasets(datasets);
-  //   this.stacks = extractStacksFromDatasets(datasets);
-  //   this.dates = extractDatesFromDatasets(datasets);
-  //   this.locations = extractLocationsFromDatasets(datasets);
-  //   this.datasetsColorsController = new DatasetsColorsController(this);
-  //   this.dateAccess = function (date) {
-  //     return Date.samples.parse(date);
-  //   };
-  //
-  //   this.locationFilters = [];
-  //   this.dateFilters = [];
-  //   this.datasetFilters = [];
-  // }
 
   get flatDataCombinedStacks() {
     return combineByStacks(this.flatData);
@@ -88,5 +59,12 @@ export class DatasetsController {
 
   getColorsForStack(stack) {
     return this.datasetsColorsController.colorsForStack(stack);
+  }
+
+  /**
+   * Returns a string that can be used as filename for downloads.
+   */
+  getFilename() {
+    let labels = this.labels;
   }
 }

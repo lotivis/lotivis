@@ -1,6 +1,6 @@
-import {debug_log, verbose_log} from "../shared/debug";
 import {formatNumber} from "../shared/format";
 import {equals} from "../shared/equal";
+import {lotivis_log} from "../shared/debug";
 
 /**
  *
@@ -29,9 +29,9 @@ export class MapLabelRenderer {
      */
     this.render = function () {
       let geoJSON = mapChart.geoJSON;
-      if (!mapChart.geoJSON) return debug_log('No Geo JSON to render.');
+      if (!mapChart.geoJSON) return lotivis_log('No Geo JSON to render.');
       let combinedData = mapChart.combinedData;
-      if (!mapChart.datasetController) return debug_log('no datasetController');
+      if (!mapChart.datasetController) return lotivis_log('no datasetController');
 
       removeLabels();
       if (!mapChart.config.isShowLabels) return;

@@ -5,8 +5,7 @@ import {UrlParameters} from "../shared/url.parameters";
 import {RadioGroup} from "../components/radio.group";
 import {Option} from "../components/option";
 import {ChartCard} from "../components/chart.card";
-import {verbose_log} from "../shared/debug";
-import {downloadImage} from "../shared/screenshot";
+import {downloadImage} from "../shared/download";
 
 /**
  *
@@ -19,9 +18,9 @@ export class DateChartCard extends ChartCard {
   /**
    *
    * @param selector
-   * @param name
+   * @param config
    */
-  constructor(selector, name) {
+  constructor(selector, config) {
     let theSelector = selector || 'date-chart-card';
     super(theSelector);
     this.selector = theSelector;
@@ -30,6 +29,7 @@ export class DateChartCard extends ChartCard {
     this.renderChart();
     this.renderRadioGroup();
     this.applyURLParameters();
+    this.setHeaderText('Date');
   }
 
   /**

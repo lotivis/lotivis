@@ -1,10 +1,9 @@
-import {hashCode} from "../shared/hash";
-import {Constants} from "../shared/constants";
-import {verbose_log} from "../shared/debug";
+import {GlobalConfig} from "../shared/config";
 
 /**
- *
+ * Appends and updates the tooltip of a plot chart.
  * @class PlotTooltipRenderer
+ * @see PlotChart
  */
 export class PlotTooltipRenderer {
 
@@ -25,8 +24,8 @@ export class PlotTooltipRenderer {
       .style('opacity', 0);
 
     /**
-     *
-     * @param dataset
+     * Returns the HTML content for the given dataset.
+     * @param dataset The dataset to represent in HTML.
      */
     function getHTMLContentForDataset(dataset) {
       let components = [];
@@ -81,10 +80,10 @@ export class PlotTooltipRenderer {
       top += offset[1];
 
       if ((plotChart.yChart(dataset.label) - plotChart.config.margin.top) <= (plotChart.graphHeight / 2)) {
-        top += (plotChart.config.lineHeight * factor) + Constants.tooltipOffset;
+        top += (plotChart.config.lineHeight * factor) + GlobalConfig.tooltipOffset;
       } else {
         top -= tooltipHeight + 20; // subtract padding
-        top -= Constants.tooltipOffset;
+        top -= GlobalConfig.tooltipOffset;
       }
 
       let left = getTooltipLeftForDataset(dataset, factor, offset);

@@ -9,7 +9,6 @@ import {Option} from "./option";
  * @extends Card
  */
 export class ChartCard extends Card {
-  chart;
 
   /**
    * Creates a new instance of ChartCard.
@@ -18,9 +17,18 @@ export class ChartCard extends Card {
    */
   constructor(parent) {
     super(parent);
-    this.injectMapChart();
     this.injectButtons();
     this.injectRadioGroup();
+    this.injectChart();
+  }
+
+  /**
+   * Creates and injects the chart.
+   *
+   * Should be overridden by subclasses.
+   */
+  injectChart() {
+    // empty
   }
 
   /**
@@ -42,14 +50,7 @@ export class ChartCard extends Card {
     }.bind(this);
   }
 
-  /**
-   * Creates and injects the chart.
-   *
-   * Should be overridden by subclasses.
-   */
-  injectMapChart() {
-    // empty
-  }
+
 
   /**
    * Creates and injects a radio button group.

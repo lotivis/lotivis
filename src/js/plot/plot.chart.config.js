@@ -1,14 +1,14 @@
-import {Constants} from "../shared/constants";
 import {PlotChartSort} from "./plot.chart.sort";
+import {GlobalConfig} from "../shared/config";
 
 export const defaultPlotChartConfig = {
   width: 1000,
   height: 600,
   margin: {
-    top: Constants.defaultMargin,
-    right: Constants.defaultMargin,
-    bottom: Constants.defaultMargin,
-    left: Constants.defaultMargin
+    top: GlobalConfig.defaultMargin,
+    right: GlobalConfig.defaultMargin,
+    bottom: GlobalConfig.defaultMargin,
+    left: GlobalConfig.defaultMargin
   },
   lineHeight: 28,
   radius: 23,

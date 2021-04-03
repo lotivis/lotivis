@@ -11,6 +11,7 @@
 .lotivis-card-header {
   padding: $small-border;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  height: 17px;
 
   .lotivis-card-header-right-component {
     overflow: visible;
@@ -29,11 +30,15 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
+  .lotivis-title-label {
+    font-weight: bold;
+    font-size: $primary-title-font-size;
+  }
 }
 
 .lotivis-card-body {
   width: 100%;
-  overflow: scroll;
 }
 
 .lotivis-card-footer {

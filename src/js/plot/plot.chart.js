@@ -1,13 +1,5 @@
 import {Chart} from "../components/chart";
-import {
-  extractDatesFromDatasets,
-  extractEarliestDateWithValue,
-  extractLatestDateWithValue
-} from "../data.juggle/dataset.extract";
-import {combineByDate} from "../data.juggle/dataset.combine";
-import {sumOfLabel} from "../data.juggle/dataset.sum";
 import {PlotAxisRenderer} from "./plot.axis.renderer";
-import {copy} from "../shared/copy";
 import {PlotBarsRenderer} from "./plot.bars.renderer";
 import {PlotTooltipRenderer} from "./plot.tooltip.renderer";
 import {PlotLabelRenderer} from "./plot.label.renderer";
@@ -15,7 +7,6 @@ import {PlotGridRenderer} from "./plot.grid.renderer";
 import {PlotBackgroundRenderer} from "./plot.background.renderer";
 import {defaultPlotChartConfig} from "./plot.chart.config";
 import {PlotChartSort} from "./plot.chart.sort";
-import {verbose_log} from "../shared/debug";
 import {DatasetsController} from "../data/datasets.controller";
 import "../dataview/dataviews.plot";
 
@@ -100,7 +91,7 @@ export class PlotChart extends Chart {
   draw() {
     this.createScales();
     this.backgroundRenderer.render();
-    this.gridRenderer.renderGrid();
+    this.gridRenderer.render();
     this.axisRenderer.renderAxis();
     this.barsRenderer.renderBars();
     this.labelsRenderer.renderLabels();

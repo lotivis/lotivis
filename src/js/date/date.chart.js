@@ -6,18 +6,18 @@ import {DateBarsRenderer} from "./date.bars.renderer";
 import {DateGhostBarsRenderer} from "./date.ghost.bars.renderer";
 import {DateTooltipRenderer} from "./date.tooltip.renderer";
 import {Chart} from "../components/chart";
-import {Constants} from "../shared/constants";
 import {DateGridRenderer} from "./date.grid.renderer";
 import {DatasetsController} from "../data/datasets.controller";
+import {GlobalConfig} from "../shared/config";
 
 const defaultConfig = {
   width: 1000,
   height: 600,
   margin: {
-    top: Constants.defaultMargin,
-    right: Constants.defaultMargin,
-    bottom: Constants.defaultMargin,
-    left: Constants.defaultMargin
+    top: GlobalConfig.defaultMargin,
+    right: GlobalConfig.defaultMargin,
+    bottom: GlobalConfig.defaultMargin,
+    left: GlobalConfig.defaultMargin
   },
   showLabels: true,
   combineStacks: false,

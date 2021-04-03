@@ -3,7 +3,7 @@ import {Color} from "../color/color";
 import {styleForCSSClass} from "../shared/style";
 import {formatNumber} from "../shared/format";
 import {equals} from "../shared/equal";
-import {Constants} from "../shared/constants";
+import {GlobalConfig} from "../shared/config";
 
 /**
  *
@@ -123,7 +123,7 @@ export class MapTooltipRenderer {
         let top = featureUpperRight[1] * factor;
         top -= tooltipSize[1];
         top += positionOffset[1];
-        top -= Constants.tooltipOffset;
+        top -= GlobalConfig.tooltipOffset;
         return top;
       }
 
@@ -134,7 +134,7 @@ export class MapTooltipRenderer {
       function getTooltipLocationUnder() {
         let top = featureLowerLeft[1] * factor;
         top += positionOffset[1];
-        top += Constants.tooltipOffset;
+        top += GlobalConfig.tooltipOffset;
         return top;
       }
 

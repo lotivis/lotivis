@@ -5,7 +5,7 @@ import {Option} from "../components/option";
 import {ChartCard} from "../components/chart.card";
 import {PlotChart} from "./plot.chart";
 import {PlotChartSettingsPopup} from "./plot.chart.settings.popup";
-import {downloadImage} from "../shared/screenshot";
+import {downloadImage} from "../shared/download";
 
 /**
  * A card containing a plot chart.
@@ -19,17 +19,17 @@ export class PlotChartCard extends ChartCard {
    * Creates a new instance of PlotChartCard.
    *
    * @param selector The selector
-   * @param name
+   * @param config
    */
-  constructor(selector, name) {
-    super(selector);
-    if (!selector) throw 'No selector specified.';
+  constructor(selector, config) {
+    let theSelector = selector || 'plot-chart-card';
+    super(theSelector);
     this.selector = selector;
     this.name = selector;
     this.datasets = [];
-    this.injectChart();
     this.injectRadioGroup();
     this.applyURLParameters();
+    this.setHeaderText('Plot');
   }
 
   /**

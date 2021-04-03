@@ -11,9 +11,6 @@ export class Color {
    * @param b The blue value.
    */
   constructor(r, g, b) {
-    console.log('r', r);
-    console.log('g', g);
-    console.log('b', b);
     if ((r || r === 0) && (g || g === 0) && (b || b === 0)) {
       this.initialize(r, g, b);
     } else if (typeof r === `object`) {

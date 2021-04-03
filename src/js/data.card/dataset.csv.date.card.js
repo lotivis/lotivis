@@ -2,6 +2,7 @@ import {Card} from "../components/card";
 import {DatasetCard} from "./dataset.card";
 import {parseCSVDate} from "../data.parse/parse.csv.date";
 import {renderCSVDate} from "../data.render/render.csv.date";
+import {downloadCSV} from "../shared/download";
 
 /**
  * Presents the CSV version of datasets.  The presented CSV can be edited.
@@ -17,6 +18,10 @@ export class DatasetCSVDateCard extends DatasetCard {
   constructor(parent) {
     super(parent);
     this.setHeaderText('Dataset CSV Card');
+  }
+
+  download(content) {
+    downloadCSV(content, 'dataset.csv');
   }
 
   textToDatasets(text) {

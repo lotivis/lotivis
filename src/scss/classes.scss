@@ -44,3 +44,14 @@
 .important {
   color: red;
 }
+
+.lotivis-headline {
+  text-align: center;
+  margin-bottom: $spacing;
+
+  h1 {
+    font-size: 26px;
+    font-style: normal;
+    margin: 0 0 $spacing;
+  }
+}

@@ -1,10 +1,10 @@
 
 .lotivis-data-card {
-  background-color: #F5F5F5;
+  //background-color: #F5F5F5;
 
   .lotivis-data-textarea {
     padding-top: 10px;
-    color: grey;
+    //color: grey;
   }
 }
 
@@ -21,8 +21,7 @@
 }
 
 .lotivis-data-status-failure {
-  margin-top: 10px;
-  border-radius: $radius;
+  //border-radius: $radius;
   background-color: tomato;
   color: white;
   padding: 10px;
@@ -32,10 +31,22 @@
 .lotivis-data-textarea {
   background-color: rgba(0, 0, 0, 0);
   margin: 0;
-  width: 98%;
+  width: 95%;
   //height: 600px;
-  border: 0px solid #cccccc;
+  border: 0 solid #cccccc;
   padding: 5px;
   font-family: monospace, sans-serif;
   outline: none;
+}
+
+.lotivis-data-card-status-tooltip {
+  position: fixed;
+  padding: 20px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  background-color: tomato;
+  color: white;
+  //animation: fadeIn ease 0.3s;
 }

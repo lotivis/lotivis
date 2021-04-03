@@ -1,5 +1,3 @@
-import {Constants} from "../shared/constants";
-
 /**
  * Draws a grid on the plot chart.
  *
@@ -18,7 +16,7 @@ export class PlotGridRenderer {
     /**
      * Adds a grid to the chart.
      */
-    this.renderGrid = function () {
+    this.render = function () {
       if (!plotChart.config.drawGrid) return;
 
       plotChart.svg

@@ -1,7 +1,7 @@
 import {csvStringToArray} from "../shared/csv.to.array";
 import {trimByChar} from "../shared/trim";
 import {createDatasets} from "../data.juggle/dataset.create";
-import {debug_log} from "../shared/debug";
+import {lotivis_log} from "../shared/debug";
 
 export function parseCSV(text) {
   let flatData = [];
@@ -13,7 +13,7 @@ export function parseCSV(text) {
     let lineArray = arrays[lineIndex].map(element => trimByChar(element, `"`));
 
     if (lineArray.length < 5) {
-      debug_log(`Skipping row: ${lineArray}`);
+      lotivis_log(`Skipping row: ${lineArray}`);
       continue;
     }
 

@@ -23,9 +23,6 @@ class Color {
    * @param b The blue value.
    */
   constructor(r, g, b) {
-    console.log('r', r);
-    console.log('g', g);
-    console.log('b', b);
     if ((r || r === 0) && (g || g === 0) && (b || b === 0)) {
       this.initialize(r, g, b);
     } else if (typeof r === `object`) {
@@ -162,11 +159,7 @@ function createIDFromDataset(dataset) {
   return hashCode(dataset.label);
 }
 
-/**
- * Holds
- * @type {{}}
- */
-const Constants = {
+const GlobalConfig = {
   // The default margin to use for charts.
   defaultMargin: 60,
   // The default offset for the space between an object an the toolbar.
@@ -174,22 +167,36 @@ const Constants = {
   // The default radius to use for bars drawn on a chart.
   barRadius: 5,
   // A Boolean value indicating whether the debug logging is enabled.
-  debugLog: false
+  debugLog: false,
+  // A Boolean value indicating whether the debug logging is enabled.
+  debug: true,
+  // A string which is used as prefix for download.
+  downloadFilePrefix: 'lotivis'
 };
 
-const prefix = '[lotivis]  ';
+// export const debug_log = function (message) {
+//   if (!GlobalConfig.debugLog) return;
+//   console.log(prefix + message);
+// };
 
-const debug_log = function (message) {
-  if (!Constants.debugLog) return;
-  console.log(prefix + message);
-};
+var lotivis_log = () => null;
+
+/**
+ * Sets whether lotivis prints debug log messages to the console.
+ * @param enabled A Boolean value indicating whether to enable debug logging.
+ */
+function debug(enabled) {
+  GlobalConfig.debugLog = enabled;
+  GlobalConfig.debug = enabled;
+  lotivis_log = enabled ? console.log : () => null;
+  lotivis_log(`[lotivis]  debug ${enabled ? 'en' : 'dis'}abled`);
+}
 
 /**
  *
  * @class Component
  */
 class Component {
-  element;
 
   /**
    *
@@ -486,6 +493,10 @@ class DateLegendRenderer {
 
 class DateBarsRenderer {
 
+  /**
+   *
+   * @param timeChart
+   */
   constructor(timeChart) {
 
     /**
@@ -514,8 +525,8 @@ class DateBarsRenderer {
         .enter()
         .append("rect")
         .attr('class', 'lotivis-date-chart-bar')
-        .attr("rx", timeChart.isCombineStacks ? 0 : Constants.barRadius)
-        .attr("ry", timeChart.isCombineStacks ? 0 : Constants.barRadius)
+        .attr("rx", timeChart.isCombineStacks ? 0 : GlobalConfig.barRadius)
+        .attr("ry", timeChart.isCombineStacks ? 0 : GlobalConfig.barRadius)
         .attr("x", (d) => timeChart.xChart(d.data.date) + timeChart.xStack(stack.label))
         .attr("y", (d) => timeChart.yChart(d[1]))
         .attr("width", timeChart.xStack.bandwidth())
@@ -528,6 +539,8 @@ class DateBarsRenderer {
  *
  * @class DateGhostBarsRenderer
  */
+
+
 class DateGhostBarsRenderer {
 
   /**
@@ -589,8 +602,8 @@ class DateGhostBarsRenderer {
         .attr("class", 'lotivis-selection-rect')
         .attr("id", date => createID(date))
         .attr("opacity", 0)
-        .attr("rx", Constants.barRadius)
-        .attr("ry", Constants.barRadius)
+        .attr("rx", GlobalConfig.barRadius)
+        .attr("ry", GlobalConfig.barRadius)
         .attr("x", (date) => dateChart.xChart(date))
         .attr("y", margin.top)
         .attr("width", dateChart.xChart.bandwidth())
@@ -777,7 +790,7 @@ class DateTooltipRenderer {
      */
     function getXLeft(date, factor, offset, tooltipSize) {
       let x = dateChart.xChart(date) * factor;
-      return x + offset[0] - tooltipSize[0] - 22 - Constants.tooltipOffset;
+      return x + offset[0] - tooltipSize[0] - 22 - GlobalConfig.tooltipOffset;
     }
 
     /**
@@ -792,7 +805,7 @@ class DateTooltipRenderer {
     function getXRight(date, factor, offset) {
       let x = dateChart.xChart(date) + dateChart.xChart.bandwidth();
       x *= factor;
-      x += offset[0] + Constants.tooltipOffset;
+      x += offset[0] + GlobalConfig.tooltipOffset;
       return x;
     }
 
@@ -995,193 +1008,7 @@ class DateGridRenderer {
 }
 
 /**
- * Returns a flat version of the given dataset collection.
- *
- * @param datasets The collection of datasets.
- * @returns {[]} The array containing the flat samples.
- */
-function flatDatasets(datasets) {
-  let flatData = [];
-  let datasetsCopy = datasets;
-  for (let datasetIndex = 0; datasetIndex < datasetsCopy.length; datasetIndex++) {
-    let dataset = datasetsCopy[datasetIndex];
-    let flatDataChunk = flatDataset(dataset);
-    flatData = flatData.concat(flatDataChunk);
-  }
-  return flatData;
-}
-
-/**
- * Returns an array containing the flat samples of the given dataset.
- *
- * @param dataset The dataset with samples.
- * @returns {[]} The array containing the flat samples.
- */
-function flatDataset(dataset) {
-  let flatData = [];
-  if (!dataset.data) {
-    console.log('Lotivis: Flat samples for dataset without samples requested. Will return an empty array.');
-    return flatData;
-  }
-  dataset.data.forEach(item => {
-    let newItem = copy(item);
-    newItem.dataset = dataset.label;
-    newItem.stack = dataset.stack;
-    flatData.push(newItem);
-  });
-  return flatData;
-}
-
-/**
- * Returns the set of dataset names from the given dataset collection.
- *
- * @param datasets The collection of datasets.
- * @returns {[]} The array containing the flat samples.
- */
-function extractLabelsFromDatasets(datasets) {
-  return toSet(datasets.map(dataset => dataset.label || 'unknown'));
-}
-
-/**
- * Returns the set of stacks from the given dataset collection.
- * Will fallback on dataset property if stack property isn't present.
- *
- * @param datasets The collection of datasets.
- * @returns {[]} The array containing the flat samples.
- */
-function extractStacksFromDatasets(datasets) {
-  return toSet(datasets.map(dataset => dataset.stack || dataset.label || 'unknown'));
-}
-
-/**
- * Returns the set of dates from the given dataset collection.
- *
- * @param datasets The collection of datasets.
- * @returns {[]} The set containing the dates.
- */
-function extractDatesFromDatasets(datasets) {
-  return extractDatesFromFlatData(flatDatasets(datasets));
-}
-
-/**
- * Returns the set of locations from the given dataset collection.
- *
- * @param datasets The collection of datasets.
- * @returns {[]} The set containing the locations.
- */
-function extractLocationsFromDatasets(datasets) {
-  return extractLocationsFromFlatData(flatDatasets(datasets));
-}
-
-/**
- * Returns the set of dates from the given dataset collection.
- *
- * @param flatData The flat samples array.
- * @returns {[]} The set containing the dates.
- */
-function extractDatesFromFlatData(flatData) {
-  return toSet(flatData.map(item => item.date || 'unknown'));
-}
-
-/**
- * Returns the set of locations from the given dataset collection.
- *
- * @param flatData The flat samples array.
- * @returns {[]} The set containing the locations.
- */
-function extractLocationsFromFlatData(flatData) {
-  return toSet(flatData.map(item => item.location || "unknown"));
-}
-
-/**
- * Return an array containing each equal item of the given array only once.
- *
- * @param array The array to create a set of.
- * @returns {any[]} The set version of the array.
- */
-function toSet(array) {
-  return Array.from(new Set(array));//.sort();
-}
-
-/**
- * Returns the earliest date occurring in the flat array of items.
- *
- * @param flatData The flat samples array.
- * @returns {*} The earliest date.
- */
-function extractEarliestDateWithValue(flatData) {
-  return extractDatesFromFlatData(filterWithValue(flatData)).sort().shift();
-}
-
-/**
- * Returns the latest date occurring in the flat array of items.
- *
- * @param flatData The flat samples array.
- * @returns {*} The latest date.
- */
-function extractLatestDateWithValue(flatData) {
-  return extractDatesFromFlatData(filterWithValue(flatData)).sort().pop();
-}
-
-/**
- * Returns a filtered collection containing all items which have a valid value greater than 0.
- *
- * @param flatData The flat samples to filter.
- * @returns {*} All items with a value greater 0.
- */
-function filterWithValue(flatData) {
-  return flatData.filter(item => (item.value || 0) > 0);
-}
-
-/**
- *
- * @class DatasetsColorsController
- */
-class DatasetsColorsController {
-
-  /**
-   * Creates a new instance of DatasetsColorsController.
-   *
-   * @param controller
-   */
-  constructor(controller) {
-
-    let datasets = controller.workingDatasets;
-    let stacks = controller.stacks;
-    let labelToColor = {};
-    let stackToColors = {};
-
-    for (let sIndex = 0; sIndex < stacks.length; sIndex++) {
-      let stack = stacks[sIndex];
-
-      // filter datasets for stack
-      let filtered = datasets.filter(function (dataset) {
-        return dataset.label === stack || dataset.stack === stack;
-      });
-
-      let colors = Color.colorsForStack(sIndex, filtered.length);
-      stackToColors[stack] = colors;
-      for (let dIndex = 0; dIndex < filtered.length; dIndex++) {
-        labelToColor[filtered[dIndex].label] = colors[dIndex];
-      }
-    }
-
-    this.colorForDataset = function (label) {
-      return labelToColor[label] || Color.defaultTint;
-    };
-
-    this.colorForStack = function (stack) {
-      return stackToColors[stack][0] || Color.defaultTint;
-    };
-
-    this.colorsForStack = function (stack) {
-      return stackToColors[stack] || [];
-    };
-  }
-}
-
-/**
- *
+ * Controls a collection of datasets.
  * @class DatasetsController
  */
 class DatasetsController {
@@ -1193,26 +1020,6 @@ class DatasetsController {
   constructor(datasets) {
     this.setDatasets(datasets);
   }
-
-  // setDatasets(datasets) {
-  //   this.datasets = copy(datasets);
-  //   this.workingDatasets = copy(datasets)
-  //     .sort((left, right) => left.label > right.label);
-  //   this.workingDatasets.forEach(dataset => dataset.isEnabled = true);
-  //   this.flatData = flatDatasets(this.workingDatasets);
-  //   this.labels = extractLabelsFromDatasets(datasets);
-  //   this.stacks = extractStacksFromDatasets(datasets);
-  //   this.dates = extractDatesFromDatasets(datasets);
-  //   this.locations = extractLocationsFromDatasets(datasets);
-  //   this.datasetsColorsController = new DatasetsColorsController(this);
-  //   this.dateAccess = function (date) {
-  //     return Date.samples.parse(date);
-  //   };
-  //
-  //   this.locationFilters = [];
-  //   this.dateFilters = [];
-  //   this.datasetFilters = [];
-  // }
 
   get flatDataCombinedStacks() {
     return combineByStacks(this.flatData);
@@ -1259,16 +1066,23 @@ class DatasetsController {
   getColorsForStack(stack) {
     return this.datasetsColorsController.colorsForStack(stack);
   }
+
+  /**
+   * Returns a string that can be used as filename for downloads.
+   */
+  getFilename() {
+    this.labels;
+  }
 }
 
 const defaultConfig = {
   width: 1000,
   height: 600,
   margin: {
-    top: Constants.defaultMargin,
-    right: Constants.defaultMargin,
-    bottom: Constants.defaultMargin,
-    left: Constants.defaultMargin
+    top: GlobalConfig.defaultMargin,
+    right: GlobalConfig.defaultMargin,
+    bottom: GlobalConfig.defaultMargin,
+    left: GlobalConfig.defaultMargin
   },
   showLabels: true,
   combineStacks: false,
@@ -1503,6 +1317,7 @@ class Card extends Component {
       .append('div')
       .classed('lotivis-card', true);
     this.createHeader();
+    this.injectTitleLabel();
     this.createBody();
     this.createFooter();
   }
@@ -1535,6 +1350,17 @@ class Card extends Component {
     //   .append('span')
     //   .text(this.name);
 
+  }
+
+  injectTitleLabel() {
+    this.titleLabel = this.headerLeftComponent
+      .append('div')
+      .classed('lotivis-title-label', true)
+      .text('Hello');
+  }
+
+  setHeaderText(newTitle) {
+    this.titleLabel.text(newTitle);
   }
 
   createBody() {
@@ -1577,26 +1403,33 @@ class Button extends Component {
    *
    * @constructor
    * @param {Component} parent The parental component.
+   * @param style The style of the button.  One of default|back|forward
    */
-  constructor(parent) {
+  constructor(parent, style = 'default') {
     super(parent);
 
-    let thisRef = this;
     this.element = parent
       .append('button')
       .attr('id', this.selector)
+      .attr('class', 'lotivis-button')
       .on('click', function (event) {
-        if (!thisRef.onClick) return;
-        thisRef.onClick(event);
-      });
+        if (!this.onClick) return;
+        this.onClick(event);
+      }.bind(this));
+
+    switch (style) {
+      case 'round':
+        this.element.classed('lotivis-button-round', true);
+        break;
+    }
   }
 
+  /**
+   * Sets the text of the button.
+   * @param text The text of the button.
+   */
   setText(text) {
     this.element.text(text);
-  }
-
-  setFontAwesomeImage(imageName) {
-    this.element.html('<i class="fas fa-' + imageName + '"></i>');
   }
 
   onClick(event) {
@@ -2198,7 +2031,6 @@ class DateChartSettingsPopup extends Popup {
  * @extends Card
  */
 class ChartCard extends Card {
-  chart;
 
   /**
    * Creates a new instance of ChartCard.
@@ -2207,9 +2039,18 @@ class ChartCard extends Card {
    */
   constructor(parent) {
     super(parent);
-    this.injectMapChart();
     this.injectButtons();
     this.injectRadioGroup();
+    this.injectChart();
+  }
+
+  /**
+   * Creates and injects the chart.
+   *
+   * Should be overridden by subclasses.
+   */
+  injectChart() {
+    // empty
   }
 
   /**
@@ -2231,14 +2072,7 @@ class ChartCard extends Card {
     }.bind(this);
   }
 
-  /**
-   * Creates and injects the chart.
-   *
-   * Should be overridden by subclasses.
-   */
-  injectMapChart() {
-    // empty
-  }
+
 
   /**
    * Creates and injects a radio button group.
@@ -2306,8 +2140,25 @@ class ChartCard extends Card {
   }
 }
 
-// http://bl.ocks.org/Rokotyan/0556f8facbaf344507cdc45dc3622177
+/**
+ * Returns the last path component of the given url.
+ * @param url The url with components.
+ * @returns {string} The last path component.
+ */
 
+/**
+ * Appends the given string in extension to the given string filename if filename not already ends with this extension.
+ * @param filename A string with or without an extension.
+ * @param extension The extension the filename will end with.
+ * @returns {*|string} The filename with the given extension.
+ */
+function appendExtensionIfNeeded(filename, extension) {
+  if (extension === '' || extension === '.') return filename;
+  extension = extension.startsWith(".") ? extension : `.${extension}`;
+  return filename.endsWith(extension) ? filename : `${filename}${extension}`;
+}
+
+// http://bl.ocks.org/Rokotyan/0556f8facbaf344507cdc45dc3622177
 /**
  * Parses a String from the given (D3.js) SVG node.
  *
@@ -2410,7 +2261,7 @@ function getSVGString(svgNode) {
 function svgString2Image(svgString, width, height, callback) {
 
   // Convert SVG string to samples URL
-  let imageSource = 'samples:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+  let imageSource = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
 
   let canvas = document.createElement("canvas");
   canvas.width = width;
@@ -2453,26 +2304,38 @@ function getOriginalSizeOfSVG(svgElement) {
 /**
  * Creates and appends an anchor linked to the given samples which is then immediately clicked.
  *
- * @param data The samples to be downloaded.
+ * @param blob The samples to be downloaded.
  * @param filename The name of the file.
  */
-function downloadData(data, filename) {
-  let anchor = document.createElement("a");
-  anchor.href = URL.createObjectURL(data);
-  anchor.download = appendPNGIfNeeded(filename);
-  document.body.appendChild(anchor);
-  anchor.click();
-  document.body.removeChild(anchor);
-
-  /**
-   * Appends '.png' to the given string if the given string not already has this extension.
-   *
-   * @param filename The filename with or without the '.png' extension.
-   * @returns {*|string} The filename with a '.png' extension.
-   */
-  function appendPNGIfNeeded(filename) {
-    return filename.endsWith('.png') ? filename : `${filename}.png`;
+function downloadBlob(blob, filename) {
+  if (window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveBlob(blob, filename);
+  } else {
+    let anchor = document.createElement("a");
+    anchor.href = URL.createObjectURL(blob);
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
   }
+}
+
+/**
+ * Initiates a download of a JSON file with the given content and the given filename.
+ * @param jsonString The JSON content.
+ * @param filename The filename of the file to be downloaded. Will append '.json' extension
+ * if needed.
+ */
+function downloadJSON(jsonString, filename) {
+  let blob = new Blob([jsonString], {type: 'text/json'});
+  let saveFilename = appendExtensionIfNeeded(filename, 'json');
+  downloadBlob(blob, saveFilename);
+}
+
+function downloadCSV(jsonString, filename) {
+  let blob = new Blob([jsonString], {type: 'text/csv'});
+  let saveFilename = appendExtensionIfNeeded(filename, 'csv');
+  downloadBlob(blob, saveFilename);
 }
 
 /**
@@ -2490,7 +2353,8 @@ function downloadImage(selector, filename) {
     fetch(dataURL)
       .then(res => res.blob())
       .then(function (dataBlob) {
-        downloadData(dataBlob, filename);
+        let saveFilename = appendExtensionIfNeeded(filename, 'png');
+        downloadBlob(dataBlob, saveFilename);
       });
   });
 }
@@ -2506,9 +2370,9 @@ class DateChartCard extends ChartCard {
   /**
    *
    * @param selector
-   * @param name
+   * @param config
    */
-  constructor(selector, name) {
+  constructor(selector, config) {
     let theSelector = selector || 'date-chart-card';
     super(theSelector);
     this.selector = theSelector;
@@ -2517,6 +2381,7 @@ class DateChartCard extends ChartCard {
     this.renderChart();
     this.renderRadioGroup();
     this.applyURLParameters();
+    this.setHeaderText('Date');
   }
 
   /**
@@ -2782,7 +2647,7 @@ class MapTooltipRenderer {
         let top = featureUpperRight[1] * factor;
         top -= tooltipSize[1];
         top += positionOffset[1];
-        top -= Constants.tooltipOffset;
+        top -= GlobalConfig.tooltipOffset;
         return top;
       }
 
@@ -2793,7 +2658,7 @@ class MapTooltipRenderer {
       function getTooltipLocationUnder() {
         let top = featureLowerLeft[1] * factor;
         top += positionOffset[1];
-        top += Constants.tooltipOffset;
+        top += GlobalConfig.tooltipOffset;
         return top;
       }
 
@@ -2954,9 +2819,9 @@ class MapLabelRenderer {
      */
     this.render = function () {
       let geoJSON = mapChart.geoJSON;
-      if (!mapChart.geoJSON) return debug_log('No Geo JSON to render.');
+      if (!mapChart.geoJSON) return lotivis_log('No Geo JSON to render.');
       let combinedData = mapChart.combinedData;
-      if (!mapChart.datasetController) return debug_log('no datasetController');
+      if (!mapChart.datasetController) return lotivis_log('no datasetController');
 
       removeLabels();
       if (!mapChart.config.isShowLabels) return;
@@ -3047,7 +2912,6 @@ class MapDatasetRenderer {
 /**
  * @class MapGeojsonRenderer
  */
-
 class MapGeojsonRenderer {
 
   /**
@@ -3081,7 +2945,7 @@ class MapGeojsonRenderer {
      */
     this.renderGeoJson = function () {
       let geoJSON = mapChart.presentedGeoJSON;
-      if (!geoJSON) return debug_log('No Geo JSON file to render.');
+      if (!geoJSON) return lotivis_log('No Geo JSON file to render.');
       let idAccessor = mapChart.config.featureIDAccessor;
 
       mapChart.areas = mapChart.svg
@@ -3152,7 +3016,7 @@ class MapExteriorBorderRenderer {
    */
   constructor(mapChart) {
 
-    if (!self.topojson) debug_log('Can\'t find topojson lib.  Skip rendering of exterior border.');
+    if (!self.topojson) lotivis_log('[lotivis]  Can\'t find topojson lib.  Skip rendering of exterior border.');
 
     /**
      * Renders the exterior border of the presented geo json.
@@ -3169,6 +3033,145 @@ class MapExteriorBorderRenderer {
         .attr('class', 'lotivis-map-exterior-borders');
     };
   }
+}
+
+/**
+ * Returns a flat version of the given dataset collection.
+ *
+ * @param datasets The collection of datasets.
+ * @returns {[]} The array containing the flat samples.
+ */
+function flatDatasets(datasets) {
+  let flatData = [];
+  let datasetsCopy = datasets;
+  for (let datasetIndex = 0; datasetIndex < datasetsCopy.length; datasetIndex++) {
+    let dataset = datasetsCopy[datasetIndex];
+    let flatDataChunk = flatDataset(dataset);
+    flatData = flatData.concat(flatDataChunk);
+  }
+  return flatData;
+}
+
+/**
+ * Returns an array containing the flat samples of the given dataset.
+ *
+ * @param dataset The dataset with samples.
+ * @returns {[]} The array containing the flat samples.
+ */
+function flatDataset(dataset) {
+  let flatData = [];
+  if (!dataset.data) {
+    console.log('Lotivis: Flat samples for dataset without samples requested. Will return an empty array.');
+    return flatData;
+  }
+  dataset.data.forEach(item => {
+    let newItem = copy(item);
+    newItem.dataset = dataset.label;
+    newItem.stack = dataset.stack;
+    flatData.push(newItem);
+  });
+  return flatData;
+}
+
+/**
+ * Returns the set of dataset names from the given dataset collection.
+ *
+ * @param datasets The collection of datasets.
+ * @returns {[]} The array containing the flat samples.
+ */
+function extractLabelsFromDatasets(datasets) {
+  return toSet(datasets.map(dataset => dataset.label || 'unknown'));
+}
+
+/**
+ * Returns the set of stacks from the given dataset collection.
+ * Will fallback on dataset property if stack property isn't present.
+ *
+ * @param datasets The collection of datasets.
+ * @returns {[]} The array containing the flat samples.
+ */
+function extractStacksFromDatasets(datasets) {
+  return toSet(datasets.map(dataset => dataset.stack || dataset.label || 'unknown'));
+}
+
+/**
+ * Returns the set of dates from the given dataset collection.
+ *
+ * @param datasets The collection of datasets.
+ * @returns {[]} The set containing the dates.
+ */
+function extractDatesFromDatasets(datasets) {
+  return extractDatesFromFlatData(flatDatasets(datasets));
+}
+
+/**
+ * Returns the set of locations from the given dataset collection.
+ *
+ * @param datasets The collection of datasets.
+ * @returns {[]} The set containing the locations.
+ */
+function extractLocationsFromDatasets(datasets) {
+  return extractLocationsFromFlatData(flatDatasets(datasets));
+}
+
+/**
+ * Returns the set of dates from the given dataset collection.
+ *
+ * @param flatData The flat samples array.
+ * @returns {[]} The set containing the dates.
+ */
+function extractDatesFromFlatData(flatData) {
+  return toSet(flatData.map(item => item.date || 'unknown'));
+}
+
+/**
+ * Returns the set of locations from the given dataset collection.
+ *
+ * @param flatData The flat samples array.
+ * @returns {[]} The set containing the locations.
+ */
+function extractLocationsFromFlatData(flatData) {
+  return toSet(flatData.map(item => item.location || "unknown"));
+}
+
+/**
+ * Return an array containing each equal item of the given array only once.
+ *
+ * @param array The array to create a set of.
+ * @returns {any[]} The set version of the array.
+ */
+function toSet(array) {
+  return Array.from(new Set(array));//.sort();
+}
+
+/**
+ * Returns the earliest date occurring in the flat array of items.
+ *
+ * @param flatData The flat samples array.
+ * @returns {*} The earliest date.
+ */
+function extractEarliestDateWithValue(flatData) {
+  return extractDatesFromFlatData(filterWithValue(flatData)).sort().shift();
+}
+
+/**
+ * Returns the latest date occurring in the flat array of items.
+ *
+ * @param flatData The flat samples array.
+ * @returns {*} The latest date.
+ */
+function extractLatestDateWithValue(flatData) {
+  return extractDatesFromFlatData(filterWithValue(flatData)).sort().pop();
+}
+
+/**
+ * Returns a filtered collection containing all items which have a valid value greater than 0.
+ *
+ * @param flatData The flat samples to filter.
+ * @returns {*} All items with a value greater 0.
+ */
+function filterWithValue(flatData) {
+  return flatData.filter(item => (item.value || 0) > 0);
 }
 
 /**
@@ -3309,10 +3312,10 @@ const defaultMapChartConfig = {
   width: 1000,
   height: 1000,
   margin: {
-    top: Constants.defaultMargin,
-    right: Constants.defaultMargin,
-    bottom: Constants.defaultMargin,
-    left: Constants.defaultMargin
+    top: GlobalConfig.defaultMargin,
+    right: GlobalConfig.defaultMargin,
+    bottom: GlobalConfig.defaultMargin,
+    left: GlobalConfig.defaultMargin
   },
   isShowLabels: true,
   geoJSON: null,
@@ -3615,16 +3618,19 @@ class MapChartCard extends ChartCard {
    * Creates a new instance of MapChartCard.
    *
    * @param parent The parental component.
+   * @param config The config of the map chart.
    */
-  constructor(parent) {
+  constructor(parent, config) {
     super(parent);
+    this.config = config;
+    this.setHeaderText(config.name || 'Map');
   }
 
   /**
    * Creates and injects the map chart.
    */
-  injectMapChart() {
-    this.chart = new MapChart(this.body);
+  injectChart() {
+    this.chart = new MapChart(this.body, this.config);
   }
 
   /**
@@ -3844,8 +3850,9 @@ class PlotBarsRenderer {
 }
 
 /**
- *
+ * Appends and updates the tooltip of a plot chart.
  * @class PlotTooltipRenderer
+ * @see PlotChart
  */
 class PlotTooltipRenderer {
 
@@ -3866,8 +3873,8 @@ class PlotTooltipRenderer {
       .style('opacity', 0);
 
     /**
-     *
-     * @param dataset
+     * Returns the HTML content for the given dataset.
+     * @param dataset The dataset to represent in HTML.
      */
     function getHTMLContentForDataset(dataset) {
       let components = [];
@@ -3922,10 +3929,10 @@ class PlotTooltipRenderer {
       top += offset[1];
 
       if ((plotChart.yChart(dataset.label) - plotChart.config.margin.top) <= (plotChart.graphHeight / 2)) {
-        top += (plotChart.config.lineHeight * factor) + Constants.tooltipOffset;
+        top += (plotChart.config.lineHeight * factor) + GlobalConfig.tooltipOffset;
       } else {
         top -= tooltipHeight + 20; // subtract padding
-        top -= Constants.tooltipOffset;
+        top -= GlobalConfig.tooltipOffset;
       }
 
       let left = getTooltipLeftForDataset(dataset, factor, offset);
@@ -4010,7 +4017,7 @@ class PlotGridRenderer {
     /**
      * Adds a grid to the chart.
      */
-    this.renderGrid = function () {
+    this.render = function () {
       if (!plotChart.config.drawGrid) return;
 
       plotChart.svg
@@ -4057,10 +4064,10 @@ const defaultPlotChartConfig = {
   width: 1000,
   height: 600,
   margin: {
-    top: Constants.defaultMargin,
-    right: Constants.defaultMargin,
-    bottom: Constants.defaultMargin,
-    left: Constants.defaultMargin
+    top: GlobalConfig.defaultMargin,
+    right: GlobalConfig.defaultMargin,
+    bottom: GlobalConfig.defaultMargin,
+    left: GlobalConfig.defaultMargin
   },
   lineHeight: 28,
   radius: 23,
@@ -4193,7 +4200,7 @@ class PlotChart extends Chart {
   draw() {
     this.createScales();
     this.backgroundRenderer.render();
-    this.gridRenderer.renderGrid();
+    this.gridRenderer.render();
     this.axisRenderer.renderAxis();
     this.barsRenderer.renderBars();
     this.labelsRenderer.renderLabels();
@@ -4511,17 +4518,17 @@ class PlotChartCard extends ChartCard {
    * Creates a new instance of PlotChartCard.
    *
    * @param selector The selector
-   * @param name
+   * @param config
    */
-  constructor(selector, name) {
-    super(selector);
-    if (!selector) throw 'No selector specified.';
+  constructor(selector, config) {
+    let theSelector = selector || 'plot-chart-card';
+    super(theSelector);
     this.selector = selector;
     this.name = selector;
     this.datasets = [];
-    this.injectChart();
     this.injectRadioGroup();
     this.applyURLParameters();
+    this.setHeaderText('Plot');
   }
 
   /**
@@ -4730,8 +4737,8 @@ DatasetsController.prototype.addListener = function (listener) {
 };
 
 /**
- * Removes the given listern
- * @param listener
+ * Removes the given listener from the collection of listeners.
+ * @param listener The listener to remove.
  */
 DatasetsController.prototype.removeListener = function (listener) {
   if (!this.listeners) return;
@@ -4745,11 +4752,24 @@ DatasetsController.prototype.removeListener = function (listener) {
  * @param reason The reason to send to the listener.  Default is 'none'.
  */
 DatasetsController.prototype.notifyListeners = function (reason = DatasetsController.NotificationReason.none) {
-  if (!this.listeners) return debug_log(`No listeners to notify.`);
+  if (!this.listeners) return lotivis_log(`[lotivis]  No listeners to notify.`);
   for (let index = 0; index < this.listeners.length; index++) {
     let listener = this.listeners[index];
     if (!listener.update) continue;
     listener.update(this, reason);
+  }
+};
+
+/**
+ * Sets this controller to all of the given listeners via the `setDatasetsController` function.
+ * @param listeners A collection of listeners.
+ */
+DatasetsController.prototype.register = function (listeners) {
+  if (!Array.isArray(listeners)) return;
+  for (let index = 0; index < listeners.length; index++) {
+    let listener = listeners[index];
+    if (!listener.setDatasetController) continue;
+    listener.setDatasetController(this);
   }
 };
 
@@ -4780,7 +4800,7 @@ DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
 DatasetsController.prototype.setLocationsFilter = function (locations) {
   let stringVersions = locations.map(location => String(location));
   if (objectsEqual(this.locationFilters, stringVersions)) {
-    return debug_log(`Date filters not changed.`);
+    return lotivis_log(`[lotivis]  Date filters not changed.`);
   }
   this.resetFilters(false);
   this.locationFilters = stringVersions;
@@ -4794,7 +4814,7 @@ DatasetsController.prototype.setLocationsFilter = function (locations) {
 DatasetsController.prototype.setDatesFilter = function (dates) {
   let stringVersions = dates.map(date => String(date));
   if (objectsEqual(this.dateFilters, stringVersions)) {
-    return debug_log(`Date filters not changed.`);
+    return lotivis_log(`[lotivis]  Date filters not changed.`);
   }
   this.resetFilters(false);
   this.dateFilters = stringVersions;
@@ -4808,7 +4828,7 @@ DatasetsController.prototype.setDatesFilter = function (dates) {
 DatasetsController.prototype.setDatasetsFilter = function (datasets) {
   let stringVersions = datasets.map(dataset => String(dataset));
   if (objectsEqual(this.datasetFilters, stringVersions)) {
-    return debug_log(`Dataset filters not changed.`);
+    return lotivis_log(`[lotivis]  Dataset filters not changed.`);
   }
   this.resetFilters(false);
   this.datasetFilters = stringVersions;
@@ -4906,6 +4926,53 @@ DatasetsController.prototype.enabledStacks = function () {
 DatasetsController.prototype.enabledDates = function () {
   return extractDatesFromDatasets(this.enabledDatasets());
 };
+
+/**
+ *
+ * @class DatasetsColorsController
+ */
+class DatasetsColorsController {
+
+  /**
+   * Creates a new instance of DatasetsColorsController.
+   *
+   * @param controller
+   */
+  constructor(controller) {
+
+    let datasets = controller.workingDatasets;
+    let stacks = controller.stacks;
+    let labelToColor = {};
+    let stackToColors = {};
+
+    for (let sIndex = 0; sIndex < stacks.length; sIndex++) {
+      let stack = stacks[sIndex];
+
+      // filter datasets for stack
+      let filtered = datasets.filter(function (dataset) {
+        return dataset.label === stack || dataset.stack === stack;
+      });
+
+      let colors = Color.colorsForStack(sIndex, filtered.length);
+      stackToColors[stack] = colors;
+      for (let dIndex = 0; dIndex < filtered.length; dIndex++) {
+        labelToColor[filtered[dIndex].label] = colors[dIndex];
+      }
+    }
+
+    this.colorForDataset = function (label) {
+      return labelToColor[label] || Color.defaultTint;
+    };
+
+    this.colorForStack = function (stack) {
+      return stackToColors[stack][0] || Color.defaultTint;
+    };
+
+    this.colorsForStack = function (stack) {
+      return stackToColors[stack] || [];
+    };
+  }
+}
 
 /**
  * Updates the datasets of this controller.
@@ -5229,8 +5296,9 @@ class DatasetCard extends Card {
     super(parent);
     this.updateSensible = true;
     this.body.style('overflow', 'scroll');
-    this.footer.style('display', 'block');
+    // this.footer.style('display', 'block');
     this.render();
+    this.injectStatusTooltip();
     this.setHeaderText('Dataset Card');
   }
 
@@ -5238,26 +5306,46 @@ class DatasetCard extends Card {
    * Appends the component to this card.
    */
   render() {
-    this.element.classed('lotivis-samples-card', true);
-
-    this.header.text('');
-    this.headline = this.header.append('div');
+    this.element.classed('lotivis-data-card', true);
+    this.statusText = this.headerRow
+      .append('div')
+      .style(`display`, `none`)
+      .classed('lotivis-col-12', true)
+      .classed('lotivis-data-status-text', true)
+      .classed('lotivis-data-status-failure', true);
 
     this.textareaID = createID();
     this.textarea = this.body
       .append('textarea')
       .attr('id', this.textareaID)
       .attr('name', this.textareaID)
-      .attr('class', 'lotivis-samples-textarea');
-
-    this.statusText = this.header
-      .append('div')
-      .style(`display`, `none`)
-      .classed('lotivis-samples-status-text', true)
-      .classed('lotivis-samples-status-failure', true);
+      .attr('class', 'lotivis-data-textarea');
 
     this.textarea.on('keyup', this.onKeyup.bind(this));
+
+    this.downloadButton = new Button(this.headerRightComponent);
+    this.downloadButton.setText('Download');
+    this.downloadButton.onClick = function (event) {
+      let content = this.getTextareaContent();
+      this.download(content);
+    }.bind(this);
   }
+
+  injectStatusTooltip() {
+    this.tooltip = this
+      .element
+      .append('div')
+      .attr('class', 'lotivis-data-card-status-tooltip lotivis-data-status-failure');
+    this.tooltip.text('def');
+  }
+
+  /**
+   * Hides the tooltip.  Does nothing if tooltips opacity is already 0.
+   */
+  hideTooltip() {
+    if (+this.tooltip.style('opacity') === 0) return;
+    this.tooltip.style('opacity', 0);
+  };
 
   /**
    * Returns the text of the textarea.
@@ -5267,20 +5355,17 @@ class DatasetCard extends Card {
     return document.getElementById(this.textareaID).value || "";
   }
 
+  /**
+   * Sets the text of the textarea.
+   * @param newContent The text for the textarea.
+   */
   setTextareaContent(newContent) {
     let textarea = document.getElementById(this.textareaID);
     if (!textarea) return;
     textarea.value = newContent;
+    if (typeof newContent !== 'string') return;
     let numberOfRows = newContent.split(`\n`).length;
     this.textarea.attr('rows', numberOfRows);
-  }
-
-  /**
-   * Sets the text of the headline.
-   * @param newHeaderText The new headline text.
-   */
-  setHeaderText(newHeaderText) {
-    this.headline.text(newHeaderText);
   }
 
   /**
@@ -5288,6 +5373,11 @@ class DatasetCard extends Card {
    * @param newStatusMessage The new status message.
    */
   setStatusMessage(newStatusMessage) {
+    if (newStatusMessage) {
+      this.showTooltip();
+    } else {
+      this.statusText.text('');
+    }
     this.statusText
       .text(newStatusMessage)
       .style(`display`, newStatusMessage === "" ? `none` : `block`);
@@ -5316,7 +5406,7 @@ class DatasetCard extends Card {
    * @param reason The reason of the update.
    */
   update(datasetsController, reason) {
-    if (!this.updateSensible) return debug_log(`Skipping update due to not update sensible (Reason: ${reason}).`);
+    if (!this.updateSensible) return lotivis_log(`[lotivis]  Skipping update due to not update sensible (Reason: ${reason}).`);
     this.updateContentsOfTextarea();
   }
 
@@ -5341,11 +5431,11 @@ class DatasetCard extends Card {
       if (notifyController === true) {
 
         if (!this.datasetController) {
-          return debug_log(`No datasets controller.`);
+          return lotivis_log(`[lotivis]  No datasets controller.`);
         }
 
         if (objectsEqual(this.cachedDatasets, parsedDatasets)) {
-          return debug_log(`No changes in datasets.`);
+          return lotivis_log(`[lotivis]  No changes in datasets.`);
         }
 
         this.cachedDatasets = parsedDatasets;
@@ -5355,7 +5445,7 @@ class DatasetCard extends Card {
       }
 
     } catch (error) {
-      debug_log(`error ${error}`);
+      lotivis_log(`[lotivis]  ERROR: ${error}`);
       this.setStatusMessage(error, false);
     }
   }
@@ -5369,6 +5459,13 @@ class DatasetCard extends Card {
     let content = this.datasetsToText(datasets);
     this.setTextareaContent(content);
     this.cachedDatasets = datasets;
+  }
+
+  /**
+   * Initiates a download of the content of the textarea.
+   */
+  download(content) {
+    throw new Error(`Subclasses should override.`);
   }
 
   /**
@@ -5394,18 +5491,22 @@ class DatasetCard extends Card {
 /**
  * A card containing a textarea which contains the JSON text of a dataset collection.
  *
- * @class DatasetJsonCard
+ * @class DatasetsJsonCard
  * @extends DatasetCard
  */
-class DatasetJsonCard extends DatasetCard {
+class DatasetsJsonCard extends DatasetCard {
 
   /**
    * Creates a new instance of DatasetJsonCard.
    * @param parent The parental element or a selector (id).
    */
-  constructor(parent) {
+  constructor(parent = 'datasets-json-card') {
     super(parent);
     this.setHeaderText('Dataset JSON Card');
+  }
+
+  download(content) {
+    downloadJSON(content, 'dataset.json');
   }
 
   textToDatasets(text) {
@@ -5514,7 +5615,7 @@ function parseCSV(text) {
     let lineArray = arrays[lineIndex].map(element => trimByChar(element, `"`));
 
     if (lineArray.length < 5) {
-      debug_log(`Skipping row: ${lineArray}`);
+      lotivis_log(`Skipping row: ${lineArray}`);
       continue;
     }
 
@@ -5538,6 +5639,36 @@ function parseCSV(text) {
 }
 
 /**
+ * Returns the given string with a quotation mark in the left and right.
+ * @param aString The string to surround by quotation marks.
+ * @returns {string} The string surrounded by quotation marks.
+ */
+function surroundWithQuotationMarks(aString) {
+  return `"${aString}"`;
+}
+
+/**
+ * Returns the CSV string of the given datasets.
+ * @param datasets The datasets to create the CSV of.
+ */
+function renderCSV(datasets) {
+  let flatData = flatDatasets(datasets);
+  let headlines = ['label', 'stack', 'value', 'date', 'location'];
+  let csvContent = `${headlines.join(',')}\n`;
+  for (let index = 0; index < flatData.length; index++) {
+    let data = flatData[index];
+    let components = [];
+    components.push(surroundWithQuotationMarks(data.dataset || 'Unknown'));
+    components.push(surroundWithQuotationMarks(data.stack || ''));
+    components.push(data.value || '0');
+    components.push(surroundWithQuotationMarks(data.date || ''));
+    components.push(surroundWithQuotationMarks(data.location || ''));
+    csvContent += `${components.join(`,`)}\n`;
+  }
+  return csvContent;
+}
+
+/**
  * Presents the CSV version of datasets.  The presented CSV can be edited.
  * @class DatasetCSVCard
  * @extends Card
@@ -5553,13 +5684,17 @@ class DatasetCSVCard extends DatasetCard {
     this.setHeaderText('Dataset CSV Card');
   }
 
+  download(content) {
+    downloadCSV(content, 'dataset.json');
+  }
+
   textToDatasets(text) {
     if (text === "") return [];
     return parseCSV(text);
   }
 
   datasetsToText(datasets) {
-    return this.datasetController.getCSVDataview().csv;
+    return renderCSV(datasets);
   }
 }
 
@@ -5652,6 +5787,10 @@ class DatasetCSVDateCard extends DatasetCard {
     this.setHeaderText('Dataset CSV Card');
   }
 
+  download(content) {
+    downloadCSV(content, 'dataset.csv');
+  }
+
   textToDatasets(text) {
     if (text === "") return [];
     return parseCSVDate(text);
@@ -5689,7 +5828,7 @@ exports.PlotChart = PlotChart;
 exports.PlotChartCard = PlotChartCard;
 
 // datasets / csv cards
-exports.DatasetJsonCard = DatasetJsonCard;
+exports.DatasetJsonCard = DatasetsJsonCard;
 exports.DatasetCSVCard = DatasetCSVCard;
 exports.DatasetCSVDateCard = DatasetCSVDateCard;
 
@@ -5704,7 +5843,8 @@ exports.GeoJson = GeoJson;
 exports.Feature = Feature;
 
 // constants
-exports.Constants = Constants;
+exports.config = GlobalConfig;
+exports.debug = debug;
 
 var exports$1 = exports;
 

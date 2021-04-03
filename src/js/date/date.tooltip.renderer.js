@@ -1,6 +1,5 @@
 import {combineByDate} from "../data.juggle/dataset.combine";
-import {Constants} from "../shared/constants";
-import {verbose_log} from "../shared/debug";
+import {GlobalConfig} from "../shared/config";
 
 /**
  * Injects and presents a tooltip on a date chart.
@@ -62,7 +61,7 @@ export class DateTooltipRenderer {
      */
     function getXLeft(date, factor, offset, tooltipSize) {
       let x = dateChart.xChart(date) * factor;
-      return x + offset[0] - tooltipSize[0] - 22 - Constants.tooltipOffset;
+      return x + offset[0] - tooltipSize[0] - 22 - GlobalConfig.tooltipOffset;
     }
 
     /**
@@ -77,7 +76,7 @@ export class DateTooltipRenderer {
     function getXRight(date, factor, offset) {
       let x = dateChart.xChart(date) + dateChart.xChart.bandwidth();
       x *= factor;
-      x += offset[0] + Constants.tooltipOffset;
+      x += offset[0] + GlobalConfig.tooltipOffset;
       return x;
     }
 

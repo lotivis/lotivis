@@ -1,12 +1,11 @@
 // http://bl.ocks.org/Rokotyan/0556f8facbaf344507cdc45dc3622177
-
 /**
  * Parses a String from the given (D3.js) SVG node.
  *
  * @param svgNode The node of the SVG.
  * @returns {string} The parsed String.
  */
-function getSVGString(svgNode) {
+export function getSVGString(svgNode) {
 
   svgNode.setAttribute('xlink', 'http://www.w3.org/1999/xlink');
   let cssStyleText = getCSSStyles(svgNode);
@@ -99,10 +98,10 @@ function getSVGString(svgNode) {
  * @param height
  * @param callback
  */
-function svgString2Image(svgString, width, height, callback) {
+export function svgString2Image(svgString, width, height, callback) {
 
   // Convert SVG string to samples URL
-  let imageSource = 'samples:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+  let imageSource = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
 
   let canvas = document.createElement("canvas");
   canvas.width = width;
@@ -127,7 +126,7 @@ function svgString2Image(svgString, width, height, callback) {
  * @param svgElement The svg element.
  * @returns {number[]} The size [width, height].
  */
-function getOriginalSizeOfSVG(svgElement) {
+export function getOriginalSizeOfSVG(svgElement) {
   let viewBoxBaseValue = svgElement.viewBox.baseVal;
   if (viewBoxBaseValue.width !== 0 && viewBoxBaseValue.height !== 0) {
     return [
@@ -140,49 +139,4 @@ function getOriginalSizeOfSVG(svgElement) {
       svgElement.height.baseVal.value,
     ];
   }
-}
-
-/**
- * Creates and appends an anchor linked to the given samples which is then immediately clicked.
- *
- * @param data The samples to be downloaded.
- * @param filename The name of the file.
- */
-function downloadData(data, filename) {
-  let anchor = document.createElement("a");
-  anchor.href = URL.createObjectURL(data);
-  anchor.download = appendPNGIfNeeded(filename);
-  document.body.appendChild(anchor);
-  anchor.click();
-  document.body.removeChild(anchor);
-
-  /**
-   * Appends '.png' to the given string if the given string not already has this extension.
-   *
-   * @param filename The filename with or without the '.png' extension.
-   * @returns {*|string} The filename with a '.png' extension.
-   */
-  function appendPNGIfNeeded(filename) {
-    return filename.endsWith('.png') ? filename : `${filename}.png`;
-  }
-}
-
-/**
- * Initiates a download of the PNG image of the SVG with the given selector (id).
- *
- * @param selector The id of the SVG element to create the image of.
- * @param filename The name of the file which is been downloaded.
- */
-export function downloadImage(selector, filename) {
-  let svgElement = d3.select('#' + selector);
-  let node = svgElement.node();
-  let size = getOriginalSizeOfSVG(node);
-  let svgString = getSVGString(node);
-  svgString2Image(svgString, 2 * size[0], 2 * size[1], function (dataURL) {
-    fetch(dataURL)
-      .then(res => res.blob())
-      .then(function (dataBlob) {
-        downloadData(dataBlob, filename);
-      });
-  });
 }

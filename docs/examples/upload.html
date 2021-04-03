@@ -5,22 +5,18 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../css/lotivis.css"/>
-  <link rel="stylesheet" href="../css/examples.css"/>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <title>Lotivis - Upload</title>
 </head>
 <body>
 
-<div class="lotivis-example-container">
+<div class="lotivis-container">
   <div class="lotivis-row">
     <div class="lotivis-col-2">
-      <a href="../index.html">
-        <button class="back-button">
-          Back
-        </button>
+      <a class="lotivis-anchor-back" href="../index.html">
+        Back
       </a>
     </div>
-    <div class="lotivis-col-8 text-center">
+    <div class="lotivis-col-8 lotivis-headline">
       <h1>Upload</h1>
     </div>
     <div class="lotivis-col-6">
@@ -66,13 +62,6 @@
         <!-- CSV Card Code Here -->
       </div>
     </div>
-    <div class="lotivis-col-6">
-      <div class="lotivis-card lotivis-example-data">
-        <samp id="csv">
-          <!-- CSV Here -->
-        </samp>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -81,7 +70,7 @@
 
 <script>
 
-  lotivis.Constants.debugLog = true;
+  lotivis.debug(true);
   let geoJSON = 'https://raw.githubusercontent.com/isellsoap/deutschlandGeoJSON/main/2_bundeslaender/4_niedrig.geo.json';
 
   let dateChartCard = new lotivis.DateChartCard();
