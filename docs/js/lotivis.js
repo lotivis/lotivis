@@ -3714,6 +3714,7 @@ class MapChartSettingsPopup extends Popup {
    */
   inject() {
     this.card.setCardTitle('Settings');
+    this.card.content.classed('lotivis-card-body-settings', true);
     this.row = this
       .card
       .content
@@ -4729,6 +4730,7 @@ class PlotChartSettingsPopup extends Popup {
    */
   inject() {
     this.card.setCardTitle('Settings');
+    this.card.content.classed('lotivis-card-body-settings', true);
     this.row = this.card.content
       .append('div')
       .classed('lotivis-row', true);
