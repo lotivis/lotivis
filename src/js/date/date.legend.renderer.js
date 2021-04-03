@@ -1,4 +1,4 @@
-import {sumOfStack} from "../data.juggle/dataset.sum";
+import {sumOfStack} from "../data.juggle/data.sum";
 import {Color} from "../color/color";
 import "../color/color.stacks";
 

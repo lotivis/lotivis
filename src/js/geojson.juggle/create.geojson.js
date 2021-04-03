@@ -1,4 +1,4 @@
-import {extractLocationsFromDatasets} from "../data.juggle/dataset.extract";
+import {extractLocationsFromDatasets} from "../data.juggle/data.extract";
 
 /**
  *

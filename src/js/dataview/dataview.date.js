@@ -1,9 +1,9 @@
 import {DatasetsController} from "../data/datasets.controller";
-import {dateToItemsRelation} from "../data.juggle/dataset.relations";
-import {createStackModel} from "../data.juggle/dataset.stacks";
+import {dateToItemsRelation} from "../data.juggle/data.relations";
+import {createStackModel} from "../data.juggle/data.stacks";
 import {copy} from "../shared/copy";
-import {combineDatasetsByRatio} from "../data.juggle/dataset.combine.ratio";
-import {extractDatesFromDatasets} from "../data.juggle/dataset.extract";
+import {combineDatasetsByRatio} from "../data.juggle/data.combine.ratio";
+import {extractDatesFromDatasets} from "../data.juggle/data.extract";
 
 /**
  * Returns a new generated DateDataview for the current enabled samples of dataset of this controller.

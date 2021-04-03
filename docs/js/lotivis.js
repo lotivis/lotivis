@@ -1320,7 +1320,7 @@ class Card extends Component {
       .text('Hello');
   }
 
-  setHeaderText(newTitle) {
+  setCardTitle(newTitle) {
     this.titleLabel.text(newTitle);
   }
 
@@ -2338,7 +2338,7 @@ class DateChartCard extends ChartCard {
     this.datasets = [];
     this.renderChart();
     this.renderRadioGroup();
-    this.setHeaderText((config && config.name) ? config.name : 'Date');
+    this.setCardTitle((config && config.name) ? config.name : 'Date');
     this.applyURLParameters();
   }
 
@@ -3706,7 +3706,7 @@ class MapChartCard extends ChartCard {
   constructor(parent, config) {
     super(parent);
     this.config = config;
-    this.setHeaderText('Map');
+    this.setCardTitle('Map');
   }
 
   /**
@@ -4689,7 +4689,7 @@ class PlotChartCard extends ChartCard {
     this.datasets = [];
     this.injectRadioGroup();
     this.applyURLParameters();
-    this.setHeaderText('Plot');
+    this.setCardTitle('Plot');
   }
 
   /**
@@ -5249,6 +5249,99 @@ DatasetsController.prototype.getDateDataview = function (groupSize) {
   return dataview;
 };
 
+class LotivisError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = this.constructor.name;
+    this.message = message;
+  }
+}
+
+class DataValidateError extends LotivisError {
+  constructor(message) {
+    super(message);
+  }
+}
+
+class MissingPropertyError extends DataValidateError {
+  constructor(message, propertyName) {
+    super(message);
+    this.propertyName = propertyName;
+  }
+}
+
+class InvalidFormatError extends DataValidateError {
+  constructor(message) {
+    super(message);
+  }
+}
+
+class GeoJSONValidateError extends LotivisError {
+  constructor(message) {
+    super(message);
+  }
+}
+
+exports.LotivisError = LotivisError;
+exports.DataValidateError = DataValidateError;
+exports.MissingPropertyError = MissingPropertyError;
+exports.InvalidFormatError = InvalidFormatError;
+exports.GeoJSONValidateError = GeoJSONValidateError;
+
+/**
+ * Validates the given datasets.
+ * @param datasets The datasets to validate.
+ * @throws InvalidFormatError
+ */
+function validateDatasets(datasets) {
+
+  if (!datasets) {
+    throw new InvalidFormatError(`No dataset given.`);
+  } else if (!Array.isArray(datasets)) {
+    throw new InvalidFormatError(`Expecting array of datasets.`);
+  }
+
+  for (let index = 0; index < datasets.length; index++) {
+    validateDataset(datasets[index]);
+  }
+}
+
+/**
+ * Validates the given dataset.
+ * @param dataset The dataset to validate.
+ * @throws InvalidFormatError
+ * @throws MissingPropertyError
+ */
+function validateDataset(dataset) {
+  if (!dataset) {
+    throw new InvalidFormatError(`No dataset given.`);
+  } else if (!dataset.label) {
+    throw new MissingPropertyError(`Missing label for dataset. ${dataset}`);
+  } else if (!dataset.data) {
+    throw new MissingPropertyError(`Invalid data. Property is not an array. Dataset: ${dataset.label}`);
+  } else if (!Array.isArray(dataset.data)) {
+    throw new InvalidFormatError(`Invalid data. Property is not an array. Dataset: ${dataset.label}`);
+  }
+
+  let data = dataset;
+  for (let index = 0; index < data.length; index++) {
+    validateDataItem(data[index]);
+  }
+}
+
+/**
+ * Validates the given data item by ensuring it has a valid `date`, `location` and `value` property value.
+ * @param item The data item to validate.
+ * @throws MissingPropertyError
+ */
+function validateDataItem(item) {
+  if (!item.date) {
+    throw new MissingPropertyError(`Missing date property for item.`);
+  } else if (!item.location) {
+    throw new MissingPropertyError(`Missing location property for item.`);
+  }
+}
+
 /**
  * Returns a dataset collection created from the given flat samples collection.
  * @param flatData The flat samples collection.
@@ -5294,10 +5387,6 @@ function createDatasets(flatData) {
   }
 
   return datasets;
-}
-
-function validateDataItem(item) {
-  return (item.label || item.dataset) && item.date && item.location && (item.value || item.value === 0)  ;
 }
 
 /**
@@ -5442,35 +5531,68 @@ class ModalPopup extends Popup {
   }
 }
 
-function validateDataset(dataset) {
-  if (!dataset) {
-    throw Error(`No dataset given.`);
-  } else if (!dataset.label) {
-    throw Error(`Missing label for dataset. ${dataset}`);
-  } else if (dataset.data && !Array.isArray(dataset.data)) {
-    throw Error(`Invalid data. Property is not an array. Dataset: ${dataset.label}`);
-  }
-}
+/**
+ * A toast in the top of the page.
+ *
+ * @class Toast
+ * @extends Component
+ */
+class Toast extends Component {
 
-function validateDatasets(datasets) {
-  if (!datasets) {
-    throw Error(`No dataset given.`);
-  } else if (!Array.isArray(datasets)) {
-    throw Error(`Datasets argument is not an array.`);
+  /**
+   * Creates an instance of Toast.
+   *
+   * @constructor
+   * @param {Component} parent The parental component.
+   */
+  constructor(parent) {
+    super(parent);
+    this.element = this
+      .parent
+      .append('div')
+      .style('opacity', 0)
+      .style('display', `none`)
+      .attr('class', 'lotivis-data-card-status-tooltip');
   }
 
-  for (let index = 0; index < datasets.length; index++) {
-    let dataset = datasets[index];
-    validateDataset(dataset);
+  /**
+   * Sets the text of the Toast.
+   * @param text The text of the Toast.
+   */
+  setText(text) {
+    this.element.text(text);
+  }
+
+  show() {
+    super.show();
+    this.element.style('opacity', 1);
+  }
+
+  hide() {
+    super.hide();
+    this.element.style('opacity', 0);
+  }
+
+  /**
+   * Sets the text of the status label.  If text is empty the status label will be hide.
+   * @param newStatusMessage The new status message.
+   */
+  setStatusMessage(newStatusMessage) {
+    this.element.text(newStatusMessage);
+    if (newStatusMessage === "") {
+      this.hide();
+    } else {
+      this.show();
+    }
   }
 }
 
 /**
  *
- * @class DatasetCard
+ * @class DataCard
  * @extends Card
  */
-class DatasetCard extends Card {
+class DataCard extends Card {
 
   /**
    * Creates a new instance of DatasetCard.
@@ -5480,10 +5602,9 @@ class DatasetCard extends Card {
     super(parent);
     this.updateSensible = true;
     this.body.style('overflow', 'scroll');
-    // this.footer.style('display', 'block');
     this.render();
-    this.injectStatusTooltip();
-    this.setHeaderText('Dataset Card');
+    this.toast = new Toast(this.parent);
+    this.setCardTitle('Dataset Card');
   }
 
   /**
@@ -5508,24 +5629,6 @@ class DatasetCard extends Card {
     }.bind(this);
   }
 
-  injectStatusTooltip() {
-    this.tooltip = this
-      .element
-      .append('div')
-      .style('opacity', 0)
-      .style('display', `none`)
-      .attr('class', 'lotivis-data-card-status-tooltip');
-  }
-
-  /**
-   * Hides the tooltip.  Does nothing if tooltips opacity is already 0.
-   */
-  hideTooltip() {
-    if (+this.tooltip.style('opacity') === 0) return;
-    this.tooltip.style('opacity', 0);
-    this.tooltip.style('display', `none`);
-  };
-
   /**
    * Returns the text of the textarea.
    * @returns {*} The text of the textarea.
@@ -5542,20 +5645,11 @@ class DatasetCard extends Card {
     let textarea = document.getElementById(this.textareaID);
     if (!textarea) return;
     textarea.value = newContent;
+
     if (typeof newContent !== 'string') return;
     // let numberOfRows = newContent.split(`\n`).length;
     // this.textarea.attr('rows', numberOfRows);
     this.textarea.attr('rows', 30);
-  }
-
-  /**
-   * Sets the text of the status label.  If text is empty the status label will be hide.
-   * @param newStatusMessage The new status message.
-   */
-  setStatusMessage(newStatusMessage) {
-    this.tooltip.text(newStatusMessage);
-    this.tooltip.style('opacity', newStatusMessage === "" ? 0 : 1);
-    this.tooltip.style('display', newStatusMessage === "" ? `none` : `block`);
   }
 
   /**
@@ -5593,7 +5687,7 @@ class DatasetCard extends Card {
   updateDatasetsOfController(notifyController = false) {
 
     let content = this.getTextareaContent();
-    this.setStatusMessage('', true);
+    this.toast.setStatusMessage('', true);
 
     try {
 
@@ -5621,7 +5715,7 @@ class DatasetCard extends Card {
 
     } catch (error) {
       lotivis_log(`[lotivis]  ERROR: ${error}`);
-      this.setStatusMessage(error, false);
+      this.toast.setStatusMessage(error, false);
     }
   }
 
@@ -5666,9 +5760,9 @@ class DatasetCard extends Card {
 /**
  * A card containing a textarea which contains the JSON text of a dataset collection.
  * @class DatasetJSONCard
- * @extends DatasetCard
+ * @extends DataCard
  */
-class DatasetJSONCard extends DatasetCard {
+class DatasetJSONCard extends DataCard {
 
   /**
    * Creates a new instance of DatasetJSONCard.
@@ -5676,7 +5770,7 @@ class DatasetJSONCard extends DatasetCard {
    */
   constructor(parent = 'datasets-json-card') {
     super(parent);
-    this.setHeaderText('Dataset JSON Card');
+    this.setCardTitle('Dataset JSON Card');
   }
 
   download(content) {
@@ -5795,7 +5889,7 @@ function renderCSV(datasets) {
  * @class DatasetCSVCard
  * @extends Card
  */
-class DatasetCSVCard extends DatasetCard {
+class DatasetCSVCard extends DataCard {
 
   /**
    * Creates a new instance of DatasetCSVCard.
@@ -5803,7 +5897,7 @@ class DatasetCSVCard extends DatasetCard {
    */
   constructor(parent) {
     super(parent);
-    this.setHeaderText('Dataset CSV Card');
+    this.setCardTitle('Dataset CSV Card');
   }
 
   download(content) {
@@ -5900,7 +5994,7 @@ function renderCSVDate(datasets) {
  * @class DatasetCSVDateCard
  * @extends Card
  */
-class DatasetCSVDateCard extends DatasetCard {
+class DatasetCSVDateCard extends DataCard {
 
   /**
    * Creates a new instance of DatasetCSVCard.
@@ -5908,7 +6002,7 @@ class DatasetCSVDateCard extends DatasetCard {
    */
   constructor(parent) {
     super(parent);
-    this.setHeaderText('Dataset CSV Card');
+    this.setCardTitle('Dataset CSV Card');
   }
 
   download(content) {
@@ -5990,7 +6084,7 @@ exports.PlotChart = PlotChart;
 exports.PlotChartCard = PlotChartCard;
 
 // datasets / csv cards
-exports.DatasetCard = DatasetCard;
+exports.DatasetCard = DataCard;
 exports.DatasetJSONCard = DatasetJSONCard;
 exports.DatasetCSVCard = DatasetCSVCard;
 exports.DatasetCSVDateCard = DatasetCSVDateCard;

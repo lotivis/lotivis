@@ -1,4 +1,4 @@
-import {flatDatasets} from "../data.juggle/dataset.flat";
+import {flatDatasets} from "../data.juggle/data.flat";
 
 /**
  * Returns the given string with a quotation mark in the left and right.

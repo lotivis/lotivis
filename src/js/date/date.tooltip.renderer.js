@@ -1,4 +1,4 @@
-import {combineByDate} from "../data.juggle/dataset.combine";
+import {combineByDate} from "../data.juggle/data.combine";
 import {GlobalConfig} from "../shared/config";
 
 /**

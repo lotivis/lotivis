@@ -20,7 +20,7 @@ export class MapChartCard extends ChartCard {
   constructor(parent, config) {
     super(parent);
     this.config = config;
-    this.setHeaderText('Map');
+    this.setCardTitle('Map');
   }
 
   /**

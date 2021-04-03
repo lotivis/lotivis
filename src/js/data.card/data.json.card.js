@@ -1,13 +1,13 @@
-import {DatasetCard} from "./dataset.card";
+import {DataCard} from "./data.card";
 import {downloadJSON} from "../shared/download";
 import {createDownloadFilename} from "../shared/filname";
 
 /**
  * A card containing a textarea which contains the JSON text of a dataset collection.
  * @class DatasetJSONCard
- * @extends DatasetCard
+ * @extends DataCard
  */
-export class DatasetJSONCard extends DatasetCard {
+export class DatasetJSONCard extends DataCard {
 
   /**
    * Creates a new instance of DatasetJSONCard.
@@ -15,7 +15,7 @@ export class DatasetJSONCard extends DatasetCard {
    */
   constructor(parent = 'datasets-json-card') {
     super(parent);
-    this.setHeaderText('Dataset JSON Card');
+    this.setCardTitle('Dataset JSON Card');
   }
 
   download(content) {

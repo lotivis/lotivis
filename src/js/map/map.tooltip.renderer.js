@@ -1,4 +1,4 @@
-import {combineByLocation} from "../data.juggle/dataset.combine";
+import {combineByLocation} from "../data.juggle/data.combine";
 import {Color} from "../color/color";
 import {styleForCSSClass} from "../shared/style";
 import {formatNumber} from "../shared/format";

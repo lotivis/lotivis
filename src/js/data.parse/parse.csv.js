@@ -1,6 +1,6 @@
 import {csvStringToArray} from "../shared/csv.to.array";
 import {trimByChar} from "../shared/trim";
-import {createDatasets} from "../data.juggle/dataset.create";
+import {createDatasets} from "../data.juggle/data.create.datasets";
 import {lotivis_log} from "../shared/debug";
 
 export function parseCSV(text) {

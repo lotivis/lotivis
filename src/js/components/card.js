@@ -61,7 +61,7 @@ export class Card extends Component {
       .text('Hello');
   }
 
-  setHeaderText(newTitle) {
+  setCardTitle(newTitle) {
     this.titleLabel.text(newTitle);
   }
 

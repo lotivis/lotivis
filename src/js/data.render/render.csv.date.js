@@ -1,5 +1,5 @@
-import {extractLabelsFromDatasets} from "../data.juggle/dataset.extract";
-import {dateToItemsRelation} from "../data.juggle/dataset.relations";
+import {extractLabelsFromDatasets} from "../data.juggle/data.extract";
+import {dateToItemsRelation} from "../data.juggle/data.relations";
 
 /**
  *

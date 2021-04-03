@@ -1,4 +1,4 @@
-import {flatDatasets} from "./dataset.flat";
+import {flatDatasets} from "./data.flat";
 
 /**
  * Returns the set of dataset names from the given dataset collection.

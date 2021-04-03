@@ -5,9 +5,9 @@ import {
   extractEarliestDateWithValue,
   extractLabelsFromDatasets,
   extractLatestDateWithValue
-} from "../data.juggle/dataset.extract";
-import {combineByDate} from "../data.juggle/dataset.combine";
-import {sumOfLabel} from "../data.juggle/dataset.sum";
+} from "../data.juggle/data.extract";
+import {combineByDate} from "../data.juggle/data.combine";
+import {sumOfLabel} from "../data.juggle/data.sum";
 
 /**
  *

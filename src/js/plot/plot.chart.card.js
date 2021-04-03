@@ -30,7 +30,7 @@ export class PlotChartCard extends ChartCard {
     this.datasets = [];
     this.injectRadioGroup();
     this.applyURLParameters();
-    this.setHeaderText('Plot');
+    this.setCardTitle('Plot');
   }
 
   /**

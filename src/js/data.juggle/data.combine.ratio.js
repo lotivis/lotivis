@@ -1,6 +1,6 @@
-import {combineByDate} from "./dataset.combine";
+import {combineByDate} from "./data.combine";
 import '../shared/extension.array';
-import {sumOfValues} from "./dataset.sum";
+import {sumOfValues} from "./data.sum";
 import {copy} from "../shared/copy";
 
 /**

@@ -31,10 +31,10 @@ import {ChartCard} from "./js/components/chart.card";
 import {Dropdown} from "./js/components/dropdown";
 import {Popup} from "./js/components/popup";
 
-import {DatasetCard} from "./js/data.card/dataset.card";
-import {DatasetJSONCard} from "./js/data.card/datasets.json.card";
-import {DatasetCSVCard} from "./js/data.card/dataset.csv.card";
-import {DatasetCSVDateCard} from "./js/data.card/dataset.csv.date.card";
+import {DataCard} from "./js/data.card/data.card";
+import {DatasetJSONCard} from "./js/data.card/data.json.card";
+import {DatasetCSVCard} from "./js/data.card/data.csv.card";
+import {DatasetCSVDateCard} from "./js/data.card/data.csv.date.card";
 import {GlobalConfig} from "./js/shared/config";
 import {debug} from "./js/shared/debug";
 import {parseCSV} from "./js/data.parse/parse.csv";
@@ -70,7 +70,7 @@ exports.PlotChart = PlotChart;
 exports.PlotChartCard = PlotChartCard;
 
 // datasets / csv cards
-exports.DatasetCard = DatasetCard;
+exports.DatasetCard = DataCard;
 exports.DatasetJSONCard = DatasetJSONCard;
 exports.DatasetCSVCard = DatasetCSVCard;
 exports.DatasetCSVDateCard = DatasetCSVDateCard;

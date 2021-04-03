@@ -1,9 +1,9 @@
 import {
   extractDatesFromDatasets,
   extractLabelsFromDatasets
-} from "./dataset.extract";
-import {flatDatasets} from "./dataset.flat";
-import {combineByDate} from "./dataset.combine";
+} from "./data.extract";
+import {flatDatasets} from "./data.flat";
+import {combineByDate} from "./data.combine";
 import {verbose_log} from "../shared/debug";
 
 /**

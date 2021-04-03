@@ -1,5 +1,5 @@
 import {Chart} from '../components/chart';
-import {combineByLocation, combineByStacks} from '../data.juggle/dataset.combine';
+import {combineByLocation, combineByStacks} from '../data.juggle/data.combine';
 import {removeFeatures} from "../geojson.juggle/remove.features";
 import {MapTooltipRenderer} from "./map.tooltip.renderer";
 import {MapLegendRenderer} from "./map.legend.renderer";

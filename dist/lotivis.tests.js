@@ -1325,138 +1325,6 @@ function renderCSV(datasets) {
   return csvContent;
 }
 
-/*
-Following code from:
-https://gist.github.com/Jezternz/c8e9fafc2c114e079829974e3764db75
-
-We use this function to save samples.parse a CSV file.
- */
-
-const csvStringToArray = strData => {
-  const objPattern = new RegExp(("(\\,|\\r?\\n|\\r|^)(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^\\,\\r\\n]*))"), "gi");
-  let arrMatches = null, arrData = [[]];
-  while (arrMatches = objPattern.exec(strData)) {
-    if (arrMatches[1].length && arrMatches[1] !== ",") arrData.push([]);
-    arrData[arrData.length - 1].push(arrMatches[2] ?
-      arrMatches[2].replace(new RegExp("\"\"", "g"), "\"") :
-      arrMatches[3]);
-  }
-  return arrData;
-};
-
-/**
- * Returns a new version of the given string by trimming the given char from the beginning and the end of the string.
- * @param string The string to be trimmed.
- * @param character The character to trim.
- * @returns {string} The trimmed version of the string.
- */
-function trimByChar(string, character) {
-  const saveString = String(string);
-  const first = [...saveString].findIndex(char => char !== character);
-  const last = [...saveString].reverse().findIndex(char => char !== character);
-  return saveString.substring(first, saveString.length - last);
-}
-
-/**
- * Returns a dataset collection created from the given flat samples collection.
- * @param flatData The flat samples collection.
- * @returns {[]} A collection of datasets.
- */
-function createDatasets(flatData) {
-  let datasetsByLabel = {};
-
-  for (let itemIndex = 0; itemIndex < flatData.length; itemIndex++) {
-    let item = flatData[itemIndex];
-
-    if (!validateDataItem(item)) ;
-
-    let label = item.dataset || item.label;
-    let dataset = datasetsByLabel[label];
-
-    if (dataset) {
-      dataset.data.push({
-        date: item.date,
-        location: item.location,
-        value: item.value
-      });
-    } else {
-      datasetsByLabel[label] = {
-        label: label,
-        stack: item.stack,
-        data: [{
-          date: item.date,
-          location: item.location,
-          value: item.value
-        }]
-      };
-    }
-  }
-
-  let datasets = [];
-  let labels = Object.getOwnPropertyNames(datasetsByLabel);
-
-  for (let index = 0; index < labels.length; index++) {
-    let label = labels[index];
-    if (label.length === 0) continue;
-    datasets.push(datasetsByLabel[label]);
-  }
-
-  return datasets;
-}
-
-function validateDataItem(item) {
-  return (item.label || item.dataset) && item.date && item.location && (item.value || item.value === 0)  ;
-}
-
-function parseCSV(text) {
-  let flatData = [];
-  let arrays = csvStringToArray(text);
-  let headlines = arrays.shift();
-
-  for (let lineIndex = 0; lineIndex < arrays.length; lineIndex++) {
-
-    let lineArray = arrays[lineIndex].map(element => trimByChar(element, `"`));
-
-    if (lineArray.length < 5) {
-      continue;
-    }
-
-    flatData.push({
-      label: lineArray[0],
-      stack: lineArray[1],
-      value: +lineArray[2],
-      date: lineArray[3],
-      location: lineArray[4]
-    });
-  }
-
-  let datasets = createDatasets(flatData);
-  datasets.csv = {
-    content: text,
-    headlines: headlines,
-    lines: arrays,
-  };
-
-  return datasets;
-}
-
-/**
- *
- * @param url
- * @param extractItemBlock
- * @returns {Promise<[]>}
- */
-function fetchCSV(
-  url,
-  extractItemBlock = function (components) {
-    return {date: components[0], value: components[1]};
-  }) {
-
-  return fetch(url)
-    .then(response => response.text())
-    .then(parseCSV);
-}
-
 /**
  *
  * @param datasets
@@ -1548,6 +1416,210 @@ function extractObjects(topology) {
     }
   }
   return objects;
+}
+
+/*
+Following code from:
+https://gist.github.com/Jezternz/c8e9fafc2c114e079829974e3764db75
+
+We use this function to save samples.parse a CSV file.
+ */
+
+const csvStringToArray = strData => {
+  const objPattern = new RegExp(("(\\,|\\r?\\n|\\r|^)(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^\\,\\r\\n]*))"), "gi");
+  let arrMatches = null, arrData = [[]];
+  while (arrMatches = objPattern.exec(strData)) {
+    if (arrMatches[1].length && arrMatches[1] !== ",") arrData.push([]);
+    arrData[arrData.length - 1].push(arrMatches[2] ?
+      arrMatches[2].replace(new RegExp("\"\"", "g"), "\"") :
+      arrMatches[3]);
+  }
+  return arrData;
+};
+
+/**
+ * Returns a new version of the given string by trimming the given char from the beginning and the end of the string.
+ * @param string The string to be trimmed.
+ * @param character The character to trim.
+ * @returns {string} The trimmed version of the string.
+ */
+function trimByChar(string, character) {
+  const saveString = String(string);
+  const first = [...saveString].findIndex(char => char !== character);
+  const last = [...saveString].reverse().findIndex(char => char !== character);
+  return saveString.substring(first, saveString.length - last);
+}
+
+class LotivisError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = this.constructor.name;
+    this.message = message;
+  }
+}
+
+class DataValidateError extends LotivisError {
+  constructor(message) {
+    super(message);
+  }
+}
+
+class MissingPropertyError extends DataValidateError {
+  constructor(message, propertyName) {
+    super(message);
+    this.propertyName = propertyName;
+  }
+}
+
+class InvalidFormatError extends DataValidateError {
+  constructor(message) {
+    super(message);
+  }
+}
+
+class GeoJSONValidateError extends LotivisError {
+  constructor(message) {
+    super(message);
+  }
+}
+
+exports.LotivisError = LotivisError;
+exports.DataValidateError = DataValidateError;
+exports.MissingPropertyError = MissingPropertyError;
+exports.InvalidFormatError = InvalidFormatError;
+exports.GeoJSONValidateError = GeoJSONValidateError;
+
+/**
+ * Validates the given datasets.
+ * @param datasets The datasets to validate.
+ * @throws InvalidFormatError
+ */
+function validateDatasets(datasets) {
+
+  if (!datasets) {
+    throw new InvalidFormatError(`No dataset given.`);
+  } else if (!Array.isArray(datasets)) {
+    throw new InvalidFormatError(`Expecting array of datasets.`);
+  }
+
+  for (let index = 0; index < datasets.length; index++) {
+    validateDataset(datasets[index]);
+  }
+}
+
+/**
+ * Validates the given dataset.
+ * @param dataset The dataset to validate.
+ * @throws InvalidFormatError
+ * @throws MissingPropertyError
+ */
+function validateDataset(dataset) {
+  if (!dataset) {
+    throw new InvalidFormatError(`No dataset given.`);
+  } else if (!dataset.label) {
+    throw new MissingPropertyError(`Missing label for dataset. ${dataset}`);
+  } else if (!dataset.data) {
+    throw new MissingPropertyError(`Invalid data. Property is not an array. Dataset: ${dataset.label}`);
+  } else if (!Array.isArray(dataset.data)) {
+    throw new InvalidFormatError(`Invalid data. Property is not an array. Dataset: ${dataset.label}`);
+  }
+
+  let data = dataset;
+  for (let index = 0; index < data.length; index++) {
+    validateDataItem(data[index]);
+  }
+}
+
+/**
+ * Validates the given data item by ensuring it has a valid `date`, `location` and `value` property value.
+ * @param item The data item to validate.
+ * @throws MissingPropertyError
+ */
+function validateDataItem(item) {
+  if (!item.date) {
+    throw new MissingPropertyError(`Missing date property for item.`);
+  } else if (!item.location) {
+    throw new MissingPropertyError(`Missing location property for item.`);
+  }
+}
+
+/**
+ * Returns a dataset collection created from the given flat samples collection.
+ * @param flatData The flat samples collection.
+ * @returns {[]} A collection of datasets.
+ */
+function createDatasets(flatData) {
+  let datasetsByLabel = {};
+
+  for (let itemIndex = 0; itemIndex < flatData.length; itemIndex++) {
+    let item = flatData[itemIndex];
+
+    if (!validateDataItem(item)) ;
+
+    let label = item.dataset || item.label;
+    let dataset = datasetsByLabel[label];
+
+    if (dataset) {
+      dataset.data.push({
+        date: item.date,
+        location: item.location,
+        value: item.value
+      });
+    } else {
+      datasetsByLabel[label] = {
+        label: label,
+        stack: item.stack,
+        data: [{
+          date: item.date,
+          location: item.location,
+          value: item.value
+        }]
+      };
+    }
+  }
+
+  let datasets = [];
+  let labels = Object.getOwnPropertyNames(datasetsByLabel);
+
+  for (let index = 0; index < labels.length; index++) {
+    let label = labels[index];
+    if (label.length === 0) continue;
+    datasets.push(datasetsByLabel[label]);
+  }
+
+  return datasets;
+}
+
+function parseCSV(text) {
+  let flatData = [];
+  let arrays = csvStringToArray(text);
+  let headlines = arrays.shift();
+
+  for (let lineIndex = 0; lineIndex < arrays.length; lineIndex++) {
+
+    let lineArray = arrays[lineIndex].map(element => trimByChar(element, `"`));
+
+    if (lineArray.length < 5) {
+      continue;
+    }
+
+    flatData.push({
+      label: lineArray[0],
+      stack: lineArray[1],
+      value: +lineArray[2],
+      date: lineArray[3],
+      location: lineArray[4]
+    });
+  }
+
+  let datasets = createDatasets(flatData);
+  datasets.csv = {
+    content: text,
+    headlines: headlines,
+    lines: arrays,
+  };
+
+  return datasets;
 }
 
 /**
@@ -1670,8 +1742,6 @@ const DateAccessWeek = function (weekday) {
   }
 };
 
-require('d3');
-
 exports.Color = Color;
 exports.DatasetController = DatasetsController;
 exports.GeoJson = GeoJson;
@@ -1679,7 +1749,6 @@ exports.Feature = Feature;
 exports.joinFeatures = joinFeatures;
 exports.renderCSV = renderCSV;
 exports.renderCSVDate = renderCSVDate;
-exports.fetchCSV = fetchCSV;
 exports.parseCSV = parseCSV;
 exports.parseCSVDate = parseCSVDate;
 exports.createGeoJSON = createGeoJSON;
@@ -1711,6 +1780,9 @@ exports.equals = equals;
 exports.objectsEqual = objectsEqual;
 exports.copy = copy;
 exports.appendExtensionIfNeeded = appendExtensionIfNeeded;
+exports.validateDataset = validateDataset;
+exports.validateDatasets = validateDatasets;
+exports.validateDataItem = validateDataItem;
 
 exports.FormattedDateAccess = FormattedDateAccess;
 exports.DateAccessWeek = DateAccessWeek;

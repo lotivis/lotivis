@@ -1,5 +1,5 @@
-import {combineByDate, combineByLocation, combineByStacks} from "../data.juggle/dataset.combine";
-import {sumOfDataset, sumOfLabel, sumOfStack} from "../data.juggle/dataset.sum";
+import {combineByDate, combineByLocation, combineByStacks} from "../data.juggle/data.combine";
+import {sumOfDataset, sumOfLabel, sumOfStack} from "../data.juggle/data.sum";
 import {d3LibraryAccess} from "../shared/d3libaccess";
 import {DefaultDateAccess} from "../data.dateaccess/dateaccess";
 

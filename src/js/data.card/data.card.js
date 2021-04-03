@@ -1,16 +1,17 @@
 import {Card} from "../components/card";
 import {createID} from "../shared/selector";
-import {validateDatasets} from "../data.juggle/dataset.validate";
+import {validateDatasets} from "../data.juggle/data.validate";
 import {lotivis_log} from "../shared/debug";
 import {objectsEqual} from "../shared/equal";
 import {Button} from "../components/button";
+import {Toast} from "../components/toast";
 
 /**
  *
- * @class DatasetCard
+ * @class DataCard
  * @extends Card
  */
-export class DatasetCard extends Card {
+export class DataCard extends Card {
 
   /**
    * Creates a new instance of DatasetCard.
@@ -20,10 +21,9 @@ export class DatasetCard extends Card {
     super(parent);
     this.updateSensible = true;
     this.body.style('overflow', 'scroll');
-    // this.footer.style('display', 'block');
     this.render();
-    this.injectStatusTooltip();
-    this.setHeaderText('Dataset Card');
+    this.toast = new Toast(this.parent);
+    this.setCardTitle('Dataset Card');
   }
 
   /**
@@ -48,24 +48,6 @@ export class DatasetCard extends Card {
     }.bind(this);
   }
 
-  injectStatusTooltip() {
-    this.tooltip = this
-      .element
-      .append('div')
-      .style('opacity', 0)
-      .style('display', `none`)
-      .attr('class', 'lotivis-data-card-status-tooltip');
-  }
-
-  /**
-   * Hides the tooltip.  Does nothing if tooltips opacity is already 0.
-   */
-  hideTooltip() {
-    if (+this.tooltip.style('opacity') === 0) return;
-    this.tooltip.style('opacity', 0);
-    this.tooltip.style('display', `none`);
-  };
-
   /**
    * Returns the text of the textarea.
    * @returns {*} The text of the textarea.
@@ -82,20 +64,11 @@ export class DatasetCard extends Card {
     let textarea = document.getElementById(this.textareaID);
     if (!textarea) return;
     textarea.value = newContent;
+
     if (typeof newContent !== 'string') return;
     // let numberOfRows = newContent.split(`\n`).length;
     // this.textarea.attr('rows', numberOfRows);
     this.textarea.attr('rows', 30);
-  }
-
-  /**
-   * Sets the text of the status label.  If text is empty the status label will be hide.
-   * @param newStatusMessage The new status message.
-   */
-  setStatusMessage(newStatusMessage) {
-    this.tooltip.text(newStatusMessage);
-    this.tooltip.style('opacity', newStatusMessage === "" ? 0 : 1);
-    this.tooltip.style('display', newStatusMessage === "" ? `none` : `block`);
   }
 
   /**
@@ -133,7 +106,7 @@ export class DatasetCard extends Card {
   updateDatasetsOfController(notifyController = false) {
 
     let content = this.getTextareaContent();
-    this.setStatusMessage('', true);
+    this.toast.setStatusMessage('', true);
 
     try {
 
@@ -161,7 +134,7 @@ export class DatasetCard extends Card {
 
     } catch (error) {
       lotivis_log(`[lotivis]  ERROR: ${error}`);
-      this.setStatusMessage(error, false);
+      this.toast.setStatusMessage(error, false);
     }
   }
 

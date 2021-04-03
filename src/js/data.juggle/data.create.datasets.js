@@ -1,3 +1,5 @@
+import {validateDataItem} from "./data.validate";
+
 /**
  * Returns a dataset collection created from the given flat samples collection.
  * @param flatData The flat samples collection.
@@ -46,8 +48,4 @@ export function createDatasets(flatData) {
   }
 
   return datasets;
-}
-
-function validateDataItem(item) {
-  return (item.label || item.dataset) && item.date && item.location && (item.value || item.value === 0)  ;
 }

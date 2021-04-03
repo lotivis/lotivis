@@ -9,13 +9,13 @@ import {Feature} from "./js/geojson/feature";
 import {
   flatDataset,
   flatDatasets
-} from "./js/data.juggle/dataset.flat";
+} from "./js/data.juggle/data.flat";
 import {
   combine,
   combineByDate,
   combineByLocation,
   combineByStacks
-} from "./js/data.juggle/dataset.combine";
+} from "./js/data.juggle/data.combine";
 import {
   extractDatesFromDatasets,
   extractDatesFromFlatData,
@@ -29,14 +29,14 @@ import {
   extractLocationsFromFlatData,
   extractStacksFromDatasets,
   extractStacksFromFlatData
-} from "./js/data.juggle/dataset.extract";
+} from "./js/data.juggle/data.extract";
 import {
   sumOfDataset,
   sumOfStack
-} from "./js/data.juggle/dataset.sum";
+} from "./js/data.juggle/data.sum";
 import {
   dateToItemsRelation
-} from "./js/data.juggle/dataset.relations";
+} from "./js/data.juggle/data.relations";
 import {DatasetsController} from "./js/data/datasets.controller";
 import "./js/data/datasets.controller.listeners";
 import "./js/data/datasets.controller.filter";
@@ -46,13 +46,12 @@ import "./js/dataview/dataview.date";
 import "./js/dataview/dataview.plot";
 import "./js/dataview/dataview.map";
 import {renderCSV} from "./js/data.render/render.csv";
-import {fetchCSV} from "./js/data.parse/fetch.csv";
 import {createGeoJSON} from "./js/geojson.juggle/create.geojson";
 import {joinFeatures} from "./js/geojson.juggle/join.features";
 import {
   combineDatasetsByRatio,
   combineDataByGroupsize
-} from "./js/data.juggle/dataset.combine.ratio";
+} from "./js/data.juggle/data.combine.ratio";
 import './js/color/color.defaults';
 import './js/color/color.map';
 import './js/color/color.plot';
@@ -61,14 +60,12 @@ import {parseCSV} from "./js/data.parse/parse.csv";
 import {parseCSVDate} from "./js/data.parse/parse.csv.date";
 import {equals, objectsEqual} from "./js/shared/equal";
 import {renderCSVDate} from "./js/data.render/render.csv.date";
-import {createDatasets} from "./js/data.juggle/dataset.create";
+import {createDatasets} from "./js/data.juggle/data.create.datasets";
 import {copy} from "./js/shared/copy";
 import {appendExtensionIfNeeded} from "./js/shared/filname";
 import {DateAccessWeek} from "./js/data.dateaccess/dateaccess.week";
-import {d3LibraryAccess} from "./js/shared/d3libaccess";
 import {FormattedDateAccess, GermanDateAccess} from "./js/data.dateaccess/dateaccess";
-
-const d3 = require('d3');
+import {validateDataItem, validateDataset, validateDatasets} from "./js/data.juggle/data.validate";
 
 exports.Color = Color;
 exports.DatasetController = DatasetsController;
@@ -77,7 +74,6 @@ exports.Feature = Feature;
 exports.joinFeatures = joinFeatures;
 exports.renderCSV = renderCSV;
 exports.renderCSVDate = renderCSVDate;
-exports.fetchCSV = fetchCSV;
 exports.parseCSV = parseCSV;
 exports.parseCSVDate = parseCSVDate;
 exports.createGeoJSON = createGeoJSON;
@@ -109,6 +105,9 @@ exports.equals = equals;
 exports.objectsEqual = objectsEqual;
 exports.copy = copy;
 exports.appendExtensionIfNeeded = appendExtensionIfNeeded;
+exports.validateDataset = validateDataset;
+exports.validateDatasets = validateDatasets;
+exports.validateDataItem = validateDataItem;
 
 exports.FormattedDateAccess = FormattedDateAccess;
 exports.DateAccessWeek = DateAccessWeek;
