@@ -35,7 +35,7 @@ export class PlotTooltipRenderer {
       components.push('Start: ' + dataset.earliestDate);
       components.push('End: ' + dataset.latestDate);
       components.push('');
-      components.push('Items: ' + dataset.data.map(item => item.value).reduce((acc, next) => acc + next, 0));
+      components.push('Items: ' + dataset.data.map(item => item.value).reduce((acc, next) => +acc + +next, 0));
       components.push('');
 
       let filtered = dataset.data.filter(item => item.value !== 0);

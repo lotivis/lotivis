@@ -26,15 +26,18 @@ export function combineDatasetsByRatio(datasets, ratio) {
  */
 export function combineDataByGroupsize(data, ratio) {
   if (!data || data.length <= ratio) return data;
+  if (ratio <= 1) return data;
+
   let combined = combineByDate(copy(data));
   let newData = [];
 
   while (combined.length > 0) {
     let dateGroup = combined.splice(0, ratio);
-    let firstItem = dateGroup.first();
-    let lastItem = dateGroup.last();
+    let firstItem = dateGroup.first() || {};
+    let lastItem = dateGroup.last() || {};
     let item = {};
     item.dataset = firstItem.dataset;
+    item.label = firstItem.label;
     item.stack = firstItem.stack;
     item.date = firstItem.date;
     item.date = firstItem.date;

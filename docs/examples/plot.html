@@ -9,26 +9,24 @@
 </head>
 <body>
 
-<div class="lotivis-example-container">
-  <div class="row">
-    <div class="col-2">
-      <a href="../index.html">
-        <button class="back-button">
-          Back
-        </button>
+<div class="lotivis-container-full">
+  <div class="lotivis-row">
+    <div class="lotivis-col-2">
+      <a class="lotivis-anchor-back" href="../index.html">
+        Back
       </a>
     </div>
-    <div class="col-8 text-center">
+    <div class="lotivis-col-8 lotivis-headline">
       <h1>Plot Data</h1>
     </div>
-    <div class="col-12">
+    <div class="lotivis-col-8">
       <div id="plot-chart-card">
         <!-- Plot Chart Here -->
       </div>
-      <div class="lotivis-example-data">
-        <samp id="data">
-          <!-- Data Here -->
-        </samp>
+    </div>
+    <div class="lotivis-col-4">
+      <div id="datasets-json-card">
+        <!-- Datasets JSON Card Here -->
       </div>
     </div>
   </div>
@@ -40,19 +38,18 @@
 <script>
 
   lotivis.debug(true);
+
   let plotChartCard = new lotivis.PlotChartCard('plot-chart-card');
-  let chart = plotChartCard.chart;
+  let datasetJSONCard = new lotivis.DatasetJSONCard('datasets-json-card');
 
   d3
     .json('/assets/example-datasets-plot.json')
     .then(function (json) {
 
-      let string = JSON.stringify(json, null, 4);
-      let element = document.getElementById('data');
-      element.innerHTML = string;
+      let controller = new lotivis.DatasetController(json);
+      plotChartCard.chart.setDatasetController(controller);
+      datasetJSONCard.setDatasetController(controller);
 
-      chart.datasets = json;
-      chart.update();
     });
 
 </script>

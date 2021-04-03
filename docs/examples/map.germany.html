@@ -49,8 +49,7 @@
   d3
     .json(geoJsonURLGermany)
     .then(function (rawGeoJSON) {
-      let geoJSON = new lotivis.GeoJson(rawGeoJSON)
-      chart.setGeoJSON(geoJSON);
+      chart.setGeoJSON(rawGeoJSON);
     });
 
 </script>

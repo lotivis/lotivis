@@ -13,6 +13,7 @@ export class Chart extends Component {
    *
    * @constructor
    * @param {Component} parent The parental component.
+   * @param config The configuration of the chart.
    */
   constructor(parent, config) {
     super(parent);
@@ -20,6 +21,9 @@ export class Chart extends Component {
     if (Object.getPrototypeOf(parent) === String.prototype) {
       this.selector = parent;
       this.element = d3.select('#' + parent);
+      if (this.element.empty()) {
+        throw new Error(`ID not found: ${parent}`);
+      }
     } else {
       this.element = parent;
       this.element.attr('id', this.selector);

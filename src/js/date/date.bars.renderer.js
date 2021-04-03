@@ -1,4 +1,5 @@
 import {GlobalConfig} from "../shared/config";
+import {lotivis_log} from "../shared/debug";
 
 export class DateBarsRenderer {
 

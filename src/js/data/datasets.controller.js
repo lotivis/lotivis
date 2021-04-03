@@ -1,5 +1,7 @@
 import {combineByDate, combineByLocation, combineByStacks} from "../data.juggle/dataset.combine";
 import {sumOfDataset, sumOfLabel, sumOfStack} from "../data.juggle/dataset.sum";
+import {d3LibraryAccess} from "../shared/d3libaccess";
+import {DefaultDateAccess} from "../data.dateaccess/dateaccess";
 
 /**
  * Controls a collection of datasets.
@@ -12,6 +14,7 @@ export class DatasetsController {
    * @param datasets The datasets to control.
    */
   constructor(datasets) {
+    this.dateAccess = DefaultDateAccess;
     this.setDatasets(datasets);
   }
 
@@ -40,8 +43,8 @@ export class DatasetsController {
   }
 
   getMax() {
-    return d3.max(this.workingDatasets, function (dataset) {
-      return d3.max(dataset.data, function (item) {
+    return d3LibraryAccess.max(this.workingDatasets, function (dataset) {
+      return d3LibraryAccess.max(dataset.data, function (item) {
         return item.value;
       });
     });

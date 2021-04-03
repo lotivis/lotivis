@@ -45,8 +45,7 @@
   const geoJsonURL = '/assets/departements.geojson';
   const mapChartCard = new lotivis.MapChartCard('map-chart-card');
   const chart = mapChartCard.chart;
-
-  chart.excludedFeatureCodes = ['2A', '2B'];
+  chart.config.excludedFeatureCodes = ['2A', '2B'];
 
   mapChartCard.onSelectedDatasetChanged = function (value) {
     let dataset = mapChartCard.datasets.find(dataset => dataset.stack === value);

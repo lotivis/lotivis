@@ -1,3 +1,9 @@
+import {Color} from "./js/color/color";
+import './js/color/color.defaults';
+import './js/color/color.map';
+import './js/color/color.plot';
+import './js/color/color.random';
+import './js/color/color.stacks';
 import {GeoJson} from "./js/geojson/geojson";
 import {Feature} from "./js/geojson/feature";
 import {
@@ -34,10 +40,11 @@ import {
 import {DatasetsController} from "./js/data/datasets.controller";
 import "./js/data/datasets.controller.listeners";
 import "./js/data/datasets.controller.filter";
+import "./js/data/datasets.controller.colors";
 import "./js/data/datasets.controller.update";
-import "./js/dataview/dataviews.date";
-import "./js/dataview/dataviews.plot";
-import "./js/dataview/dataviews.map";
+import "./js/dataview/dataview.date";
+import "./js/dataview/dataview.plot";
+import "./js/dataview/dataview.map";
 import {renderCSV} from "./js/data.render/render.csv";
 import {fetchCSV} from "./js/data.parse/fetch.csv";
 import {createGeoJSON} from "./js/geojson.juggle/create.geojson";
@@ -57,7 +64,13 @@ import {renderCSVDate} from "./js/data.render/render.csv.date";
 import {createDatasets} from "./js/data.juggle/dataset.create";
 import {copy} from "./js/shared/copy";
 import {appendExtensionIfNeeded} from "./js/shared/filname";
+import {DateAccessWeek} from "./js/data.dateaccess/dateaccess.week";
+import {d3LibraryAccess} from "./js/shared/d3libaccess";
+import {FormattedDateAccess, GermanDateAccess} from "./js/data.dateaccess/dateaccess";
 
+const d3 = require('d3');
+
+exports.Color = Color;
 exports.DatasetController = DatasetsController;
 exports.GeoJson = GeoJson;
 exports.Feature = Feature;
@@ -97,4 +110,7 @@ exports.objectsEqual = objectsEqual;
 exports.copy = copy;
 exports.appendExtensionIfNeeded = appendExtensionIfNeeded;
 
+exports.FormattedDateAccess = FormattedDateAccess;
+exports.DateAccessWeek = DateAccessWeek;
+exports.GermanDateAccess = GermanDateAccess;
 export default exports;

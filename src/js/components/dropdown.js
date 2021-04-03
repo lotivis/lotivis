@@ -1,6 +1,6 @@
 import {Component} from "./component";
 import {createID} from "../shared/selector";
-import {verbose_log} from "../shared/debug";
+import {lotivis_log, verbose_log} from "../shared/debug";
 
 /**
  *
@@ -10,8 +10,8 @@ import {verbose_log} from "../shared/debug";
 export class Dropdown extends Component {
 
   /**
-   *
-   * @param parent
+   * Creates a new instance of Dropdown.
+   * @param parent The parent or selector.
    */
   constructor(parent) {
     super(parent);
@@ -35,7 +35,6 @@ export class Dropdown extends Component {
     let thisReference = this;
     this.select = this.element
       .append('select')
-      .classed('form-control form-control-sm', true)
       .attr('id', this.selectId)
       .on('change', function (event) {
         thisReference.onClick(event);
@@ -61,9 +60,12 @@ export class Dropdown extends Component {
       } else if (typeof options[i] === 'string') {
         id = options[i];
         name = options[i];
+      } else {
+        id = options[i].id;
+        name = options[i].title;
       }
 
-      let inputElement = this.addOption(id, name);
+      let inputElement = this.addOption(name, name);
       this.inputElements.push(inputElement);
     }
     return this;

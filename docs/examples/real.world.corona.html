@@ -9,7 +9,7 @@
 </head>
 <body>
 
-<div class="lotivis-container">
+<div class="lotivis-container-full">
   <div class="lotivis-row">
     <div class="lotivis-col-2">
       <a class="lotivis-anchor-back" href="../index.html">
@@ -19,23 +19,28 @@
     <div class="lotivis-col-8 lotivis-headline">
       <h1>Corona-Zahlen Zeitverlauf</h1>
     </div>
-    <div class="lotivis-col-12">
+    <div class="lotivis-col-8">
+      <div class="lotivis-card">
+        <div id="plot-chart">
+          <!-- Plot Chart Here -->
+        </div>
+      </div>
       <div class="lotivis-card">
         <div class="lotivis-card-header">
           <div id="dropdown-group-size">
-            <!-- Dropdown Code Here -->
+            <!-- Dropdown Here -->
           </div>
         </div>
         <div class="lotivis-card-body" style="overflow: scroll;">
           <div style="width: 2000px">
             <div id="date-chart">
-              <!-- Date Chart Code Here -->
+              <!-- Date Chart Here -->
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="lotivis-col-12">
+    <div class="lotivis-col-4">
       <div id="csv-card">
         <!-- CSV Card Here -->
       </div>
@@ -50,20 +55,29 @@
 
   lotivis.debug(true);
   let csvCard = new lotivis.DatasetCSVDateCard('csv-card');
+  let plotChart = new lotivis.PlotChart('plot-chart', {
+    margin: {
+      top: 30,
+      left: 120,
+      bottom: 30,
+      right: 30,
+    }
+  });
   let dateChart = new lotivis.DateChart('date-chart', {
     height: 500,
     width: 2000,
     margin: {
       top: 20
     },
-    sendsNotifications: false,
-    dateAccess: function (date) {
-      console.log('dateAccess', date);
-    }
+    groupSize: 7,
+    sendsNotifications: false
   });
 
   let datasetsController = new lotivis.DatasetController([]);
+  datasetsController.dateAccess = lotivis.GermanDateAccess;
+
   dateChart.setDatasetController(datasetsController);
+  plotChart.setDatasetController(datasetsController);
   csvCard.setDatasetController(datasetsController);
 
   let dropdown = new lotivis.Dropdown.create(
@@ -100,17 +114,13 @@
   fetch(url)
     .then(response => response.text())
     .then(function (rawCSV) {
-
       let datasets = lotivis.parseCSVDate(rawCSV);
-
       datasetsController.setDatasets(datasets);
-      csvCard.updateDatasetsOfController(true);
-
     })
     .catch(console.error);
 
   function updateGroupSize(newGroupSize) {
-    dateChart.datasets = lotivis.combineDatasetsByRatio(originalDatasets, newGroupSize);
+    dateChart.config.groupSize = newGroupSize;
     dateChart.update();
   }
 

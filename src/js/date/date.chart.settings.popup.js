@@ -12,15 +12,8 @@ import {Option} from "../components/option";
 export class DateChartSettingsPopup extends Popup {
 
   render() {
-    this.card
-      .headerRow
-      .append('h3')
-      .text('Settings');
-    // this.card
-    //     .header
-    //     .style('display', 'none');
-
-    this.row = this.card.body
+    this.card.setHeaderText('Settings');
+    this.row = this.card.content
       .append('div')
       .classed('row', true);
 
@@ -30,7 +23,7 @@ export class DateChartSettingsPopup extends Popup {
   }
 
   renderShowLabelsCheckbox() {
-    let container = this.row.append('div').classed('col-12 margin-top', true);
+    let container = this.row.append('div').classed('col-12', true);
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText('Labels');
     this.showLabelsCheckbox.onClick = function (checked) {

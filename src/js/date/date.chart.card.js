@@ -7,7 +7,6 @@ import {Option} from "../components/option";
 import {ChartCard} from "../components/chart.card";
 import {downloadImage} from "../shared/download";
 import {createDownloadFilename} from "../shared/filname";
-import {lotivis_log} from "../shared/debug";
 
 /**
  *

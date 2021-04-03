@@ -11,8 +11,6 @@ import {MapChart} from "./js/map/map.chart";
 import {MapChartCard} from "./js/map/map.chart.card";
 import {PlotChart} from "./js/plot/plot.chart";
 import {PlotChartCard} from "./js/plot/plot.chart.card";
-import {GeoJson} from "./js/geojson/geojson";
-import {Feature} from "./js/geojson/feature";
 import {RadioGroup} from "./js/components/radio.group";
 import {Option} from "./js/components/option";
 import {UrlParameters} from "./js/shared/url.parameters";
@@ -20,9 +18,11 @@ import {DatasetsController} from "./js/data/datasets.controller";
 import "./js/data/datasets.controller.listeners";
 import "./js/data/datasets.controller.filter";
 import "./js/data/datasets.controller.update";
-import "./js/dataview/dataviews.date";
-import "./js/dataview/dataviews.plot";
-import "./js/dataview/dataviews.map";
+import "./js/dataview/dataview.date";
+import "./js/dataview/dataview.plot";
+import "./js/dataview/dataview.map";
+import {Chart} from "./js/components/chart";
+import "./js/components/chart.datasets";
 import {Card} from "./js/components/card";
 import {Checkbox} from "./js/components/checkbox";
 import {ModalPopup} from "./js/components/modal.popup";
@@ -38,6 +38,8 @@ import {GlobalConfig} from "./js/shared/config";
 import {debug} from "./js/shared/debug";
 import {parseCSV} from "./js/data.parse/parse.csv";
 import {parseCSVDate} from "./js/data.parse/parse.csv.date";
+import {DateAccessWeek} from "./js/data.dateaccess/dateaccess.week";
+import {FormattedDateAccess, GermanDateAccess} from "./js/data.dateaccess/dateaccess";
 
 // colors
 exports.Color = Color;
@@ -45,6 +47,7 @@ exports.Color = Color;
 // components
 exports.Component = Component;
 exports.Card = Card;
+exports.Chart = Chart;
 exports.ChartCard = ChartCard;
 exports.Checkbox = Checkbox;
 exports.Dropdown = Dropdown;
@@ -88,5 +91,9 @@ exports.parseCSVDate = parseCSVDate;
 // constants
 exports.config = GlobalConfig;
 exports.debug = debug;
+
+exports.FormattedDateAccess = FormattedDateAccess;
+exports.DateAccessWeek = DateAccessWeek;
+exports.GermanDateAccess = GermanDateAccess;
 
 export default exports;

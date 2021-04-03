@@ -11,10 +11,8 @@ import {createGeoJSON} from "../geojson.juggle/create.geojson";
 import {MapMinimapRenderer} from "./map.minimap.renderer";
 import {MapSelectionBoundsRenderer} from "./map.selection.bounds.renderer";
 import {defaultMapChartConfig} from "./map.chart.config";
-import {DatasetsController} from "../data/datasets.controller";
 import {MapBackgroundRenderer} from "./map.background.renderer";
 import {GeoJson} from "../geojson/geojson";
-import {lotivis_log} from "../shared/debug";
 
 /**
  * A component which renders a geo json with d3.
@@ -111,7 +109,6 @@ export class MapChart extends Chart {
 
   /**
    * Sets the presented geo json.
-   *
    * @param newGeoJSON
    */
   setGeoJSON(newGeoJSON) {
@@ -136,23 +133,6 @@ export class MapChart extends Chart {
     this.zoomTo(this.geoJSON);
     this.exteriorBorderRenderer.render();
     this.geoJSONRenderer.renderGeoJson();
-  }
-
-  /**
-   * Sets the datasets of this map chart.
-   * @param newDatasets The new dataset.
-   */
-  set datasets(newDatasets) {
-    this.setDatasetController(new DatasetsController(newDatasets));
-  }
-
-  /**
-   *
-   * @returns {*}
-   */
-  get datasets() {
-    if (!this.datasetController) return [];
-    return this.datasetController.datasets;
   }
 
   /**
@@ -181,15 +161,5 @@ export class MapChart extends Chart {
     this.minimapRenderer.render();
     this.tooltipRenderer.raise();
     this.selectionBoundsRenderer.raise();
-  }
-
-  /**
-   *
-   * @param newController
-   */
-  setDatasetController(newController) {
-    this.datasetController = newController;
-    this.datasetController.addListener(this);
-    this.datasetsDidChange();
   }
 }

@@ -102,13 +102,20 @@ Color.randomColor = function () {
     (Math.random() * 255) + ")";
 };
 
+var d3LibraryAccess;
+try {
+  d3LibraryAccess = require('d3');
+} catch (e) {
+  d3LibraryAccess = d3;
+}
+
 /**
  * Returns a randomly generated color.
  * @returns {[]}
  */
 Color.colorsForStack = function (stackNumber, amount = 1) {
   let colorCouple = Color.stackColors[stackNumber % Color.stackColors.length];
-  let colorGenerator = d3
+  let colorGenerator = d3LibraryAccess
     .scaleLinear()
     .domain([0, amount])
     .range([colorCouple[0], colorCouple[1]]);
@@ -147,6 +154,15 @@ var createID;
     return 'lotivis-id-' + uniquePrevious++;
   };
 }());
+
+/**
+ * Returns a 'save-to-use' id for a HTML element by replacing whitespace with dashes.
+ * @param theID The id for a HTML element.
+ * @returns {string} The save version of the given id.
+ */
+function toSaveID(theID) {
+  return theID.replaceAll(' ', '-');
+}
 
 /**
  * Creates and returns a unique (save to use for elements) id.  The id is created by calculating the hash of the
@@ -898,6 +914,7 @@ class Chart extends Component {
    *
    * @constructor
    * @param {Component} parent The parental component.
+   * @param config The configuration of the chart.
    */
   constructor(parent, config) {
     super(parent);
@@ -905,6 +922,9 @@ class Chart extends Component {
     if (Object.getPrototypeOf(parent) === String.prototype) {
       this.selector = parent;
       this.element = d3.select('#' + parent);
+      if (this.element.empty()) {
+        throw new Error(`ID not found: ${parent}`);
+      }
     } else {
       this.element = parent;
       this.element.attr('id', this.selector);
@@ -1010,74 +1030,6 @@ class DateGridRenderer {
   }
 }
 
-/**
- * Controls a collection of datasets.
- * @class DatasetsController
- */
-class DatasetsController {
-
-  /**
-   * Creates a new instance of DatasetsController
-   * @param datasets The datasets to control.
-   */
-  constructor(datasets) {
-    this.setDatasets(datasets);
-  }
-
-  get flatDataCombinedStacks() {
-    return combineByStacks(this.flatData);
-  }
-
-  get flatDataCombinedDates() {
-    return combineByDate(this.flatData);
-  }
-
-  get flatDataCombinedLocations() {
-    return combineByLocation(this.flatData);
-  }
-
-  getSumOfLabel(label) {
-    return sumOfLabel(this.flatData, label);
-  }
-
-  getSumOfDataset(dataset) {
-    return sumOfDataset(this.flatData, dataset);
-  }
-
-  getSumOfStack(stack) {
-    return sumOfStack(this.flatData, stack);
-  }
-
-  getMax() {
-    return d3.max(this.workingDatasets, function (dataset) {
-      return d3.max(dataset.data, function (item) {
-        return item.value;
-      });
-    });
-  }
-
-  // MARK: - Colors
-
-  getColorForDataset(label) {
-    return this.datasetsColorsController.colorForDataset(label);
-  }
-
-  getColorForStack(stack) {
-    return this.datasetsColorsController.colorForStack(stack);
-  }
-
-  getColorsForStack(stack) {
-    return this.datasetsColorsController.colorsForStack(stack);
-  }
-
-  /**
-   * Returns a string that can be used as filename for downloads.
-   */
-  getFilename() {
-    return this.labels.join(',');
-  }
-}
-
 const defaultConfig = {
   width: 1000,
   height: 600,
@@ -1116,8 +1068,7 @@ class DateChart extends Chart {
 
   initializeDefaultValues() {
 
-    let theConfig = this.config;
-    lotivis_log(`[lotivis]  `, theConfig);
+    this.config;
     let margin;
     margin = Object.assign({}, defaultConfig.margin);
     margin = Object.assign(margin, this.config.margin);
@@ -1129,11 +1080,7 @@ class DateChart extends Chart {
     this.datasets = [];
 
     this.labelColor = new Color(155, 155, 155).rgbString();
-    this.type = 'bar'; // DateChart.ChartType.Bar;
-    // this.valueType = 'relative';
-
-    // this.isShowLabels = false;
-    // this.updateSensible = true;
+    this.type = 'bar';
 
     this.numberFormat = new Intl.NumberFormat('de-DE', {
       maximumFractionDigits: 3
@@ -1176,6 +1123,7 @@ class DateChart extends Chart {
   createScales() {
     let config = this.config;
     let margin = config.margin;
+    if (!this.datasetController) return;
 
     this.xChart = d3
       .scaleBand()
@@ -1216,8 +1164,6 @@ class DateChart extends Chart {
     this.gridRenderer.createAxis();
     this.gridRenderer.renderGrid();
     this.ghostBarsRenderer.renderGhostBars();
-
-    lotivis_log(`[lotivis]  `, this.config);
 
     if (this.config.combineStacks) {
       this.legendRenderer.renderCombinedStacksLegend();
@@ -1273,33 +1219,6 @@ class DateChart extends Chart {
       this.datasetController.toggleDataset(label, false);
       this.update();
     }
-  }
-
-  /**
-   * Sets a new datasets controller.  The chart is updated automatically.
-   *
-   * @param newController The new datasets controller.
-   */
-  setDatasetController(newController) {
-    this.datasetController = newController;
-    this.datasetController.addListener(this);
-    this.update();
-  }
-
-  /**
-   *
-   * @param newDatasets
-   */
-  set datasets(newDatasets) {
-    this.setDatasetController(new DatasetsController(newDatasets));
-  }
-
-  /**
-   *
-   * @returns {*}
-   */
-  get datasets() {
-    return this.datasetController ? this.datasetController.datasets || [] : [];
   }
 }
 
@@ -1934,18 +1853,18 @@ UrlParameters.endYear = 'end-year';
 UrlParameters.showTestData = 'show-samples';
 
 /**
- *
+ * Represents an option of a dropdown or radio group.
  * @class Option
  */
 class Option {
 
-  constructor(id, title) {
-    this.id = id;
-    this.title = title || id;
-  }
-
-  get translatedTitle() {
-    return this.title;
+  /**
+   * Creates a new instance of Option.
+   * @param title The title of the option.
+   */
+  constructor(title) {
+    this.title = title;
+    this.id = toSaveID(title);
   }
 }
 
@@ -1957,15 +1876,8 @@ class Option {
 class DateChartSettingsPopup extends Popup {
 
   render() {
-    this.card
-      .headerRow
-      .append('h3')
-      .text('Settings');
-    // this.card
-    //     .header
-    //     .style('display', 'none');
-
-    this.row = this.card.body
+    this.card.setHeaderText('Settings');
+    this.row = this.card.content
       .append('div')
       .classed('row', true);
 
@@ -1975,7 +1887,7 @@ class DateChartSettingsPopup extends Popup {
   }
 
   renderShowLabelsCheckbox() {
-    let container = this.row.append('div').classed('col-12 margin-top', true);
+    let container = this.row.append('div').classed('col-12', true);
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText('Labels');
     this.showLabelsCheckbox.onClick = function (checked) {
@@ -2397,7 +2309,7 @@ class DateChartCard extends ChartCard {
    *
    */
   renderChart() {
-    this.chart = new DateChart(this.chartID, this.config || {});
+    this.chart = new DateChart(this.body, this.config || {});
     this.chartID = this.chart.selector;
   }
 
@@ -2426,14 +2338,12 @@ class DateChartCard extends ChartCard {
    *
    */
   applyURLParameters() {
-    lotivis_log(`[lotivis]  `, this.selector);
-    lotivis_log(`[lotivis]  `, this.chartID);
     this.chart.type = UrlParameters.getInstance()
-      .getString(UrlParameters.chartType + this.selector, 'bar');
+      .getString(UrlParameters.chartType + this.chartID, 'bar');
     this.chart.config.showLabels = UrlParameters.getInstance()
-      .getBoolean(UrlParameters.chartShowLabels + this.selector, this.chart.config.showLabels);
+      .getBoolean(UrlParameters.chartShowLabels + this.chartID, this.chart.config.showLabels);
     this.chart.config.combineStacks = UrlParameters.getInstance()
-      .getBoolean(UrlParameters.chartCombineStacks + this.selector, this.chart.config.combineStacks);
+      .getBoolean(UrlParameters.chartCombineStacks + this.chartID, this.chart.config.combineStacks);
   }
 
   /**
@@ -3608,7 +3518,6 @@ class MapChart extends Chart {
 
   /**
    * Sets the presented geo json.
-   *
    * @param newGeoJSON
    */
   setGeoJSON(newGeoJSON) {
@@ -3633,23 +3542,6 @@ class MapChart extends Chart {
     this.zoomTo(this.geoJSON);
     this.exteriorBorderRenderer.render();
     this.geoJSONRenderer.renderGeoJson();
-  }
-
-  /**
-   * Sets the datasets of this map chart.
-   * @param newDatasets The new dataset.
-   */
-  set datasets(newDatasets) {
-    this.setDatasetController(new DatasetsController(newDatasets));
-  }
-
-  /**
-   *
-   * @returns {*}
-   */
-  get datasets() {
-    if (!this.datasetController) return [];
-    return this.datasetController.datasets;
   }
 
   /**
@@ -3678,16 +3570,6 @@ class MapChart extends Chart {
     this.minimapRenderer.render();
     this.tooltipRenderer.raise();
     this.selectionBoundsRenderer.raise();
-  }
-
-  /**
-   *
-   * @param newController
-   */
-  setDatasetController(newController) {
-    this.datasetController = newController;
-    this.datasetController.addListener(this);
-    this.datasetsDidChange();
   }
 }
 
@@ -4215,36 +4097,145 @@ const defaultPlotChartConfig = {
   sort: PlotChartSort.duration
 };
 
+const DefaultDateAccess = function (date) {
+  console.log(date);
+  // throw new Error('Here');
+  return date;
+};
+
+let warned = false;
+const FormattedDateAccess = function (dateString) {
+  let value = Date.parse(dateString);
+  if (isNaN(value)) {
+    if (!warned) {
+      warned = true;
+      lotivis_log(`[lotivis]  Warning only once! Received NaN for date "${dateString}"`);
+    }
+  }
+
+  return value;
+};
+
+const GermanDateAccess = function (dateString) {
+  let saveDateString = String(dateString);
+  let components = saveDateString.split('.');
+  let day = components[0];
+  let month = components[1];
+  let year = components[2];
+  let date = new Date(`${year}-${month}-${day}`);
+  return Number(date);
+};
+
+/**
+ * Controls a collection of datasets.
+ * @class DatasetsController
+ */
+class DatasetsController {
+
+  /**
+   * Creates a new instance of DatasetsController
+   * @param datasets The datasets to control.
+   */
+  constructor(datasets) {
+    this.dateAccess = DefaultDateAccess;
+    this.setDatasets(datasets);
+  }
+
+  get flatDataCombinedStacks() {
+    return combineByStacks(this.flatData);
+  }
+
+  get flatDataCombinedDates() {
+    return combineByDate(this.flatData);
+  }
+
+  get flatDataCombinedLocations() {
+    return combineByLocation(this.flatData);
+  }
+
+  getSumOfLabel(label) {
+    return sumOfLabel(this.flatData, label);
+  }
+
+  getSumOfDataset(dataset) {
+    return sumOfDataset(this.flatData, dataset);
+  }
+
+  getSumOfStack(stack) {
+    return sumOfStack(this.flatData, stack);
+  }
+
+  getMax() {
+    return d3LibraryAccess.max(this.workingDatasets, function (dataset) {
+      return d3LibraryAccess.max(dataset.data, function (item) {
+        return item.value;
+      });
+    });
+  }
+
+  // MARK: - Colors
+
+  getColorForDataset(label) {
+    return this.datasetsColorsController.colorForDataset(label);
+  }
+
+  getColorForStack(stack) {
+    return this.datasetsColorsController.colorForStack(stack);
+  }
+
+  getColorsForStack(stack) {
+    return this.datasetsColorsController.colorsForStack(stack);
+  }
+
+  /**
+   * Returns a string that can be used as filename for downloads.
+   */
+  getFilename() {
+    return this.labels.join(',');
+  }
+}
+
+/**
+ *
+ * @param dataset
+ * @param dateAccess
+ * @returns {{}}
+ */
+function createPlotDataset(dataset, dateAccess) {
+  let newDataset = {};
+  let data = copy(dataset.data);
+  let firstDate = extractEarliestDateWithValue(data) || 0;
+  let lastDate = extractLatestDateWithValue(data) || 0;
+
+  newDataset.label = dataset.label;
+  newDataset.stack = dataset.stack;
+  newDataset.earliestDate = firstDate;
+  newDataset.firstDate = firstDate;
+  newDataset.latestDate = lastDate;
+  newDataset.lastDate = lastDate;
+  newDataset.duration = lastDate - firstDate;
+  newDataset.data = combineByDate(data);
+  newDataset.sum = sumOfLabel(data, dataset.label);
+  data = combineByDate(data)
+    .sort((left, right) => left.dateNumeric - right.dateNumeric);
+
+  newDataset.data = data;
+  newDataset.dataWithValues = data.filter(item => (item.value || 0) > 0);
+
+  return newDataset;
+}
+
 /**
  * Returns a new generated plot samples view for the current enabled samples of dataset of this controller.
  */
 DatasetsController.prototype.getPlotDataview = function () {
-  let dateAccess = this.dateAccess;
+
+  this.dateAccess;
   let enabledDatasets = this.enabledDatasets();
   let dataview = {datasets: []};
 
   enabledDatasets.forEach(function (dataset) {
-    let newDataset = {};
-    let data = copy(dataset.data);
-    data.forEach(item => item.label = dataset.label);
-
-    let firstDate = extractEarliestDateWithValue(data) || 0;
-    let lastDate = extractLatestDateWithValue(data) || 0;
-
-    newDataset.label = dataset.label;
-    newDataset.stack = dataset.stack;
-    newDataset.earliestDate = firstDate;
-    newDataset.latestDate = lastDate;
-    newDataset.duration = lastDate - firstDate;
-    newDataset.data = combineByDate(data);
-    newDataset.sum = sumOfLabel(data, dataset.label);
-    data = combineByDate(data)
-      .sort((left, right) => dateAccess(left.date) - dateAccess(right.date));
-
-    newDataset.data = data;
-    newDataset.dataWithValues = data.filter(item => (item.value || 0) > 0);
-
-    dataview.datasets.push(newDataset);
+    dataview.datasets.push(createPlotDataset(dataset));
   });
 
   dataview.labelsCount = dataview.datasets.length;
@@ -4417,32 +4408,6 @@ class PlotChart extends Chart {
         break;
     }
   }
-
-  /**
-   * Sets the datasets.
-   * @param newDatasets The array of datasets.
-   */
-  set datasets(newDatasets) {
-    this.setDatasetController(new DatasetsController(newDatasets));
-  }
-
-  /**
-   * Returns the presented datasets.
-   * @returns {*}
-   */
-  get datasets() {
-    return this.datasetController.datasets;
-  }
-
-  /**
-   * Sets the nes datasets controller.
-   * @param newController The dataset controller.
-   */
-  setDatasetController(newController) {
-    this.datasetController = newController;
-    this.datasetController.addListener(this);
-    this.update();
-  }
 }
 
 /**
@@ -4453,8 +4418,8 @@ class PlotChart extends Chart {
 class Dropdown extends Component {
 
   /**
-   *
-   * @param parent
+   * Creates a new instance of Dropdown.
+   * @param parent The parent or selector.
    */
   constructor(parent) {
     super(parent);
@@ -4478,7 +4443,6 @@ class Dropdown extends Component {
     let thisReference = this;
     this.select = this.element
       .append('select')
-      .classed('form-control form-control-sm', true)
       .attr('id', this.selectId)
       .on('change', function (event) {
         thisReference.onClick(event);
@@ -4496,17 +4460,20 @@ class Dropdown extends Component {
   setOptions(options) {
     this.removeAllInputs();
     for (let i = 0; i < options.length; i++) {
-      let id, name;
+      let name;
 
       if (Array.isArray(options[i])) {
-        id = options[i][0] || options[i].id;
+        options[i][0] || options[i].id;
         name = options[i][1] || options[i].translatedTitle;
       } else if (typeof options[i] === 'string') {
-        id = options[i];
+        options[i];
         name = options[i];
+      } else {
+        options[i].id;
+        name = options[i].title;
       }
 
-      let inputElement = this.addOption(id, name);
+      let inputElement = this.addOption(name, name);
       this.inputElements.push(inputElement);
     }
     return this;
@@ -4589,10 +4556,10 @@ class PlotChartSettingsPopup extends Popup {
    * Appends the headline and the content row of the popup.
    */
   render() {
-    this.card.headerRow.append('h3').text('Settings');
-    this.row = this.card.body
+    this.card.setHeaderText('Settings');
+    this.row = this.card.content
       .append('div')
-      .classed('lotivis-row margin-left margin-right margin-top', true);
+      .classed('lotivis-row', true);
     this.renderShowLabelsCheckbox();
   }
 
@@ -4600,7 +4567,7 @@ class PlotChartSettingsPopup extends Popup {
    * Appends the checkboxes the popups content.
    */
   renderShowLabelsCheckbox() {
-    let container = this.row.append('div').classed('lotivis-margin-top', true);
+    let container = this.row.append('div').classed('lotivis-col-12', true);
 
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText('Labels');
@@ -4984,24 +4951,35 @@ class DatasetsColorsController {
  * @param datasets The new datasets.
  */
 DatasetsController.prototype.setDatasets = function (datasets) {
+  this.originalDatasets = datasets;
   this.datasets = copy(datasets);
   this.update();
 };
 
 DatasetsController.prototype.update = function () {
   if (!this.datasets || !Array.isArray(this.datasets)) return;
+
+  let dateAccess = this.dateAccess;
   this.workingDatasets = copy(this.datasets)
     .sort((left, right) => left.label > right.label);
-  this.workingDatasets.forEach(dataset => dataset.isEnabled = true);
+  this.workingDatasets.forEach(function (dataset) {
+    dataset.isEnabled = true;
+    dataset.data.forEach(function (item) {
+      item.dateNumeric = dateAccess(item.date);
+    });
+    dataset.data = dataset.data
+      .sort((left, right) => left.dateNumeric - right.dateNumeric);
+  });
+
   this.flatData = flatDatasets(this.workingDatasets);
   this.labels = extractLabelsFromDatasets(this.datasets);
   this.stacks = extractStacksFromDatasets(this.datasets);
   this.dates = extractDatesFromDatasets(this.datasets);
   this.locations = extractLocationsFromDatasets(this.datasets);
   this.datasetsColorsController = new DatasetsColorsController(this);
-  this.dateAccess = function (date) {
-    return Date.parse(date);
-  };
+  // this.dateAccess = function (date) {
+  //   return Date.parse(date);
+  // };
 
   this.locationFilters = [];
   this.dateFilters = [];
@@ -5129,50 +5107,6 @@ Array.prototype.last = function () {
 };
 
 /**
- * Combines each `ratio` entries to one.
- * @param datasets The datasets collection.
- * @param ratio The ratio.
- */
-function combineDatasetsByRatio(datasets, ratio) {
-  let copied = copy(datasets);
-  for (let index = 0; index < copied.length; index++) {
-    let dataset = copied[index];
-    let data = dataset.data;
-    dataset.data = combineDataByGroupsize(data, ratio);
-    copied[index] = dataset;
-  }
-  return copied;
-}
-
-/**
- *
- * @param data
- * @param ratio
- */
-function combineDataByGroupsize(data, ratio) {
-  if (!data || data.length <= ratio) return data;
-  let combined = combineByDate(copy(data));
-  let newData = [];
-
-  while (combined.length > 0) {
-    let dateGroup = combined.splice(0, ratio);
-    let firstItem = dateGroup.first();
-    let lastItem = dateGroup.last();
-    let item = {};
-    item.dataset = firstItem.dataset;
-    item.stack = firstItem.stack;
-    item.date = firstItem.date;
-    item.date = firstItem.date;
-    item.from = firstItem.date;
-    item.till = lastItem.date;
-    item.value = sumOfValues(dateGroup);
-    newData.push(item);
-  }
-
-  return newData;
-}
-
-/**
  * Returns a new generated DateDataview for the current enabled samples of dataset of this controller.
  */
 DatasetsController.prototype.getDateDataview = function () {
@@ -5183,7 +5117,8 @@ DatasetsController.prototype.getDateDataview = function () {
   let dataview = {};
 
   dataview.dateGroupRatio = dateGroupRatio;
-  dataview.datasets = combineDatasetsByRatio(workingDatasets, dateGroupRatio);
+  // dataview.datasets = combineDatasetsByRatio(workingDatasets, dateGroupRatio);
+  dataview.datasets = workingDatasets;
   dataview.dateToItemsRelation = dateToItemsRelation(workingDatasets);
   dataview.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets);
   dataview.datasetStacks = createStackModel(this, workingDatasets, dataview.dateToItemsRelation);
@@ -5193,7 +5128,37 @@ DatasetsController.prototype.getDateDataview = function () {
       return d3.max(series.map(item => item['1']));
     });
   });
+
+  console.log(dataview);
+
   return dataview;
+};
+
+/**
+ * Sets a new datasets controller.  The chart is updated automatically.
+ * @param newController The new datasets controller.
+ */
+Chart.prototype.setDatasetController = function (newController) {
+  this.datasetController = newController;
+  this.datasetController.addListener(this);
+  this.update();
+};
+
+/**
+ * Sets the datasets of this map chart.
+ * @param newDatasets The new dataset.
+ */
+Chart.prototype.setDatasets = function (newDatasets) {
+  this.setDatasetController(new DatasetsController(newDatasets));
+};
+
+/**
+ * Returns the presented datasets.
+ * @returns {[*]} The collection of datasets.
+ */
+Chart.prototype.setDatasets = function () {
+  if (!this.datasetController || !Array.isArray(this.datasetController.datasets)) return [];
+  return this.datasetController.datasets;
 };
 
 /**
@@ -5802,12 +5767,48 @@ class DatasetCSVDateCard extends DatasetCard {
   }
 }
 
+/**
+ *
+ * @param weekday
+ * @returns {number}
+ * @constructor
+ */
+const DateAccessWeek = function (weekday) {
+  let lowercase = weekday.toLowerCase();
+  switch (lowercase) {
+    case 'sunday':
+    case 'sun':
+      return 0;
+    case 'monday':
+    case 'mon':
+      return 1;
+    case 'tuesday':
+    case 'tue':
+      return 2;
+    case 'wednesday':
+    case 'wed':
+      return 3;
+    case 'thursday':
+    case 'thr':
+      return 4;
+    case 'friday':
+    case 'fri':
+      return 5;
+    case 'saturday':
+    case 'sat':
+      return 6;
+    default:
+      return -1;
+  }
+};
+
 // colors
 exports.Color = Color;
 
 // components
 exports.Component = Component;
 exports.Card = Card;
+exports.Chart = Chart;
 exports.ChartCard = ChartCard;
 exports.Checkbox = Checkbox;
 exports.Dropdown = Dropdown;
@@ -5851,6 +5852,10 @@ exports.parseCSVDate = parseCSVDate;
 // constants
 exports.config = GlobalConfig;
 exports.debug = debug;
+
+exports.FormattedDateAccess = FormattedDateAccess;
+exports.DateAccessWeek = DateAccessWeek;
+exports.GermanDateAccess = GermanDateAccess;
 
 var exports$1 = exports;
 

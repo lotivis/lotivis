@@ -1,7 +1,6 @@
 import {Popup} from "../components/popup";
 import {Checkbox} from "../components/checkbox";
 import {UrlParameters} from "../shared/url.parameters";
-import {verbose_log} from "../shared/debug";
 import {Dropdown} from "../components/dropdown";
 import {Option} from "../components/option";
 import {PlotChartSort} from "./plot.chart.sort";
@@ -17,10 +16,10 @@ export class PlotChartSettingsPopup extends Popup {
    * Appends the headline and the content row of the popup.
    */
   render() {
-    this.card.headerRow.append('h3').text('Settings');
-    this.row = this.card.body
+    this.card.setHeaderText('Settings');
+    this.row = this.card.content
       .append('div')
-      .classed('lotivis-row margin-left margin-right margin-top', true);
+      .classed('lotivis-row', true);
     this.renderShowLabelsCheckbox();
   }
 
@@ -28,7 +27,7 @@ export class PlotChartSettingsPopup extends Popup {
    * Appends the checkboxes the popups content.
    */
   renderShowLabelsCheckbox() {
-    let container = this.row.append('div').classed('lotivis-margin-top', true);
+    let container = this.row.append('div').classed('lotivis-col-12', true);
 
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText('Labels');

@@ -7,9 +7,7 @@ import {DateGhostBarsRenderer} from "./date.ghost.bars.renderer";
 import {DateTooltipRenderer} from "./date.tooltip.renderer";
 import {Chart} from "../components/chart";
 import {DateGridRenderer} from "./date.grid.renderer";
-import {DatasetsController} from "../data/datasets.controller";
 import {GlobalConfig} from "../shared/config";
-import {lotivis_log} from "../shared/debug";
 
 const defaultConfig = {
   width: 1000,
@@ -50,7 +48,6 @@ export class DateChart extends Chart {
   initializeDefaultValues() {
 
     let theConfig = this.config;
-    lotivis_log(`[lotivis]  `, theConfig);
     let margin;
     margin = Object.assign({}, defaultConfig.margin);
     margin = Object.assign(margin, this.config.margin);
@@ -62,11 +59,7 @@ export class DateChart extends Chart {
     this.datasets = [];
 
     this.labelColor = new Color(155, 155, 155).rgbString();
-    this.type = 'bar'; // DateChart.ChartType.Bar;
-    // this.valueType = 'relative';
-
-    // this.isShowLabels = false;
-    // this.updateSensible = true;
+    this.type = 'bar';
 
     this.numberFormat = new Intl.NumberFormat('de-DE', {
       maximumFractionDigits: 3
@@ -100,7 +93,8 @@ export class DateChart extends Chart {
    */
   precalculateHelpData() {
     if (!this.datasetController) return;
-    this.dataview = this.datasetController.getDateDataview();
+    let groupSize = this.config.groupSize || 1;
+    this.dataview = this.datasetController.getDateDataview(groupSize);
   }
 
   /**
@@ -109,16 +103,17 @@ export class DateChart extends Chart {
   createScales() {
     let config = this.config;
     let margin = config.margin;
+    if (!this.dataview) return;
 
     this.xChart = d3
       .scaleBand()
-      .domain(this.datasetController.dates)
+      .domain(this.dataview.dates)
       .rangeRound([margin.left, config.width - margin.right])
       .paddingInner(0.1);
 
     this.xStack = d3
       .scaleBand()
-      .domain(this.datasetController.enabledStacks())
+      .domain(this.dataview.enabledStacks)
       .rangeRound([0, this.xChart.bandwidth()])
       .padding(0.05);
 
@@ -149,8 +144,6 @@ export class DateChart extends Chart {
     this.gridRenderer.createAxis();
     this.gridRenderer.renderGrid();
     this.ghostBarsRenderer.renderGhostBars();
-
-    lotivis_log(`[lotivis]  `, this.config);
 
     if (this.config.combineStacks) {
       this.legendRenderer.renderCombinedStacksLegend();
@@ -206,32 +199,5 @@ export class DateChart extends Chart {
       this.datasetController.toggleDataset(label, false);
       this.update();
     }
-  }
-
-  /**
-   * Sets a new datasets controller.  The chart is updated automatically.
-   *
-   * @param newController The new datasets controller.
-   */
-  setDatasetController(newController) {
-    this.datasetController = newController;
-    this.datasetController.addListener(this);
-    this.update();
-  }
-
-  /**
-   *
-   * @param newDatasets
-   */
-  set datasets(newDatasets) {
-    this.setDatasetController(new DatasetsController(newDatasets));
-  }
-
-  /**
-   *
-   * @returns {*}
-   */
-  get datasets() {
-    return this.datasetController ? this.datasetController.datasets || [] : [];
   }
 }

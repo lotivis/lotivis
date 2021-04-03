@@ -1,4 +1,5 @@
 import {Color} from "./color";
+import {d3LibraryAccess} from "../shared/d3libaccess";
 
 /**
  * Returns a randomly generated color.
@@ -6,7 +7,7 @@ import {Color} from "./color";
  */
 Color.colorsForStack = function (stackNumber, amount = 1) {
   let colorCouple = Color.stackColors[stackNumber % Color.stackColors.length];
-  let colorGenerator = d3
+  let colorGenerator = d3LibraryAccess
     .scaleLinear()
     .domain([0, amount])
     .range([colorCouple[0], colorCouple[1]]);

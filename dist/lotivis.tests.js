@@ -11,6 +11,125 @@ typeof define === 'function' && define.amd ? define(['exports'], factory) :
 }(this, (function (exports) { 'use strict';
 
 /**
+ * Color defined by r,g,b.
+ * @class Color
+ */
+class Color {
+
+  /**
+   * Creates a new instance of Color.
+   * @param r The red value.
+   * @param g The green value.
+   * @param b The blue value.
+   */
+  constructor(r, g, b) {
+    if ((r || r === 0) && (g || g === 0) && (b || b === 0)) {
+      this.initialize(r, g, b);
+    } else if (typeof r === `object`) {
+      this.initialize(r.r, r.g, r.b);
+    } else if (r) ; else if (r) {
+      this.initialize(r, r, r);
+    } else {
+      throw new Error(`Invalid argument: ${r}`);
+    }
+  }
+
+  initialize(r, g, b) {
+    this.r = Math.round(r);
+    this.g = Math.round(g);
+    this.b = Math.round(b);
+  }
+
+  rgbString() {
+    return `rgb(${this.r},${this.g},${this.b})`;
+  }
+
+  toString() {
+    return this.rgbString();
+  }
+
+  colorAdding(r, g, b) {
+    return new Color(this.r + r, this.g + g, this.b + b);
+  }
+}
+
+Color.defaultTint = new Color(0, 122, 255);
+Color.organgeLow = new Color(250, 211, 144);
+Color.organgeHigh = new Color(229, 142, 38);
+Color.redLow = new Color(248, 194, 145);
+Color.redHigh = new Color(183, 21, 64);
+Color.blueLow = new Color(106, 137, 204);
+Color.blueHigh = new Color(12, 36, 97);
+Color.lightBlueLow = new Color(130, 204, 221);
+Color.lightBlueHight = new Color(10, 61, 98);
+Color.greenLow = new Color(184, 233, 148);
+Color.greenHight = new Color(7, 153, 146);
+Color.stackColors = [
+  [Color.blueHigh, Color.blueLow],
+  [Color.redHigh, Color.redLow],
+  [Color.greenHight, Color.greenLow],
+  [Color.organgeHigh, Color.organgeLow],
+  [Color.lightBlueHight, Color.lightBlueLow],
+];
+
+Color.colorGenerator = function (till) {
+  return d3
+    .scaleLinear()
+    .domain([0, 1 / 3 * till, 2 / 3 * till, till])
+    .range(['yellow', 'orange', 'red', 'purple']);
+};
+
+/**
+ *
+ * @param till
+ * @returns {*}
+ */
+Color.plotColor = function (till) {
+  return d3
+    .scaleLinear()
+    .domain([0, 1 / 2 * till, till])
+    .range(['lightgreen', 'steelblue', 'purple']);
+};
+
+/**
+ * Returns a randomly generated color.
+ * @returns {string}
+ */
+Color.randomColor = function () {
+  return "rgb(" +
+    (Math.random() * 255) + ", " +
+    (Math.random() * 255) + "," +
+    (Math.random() * 255) + ")";
+};
+
+var d3LibraryAccess;
+try {
+  d3LibraryAccess = require('d3');
+} catch (e) {
+  d3LibraryAccess = d3;
+}
+
+/**
+ * Returns a randomly generated color.
+ * @returns {[]}
+ */
+Color.colorsForStack = function (stackNumber, amount = 1) {
+  let colorCouple = Color.stackColors[stackNumber % Color.stackColors.length];
+  let colorGenerator = d3LibraryAccess
+    .scaleLinear()
+    .domain([0, amount])
+    .range([colorCouple[0], colorCouple[1]]);
+
+  let colors = [];
+  for (let i = 0; i < amount; i++) {
+    let color = colorGenerator(i);
+    colors.push(new Color(color));
+  }
+
+  return colors;
+};
+
+/**
  * @class Geometry
  */
 class Geometry {
@@ -423,38 +542,43 @@ function toSet(array) {
  * @param flatData The flat samples array.
  * @returns {*} The earliest date.
  */
-function extractEarliestDate(flatData) {
-  return extractDatesFromFlatData(flatData).sort().shift();
+function extractEarliestDate(flatData, dateAccess = (date) => date) {
+  return extractDatesFromFlatData(flatData)
+    .sort((left, right) => dateAccess(left) - dateAccess(right)).shift();
 }
 
 /**
  * Returns the earliest date occurring in the flat array of items.
  *
  * @param flatData The flat samples array.
+ * @param dateAccess
  * @returns {*} The earliest date.
  */
-function extractEarliestDateWithValue(flatData) {
-  return extractDatesFromFlatData(filterWithValue(flatData)).sort().shift();
+function extractEarliestDateWithValue(flatData, dateAccess = (date) => date) {
+  return extractEarliestDate(filterWithValue(flatData), dateAccess);
 }
 
 /**
  * Returns the latest date occurring in the flat array of items.
  *
  * @param flatData The flat samples array.
+ * @param dateAccess
  * @returns {*} The latest date.
  */
-function extractLatestDate(flatData) {
-  return extractDatesFromFlatData(flatData).sort().pop();
+function extractLatestDate(flatData, dateAccess = (date) => date) {
+  return extractDatesFromFlatData(flatData)
+    .sort((left, right) => dateAccess(left) - dateAccess(right)).pop();
 }
 
 /**
  * Returns the latest date occurring in the flat array of items.
  *
  * @param flatData The flat samples array.
+ * @param dateAccess
  * @returns {*} The latest date.
  */
-function extractLatestDateWithValue(flatData) {
-  return extractDatesFromFlatData(filterWithValue(flatData)).sort().pop();
+function extractLatestDateWithValue(flatData, dateAccess = (date) => date) {
+  return extractLatestDate(filterWithValue(flatData), dateAccess);
 }
 
 /**
@@ -561,6 +685,27 @@ function dateToItemsRelation(datasets, dateAccess) {
   });
 }
 
+const DefaultDateAccess = function (date) {
+  console.log(date);
+  // throw new Error('Here');
+  return date;
+};
+const FormattedDateAccess = function (dateString) {
+  let value = Date.parse(dateString);
+
+  return value;
+};
+
+const GermanDateAccess = function (dateString) {
+  let saveDateString = String(dateString);
+  let components = saveDateString.split('.');
+  let day = components[0];
+  let month = components[1];
+  let year = components[2];
+  let date = new Date(`${year}-${month}-${day}`);
+  return Number(date);
+};
+
 /**
  * Controls a collection of datasets.
  * @class DatasetsController
@@ -572,6 +717,7 @@ class DatasetsController {
    * @param datasets The datasets to control.
    */
   constructor(datasets) {
+    this.dateAccess = DefaultDateAccess;
     this.setDatasets(datasets);
   }
 
@@ -600,8 +746,8 @@ class DatasetsController {
   }
 
   getMax() {
-    return d3.max(this.workingDatasets, function (dataset) {
-      return d3.max(dataset.data, function (item) {
+    return d3LibraryAccess.max(this.workingDatasets, function (dataset) {
+      return d3LibraryAccess.max(dataset.data, function (item) {
         return item.value;
       });
     });
@@ -853,49 +999,6 @@ DatasetsController.prototype.enabledDates = function () {
 };
 
 /**
- * Color defined by r,g,b.
- * @class Color
- */
-class Color {
-
-  /**
-   * Creates a new instance of Color.
-   * @param r The red value.
-   * @param g The green value.
-   * @param b The blue value.
-   */
-  constructor(r, g, b) {
-    if ((r || r === 0) && (g || g === 0) && (b || b === 0)) {
-      this.initialize(r, g, b);
-    } else if (typeof r === `object`) {
-      this.initialize(r.r, r.g, r.b);
-    } else if (r) ; else if (r) {
-      this.initialize(r, r, r);
-    } else {
-      throw new Error(`Invalid argument: ${r}`);
-    }
-  }
-
-  initialize(r, g, b) {
-    this.r = Math.round(r);
-    this.g = Math.round(g);
-    this.b = Math.round(b);
-  }
-
-  rgbString() {
-    return `rgb(${this.r},${this.g},${this.b})`;
-  }
-
-  toString() {
-    return this.rgbString();
-  }
-
-  colorAdding(r, g, b) {
-    return new Color(this.r + r, this.g + g, this.b + b);
-  }
-}
-
-/**
  *
  * @class DatasetsColorsController
  */
@@ -947,24 +1050,36 @@ class DatasetsColorsController {
  * @param datasets The new datasets.
  */
 DatasetsController.prototype.setDatasets = function (datasets) {
+  this.originalDatasets = datasets;
   this.datasets = copy(datasets);
   this.update();
 };
 
 DatasetsController.prototype.update = function () {
   if (!this.datasets || !Array.isArray(this.datasets)) return;
+
+  let dateAccess = this.dateAccess;
   this.workingDatasets = copy(this.datasets)
     .sort((left, right) => left.label > right.label);
-  this.workingDatasets.forEach(dataset => dataset.isEnabled = true);
+  this.workingDatasets.forEach(function (dataset) {
+    dataset.isEnabled = true;
+    dataset.data.forEach(function (item) {
+      item.dateNumeric = dateAccess(item.date);
+    });
+    dataset.data = dataset.data
+      .sort((left, right) => left.dateNumeric - right.dateNumeric);
+  });
+
   this.flatData = flatDatasets(this.workingDatasets);
   this.labels = extractLabelsFromDatasets(this.datasets);
   this.stacks = extractStacksFromDatasets(this.datasets);
-  this.dates = extractDatesFromDatasets(this.datasets);
+  this.dates = extractDatesFromDatasets(this.datasets)
+    .sort((left, right) => dateAccess(left) - dateAccess(right));
   this.locations = extractLocationsFromDatasets(this.datasets);
   this.datasetsColorsController = new DatasetsColorsController(this);
-  this.dateAccess = function (date) {
-    return Date.parse(date);
-  };
+  // this.dateAccess = function (date) {
+  //   return Date.parse(date);
+  // };
 
   this.locationFilters = [];
   this.dateFilters = [];
@@ -1072,15 +1187,18 @@ function combineDatasetsByRatio(datasets, ratio) {
  */
 function combineDataByGroupsize(data, ratio) {
   if (!data || data.length <= ratio) return data;
+  if (ratio <= 1) return data;
+
   let combined = combineByDate(copy(data));
   let newData = [];
 
   while (combined.length > 0) {
     let dateGroup = combined.splice(0, ratio);
-    let firstItem = dateGroup.first();
-    let lastItem = dateGroup.last();
+    let firstItem = dateGroup.first() || {};
+    let lastItem = dateGroup.last() || {};
     let item = {};
     item.dataset = firstItem.dataset;
+    item.label = firstItem.label;
     item.stack = firstItem.stack;
     item.date = firstItem.date;
     item.date = firstItem.date;
@@ -1096,57 +1214,81 @@ function combineDataByGroupsize(data, ratio) {
 /**
  * Returns a new generated DateDataview for the current enabled samples of dataset of this controller.
  */
-DatasetsController.prototype.getDateDataview = function () {
+DatasetsController.prototype.getDateDataview = function (groupSize) {
   this.dateAccess;
   let workingDatasets = copy(this.workingDatasets);
   let enabledDatasets = copy(this.enabledDatasets() || workingDatasets);
-  let dateGroupRatio = 2;
   let dataview = {};
+  let saveGroupSize = groupSize || 1;
 
-  dataview.dateGroupRatio = dateGroupRatio;
-  dataview.datasets = combineDatasetsByRatio(workingDatasets, dateGroupRatio);
+  dataview.groupSize = saveGroupSize;
+  if (saveGroupSize <= 1) {
+    dataview.datasets = workingDatasets;
+    dataview.enabledDatasets = enabledDatasets;
+  } else {
+    workingDatasets = combineDatasetsByRatio(workingDatasets, saveGroupSize);
+    enabledDatasets = combineDatasetsByRatio(enabledDatasets, saveGroupSize);
+    dataview.datasets = workingDatasets;
+  }
+
   dataview.dateToItemsRelation = dateToItemsRelation(workingDatasets);
   dataview.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets);
   dataview.datasetStacks = createStackModel(this, workingDatasets, dataview.dateToItemsRelation);
   dataview.datasetStacksPresented = createStackModel(this, enabledDatasets, dataview.dateToItemsRelationPresented);
+
   dataview.max = d3.max(dataview.datasetStacksPresented, function (stack) {
     return d3.max(stack, function (series) {
       return d3.max(series.map(item => item['1']));
     });
   });
+
+  dataview.dates = extractDatesFromDatasets(enabledDatasets);
+  dataview.enabledStacks = this.enabledStacks();
+
   return dataview;
 };
+
+/**
+ *
+ * @param dataset
+ * @param dateAccess
+ * @returns {{}}
+ */
+function createPlotDataset(dataset, dateAccess) {
+  let newDataset = {};
+  let data = copy(dataset.data);
+  let firstDate = extractEarliestDateWithValue(data) || 0;
+  let lastDate = extractLatestDateWithValue(data) || 0;
+
+  newDataset.label = dataset.label;
+  newDataset.stack = dataset.stack;
+  newDataset.earliestDate = firstDate;
+  newDataset.firstDate = firstDate;
+  newDataset.latestDate = lastDate;
+  newDataset.lastDate = lastDate;
+  newDataset.duration = lastDate - firstDate;
+  newDataset.data = combineByDate(data);
+  newDataset.sum = sumOfLabel(data, dataset.label);
+  data = combineByDate(data)
+    .sort((left, right) => left.dateNumeric - right.dateNumeric);
+
+  newDataset.data = data;
+  newDataset.dataWithValues = data.filter(item => (item.value || 0) > 0);
+
+  return newDataset;
+}
 
 /**
  * Returns a new generated plot samples view for the current enabled samples of dataset of this controller.
  */
 DatasetsController.prototype.getPlotDataview = function () {
-  let dateAccess = this.dateAccess;
+
+  this.dateAccess;
   let enabledDatasets = this.enabledDatasets();
   let dataview = {datasets: []};
 
   enabledDatasets.forEach(function (dataset) {
-    let newDataset = {};
-    let data = copy(dataset.data);
-    data.forEach(item => item.label = dataset.label);
-
-    let firstDate = extractEarliestDateWithValue(data) || 0;
-    let lastDate = extractLatestDateWithValue(data) || 0;
-
-    newDataset.label = dataset.label;
-    newDataset.stack = dataset.stack;
-    newDataset.earliestDate = firstDate;
-    newDataset.latestDate = lastDate;
-    newDataset.duration = lastDate - firstDate;
-    newDataset.data = combineByDate(data);
-    newDataset.sum = sumOfLabel(data, dataset.label);
-    data = combineByDate(data)
-      .sort((left, right) => dateAccess(left.date) - dateAccess(right.date));
-
-    newDataset.data = data;
-    newDataset.dataWithValues = data.filter(item => (item.value || 0) > 0);
-
-    dataview.datasets.push(newDataset);
+    dataview.datasets.push(createPlotDataset(dataset));
   });
 
   dataview.labelsCount = dataview.datasets.length;
@@ -1415,55 +1557,6 @@ function extractObjects(topology) {
   return objects;
 }
 
-Color.defaultTint = new Color(0, 122, 255);
-Color.organgeLow = new Color(250, 211, 144);
-Color.organgeHigh = new Color(229, 142, 38);
-Color.redLow = new Color(248, 194, 145);
-Color.redHigh = new Color(183, 21, 64);
-Color.blueLow = new Color(106, 137, 204);
-Color.blueHigh = new Color(12, 36, 97);
-Color.lightBlueLow = new Color(130, 204, 221);
-Color.lightBlueHight = new Color(10, 61, 98);
-Color.greenLow = new Color(184, 233, 148);
-Color.greenHight = new Color(7, 153, 146);
-Color.stackColors = [
-  [Color.blueHigh, Color.blueLow],
-  [Color.redHigh, Color.redLow],
-  [Color.greenHight, Color.greenLow],
-  [Color.organgeHigh, Color.organgeLow],
-  [Color.lightBlueHight, Color.lightBlueLow],
-];
-
-Color.colorGenerator = function (till) {
-  return d3
-    .scaleLinear()
-    .domain([0, 1 / 3 * till, 2 / 3 * till, till])
-    .range(['yellow', 'orange', 'red', 'purple']);
-};
-
-/**
- *
- * @param till
- * @returns {*}
- */
-Color.plotColor = function (till) {
-  return d3
-    .scaleLinear()
-    .domain([0, 1 / 2 * till, till])
-    .range(['lightgreen', 'steelblue', 'purple']);
-};
-
-/**
- * Returns a randomly generated color.
- * @returns {string}
- */
-Color.randomColor = function () {
-  return "rgb(" +
-    (Math.random() * 255) + ", " +
-    (Math.random() * 255) + "," +
-    (Math.random() * 255) + ")";
-};
-
 /**
  * Returns a collection of datasets parsed from the given CSV content.
  * @param text The CSV content.
@@ -1549,6 +1642,44 @@ function appendExtensionIfNeeded(filename, extension) {
   return filename.endsWith(extension) ? filename : `${filename}${extension}`;
 }
 
+/**
+ *
+ * @param weekday
+ * @returns {number}
+ * @constructor
+ */
+const DateAccessWeek = function (weekday) {
+  let lowercase = weekday.toLowerCase();
+  switch (lowercase) {
+    case 'sunday':
+    case 'sun':
+      return 0;
+    case 'monday':
+    case 'mon':
+      return 1;
+    case 'tuesday':
+    case 'tue':
+      return 2;
+    case 'wednesday':
+    case 'wed':
+      return 3;
+    case 'thursday':
+    case 'thr':
+      return 4;
+    case 'friday':
+    case 'fri':
+      return 5;
+    case 'saturday':
+    case 'sat':
+      return 6;
+    default:
+      return -1;
+  }
+};
+
+require('d3');
+
+exports.Color = Color;
 exports.DatasetController = DatasetsController;
 exports.GeoJson = GeoJson;
 exports.Feature = Feature;
@@ -1588,6 +1719,9 @@ exports.objectsEqual = objectsEqual;
 exports.copy = copy;
 exports.appendExtensionIfNeeded = appendExtensionIfNeeded;
 
+exports.FormattedDateAccess = FormattedDateAccess;
+exports.DateAccessWeek = DateAccessWeek;
+exports.GermanDateAccess = GermanDateAccess;
 var exports$1 = exports;
 
 exports.default = exports$1;

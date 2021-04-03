@@ -9,29 +9,42 @@ import {
 } from "../data.juggle/dataset.extract";
 import {DatasetsColorsController} from "./datasets.controller.colors";
 
+
 /**
  * Updates the datasets of this controller.
  * @param datasets The new datasets.
  */
 DatasetsController.prototype.setDatasets = function (datasets) {
+  this.originalDatasets = datasets;
   this.datasets = copy(datasets);
   this.update();
 };
 
 DatasetsController.prototype.update = function () {
   if (!this.datasets || !Array.isArray(this.datasets)) return;
+
+  let dateAccess = this.dateAccess;
   this.workingDatasets = copy(this.datasets)
     .sort((left, right) => left.label > right.label);
-  this.workingDatasets.forEach(dataset => dataset.isEnabled = true);
+  this.workingDatasets.forEach(function (dataset) {
+    dataset.isEnabled = true;
+    dataset.data.forEach(function (item) {
+      item.dateNumeric = dateAccess(item.date);
+    });
+    dataset.data = dataset.data
+      .sort((left, right) => left.dateNumeric - right.dateNumeric);
+  });
+
   this.flatData = flatDatasets(this.workingDatasets);
   this.labels = extractLabelsFromDatasets(this.datasets);
   this.stacks = extractStacksFromDatasets(this.datasets);
-  this.dates = extractDatesFromDatasets(this.datasets);
+  this.dates = extractDatesFromDatasets(this.datasets)
+    .sort((left, right) => dateAccess(left) - dateAccess(right));
   this.locations = extractLocationsFromDatasets(this.datasets);
   this.datasetsColorsController = new DatasetsColorsController(this);
-  this.dateAccess = function (date) {
-    return Date.parse(date);
-  };
+  // this.dateAccess = function (date) {
+  //   return Date.parse(date);
+  // };
 
   this.locationFilters = [];
   this.dateFilters = [];

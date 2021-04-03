@@ -7,8 +7,7 @@ import {PlotGridRenderer} from "./plot.grid.renderer";
 import {PlotBackgroundRenderer} from "./plot.background.renderer";
 import {defaultPlotChartConfig} from "./plot.chart.config";
 import {PlotChartSort} from "./plot.chart.sort";
-import {DatasetsController} from "../data/datasets.controller";
-import "../dataview/dataviews.plot";
+import "../dataview/dataview.plot";
 
 /**
  * A lotivis plot chart.
@@ -173,31 +172,5 @@ export class PlotChart extends Chart {
       default:
         break;
     }
-  }
-
-  /**
-   * Sets the datasets.
-   * @param newDatasets The array of datasets.
-   */
-  set datasets(newDatasets) {
-    this.setDatasetController(new DatasetsController(newDatasets));
-  }
-
-  /**
-   * Returns the presented datasets.
-   * @returns {*}
-   */
-  get datasets() {
-    return this.datasetController.datasets;
-  }
-
-  /**
-   * Sets the nes datasets controller.
-   * @param newController The dataset controller.
-   */
-  setDatasetController(newController) {
-    this.datasetController = newController;
-    this.datasetController.addListener(this);
-    this.update();
   }
 }
