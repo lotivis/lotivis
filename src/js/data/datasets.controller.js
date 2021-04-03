@@ -2,6 +2,7 @@ import {combineByDate, combineByLocation, combineByStacks} from "../data.juggle/
 import {sumOfDataset, sumOfLabel, sumOfStack} from "../data.juggle/data.sum";
 import {d3LibraryAccess} from "../shared/d3libaccess";
 import {DefaultDateAccess} from "../data.date.assessor/date.assessor";
+import {InvalidFormatError} from "../data.juggle/data.validate.error";
 
 /**
  * Controls a collection of datasets.
@@ -15,6 +16,7 @@ export class DatasetsController {
    * @param config
    */
   constructor(datasets, config) {
+    if (!Array.isArray(datasets)) throw new InvalidFormatError();
     this.config = config || {};
     this.dateAccess = this.config.dateAccess || DefaultDateAccess;
     this.setDatasets(datasets);

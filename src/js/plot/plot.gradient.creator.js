@@ -35,9 +35,8 @@ export class PlotGradientCreator {
       .attr("y2", "0%");
 
     let data = dataset.data;
-    let dataWithValues = dataset.dataWithValues;
-    let count = dataWithValues.length;
-    let latestDate = dataset.latestDate;
+    let count = data.length;
+    let latestDate = dataset.lastDate;
     let duration = dataset.duration;
 
     if (!data || data.length === 0) return;
@@ -57,7 +56,7 @@ export class PlotGradientCreator {
 
       for (let index = 0; index < count; index++) {
 
-        let item = dataWithValues[index];
+        let item = data[index];
         let date = item.date;
         let opacity = item.value / max;
 

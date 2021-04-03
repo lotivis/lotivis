@@ -27,7 +27,7 @@ export const FormattedDateAccess = function (dateString) {
  * @returns {number}
  * @constructor
  */
-export const GermanDateAccess = function (dateString) {
+export const DateGermanAssessor = function (dateString) {
   let saveDateString = String(dateString);
   let components = saveDateString.split('.');
   let day = components[0];
@@ -43,7 +43,7 @@ export const GermanDateAccess = function (dateString) {
  * @returns {number}
  * @constructor
  */
-export const DateAccessWeek = function (weekday) {
+export const DateWeekAssessor = function (weekday) {
   let lowercase = weekday.toLowerCase();
   switch (lowercase) {
     case 'sunday':

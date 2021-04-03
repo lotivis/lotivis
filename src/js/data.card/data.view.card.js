@@ -82,6 +82,12 @@ export class DataViewDatasetsControllerCard extends DataViewCard {
   }
 
   getDataView() {
-    return this.datasetController.datasets;
+    return {
+      workingDatasets: this.datasetController.workingDatasets,
+      flatData: this.datasetController.flatData,
+      labels: this.datasetController.labels,
+      stacks: this.datasetController.stacks,
+      dates: this.datasetController.dates
+    };
   }
 }

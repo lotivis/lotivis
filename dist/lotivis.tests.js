@@ -308,13 +308,15 @@ function flatDataset(dataset) {
   return flatData;
 }
 
+function containsValue(value) {
+  return value || value === 0;
+}
+
 /**
- * Returns
  *
  * @param flattenList
  * @returns {[]}
  */
-
 function combine(flattenList) {
   let combined = [];
   let copiedList = copy(flattenList);
@@ -331,14 +333,14 @@ function combine(flattenList) {
       entry.value += (listItem.value + 0);
     } else {
       let entry = {};
-      if (listItem.label) entry.label = listItem.label;
-      if (listItem.dataset) entry.dataset = listItem.dataset;
-      if (listItem.stack) entry.stack = listItem.stack;
-      if (listItem.location) entry.location = listItem.location;
-      if (listItem.locationTotal) entry.locationTotal = listItem.locationTotal;
-      if (listItem.date) entry.date = listItem.date;
-      if (listItem.dateTotal) entry.dateTotal = listItem.dateTotal;
-      if (listItem.locationName) entry.locationName = listItem.locationName;
+      if (containsValue(listItem.label)) entry.label = listItem.label;
+      if (containsValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (containsValue(listItem.stack)) entry.stack = listItem.stack;
+      if (containsValue(listItem.location)) entry.location = listItem.location;
+      if (containsValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
+      if (containsValue(listItem.date)) entry.date = listItem.date;
+      if (containsValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
+      if (containsValue(listItem.locationName)) entry.locationName = listItem.locationName;
       entry.value = (listItem.value || 0);
       combined.push(entry);
     }
@@ -356,23 +358,26 @@ function combineByStacks(flattenList) {
   let combined = [];
   for (let index = 0; index < flattenList.length; index++) {
     let listItem = flattenList[index];
+
     let entry = combined.find(function (entryItem) {
       return entryItem.stack === listItem.stack
         && entryItem.label === listItem.label
         && entryItem.location === listItem.location
         && entryItem.date === listItem.date;
     });
+
     if (entry) {
       entry.value += (listItem.value + 0);
     } else {
       let entry = {};
-      if (listItem.label) entry.label = listItem.label;
-      if (listItem.stack) entry.stack = listItem.stack;
-      if (listItem.location) entry.location = listItem.location;
-      if (listItem.locationTotal) entry.locationTotal = listItem.locationTotal;
-      if (listItem.date) entry.date = listItem.date;
-      if (listItem.dateTotal) entry.dateTotal = listItem.dateTotal;
-      if (listItem.locationName) entry.locationName = listItem.locationName;
+      if (containsValue(listItem.label)) entry.label = listItem.label;
+      if (containsValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (containsValue(listItem.stack)) entry.stack = listItem.stack;
+      if (containsValue(listItem.location)) entry.location = listItem.location;
+      if (containsValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
+      if (containsValue(listItem.date)) entry.date = listItem.date;
+      if (containsValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
+      if (containsValue(listItem.locationName)) entry.locationName = listItem.locationName;
       entry.value = (listItem.value || 0);
       combined.push(entry);
     }
@@ -390,7 +395,7 @@ function combineByDate(flatData) {
   for (let index = 0; index < flatData.length; index++) {
     let listItem = flatData[index];
     let entry = combined.find(function (entryItem) {
-      return  entryItem.dataset === listItem.dataset
+      return entryItem.dataset === listItem.dataset
         && entryItem.stack === listItem.stack
         && entryItem.label === listItem.label
         && entryItem.date === listItem.date;
@@ -399,12 +404,11 @@ function combineByDate(flatData) {
       entry.value += (listItem.value + 0);
     } else {
       let entry = {};
-      if (listItem.label) entry.label = listItem.label;
-      if (listItem.dataset) entry.dataset = listItem.dataset;
-      if (listItem.stack) entry.stack = listItem.stack;
-      if (listItem.date) entry.date = listItem.date;
-      if (listItem.dateTotal) entry.dateTotal = listItem.dateTotal;
-      if (listItem.locationName) entry.locationName = listItem.locationName;
+      if (containsValue(listItem.label)) entry.label = listItem.label;
+      if (containsValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (containsValue(listItem.stack)) entry.stack = listItem.stack;
+      if (containsValue(listItem.date)) entry.date = listItem.date;
+      if (containsValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
       entry.value = (listItem.value || 0);
       combined.push(entry);
     }
@@ -422,7 +426,7 @@ function combineByLocation(flatData) {
   for (let index = 0; index < flatData.length; index++) {
     let listItem = flatData[index];
     let entry = combined.find(function (entryItem) {
-      return  entryItem.dataset === listItem.dataset
+      return entryItem.dataset === listItem.dataset
         && entryItem.stack === listItem.stack
         && entryItem.label === listItem.label
         && entryItem.location === listItem.location;
@@ -431,12 +435,12 @@ function combineByLocation(flatData) {
       entry.value += listItem.value;
     } else {
       let entry = {};
-      if (listItem.label) entry.label = listItem.label;
-      if (listItem.dataset) entry.dataset = listItem.dataset;
-      if (listItem.stack) entry.stack = listItem.stack;
-      if (listItem.location) entry.location = listItem.location;
-      if (listItem.locationTotal) entry.locationTotal = listItem.locationTotal;
-      if (listItem.locationName) entry.locationName = listItem.locationName;
+      if (containsValue(listItem.label)) entry.label = listItem.label;
+      if (containsValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (containsValue(listItem.stack)) entry.stack = listItem.stack;
+      if (containsValue(listItem.location)) entry.location = listItem.location;
+      if (containsValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
+      if (containsValue(listItem.locationName)) entry.locationName = listItem.locationName;
       entry.value = listItem.value;
       combined.push(entry);
     }
@@ -696,18 +700,34 @@ function dateToItemsRelation(datasets, dateAccess) {
   });
 }
 
+/**
+ *
+ * @param date
+ * @constructor
+ */
 const DefaultDateAccess = (date) => date;
 
+/**
+ *
+ * @param dateString
+ * @returns {number}
+ * @constructor
+ */
 const FormattedDateAccess = function (dateString) {
   let value = Date.parse(dateString);
   if (isNaN(value)) {
     LogOnlyOnce('isNaN');
   }
-
   return value;
 };
 
-const GermanDateAccess = function (dateString) {
+/**
+ *
+ * @param dateString
+ * @returns {number}
+ * @constructor
+ */
+const DateGermanAssessor = function (dateString) {
   let saveDateString = String(dateString);
   let components = saveDateString.split('.');
   let day = components[0];
@@ -716,6 +736,79 @@ const GermanDateAccess = function (dateString) {
   let date = new Date(`${year}-${month}-${day}`);
   return Number(date);
 };
+
+/**
+ *
+ * @param weekday
+ * @returns {number}
+ * @constructor
+ */
+const DateWeekAssessor = function (weekday) {
+  let lowercase = weekday.toLowerCase();
+  switch (lowercase) {
+    case 'sunday':
+    case 'sun':
+      return 0;
+    case 'monday':
+    case 'mon':
+      return 1;
+    case 'tuesday':
+    case 'tue':
+      return 2;
+    case 'wednesday':
+    case 'wed':
+      return 3;
+    case 'thursday':
+    case 'thr':
+      return 4;
+    case 'friday':
+    case 'fri':
+      return 5;
+    case 'saturday':
+    case 'sat':
+      return 6;
+    default:
+      return -1;
+  }
+};
+
+class LotivisError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = this.constructor.name;
+  }
+}
+
+class DataValidateError extends LotivisError {
+  // constructor(message) {
+  //   super(message);
+  // }
+}
+
+class MissingPropertyError extends DataValidateError {
+  // constructor(message, propertyName) {
+  //   super(message);
+  //   this.propertyName = propertyName;
+  // }
+}
+
+class InvalidFormatError extends DataValidateError {
+  // constructor(message) {
+  //   super(message);
+  // }
+}
+
+class GeoJSONValidateError extends LotivisError {
+  // constructor(message) {
+  //   super(message);
+  // }
+}
+
+exports.LotivisError = LotivisError;
+exports.DataValidateError = DataValidateError;
+exports.MissingPropertyError = MissingPropertyError;
+exports.InvalidFormatError = InvalidFormatError;
+exports.GeoJSONValidateError = GeoJSONValidateError;
 
 /**
  * Controls a collection of datasets.
@@ -729,6 +822,7 @@ class DatasetsController {
    * @param config
    */
   constructor(datasets, config) {
+    if (!Array.isArray(datasets)) throw new InvalidFormatError();
     this.config = config || {};
     this.dateAccess = this.config.dateAccess || DefaultDateAccess;
     this.setDatasets(datasets);
@@ -1274,21 +1368,16 @@ function createPlotDataset(dataset, dateAccess) {
   let data = copy(dataset.data);
   let firstDate = extractEarliestDateWithValue(data) || 0;
   let lastDate = extractLatestDateWithValue(data) || 0;
+  let flatData = flatDataset(dataset);
 
   newDataset.label = dataset.label;
   newDataset.stack = dataset.stack;
-  newDataset.earliestDate = firstDate;
   newDataset.firstDate = firstDate;
-  newDataset.latestDate = lastDate;
   newDataset.lastDate = lastDate;
-  newDataset.duration = lastDate - firstDate;
-  newDataset.data = combineByDate(data);
-  newDataset.sum = sumOfLabel(data, dataset.label);
-  data = combineByDate(data)
-    .sort((left, right) => left.dateNumeric - right.dateNumeric);
-
-  newDataset.data = data;
-  newDataset.dataWithValues = data.filter(item => (item.value || 0) > 0);
+  newDataset.sum = sumOfValues(flatData);
+  newDataset.data = combineByDate(data)
+    .sort((left, right) => left.dateNumeric - right.dateNumeric)
+    .filter(item => (item.value || 0) > 0);
 
   return newDataset;
 }
@@ -1301,15 +1390,19 @@ DatasetsController.prototype.getPlotDataview = function () {
   this.dateAccess;
   let enabledDatasets = this.enabledDatasets();
   let dataview = {datasets: []};
+  dataview.dates = extractDatesFromDatasets(enabledDatasets);
+  dataview.labels = extractLabelsFromDatasets(enabledDatasets);
+  dataview.max = this.getMax();
 
   enabledDatasets.forEach(function (dataset) {
-    dataview.datasets.push(createPlotDataset(dataset));
+    let newDataset = createPlotDataset(dataset);
+    let firstIndex = dataview.dates.indexOf(newDataset.firstDate);
+    let lastIndex = dataview.dates.indexOf(newDataset.lastDate);
+    newDataset.duration = lastIndex - firstIndex;
+    dataview.datasets.push(newDataset);
   });
 
   dataview.labelsCount = dataview.datasets.length;
-  dataview.dates = extractDatesFromDatasets(dataview.datasets);
-  dataview.labels = extractLabelsFromDatasets(dataview.datasets);
-  dataview.max = this.getMax();
 
   return dataview;
 };
@@ -1319,9 +1412,10 @@ DatasetsController.prototype.getPlotDataview = function () {
  */
 DatasetsController.prototype.getMapDataview = function () {
 
-  this.dateAccess;
-  this.enabledDatasets();
-  let dataview = {datasets: []};
+  let dataview = {};
+  let flatData = this.enabledFlatData();
+  let combinedByStack = combineByStacks(flatData);
+  dataview.combinedData = combineByLocation(combinedByStack);
 
   return dataview;
 };
@@ -1480,44 +1574,6 @@ function trimByChar(string, character) {
   const last = [...saveString].reverse().findIndex(char => char !== character);
   return saveString.substring(first, saveString.length - last);
 }
-
-class LotivisError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = this.constructor.name;
-  }
-}
-
-class DataValidateError extends LotivisError {
-  // constructor(message) {
-  //   super(message);
-  // }
-}
-
-class MissingPropertyError extends DataValidateError {
-  // constructor(message, propertyName) {
-  //   super(message);
-  //   this.propertyName = propertyName;
-  // }
-}
-
-class InvalidFormatError extends DataValidateError {
-  // constructor(message) {
-  //   super(message);
-  // }
-}
-
-class GeoJSONValidateError extends LotivisError {
-  // constructor(message) {
-  //   super(message);
-  // }
-}
-
-exports.LotivisError = LotivisError;
-exports.DataValidateError = DataValidateError;
-exports.MissingPropertyError = MissingPropertyError;
-exports.InvalidFormatError = InvalidFormatError;
-exports.GeoJSONValidateError = GeoJSONValidateError;
 
 /**
  * Validates the given datasets.
@@ -1737,41 +1793,6 @@ function appendExtensionIfNeeded(filename, extension) {
   return filename.endsWith(extension) ? filename : `${filename}${extension}`;
 }
 
-/**
- *
- * @param weekday
- * @returns {number}
- * @constructor
- */
-const DateAccessWeek = function (weekday) {
-  let lowercase = weekday.toLowerCase();
-  switch (lowercase) {
-    case 'sunday':
-    case 'sun':
-      return 0;
-    case 'monday':
-    case 'mon':
-      return 1;
-    case 'tuesday':
-    case 'tue':
-      return 2;
-    case 'wednesday':
-    case 'wed':
-      return 3;
-    case 'thursday':
-    case 'thr':
-      return 4;
-    case 'friday':
-    case 'fri':
-      return 5;
-    case 'saturday':
-    case 'sat':
-      return 6;
-    default:
-      return -1;
-  }
-};
-
 exports.Color = Color;
 exports.DatasetController = DatasetsController;
 exports.GeoJson = GeoJson;
@@ -1814,9 +1835,11 @@ exports.validateDataset = validateDataset;
 exports.validateDatasets = validateDatasets;
 exports.validateDataItem = validateDataItem;
 
+exports.DefaultDateAccess = DefaultDateAccess;
 exports.FormattedDateAccess = FormattedDateAccess;
-exports.DateAccessWeek = DateAccessWeek;
-exports.GermanDateAccess = GermanDateAccess;
+exports.GermanDateAccess = DateGermanAssessor;
+exports.DateWeekAssessor = DateWeekAssessor;
+
 var exports$1 = exports;
 
 exports.default = exports$1;

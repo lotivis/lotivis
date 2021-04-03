@@ -7,3 +7,4 @@ export const PlotChartSort = {
   intensity: 'intensity',
   firstDate: 'firstDate'
 };
+

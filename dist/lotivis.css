@@ -24,7 +24,7 @@ body {
 /* MARK: - Buttons */
 button.lotivis-button {
   text-decoration: none;
-  font-size: small;
+  font-size: 12px;
   background-color: #00000000;
   color: gray;
   padding: 5px 0;
@@ -61,7 +61,7 @@ button.lotivis-button-down::after {
 }
 
 button.lotivis-button-small {
-  font-size: smaller;
+  font-size: 12px;
 }
 
 button.lotivis-button-round {
@@ -110,19 +110,20 @@ button.lotivis-button-round:active {
 .lotivis-card-header {
   padding: 10px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  height: 17px;
+  height: 14px;
 }
-.lotivis-card-header .lotivis-card-header-right-component {
+.lotivis-card-header .lotivis-card-header-right {
+  overflow: visible;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+}
+.lotivis-card-header .lotivis-card-header-center {
   overflow: visible;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.lotivis-card-header .lotivis-card-header-center-component {
-  overflow: visible;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.lotivis-card-header .lotivis-card-header-left-component {
+.lotivis-card-header .lotivis-card-header-left {
   overflow: visible;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -135,8 +136,8 @@ button.lotivis-button-round:active {
 .lotivis-card-body {
   width: 100%;
 }
-.lotivis-card-body .lotivis-card-body-content {
-  margin: 5px;
+.lotivis-card-body .lotivis-card-body-settings {
+  margin: 10px;
 }
 
 .lotivis-card-footer {
@@ -197,10 +198,6 @@ button.lotivis-button-round:active {
   font-size: 26px;
   font-style: normal;
   margin: 0 0 5px;
-}
-
-.lotivis-data-card .lotivis-data-textarea {
-  padding-top: 10px;
 }
 
 .lotivis-data-status-label {
@@ -305,14 +302,13 @@ input[type=checkbox] {
 .radio-group label {
   color: black;
   font-weight: normal;
+  font-size: 14px;
   cursor: pointer;
   transition: 0.36s;
 }
-
 .radio-group label:hover {
   color: dodgerblue;
 }
-
 .radio-group label:active {
   opacity: 0.6;
 }
@@ -321,13 +317,13 @@ input[type=checkbox] {
   padding: 0 50px 0 50px;
   margin: auto;
   max-width: 1200px;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .lotivis-container-full {
   padding: 0;
   margin: auto;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .lotivis-row, .lotivis-group {
@@ -410,6 +406,21 @@ input[type=checkbox] {
 .lotivis-map-legend-rect {
   stroke: black;
   stroke-width: 1;
+}
+
+.lotivis-menu li {
+  margin-top: 5px;
+}
+.lotivis-menu a, .lotivis-menu a:visited {
+  color: dodgerblue;
+  opacity: 0.8;
+}
+.lotivis-menu a:hover, .lotivis-menu a:visited:hover {
+  color: dodgerblue;
+  opacity: 1;
+}
+.lotivis-menu a:active {
+  opacity: 0.6;
 }
 
 .lotivis-plot-background {

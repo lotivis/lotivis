@@ -28,9 +28,9 @@ export class PlotLabelRenderer {
         .append('text')
         .attr('class', 'lotivis-plot-label')
         .attr("id", (d) => 'rect-' + hashCode(d.label))
-        .attr("x", (d) => xChart(d.earliestDate) + (xBandwidth / 2))
+        .attr("x", (d) => xChart(d.firstDate) + (xBandwidth / 2))
         .attr("y", (d) => plotChart.yChart(d.label))
-        .attr("width", (d) => xChart(d.latestDate) - xChart(d.earliestDate) + xBandwidth)
+        .attr("width", (d) => xChart(d.lastDate) - xChart(d.firstDate) + xBandwidth)
         .text(function (dataset) {
           if (dataset.sum === 0) return;
           return `${dataset.duration} years, ${dataset.sum} items`;

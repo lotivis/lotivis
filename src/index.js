@@ -13,15 +13,6 @@ import {PlotChart} from "./js/plot/plot.chart";
 import {PlotChartCard} from "./js/plot/plot.chart.card";
 import {RadioGroup} from "./js/components/radio.group";
 import {Option} from "./js/components/option";
-import {UrlParameters} from "./js/shared/url.parameters";
-import {DatasetsController} from "./js/data/datasets.controller";
-import "./js/data/datasets.controller.listeners";
-import "./js/data/datasets.controller.filter";
-import "./js/data/datasets.controller.update";
-import "./js/dataview/dataview.date";
-import "./js/dataview/dataview.date.combined.stacks";
-import "./js/dataview/dataview.plot";
-import "./js/dataview/dataview.map";
 import {Chart} from "./js/components/chart";
 import "./js/components/chart.datasets";
 import {Card} from "./js/components/card";
@@ -30,24 +21,37 @@ import {ModalPopup} from "./js/components/modal.popup";
 import {ChartCard} from "./js/components/chart.card";
 import {Dropdown} from "./js/components/dropdown";
 import {Popup} from "./js/components/popup";
-
 import {DataCard} from "./js/data.card/data.card";
 import {DatasetJSONCard} from "./js/data.card/data.json.card";
 import {DatasetCSVCard} from "./js/data.card/data.csv.card";
 import {DatasetCSVDateCard} from "./js/data.card/data.csv.date.card";
+import {
+  DataViewCard,
+  DataViewDateCard,
+  DataViewFlatCard,
+  DataViewMapCard,
+  DataViewPlotCard,
+  DataViewDatasetsControllerCard
+} from "./js/data.card/data.view.card";
+import {DatasetsController} from "./js/data/datasets.controller";
+import "./js/data/datasets.controller.listeners";
+import "./js/data/datasets.controller.filter";
+import "./js/data/datasets.controller.update";
+import "./js/dataview/dataview.date";
+import "./js/dataview/dataview.date.combined.stacks";
+import "./js/dataview/dataview.plot";
+import "./js/dataview/dataview.map";
+import {UrlParameters} from "./js/shared/url.parameters";
 import {GlobalConfig} from "./js/shared/config";
 import {debug} from "./js/shared/debug";
 import {parseCSV} from "./js/data.parse/parse.csv";
 import {parseCSVDate} from "./js/data.parse/parse.csv.date";
-import {DateAccessWeek} from "./js/data.date.assessor/date.assessor.weekday";
-import {FormattedDateAccess, GermanDateAccess} from "./js/data.date.assessor/date.assessor";
 import {
-  DataViewCard, DataViewDatasetsControllerCard,
-  DataViewDateCard,
-  DataViewFlatCard,
-  DataViewMapCard,
-  DataViewPlotCard
-} from "./js/data.card/data.view.card";
+  FormattedDateAccess,
+  DateGermanAssessor,
+  DefaultDateAccess,
+  DateWeekAssessor
+} from "./js/data.date.assessor/date.assessor";
 
 // colors
 exports.Color = Color;
@@ -106,8 +110,10 @@ exports.parseCSVDate = parseCSVDate;
 exports.config = GlobalConfig;
 exports.debug = debug;
 
+// date assessors
+exports.DefaultDateAccess = DefaultDateAccess;
 exports.FormattedDateAccess = FormattedDateAccess;
-exports.DateAccessWeek = DateAccessWeek;
-exports.GermanDateAccess = GermanDateAccess;
+exports.GermanDateAccess = DateGermanAssessor;
+exports.DateWeekAssessor = DateWeekAssessor;
 
 export default exports;

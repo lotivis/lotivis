@@ -63,15 +63,15 @@ export class PlotBarsRenderer {
         .attr('class', 'lotivis-plot-bar')
         .attr("rx", radius)
         .attr("ry", radius)
-        .attr("x", (d) => plotChart.xChart((d.duration < 0) ? d.latestDate : d.earliestDate || 0))
+        .attr("x", (d) => plotChart.xChart((d.duration < 0) ? d.lastDate : d.firstDate || 0))
         .attr("y", (d) => plotChart.yChart(d.label))
         .attr("height", plotChart.yChart.bandwidth())
         .attr("id", (d) => 'rect-' + createIDFromDataset(d))
         .on('mouseenter', mouseEnter)
         .on('mouseout', mouseOut)
         .attr("width", function (data) {
-          if (!data.earliestDate || !data.latestDate) return 0;
-          return plotChart.xChart(data.latestDate) - plotChart.xChart(data.earliestDate) + plotChart.xChart.bandwidth();
+          if (!data.firstDate || !data.lastDate) return 0;
+          return plotChart.xChart(data.lastDate) - plotChart.xChart(data.firstDate) + plotChart.xChart.bandwidth();
         }.bind(this));
     };
   }

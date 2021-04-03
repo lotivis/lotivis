@@ -7,7 +7,8 @@ import {
   extractLatestDateWithValue
 } from "../data.juggle/data.extract";
 import {combineByDate} from "../data.juggle/data.combine";
-import {sumOfLabel} from "../data.juggle/data.sum";
+import {sumOfDataset, sumOfLabel, sumOfValues} from "../data.juggle/data.sum";
+import {flatDataset} from "../data.juggle/data.flat";
 
 /**
  *
@@ -20,21 +21,16 @@ function createPlotDataset(dataset, dateAccess) {
   let data = copy(dataset.data);
   let firstDate = extractEarliestDateWithValue(data) || 0;
   let lastDate = extractLatestDateWithValue(data) || 0;
+  let flatData = flatDataset(dataset);
 
   newDataset.label = dataset.label;
   newDataset.stack = dataset.stack;
-  newDataset.earliestDate = firstDate;
   newDataset.firstDate = firstDate;
-  newDataset.latestDate = lastDate;
   newDataset.lastDate = lastDate;
-  newDataset.duration = lastDate - firstDate;
-  newDataset.data = combineByDate(data);
-  newDataset.sum = sumOfLabel(data, dataset.label);
-  data = combineByDate(data)
-    .sort((left, right) => left.dateNumeric - right.dateNumeric);
-
-  newDataset.data = data;
-  newDataset.dataWithValues = data.filter(item => (item.value || 0) > 0);
+  newDataset.sum = sumOfValues(flatData);
+  newDataset.data = combineByDate(data)
+    .sort((left, right) => left.dateNumeric - right.dateNumeric)
+    .filter(item => (item.value || 0) > 0);
 
   return newDataset;
 }
@@ -47,15 +43,19 @@ DatasetsController.prototype.getPlotDataview = function () {
   let dateAccess = this.dateAccess;
   let enabledDatasets = this.enabledDatasets();
   let dataview = {datasets: []};
+  dataview.dates = extractDatesFromDatasets(enabledDatasets);
+  dataview.labels = extractLabelsFromDatasets(enabledDatasets);
+  dataview.max = this.getMax();
 
   enabledDatasets.forEach(function (dataset) {
-    dataview.datasets.push(createPlotDataset(dataset, dateAccess));
+    let newDataset = createPlotDataset(dataset, dateAccess);
+    let firstIndex = dataview.dates.indexOf(newDataset.firstDate);
+    let lastIndex = dataview.dates.indexOf(newDataset.lastDate);
+    newDataset.duration = lastIndex - firstIndex;
+    dataview.datasets.push(newDataset);
   });
 
   dataview.labelsCount = dataview.datasets.length;
-  dataview.dates = extractDatesFromDatasets(dataview.datasets);
-  dataview.labels = extractLabelsFromDatasets(dataview.datasets);
-  dataview.max = this.getMax();
 
   return dataview;
 };
