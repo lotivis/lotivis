@@ -88,7 +88,6 @@ export class PlotChart extends Chart {
    * Creates and renders the chart.
    */
   draw() {
-    this.createScales();
     this.backgroundRenderer.render();
     this.gridRenderer.render();
     this.axisRenderer.renderAxis();

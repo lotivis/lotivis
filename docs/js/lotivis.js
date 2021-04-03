@@ -3306,10 +3306,13 @@ class MapSelectionBoundsRenderer {
    */
   constructor(mapChart) {
 
-    let bounds = mapChart.svg
-      .append('rect')
-      .attr('class', 'lotivis-map-selection-rect')
-      .style('fill-opacity', 0);
+    let bounds;
+    if (mapChart.svg) {
+      bounds = mapChart.svg
+        .append('rect')
+        .attr('class', 'lotivis-map-selection-rect')
+        .style('fill-opacity', 0);
+    }
 
     /**
      * Tells this renderer that the mouse moved in an area.
@@ -3571,16 +3574,6 @@ class MapChart extends Chart {
       .attr('id', this.selector);
 
     this.initialize();
-    this.renderSVG();
-    this.backgroundRenderer = new MapBackgroundRenderer(this);
-    this.geoJSONRenderer = new MapGeojsonRenderer(this);
-    this.datasetRenderer = new MapDatasetRenderer(this);
-    this.exteriorBorderRenderer = new MapExteriorBorderRenderer(this);
-    this.minimapRenderer = new MapMinimapRenderer(this);
-    this.labelRenderer = new MapLabelRenderer(this);
-    this.legendRenderer = new MapLegendRenderer(this);
-    this.selectionBoundsRenderer = new MapSelectionBoundsRenderer(this);
-    this.tooltipRenderer = new MapTooltipRenderer(this);
   }
 
   /**
@@ -3598,15 +3591,42 @@ class MapChart extends Chart {
 
     this.projection = d3.geoMercator();
     this.path = d3.geoPath().projection(this.projection);
+
+    this.backgroundRenderer = new MapBackgroundRenderer(this);
+    this.geoJSONRenderer = new MapGeojsonRenderer(this);
+    this.datasetRenderer = new MapDatasetRenderer(this);
+    this.exteriorBorderRenderer = new MapExteriorBorderRenderer(this);
+    this.minimapRenderer = new MapMinimapRenderer(this);
+    this.labelRenderer = new MapLabelRenderer(this);
+    this.legendRenderer = new MapLegendRenderer(this);
+    this.selectionBoundsRenderer = new MapSelectionBoundsRenderer(this);
+    this.tooltipRenderer = new MapTooltipRenderer(this);
   }
 
-  /**
-   * Tells the receiving map chart to update its view.
-   */
-  update() {
-    if (!this.updateSensible) return;
-    this.geoJSONDidChange();
-    this.datasetsDidChange();
+  precalculate() {
+    if (this.svg) this.svg.remove();
+    this.renderSVG();
+    if (!this.datasetController) return;
+    if (!this.geoJSON) {
+      this.geoJSON = createGeoJSON(this.datasetController.workingDatasets);
+      this.geoJSONDidChange();
+    }
+    const combinedByStack = combineByStacks(this.datasetController.enabledFlatData());
+    this.combinedData = combineByLocation(combinedByStack);
+    this.dataview = this.datasetController.getMapDataview();
+  }
+
+  draw() {
+    this.backgroundRenderer.render();
+    this.exteriorBorderRenderer.render();
+    this.geoJSONRenderer.renderGeoJson();
+    this.tooltipRenderer.raise();
+    this.legendRenderer.render();
+    this.datasetRenderer.render();
+    this.labelRenderer.render();
+    this.minimapRenderer.render();
+    this.tooltipRenderer.raise();
+    this.selectionBoundsRenderer.raise();
   }
 
   /**
@@ -3618,11 +3638,11 @@ class MapChart extends Chart {
       .append('svg')
       .attr('id', this.svgSelector)
       .attr('viewBox', `0 0 ${this.config.width} ${this.config.height}`);
+    this.selectionBoundsRenderer = new MapSelectionBoundsRenderer(this);
   }
 
   /**
    * Sets the size of the projection to fit the given geo json.
-   *
    * @param geoJSON
    */
   zoomTo(geoJSON) {
@@ -3667,36 +3687,8 @@ class MapChart extends Chart {
     this.geoJSON.features.forEach((feature) => feature.center = d3.geoCentroid(feature));
     this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.excludedFeatureCodes);
     this.zoomTo(this.geoJSON);
-    this.exteriorBorderRenderer.render();
-    this.geoJSONRenderer.renderGeoJson();
-  }
-
-  /**
-   * Tells the receiving map chart that its `datasets` property did change.
-   */
-  datasetsDidChange() {
-    if (!this.datasetController) return;
-    const combinedByStack = combineByStacks(this.datasetController.enabledFlatData());
-    this.combinedData = combineByLocation(combinedByStack);
-
-    this.svg.remove();
-    this.renderSVG();
-
-    if (!this.geoJSON) {
-      this.geoJSON = createGeoJSON(this.datasetController.workingDatasets);
-      this.geoJSONDidChange();
-    }
-
-    this.backgroundRenderer.render();
-    this.exteriorBorderRenderer.render();
-    this.geoJSONRenderer.renderGeoJson();
-    this.tooltipRenderer.raise();
-    this.legendRenderer.render();
-    this.datasetRenderer.render();
-    this.labelRenderer.render();
-    this.minimapRenderer.render();
-    this.tooltipRenderer.raise();
-    this.selectionBoundsRenderer.raise();
+    // this.exteriorBorderRenderer.render();
+    // this.geoJSONRenderer.renderGeoJson();
   }
 }
 
@@ -4498,7 +4490,6 @@ class PlotChart extends Chart {
    * Creates and renders the chart.
    */
   draw() {
-    this.createScales();
     this.backgroundRenderer.render();
     this.gridRenderer.render();
     this.axisRenderer.renderAxis();

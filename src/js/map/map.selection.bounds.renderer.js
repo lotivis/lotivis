@@ -11,10 +11,13 @@ export class MapSelectionBoundsRenderer {
    */
   constructor(mapChart) {
 
-    let bounds = mapChart.svg
-      .append('rect')
-      .attr('class', 'lotivis-map-selection-rect')
-      .style('fill-opacity', 0);
+    let bounds;
+    if (mapChart.svg) {
+      bounds = mapChart.svg
+        .append('rect')
+        .attr('class', 'lotivis-map-selection-rect')
+        .style('fill-opacity', 0);
+    }
 
     /**
      * Tells this renderer that the mouse moved in an area.
