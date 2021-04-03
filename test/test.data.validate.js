@@ -20,13 +20,13 @@ describe('validate', function () {
       }, lotivis.DataValidateError);
     });
 
-    it('throws an error for an item without a date property', function () {
+    it('throws an error for an item without a `date` property', function () {
       assert.throws(() => {
         lotivis.validateDataItem({location: 'some', value: 0});
       }, lotivis.MissingPropertyError);
     });
 
-    it('throws an error for an item without a location property', function () {
+    it('throws an error for an item without a `location` property', function () {
       assert.throws(() => {
         lotivis.validateDataItem({date: 'some', value: 0});
       }, lotivis.DataValidateError);
@@ -41,19 +41,19 @@ describe('validate', function () {
       lotivis.validateDataset({label: 'dataset_1', data: []});
     });
 
-    it('throws an error for missing label property', function () {
+    it('throws an error for missing `label` property', function () {
       assert.throws(() => {
         lotivis.validateDataset({data: []});
       }, lotivis.MissingPropertyError);
     });
 
-    it('throws an error for missing data property', function () {
+    it('throws an error for missing `data` property', function () {
       assert.throws(() => {
         lotivis.validateDataset({label: 'dataset_1'});
       }, lotivis.MissingPropertyError);
     });
 
-    it('throws an error for invalid data property', function () {
+    it('throws an error for invalid `data` property', function () {
       assert.throws(() => {
         lotivis.validateDataset({label: 'dataset_1', data: 'my data'});
       }, lotivis.InvalidFormatError);

@@ -18,7 +18,7 @@ export class DatasetCSVDateCard extends DataCard {
    */
   constructor(parent) {
     super(parent);
-    this.setCardTitle('Dataset CSV Card');
+    this.setCardTitle('Dataset CSV');
   }
 
   download(content) {

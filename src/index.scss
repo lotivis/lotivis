@@ -1,6 +1,7 @@
 // MARK: - Font
-$primary-font-size: 13px;
+$primary-font-size: 14px;
 $primary-title-font-size: 15px;
+$button-font-size: 12px;
 $primary-font-family: sans-serif;
 
 $monospace-font-size: 13px;
@@ -37,6 +38,7 @@ body {
 @import "scss/input";
 @import "scss/layout";
 @import "scss/map";
+@import "scss/menu";
 @import "scss/plot";
 @import "scss/popup";
 @import "scss/tooltip";

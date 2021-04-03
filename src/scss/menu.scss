@@ -1,0 +1,19 @@
+.lotivis-menu {
+  li {
+    margin-top: 5px;
+  }
+
+  a, a:visited {
+    color: $tint-color;
+    opacity: 0.8;
+  }
+
+  a:hover, a:visited:hover {
+    color: $tint-color;
+    opacity: 1;
+  }
+
+  a:active {
+    opacity: 0.6;
+  }
+}

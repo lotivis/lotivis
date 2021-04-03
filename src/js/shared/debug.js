@@ -2,6 +2,18 @@ import {GlobalConfig} from "./config";
 
 const prefix = '[lotivis]  ';
 
+let alreadyLogged = [];
+
+export function LogOnlyOnce(id, message) {
+  if (alreadyLogged.includes(id)) return;
+  alreadyLogged.push(id);
+  lotivis_log(`[lotivis]  Warning only once! ${message}`);
+}
+
+export function clearAlreadyLogged() {
+  alreadyLogged = [];
+}
+
 export const verbose_log = console.log;
 
 // export const debug_log = function (message) {

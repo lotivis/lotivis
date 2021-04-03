@@ -15,7 +15,7 @@ export class DatasetJSONCard extends DataCard {
    */
   constructor(parent = 'datasets-json-card') {
     super(parent);
-    this.setCardTitle('Dataset JSON Card');
+    this.setCardTitle('Dataset JSON');
   }
 
   download(content) {

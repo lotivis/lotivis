@@ -1,5 +1,5 @@
 import {createID} from "../shared/selector";
-import {verbose_log} from "../shared/debug";
+import {ElementNotFoundError} from "../data.juggle/data.validate.error";
 
 /**
  *
@@ -23,6 +23,9 @@ export class Component {
   initializeFromSelector(selector) {
     this.selector = selector;
     this.parent = d3.select('#' + selector);
+    if (this.parent.empty()) {
+      throw new ElementNotFoundError(selector);
+    }
   }
 
   initializeFromParent(parent) {

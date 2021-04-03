@@ -1,7 +1,7 @@
 import {combineByDate, combineByLocation, combineByStacks} from "../data.juggle/data.combine";
 import {sumOfDataset, sumOfLabel, sumOfStack} from "../data.juggle/data.sum";
 import {d3LibraryAccess} from "../shared/d3libaccess";
-import {DefaultDateAccess} from "../data.dateaccess/dateaccess";
+import {DefaultDateAccess} from "../data.date.assessor/date.assessor";
 
 /**
  * Controls a collection of datasets.
@@ -12,21 +12,23 @@ export class DatasetsController {
   /**
    * Creates a new instance of DatasetsController
    * @param datasets The datasets to control.
+   * @param config
    */
-  constructor(datasets) {
-    this.dateAccess = DefaultDateAccess;
+  constructor(datasets, config) {
+    this.config = config || {};
+    this.dateAccess = this.config.dateAccess || DefaultDateAccess;
     this.setDatasets(datasets);
   }
 
-  get flatDataCombinedStacks() {
+  getFlatDataCombinedStacks() {
     return combineByStacks(this.flatData);
   }
 
-  get flatDataCombinedDates() {
+  getFlatDataCombinedDates() {
     return combineByDate(this.flatData);
   }
 
-  get flatDataCombinedLocations() {
+  getFlatDataCombinedLocations() {
     return combineByLocation(this.flatData);
   }
 

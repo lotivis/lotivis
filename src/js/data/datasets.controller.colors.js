@@ -8,13 +8,12 @@ export class DatasetsColorsController {
 
   /**
    * Creates a new instance of DatasetsColorsController.
-   *
-   * @param controller
+   * @param workingDatasets
+   * @param stacks
    */
-  constructor(controller) {
+  constructor(workingDatasets, stacks) {
 
-    let datasets = controller.workingDatasets;
-    let stacks = controller.stacks;
+    let datasets = workingDatasets;
     let labelToColor = {};
     let stackToColors = {};
 

@@ -8,7 +8,7 @@ import {
   extractStacksFromDatasets
 } from "../data.juggle/data.extract";
 import {DatasetsColorsController} from "./datasets.controller.colors";
-
+import {clearAlreadyLogged} from "../shared/debug";
 
 /**
  * Updates the datasets of this controller.
@@ -17,9 +17,13 @@ import {DatasetsColorsController} from "./datasets.controller.colors";
 DatasetsController.prototype.setDatasets = function (datasets) {
   this.originalDatasets = datasets;
   this.datasets = copy(datasets);
+  clearAlreadyLogged();
   this.update();
 };
 
+/**
+ *
+ */
 DatasetsController.prototype.update = function () {
   if (!this.datasets || !Array.isArray(this.datasets)) return;
 
@@ -41,7 +45,7 @@ DatasetsController.prototype.update = function () {
   this.dates = extractDatesFromDatasets(this.datasets)
     .sort((left, right) => dateAccess(left) - dateAccess(right));
   this.locations = extractLocationsFromDatasets(this.datasets);
-  this.datasetsColorsController = new DatasetsColorsController(this);
+  this.datasetsColorsController = new DatasetsColorsController(this.workingDatasets, this.stacks);
   // this.dateAccess = function (date) {
   //   return Date.parse(date);
   // };
@@ -60,7 +64,6 @@ DatasetsController.prototype.add = function (additionalDataset) {
   if (this.datasets.find(dataset => dataset.label === additionalDataset.label)) {
     throw new Error(`DatasetsController already contains a dataset with the same label (${additionalDataset.label}).`);
   }
-
   this.datasets.push(additionalDataset);
   this.update();
 };

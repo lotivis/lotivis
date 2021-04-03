@@ -636,6 +636,17 @@ function sumOfValues(flatData) {
     .reduce((acc, next) => acc + next, 0);
 }
 
+let alreadyLogged = [];
+
+function LogOnlyOnce(id, message) {
+  if (alreadyLogged.includes(id)) return;
+  alreadyLogged.push(id);
+}
+
+function clearAlreadyLogged() {
+  alreadyLogged = [];
+}
+
 // export const debug_log = function (message) {
 //   if (!GlobalConfig.debugLog) return;
 //   console.log(prefix + message);
@@ -686,8 +697,12 @@ function dateToItemsRelation(datasets, dateAccess) {
 }
 
 const DefaultDateAccess = (date) => date;
+
 const FormattedDateAccess = function (dateString) {
   let value = Date.parse(dateString);
+  if (isNaN(value)) {
+    LogOnlyOnce('isNaN');
+  }
 
   return value;
 };
@@ -711,21 +726,23 @@ class DatasetsController {
   /**
    * Creates a new instance of DatasetsController
    * @param datasets The datasets to control.
+   * @param config
    */
-  constructor(datasets) {
-    this.dateAccess = DefaultDateAccess;
+  constructor(datasets, config) {
+    this.config = config || {};
+    this.dateAccess = this.config.dateAccess || DefaultDateAccess;
     this.setDatasets(datasets);
   }
 
-  get flatDataCombinedStacks() {
+  getFlatDataCombinedStacks() {
     return combineByStacks(this.flatData);
   }
 
-  get flatDataCombinedDates() {
+  getFlatDataCombinedDates() {
     return combineByDate(this.flatData);
   }
 
-  get flatDataCombinedLocations() {
+  getFlatDataCombinedLocations() {
     return combineByLocation(this.flatData);
   }
 
@@ -1002,13 +1019,12 @@ class DatasetsColorsController {
 
   /**
    * Creates a new instance of DatasetsColorsController.
-   *
-   * @param controller
+   * @param workingDatasets
+   * @param stacks
    */
-  constructor(controller) {
+  constructor(workingDatasets, stacks) {
 
-    let datasets = controller.workingDatasets;
-    let stacks = controller.stacks;
+    let datasets = workingDatasets;
     let labelToColor = {};
     let stackToColors = {};
 
@@ -1048,9 +1064,13 @@ class DatasetsColorsController {
 DatasetsController.prototype.setDatasets = function (datasets) {
   this.originalDatasets = datasets;
   this.datasets = copy(datasets);
+  clearAlreadyLogged();
   this.update();
 };
 
+/**
+ *
+ */
 DatasetsController.prototype.update = function () {
   if (!this.datasets || !Array.isArray(this.datasets)) return;
 
@@ -1072,7 +1092,7 @@ DatasetsController.prototype.update = function () {
   this.dates = extractDatesFromDatasets(this.datasets)
     .sort((left, right) => dateAccess(left) - dateAccess(right));
   this.locations = extractLocationsFromDatasets(this.datasets);
-  this.datasetsColorsController = new DatasetsColorsController(this);
+  this.datasetsColorsController = new DatasetsColorsController(this.workingDatasets, this.stacks);
   // this.dateAccess = function (date) {
   //   return Date.parse(date);
   // };
@@ -1091,7 +1111,6 @@ DatasetsController.prototype.add = function (additionalDataset) {
   if (this.datasets.find(dataset => dataset.label === additionalDataset.label)) {
     throw new Error(`DatasetsController already contains a dataset with the same label (${additionalDataset.label}).`);
   }
-
   this.datasets.push(additionalDataset);
   this.update();
 };
@@ -1296,6 +1315,18 @@ DatasetsController.prototype.getPlotDataview = function () {
 };
 
 /**
+ * Returns a new generated map data view for the current enabled samples of dataset of this controller.
+ */
+DatasetsController.prototype.getMapDataview = function () {
+
+  this.dateAccess;
+  this.enabledDatasets();
+  let dataview = {datasets: []};
+
+  return dataview;
+};
+
+/**
  * Returns the given string with a quotation mark in the left and right.
  * @param aString The string to surround by quotation marks.
  * @returns {string} The string surrounded by quotation marks.
@@ -1454,33 +1485,32 @@ class LotivisError extends Error {
   constructor(message) {
     super(message);
     this.name = this.constructor.name;
-    this.message = message;
   }
 }
 
 class DataValidateError extends LotivisError {
-  constructor(message) {
-    super(message);
-  }
+  // constructor(message) {
+  //   super(message);
+  // }
 }
 
 class MissingPropertyError extends DataValidateError {
-  constructor(message, propertyName) {
-    super(message);
-    this.propertyName = propertyName;
-  }
+  // constructor(message, propertyName) {
+  //   super(message);
+  //   this.propertyName = propertyName;
+  // }
 }
 
 class InvalidFormatError extends DataValidateError {
-  constructor(message) {
-    super(message);
-  }
+  // constructor(message) {
+  //   super(message);
+  // }
 }
 
 class GeoJSONValidateError extends LotivisError {
-  constructor(message) {
-    super(message);
-  }
+  // constructor(message) {
+  //   super(message);
+  // }
 }
 
 exports.LotivisError = LotivisError;

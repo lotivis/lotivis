@@ -18,7 +18,8 @@ export class MapChartCard extends ChartCard {
    * @param config The config of the map chart.
    */
   constructor(parent, config) {
-    super(parent);
+    let theSelector = parent || 'map-chart-card';
+    super(theSelector);
     this.config = config;
     this.setCardTitle('Map');
   }

@@ -15,8 +15,8 @@ export class PlotChartSettingsPopup extends Popup {
   /**
    * Appends the headline and the content row of the popup.
    */
-  render() {
-    this.card.setHeaderText('Settings');
+  inject() {
+    this.card.setCardTitle('Settings');
     this.row = this.card.content
       .append('div')
       .classed('lotivis-row', true);

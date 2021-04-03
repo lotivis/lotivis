@@ -63,8 +63,8 @@ import {renderCSVDate} from "./js/data.render/render.csv.date";
 import {createDatasets} from "./js/data.juggle/data.create.datasets";
 import {copy} from "./js/shared/copy";
 import {appendExtensionIfNeeded} from "./js/shared/filname";
-import {DateAccessWeek} from "./js/data.dateaccess/dateaccess.week";
-import {FormattedDateAccess, GermanDateAccess} from "./js/data.dateaccess/dateaccess";
+import {DateAccessWeek} from "./js/data.date.assessor/date.assessor.weekday";
+import {FormattedDateAccess, GermanDateAccess} from "./js/data.date.assessor/date.assessor";
 import {validateDataItem, validateDataset, validateDatasets} from "./js/data.juggle/data.validate";
 
 exports.Color = Color;

@@ -2,7 +2,7 @@
 
 button.lotivis-button {
   text-decoration: none;
-  font-size: small;
+  font-size: $button-font-size;
   background-color: #00000000;
   //color: $primary-text-color;
   color: gray;
@@ -40,7 +40,7 @@ button.lotivis-button-down::after {
 }
 
 button.lotivis-button-small {
-  font-size: smaller;
+  font-size: $button-font-size;
 }
 
 button.lotivis-button-round {

@@ -23,7 +23,7 @@ export class DataCard extends Card {
     this.body.style('overflow', 'scroll');
     this.render();
     this.toast = new Toast(this.parent);
-    this.setCardTitle('Dataset Card');
+    this.setCardTitle('Dataset');
   }
 
   /**

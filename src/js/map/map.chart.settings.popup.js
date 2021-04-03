@@ -14,8 +14,8 @@ export class MapChartSettingsPopup extends Popup {
    * Injects the elements of the settings panel.
    * @override
    */
-  render() {
-    this.card.setHeaderText('Settings');
+  inject() {
+    this.card.setCardTitle('Settings');
     this.row = this
       .card
       .content

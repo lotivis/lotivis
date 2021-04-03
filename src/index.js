@@ -39,8 +39,15 @@ import {GlobalConfig} from "./js/shared/config";
 import {debug} from "./js/shared/debug";
 import {parseCSV} from "./js/data.parse/parse.csv";
 import {parseCSVDate} from "./js/data.parse/parse.csv.date";
-import {DateAccessWeek} from "./js/data.dateaccess/dateaccess.week";
-import {FormattedDateAccess, GermanDateAccess} from "./js/data.dateaccess/dateaccess";
+import {DateAccessWeek} from "./js/data.date.assessor/date.assessor.weekday";
+import {FormattedDateAccess, GermanDateAccess} from "./js/data.date.assessor/date.assessor";
+import {
+  DataViewCard, DataViewDatasetsControllerCard,
+  DataViewDateCard,
+  DataViewFlatCard,
+  DataViewMapCard,
+  DataViewPlotCard
+} from "./js/data.card/data.view.card";
 
 // colors
 exports.Color = Color;
@@ -74,6 +81,12 @@ exports.DatasetCard = DataCard;
 exports.DatasetJSONCard = DatasetJSONCard;
 exports.DatasetCSVCard = DatasetCSVCard;
 exports.DatasetCSVDateCard = DatasetCSVDateCard;
+exports.DataViewCard = DataViewCard;
+exports.DataViewDateCard = DataViewDateCard;
+exports.DataViewPlotCard = DataViewPlotCard;
+exports.DataViewMapCard = DataViewMapCard;
+exports.DataViewFlatCard = DataViewFlatCard;
+exports.DataViewDatasetsControllerCard = DataViewDatasetsControllerCard;
 
 // datasets
 exports.DatasetController = DatasetsController;

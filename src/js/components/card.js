@@ -10,85 +10,86 @@ export class Card extends Component {
 
   /**
    * Creates a new instance of Card.
-   *
    * @param parent The parental component.
    */
   constructor(parent) {
     super(parent);
+    this.injectCard();
+    this.injectHeader();
+    this.injectBody();
+    this.injectFooter();
+  }
+
+  injectCard() {
     this.element = this.parent
       .append('div')
       .classed('lotivis-card', true);
-    this.createHeader();
-    this.injectTitleLabel();
-    this.createBody();
-    this.createFooter();
   }
 
-  createHeader() {
+  injectHeader() {
     this.header = this.element
       .append('div')
-      .classed('lotivis-card-header', true);
+      .attr('class', 'lotivis-card-header');
     this.headerRow = this.header
       .append('div')
-      .classed('lotivis-row', true);
+      .attr('class', 'lotivis-row');
     this.headerLeftComponent = this.headerRow
       .append('div')
-      // .classed('col-lg-2', true)
-      .classed('lotivis-col-3', true)
-      .classed('lotivis-card-header-left-component', true);
+      .attr('class', 'lotivis-col-3 lotivis-card-header-left');
     this.headerCenterComponent = this.headerRow
       .append('div')
-      // .classed('col-lg-2', true)
-      .classed('lotivis-col-6', true)
-      .classed('lotivis-card-header-center-component', true);
+      .attr('class', 'lotivis-col-6 lotivis-card-header-center');
     this.headerRightComponent = this.headerRow
       .append('div')
-      // .classed('col-lg-10', true)
-      .classed('lotivis-col-3', true)
-      .classed('lotivis-card-header-right-component', true)
-      .classed('lotivis-button-group', true)
-      .classed('text-end', true);
-    // this.titleLabel = this.headerLeftComponent
-    //   .append('span')
-    //   .text(this.name);
-
-  }
-
-  injectTitleLabel() {
+      .attr('class', 'lotivis-col-3 lotivis-card-header-right lotivis-button-group');
     this.titleLabel = this.headerLeftComponent
       .append('div')
-      .classed('lotivis-title-label', true)
-      .text('Hello');
+      .attr('class', 'lotivis-title-label');
   }
 
+  injectBody() {
+    this.body = this.element
+      .append('div')
+      .attr('class', 'lotivis-card-body');
+    this.content = this.body
+      .append('div')
+      .attr('class', 'lotivis-card-body-content');
+  }
+
+  injectFooter() {
+    this.footer = this.element
+      .append('div')
+      .attr('class', 'lotivis-card-footer');
+    this.footerRow = this.footer
+      .append('div')
+      .attr('class', 'lotivis-row');
+    this.footerLeftComponent = this.footerRow
+      .append('div')
+      .attr('class', 'lotivis-col-6');
+    this.footerRightComponent = this.footerRow
+      .append('div')
+      .attr('class', 'lotivis-col-6');
+    this.footer.style('display', 'none');
+  }
+
+  /**
+   * @param newTitle The text of the title label.
+   */
   setCardTitle(newTitle) {
     this.titleLabel.text(newTitle);
   }
 
-  createBody() {
-    this.body = this.element
-      .append('div')
-      .classed('lotivis-card-body', true);
-    this.content = this.body
-      .append('div')
-      .classed('lotivis-card-body-content', true)
-      .attr('id', 'content');
+  /**
+   * Shows the footer by resetting its style display value.
+   */
+  showFooter() {
+    this.footer.style('display', '');
   }
 
-  createFooter() {
-    this.footer = this.element
-      .append('div')
-      .classed('lotivis-card-footer', true);
-    this.footerRow = this.footer
-      .append('div')
-      .classed('row', true);
-    this.footerLeftComponent = this.footerRow
-      .append('div')
-      .classed('col-6', true);
-    this.footerRightComponent = this.footerRow
-      .append('div')
-      .classed('col-6', true)
-      .classed('text-end', true);
+  /**
+   * Hides the footer by setting its style display value to `none`.
+   */
+  hideFooter() {
     this.footer.style('display', 'none');
   }
 }

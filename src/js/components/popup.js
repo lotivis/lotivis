@@ -18,11 +18,11 @@ export class Popup extends Component {
    */
   constructor(parent) {
     super(parent);
-    this.renderUnderground(parent);
-    this.renderContainer();
-    this.renderCard();
-    this.render();
-    this.renderCloseButton();
+    this.injectUnderground(parent);
+    this.injectContainer();
+    this.injectCard();
+    this.inject();
+    this.injectCloseButton();
     this.addCloseActionListeners();
   }
 
@@ -33,7 +33,7 @@ export class Popup extends Component {
    *
    * Should be overridden by subclasses.
    */
-  render() {
+  inject() {
     // empty
   }
 
@@ -42,7 +42,7 @@ export class Popup extends Component {
    *
    * @param parent The parental element.
    */
-  renderUnderground(parent) {
+  injectUnderground(parent) {
     this.modalBackgroundId = createID();
     this.modalBackground = parent
       .append('div')
@@ -53,7 +53,7 @@ export class Popup extends Component {
   /**
    *
    */
-  renderContainer() {
+  injectContainer() {
     this.elementId = createID();
     this.element = this.modalBackground
       .append('div')
@@ -64,7 +64,7 @@ export class Popup extends Component {
   /**
    *
    */
-  renderCard() {
+  injectCard() {
     this.card = new Card(this.element);
     this.card.element.classed('lotivis-popup lotivis-arrow lotivis-arrow-right', true);
   }
@@ -72,7 +72,7 @@ export class Popup extends Component {
   /**
    * Appends a close button to the right header component.
    */
-  renderCloseButton() {
+  injectCloseButton() {
     this.closeButton = new Button(this.card.headerRightComponent);
     this.closeButton.element.classed('lotivis-button-small', true);
     this.closeButton.setText('Close');

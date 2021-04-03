@@ -40,17 +40,20 @@ input[type="checkbox"] {
 
 // MARK: - Radio Group
 
-.radio-group label {
-  color: black;
-  font-weight: normal;
-  cursor: pointer;
-  transition: 0.36s;
-}
+.radio-group {
+  label {
+    color: black;
+    font-weight: normal;
+    font-size: $primary-font-size;
+    cursor: pointer;
+    transition: 0.36s;
+  }
 
-.radio-group label:hover {
-  color: $tint-color;
-}
+  label:hover {
+    color: $tint-color;
+  }
 
-.radio-group label:active {
-  opacity: 0.6;
+  label:active {
+    opacity: 0.6;
+  }
 }

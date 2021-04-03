@@ -21,8 +21,8 @@ export class ModalPopup extends Popup {
   /**
    *
    */
-  render() {
-    super.render();
+  inject() {
+    super.inject();
     this.renderRow();
   }
 

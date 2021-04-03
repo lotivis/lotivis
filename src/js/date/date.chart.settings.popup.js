@@ -11,18 +11,19 @@ import {Option} from "../components/option";
  */
 export class DateChartSettingsPopup extends Popup {
 
-  render() {
-    this.card.setHeaderText('Settings');
+  inject() {
+    this.card.setCardTitle('Settings');
+    this.card.content.classed('lotivis-card-body-settings', true);
     this.row = this.card.content
       .append('div')
       .classed('row', true);
 
-    this.renderShowLabelsCheckbox();
-    this.renderCombineStacksCheckbox();
-    this.renderRadios();
+    this.injectShowLabelsCheckbox();
+    this.injectCombineStacksCheckbox();
+    this.injectRadios();
   }
 
-  renderShowLabelsCheckbox() {
+  injectShowLabelsCheckbox() {
     let container = this.row.append('div').classed('col-12', true);
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText('Labels');
@@ -33,7 +34,7 @@ export class DateChartSettingsPopup extends Popup {
     }.bind(this);
   }
 
-  renderCombineStacksCheckbox() {
+  injectCombineStacksCheckbox() {
     let container = this.row.append('div').classed('col-12', true);
     this.combineStacksCheckbox = new Checkbox(container);
     this.combineStacksCheckbox.setText('Combine Stacks');
@@ -44,7 +45,7 @@ export class DateChartSettingsPopup extends Popup {
     }.bind(this);
   }
 
-  renderRadios() {
+  injectRadios() {
     let container = this.row.append('div').classed('col-12', true);
     this.typeRadioGroup = new RadioGroup(container);
     this.typeRadioGroup.setOptions([
