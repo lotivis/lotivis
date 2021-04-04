@@ -117,6 +117,7 @@ button.lotivis-button-round:active {
   text-overflow: ellipsis;
   white-space: nowrap;
   text-align: right;
+  margin-left: auto;
 }
 .lotivis-card-header .lotivis-card-header-center {
   overflow: visible;

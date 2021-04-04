@@ -1,6 +1,5 @@
 import {Component} from "./component";
 import {createID} from "../shared/selector";
-import {lotivis_log, verbose_log} from "../shared/debug";
 
 /**
  *

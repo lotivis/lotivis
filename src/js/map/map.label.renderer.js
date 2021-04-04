@@ -30,11 +30,11 @@ export class MapLabelRenderer {
     this.render = function () {
       let geoJSON = mapChart.geoJSON;
       if (!mapChart.geoJSON) return lotivis_log('No Geo JSON to render.');
-      let combinedData = mapChart.combinedData;
-      if (!mapChart.datasetController) return lotivis_log('no datasetController');
+      let dataview = mapChart.dataview;
+      if (!dataview) return lotivis_log('No dataview in map.');
 
       removeLabels();
-      if (!mapChart.config.isShowLabels) return;
+      if (!mapChart.config.showLabels) return;
 
       mapChart.svg
         .selectAll('text')
@@ -44,7 +44,7 @@ export class MapLabelRenderer {
         .attr('class', 'lotivis-map-label')
         .text(function (feature) {
           let featureID = mapChart.config.featureIDAccessor(feature);
-          let dataset = combinedData.find(dataset => equals(dataset.location, featureID));
+          let dataset = dataview.combinedData.find(dataset => equals(dataset.location, featureID));
           return dataset ? formatNumber(dataset.value) : '';
         })
         .attr('x', function (feature) {

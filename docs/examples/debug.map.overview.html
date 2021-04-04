@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
+  <link rel="stylesheet" href="../css/lotivis.css"/>
+  <title>Lotivis Examples - Map Chart Overview</title>
+</head>
+<body>
+
+<div class="lotivis-container-full">
+  <div class="lotivis-row">
+    <div class="lotivis-col-2">
+      <a class="lotivis-anchor-back" href="../index.html">
+        Back
+      </a>
+    </div>
+    <div class="lotivis-col-8 lotivis-headline">
+      <h1>Map Chart Overview</h1>
+    </div>
+    <div class="lotivis-col-2">
+      <!-- Placeholder -->
+    </div>
+    <div class="lotivis-col-3">
+      <div id="location-chart-card-1">
+        <!-- Location Chart 1 Code Here -->
+      </div>
+      <div id="location-chart-card-3">
+        <!-- Location Chart 3 Code Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-3">
+      <div id="location-chart-card-2">
+        <!-- Location Chart 2 Code Here -->
+      </div>
+      <div id="location-chart-card-4">
+        <!-- Location Chart 4 Code Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-3">
+      <div id="datasets-json-card">
+        <!-- Dataset JSON Card Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-3">
+      <div id="dataview-location-card">
+        <!-- Dataview Location Card Here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
+<script src="../js/lotivis.js"></script>
+
+<script>
+
+  lotivis.debug(true);
+
+  let datasets = [
+    {
+      label: 'dataset_1',
+      stack: 'dataset_1',
+      data: [
+        {location: 45, date: 2000, value: 2},
+        {location: 45, date: 2001, value: 1},
+        {location: 45, date: 2002, value: 4},
+        {location: 45, date: 2003, value: 3},
+      ]
+    }
+  ];
+
+  let datasetsCard = new lotivis.DatasetJSONCard();
+  let dataviewMapCard = new lotivis.DataViewMapCard('dataview-location-card');
+
+  let locationChartCard1 = new lotivis.MapChartCard('location-chart-card-1', {name: 'Standard'});
+  let locationChartCard2 = new lotivis.MapChartCard('location-chart-card-2', {name: 'Show Labels', showLabels: true});
+  let locationChartCard3 = new lotivis.MapChartCard('location-chart-card-3', {name: 'Standard'});
+  let locationChartCard4 = new lotivis.MapChartCard('location-chart-card-4', {
+    name: 'Exclude Features',
+    excludedFeatureCodes: ['2A', '2B']
+  });
+
+  fetch('/assets/departements.geojson')
+    .then(response => response.text())
+    .then(text => JSON.parse(text))
+    .then(geoJSON => {
+      locationChartCard1.chart.setGeoJSON(geoJSON);
+      locationChartCard2.chart.setGeoJSON(geoJSON);
+      locationChartCard3.chart.setGeoJSON(geoJSON);
+      locationChartCard4.chart.setGeoJSON(geoJSON);
+      return fetch('/assets/example-datasets-location-time-grouped-stacked.json');
+    })
+    .then(response => response.text())
+    .then(text => JSON.parse(text))
+    .then(function (json) {
+
+      let datasetsController = new lotivis.DatasetController(datasets);
+      datasetsController.register([
+        locationChartCard1.chart,
+        locationChartCard2.chart,
+        locationChartCard3.chart,
+        locationChartCard4.chart,
+        datasetsCard,
+        dataviewMapCard
+      ]);
+
+    });
+
+</script>
+
+</body>
+</html>

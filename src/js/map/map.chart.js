@@ -80,12 +80,13 @@ export class MapChart extends Chart {
   draw() {
     this.backgroundRenderer.render();
     this.exteriorBorderRenderer.render();
-    this.geoJSONRenderer.renderGeoJson();
+    this.geoJSONRenderer.render();
     this.tooltipRenderer.raise();
     this.legendRenderer.render();
     this.datasetRenderer.render();
     this.labelRenderer.render();
     this.minimapRenderer.render();
+
     this.tooltipRenderer.raise();
     this.selectionBoundsRenderer.raise();
   }
@@ -148,7 +149,9 @@ export class MapChart extends Chart {
     this.geoJSON.features.forEach((feature) => feature.center = d3.geoCentroid(feature));
     this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.excludedFeatureCodes);
     this.zoomTo(this.geoJSON);
-    // this.exteriorBorderRenderer.render();
-    // this.geoJSONRenderer.renderGeoJson();
+
+    this.backgroundRenderer.render();
+    this.exteriorBorderRenderer.render();
+    this.geoJSONRenderer.render();
   }
 }

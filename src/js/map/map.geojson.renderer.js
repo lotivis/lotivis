@@ -34,7 +34,7 @@ export class MapGeojsonRenderer {
     /**
      * Renders the `presentedGeoJSON` property.
      */
-    this.renderGeoJson = function () {
+    this.render = function () {
       let geoJSON = mapChart.presentedGeoJSON;
       if (!geoJSON) return lotivis_log('No Geo JSON file to render.');
       let idAccessor = mapChart.config.featureIDAccessor;

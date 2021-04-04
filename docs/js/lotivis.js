@@ -195,10 +195,10 @@ class DataValidateError extends LotivisError {
 }
 
 class MissingPropertyError extends DataValidateError {
-  // constructor(message, propertyName) {
-  //   super(message);
-  //   this.propertyName = propertyName;
-  // }
+  constructor(message, data) {
+    super(message + ' ' + JSON.stringify(data || {}));
+    this.data = data;
+  }
 }
 
 class InvalidFormatError extends DataValidateError {
@@ -291,7 +291,6 @@ class DateAxisRenderer {
 
   /**
    * Creates a new instance of DateAxisRenderer.
-   *
    * @param dateChart The parental date chart.
    */
   constructor(dateChart) {
@@ -299,7 +298,7 @@ class DateAxisRenderer {
     /**
      * Appends the `left` and `bottom` axis to the date chart.
      */
-    this.renderAxis = function () {
+    this.render = function () {
       let height = dateChart.config.height;
       let margin = dateChart.config.margin;
 
@@ -538,43 +537,16 @@ const GlobalConfig = {
   filenameSeparator: '_'
 };
 
-let alreadyLogged = [];
-
-function LogOnlyOnce(id, message) {
-  if (alreadyLogged.includes(id)) return;
-  alreadyLogged.push(id);
-  lotivis_log(`[lotivis]  Warning only once! ${message}`);
-}
-
-function clearAlreadyLogged() {
-  alreadyLogged = [];
-}
-
-// export const debug_log = function (message) {
-//   if (!GlobalConfig.debugLog) return;
-//   console.log(prefix + message);
-// };
-
-var lotivis_log = () => null;
-
 /**
- * Sets whether lotivis prints debug log messages to the console.
- * @param enabled A Boolean value indicating whether to enable debug logging.
+ * @class DateBarsRenderer
  */
-function debug(enabled) {
-  GlobalConfig.debugLog = enabled;
-  GlobalConfig.debug = enabled;
-  lotivis_log = enabled ? console.log : () => null;
-  lotivis_log(`[lotivis]  debug ${enabled ? 'en' : 'dis'}abled`);
-}
-
 class DateBarsRenderer {
 
   /**
-   *
-   * @param timeChart
+   * Creates a new instance of DateBarsRenderer.
+   * @param dateChart The parental date chart.
    */
-  constructor(timeChart) {
+  constructor(dateChart) {
 
     /**
      *
@@ -582,9 +554,9 @@ class DateBarsRenderer {
      * @param stackIndex
      */
     this.renderBars = function (stack, stackIndex) {
-      let isCombineStacks = timeChart.config.combineStacks;
-      let colors = timeChart.datasetController.getColorsForStack(stack.stack);
-      timeChart
+      let isCombineStacks = dateChart.config.combineStacks;
+      let colors = dateChart.datasetController.getColorsForStack(stack.stack);
+      dateChart
         .svg
         .append("g")
         .selectAll("g")
@@ -605,10 +577,10 @@ class DateBarsRenderer {
         .attr('class', 'lotivis-date-chart-bar')
         .attr("rx", isCombineStacks ? 0 : GlobalConfig.barRadius)
         .attr("ry", isCombineStacks ? 0 : GlobalConfig.barRadius)
-        .attr("x", (d) => timeChart.xChart(d.data.date) + timeChart.xStack(stack.label))
-        .attr("y", (d) => timeChart.yChart(d[1]))
-        .attr("width", timeChart.xStack.bandwidth())
-        .attr("height", (d) => timeChart.yChart(d[0]) - timeChart.yChart(d[1]));
+        .attr("x", (d) => dateChart.xChart(d.data.date) + dateChart.xStack(stack.label))
+        .attr("y", (d) => dateChart.yChart(d[1]))
+        .attr("width", dateChart.xStack.bandwidth())
+        .attr("height", (d) => dateChart.yChart(d[0]) - dateChart.yChart(d[1]));
     };
   }
 }
@@ -1260,7 +1232,7 @@ class DateChart extends Chart {
   draw() {
     this.renderSVG();
     if (!this.dataview || !this.dataview.datasetStacks || this.dataview.datasetStacks.length === 0) return;
-    this.axisRenderer.renderAxis();
+    this.axisRenderer.render();
     this.gridRenderer.createAxis();
     this.gridRenderer.renderGrid();
     this.ghostBarsRenderer.renderGhostBars();
@@ -1357,13 +1329,13 @@ class Card extends Component {
       .attr('class', 'lotivis-row');
     this.headerLeftComponent = this.headerRow
       .append('div')
-      .attr('class', 'lotivis-col-3 lotivis-card-header-left');
+      .attr('class', 'lotivis-card-header-left');
     this.headerCenterComponent = this.headerRow
       .append('div')
-      .attr('class', 'lotivis-col-6 lotivis-card-header-center');
+      .attr('class', 'lotivis-card-header-center');
     this.headerRightComponent = this.headerRow
       .append('div')
-      .attr('class', 'lotivis-col-3 lotivis-card-header-right lotivis-button-group');
+      .attr('class', 'lotivis-card-header-right lotivis-button-group');
     this.titleLabel = this.headerLeftComponent
       .append('div')
       .attr('class', 'lotivis-title-label');
@@ -2056,6 +2028,7 @@ class ChartCard extends Card {
    * Creates a new instance of ChartCard.
    *
    * @param parent The parental component.
+   * @param config The configuration
    */
   constructor(parent, config) {
     super(parent);
@@ -2063,6 +2036,7 @@ class ChartCard extends Card {
     this.injectButtons();
     this.injectRadioGroup();
     this.injectChart();
+    this.setCardTitle((config && config.name) ? config.name : 'No Title');
   }
 
   /**
@@ -2403,7 +2377,6 @@ class DateChartCard extends ChartCard {
     this.datasets = [];
     this.renderChart();
     this.renderRadioGroup();
-    this.setCardTitle((config && config.name) ? config.name : 'Date');
     this.applyURLParameters();
   }
 
@@ -2811,6 +2784,31 @@ class MapLegendRenderer {
   }
 }
 
+let alreadyLogged = [];
+
+function LogOnlyOnce(id, message) {
+  if (alreadyLogged.includes(id)) return;
+  alreadyLogged.push(id);
+  lotivis_log(`[lotivis]  Warning only once! ${message}`);
+}
+
+function clearAlreadyLogged() {
+  alreadyLogged = [];
+}
+
+var lotivis_log = () => null;
+
+/**
+ * Sets whether lotivis prints debug log messages to the console.
+ * @param enabled A Boolean value indicating whether to enable debug logging.
+ */
+function debug(enabled) {
+  GlobalConfig.debugLog = enabled;
+  GlobalConfig.debug = enabled;
+  lotivis_log = enabled ? console.log : () => null;
+  lotivis_log(`[lotivis]  debug ${enabled ? 'en' : 'dis'}abled`);
+}
+
 /**
  *
  * @class MapLabelRenderer
@@ -2839,11 +2837,11 @@ class MapLabelRenderer {
     this.render = function () {
       let geoJSON = mapChart.geoJSON;
       if (!mapChart.geoJSON) return lotivis_log('No Geo JSON to render.');
-      let combinedData = mapChart.combinedData;
-      if (!mapChart.datasetController) return lotivis_log('no datasetController');
+      let dataview = mapChart.dataview;
+      if (!dataview) return lotivis_log('No dataview in map.');
 
       removeLabels();
-      if (!mapChart.config.isShowLabels) return;
+      if (!mapChart.config.showLabels) return;
 
       mapChart.svg
         .selectAll('text')
@@ -2853,7 +2851,7 @@ class MapLabelRenderer {
         .attr('class', 'lotivis-map-label')
         .text(function (feature) {
           let featureID = mapChart.config.featureIDAccessor(feature);
-          let dataset = combinedData.find(dataset => equals(dataset.location, featureID));
+          let dataset = dataview.combinedData.find(dataset => equals(dataset.location, featureID));
           return dataset ? formatNumber(dataset.value) : '';
         })
         .attr('x', function (feature) {
@@ -2962,7 +2960,7 @@ class MapGeojsonRenderer {
     /**
      * Renders the `presentedGeoJSON` property.
      */
-    this.renderGeoJson = function () {
+    this.render = function () {
       let geoJSON = mapChart.presentedGeoJSON;
       if (!geoJSON) return lotivis_log('No Geo JSON file to render.');
       let idAccessor = mapChart.config.featureIDAccessor;
@@ -3276,7 +3274,6 @@ function createGeoJSON(datasets) {
  *
  * @class MapMinimapRenderer
  */
-
 class MapMinimapRenderer {
 
   /**
@@ -3429,7 +3426,6 @@ class Geometry {
 
   /**
    * Creates a new instance of Geometry.
-   *
    * @param source
    */
   constructor(source) {
@@ -3619,12 +3615,13 @@ class MapChart extends Chart {
   draw() {
     this.backgroundRenderer.render();
     this.exteriorBorderRenderer.render();
-    this.geoJSONRenderer.renderGeoJson();
+    this.geoJSONRenderer.render();
     this.tooltipRenderer.raise();
     this.legendRenderer.render();
     this.datasetRenderer.render();
     this.labelRenderer.render();
     this.minimapRenderer.render();
+
     this.tooltipRenderer.raise();
     this.selectionBoundsRenderer.raise();
   }
@@ -3687,8 +3684,10 @@ class MapChart extends Chart {
     this.geoJSON.features.forEach((feature) => feature.center = d3.geoCentroid(feature));
     this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.excludedFeatureCodes);
     this.zoomTo(this.geoJSON);
-    // this.exteriorBorderRenderer.render();
-    // this.geoJSONRenderer.renderGeoJson();
+
+    this.backgroundRenderer.render();
+    this.exteriorBorderRenderer.render();
+    this.geoJSONRenderer.render();
   }
 }
 
@@ -3744,12 +3743,12 @@ class MapChartSettingsPopup extends Popup {
    * @override
    */
   willShow() {
-    this.showLabelsCheckbox.setChecked(this.mapChart.isShowLabels);
+    this.showLabelsCheckbox.setChecked(this.mapChart.config.showLabels);
   }
 }
 
 /**
- *
+ * A lotivis card containing a location chart.
  * @class MapChartCard
  * @extends ChartCard
  */
@@ -3757,15 +3756,11 @@ class MapChartCard extends ChartCard {
 
   /**
    * Creates a new instance of MapChartCard.
-   *
-   * @param parent The parental component.
+   * @param {Component|String} parent The parental component.
    * @param config The config of the map chart.
    */
   constructor(parent, config) {
-    let theSelector = parent || 'map-chart-card';
-    super(theSelector);
-    this.config = config;
-    this.setCardTitle('Map');
+    super(parent || 'map-chart-card', config);
   }
 
   /**
@@ -3780,7 +3775,10 @@ class MapChartCard extends ChartCard {
    * @override
    */
   screenshotButtonAction() {
-    let filename = this.chart.datasetController.getFilename();
+    let filename = 'Unknown';
+    if (this.chart && this.chart.datasetController) {
+      filename = this.chart.datasetController.getFilename();
+    }
     let downloadFilename = createDownloadFilename(filename, `map-chart`);
     downloadImage(this.chart.svgSelector, downloadFilename);
   }
@@ -5006,9 +5004,9 @@ function validateDataset(dataset) {
  */
 function validateDataItem(item) {
   if (!item.date) {
-    throw new MissingPropertyError(`Missing date property for item.`);
+    throw new MissingPropertyError(`Missing date property for item.`, item);
   } else if (!item.location) {
-    throw new MissingPropertyError(`Missing location property for item.`);
+    throw new MissingPropertyError(`Missing location property for item.`, item);
   }
 }
 

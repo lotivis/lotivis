@@ -29,7 +29,6 @@ export class DateChartCard extends ChartCard {
     this.datasets = [];
     this.renderChart();
     this.renderRadioGroup();
-    this.setCardTitle((config && config.name) ? config.name : 'Date');
     this.applyURLParameters();
   }
 

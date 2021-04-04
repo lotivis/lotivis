@@ -5,7 +5,6 @@ export class Geometry {
 
   /**
    * Creates a new instance of Geometry.
-   *
    * @param source
    */
   constructor(source) {

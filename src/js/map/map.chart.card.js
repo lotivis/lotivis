@@ -5,7 +5,7 @@ import {downloadImage} from "../shared/download";
 import {createDownloadFilename} from "../shared/filname";
 
 /**
- *
+ * A lotivis card containing a location chart.
  * @class MapChartCard
  * @extends ChartCard
  */
@@ -13,15 +13,11 @@ export class MapChartCard extends ChartCard {
 
   /**
    * Creates a new instance of MapChartCard.
-   *
-   * @param parent The parental component.
+   * @param {Component|String} parent The parental component.
    * @param config The config of the map chart.
    */
   constructor(parent, config) {
-    let theSelector = parent || 'map-chart-card';
-    super(theSelector);
-    this.config = config;
-    this.setCardTitle('Map');
+    super(parent || 'map-chart-card', config);
   }
 
   /**
@@ -36,7 +32,10 @@ export class MapChartCard extends ChartCard {
    * @override
    */
   screenshotButtonAction() {
-    let filename = this.chart.datasetController.getFilename();
+    let filename = 'Unknown';
+    if (this.chart && this.chart.datasetController) {
+      filename = this.chart.datasetController.getFilename();
+    }
     let downloadFilename = createDownloadFilename(filename, `map-chart`);
     downloadImage(this.chart.svgSelector, downloadFilename);
   }

@@ -136,7 +136,6 @@ class Geometry {
 
   /**
    * Creates a new instance of Geometry.
-   *
    * @param source
    */
   constructor(source) {
@@ -640,24 +639,6 @@ function sumOfValues(flatData) {
     .reduce((acc, next) => acc + next, 0);
 }
 
-let alreadyLogged = [];
-
-function LogOnlyOnce(id, message) {
-  if (alreadyLogged.includes(id)) return;
-  alreadyLogged.push(id);
-}
-
-function clearAlreadyLogged() {
-  alreadyLogged = [];
-}
-
-// export const debug_log = function (message) {
-//   if (!GlobalConfig.debugLog) return;
-//   console.log(prefix + message);
-// };
-
-var lotivis_log = () => null;
-
 /**
  *
  * @param datasets
@@ -699,6 +680,19 @@ function dateToItemsRelation(datasets, dateAccess) {
     return datasetDate;
   });
 }
+
+let alreadyLogged = [];
+
+function LogOnlyOnce(id, message) {
+  if (alreadyLogged.includes(id)) return;
+  alreadyLogged.push(id);
+}
+
+function clearAlreadyLogged() {
+  alreadyLogged = [];
+}
+
+var lotivis_log = () => null;
 
 /**
  *
@@ -786,10 +780,10 @@ class DataValidateError extends LotivisError {
 }
 
 class MissingPropertyError extends DataValidateError {
-  // constructor(message, propertyName) {
-  //   super(message);
-  //   this.propertyName = propertyName;
-  // }
+  constructor(message, data) {
+    super(message + ' ' + JSON.stringify(data || {}));
+    this.data = data;
+  }
 }
 
 class InvalidFormatError extends DataValidateError {
@@ -1623,9 +1617,9 @@ function validateDataset(dataset) {
  */
 function validateDataItem(item) {
   if (!item.date) {
-    throw new MissingPropertyError(`Missing date property for item.`);
+    throw new MissingPropertyError(`Missing date property for item.`, item);
   } else if (!item.location) {
-    throw new MissingPropertyError(`Missing location property for item.`);
+    throw new MissingPropertyError(`Missing location property for item.`, item);
   }
 }
 

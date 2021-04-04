@@ -2,8 +2,6 @@
  *
  * @class MapMinimapRenderer
  */
-import {verbose_log} from "../shared/debug";
-
 export class MapMinimapRenderer {
 
   /**

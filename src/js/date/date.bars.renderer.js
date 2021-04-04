@@ -1,13 +1,15 @@
 import {GlobalConfig} from "../shared/config";
-import {lotivis_log} from "../shared/debug";
 
+/**
+ * @class DateBarsRenderer
+ */
 export class DateBarsRenderer {
 
   /**
-   *
-   * @param timeChart
+   * Creates a new instance of DateBarsRenderer.
+   * @param dateChart The parental date chart.
    */
-  constructor(timeChart) {
+  constructor(dateChart) {
 
     /**
      *
@@ -15,9 +17,9 @@ export class DateBarsRenderer {
      * @param stackIndex
      */
     this.renderBars = function (stack, stackIndex) {
-      let isCombineStacks = timeChart.config.combineStacks;
-      let colors = timeChart.datasetController.getColorsForStack(stack.stack);
-      timeChart
+      let isCombineStacks = dateChart.config.combineStacks;
+      let colors = dateChart.datasetController.getColorsForStack(stack.stack);
+      dateChart
         .svg
         .append("g")
         .selectAll("g")
@@ -38,10 +40,10 @@ export class DateBarsRenderer {
         .attr('class', 'lotivis-date-chart-bar')
         .attr("rx", isCombineStacks ? 0 : GlobalConfig.barRadius)
         .attr("ry", isCombineStacks ? 0 : GlobalConfig.barRadius)
-        .attr("x", (d) => timeChart.xChart(d.data.date) + timeChart.xStack(stack.label))
-        .attr("y", (d) => timeChart.yChart(d[1]))
-        .attr("width", timeChart.xStack.bandwidth())
-        .attr("height", (d) => timeChart.yChart(d[0]) - timeChart.yChart(d[1]));
+        .attr("x", (d) => dateChart.xChart(d.data.date) + dateChart.xStack(stack.label))
+        .attr("y", (d) => dateChart.yChart(d[1]))
+        .attr("width", dateChart.xStack.bandwidth())
+        .attr("height", (d) => dateChart.yChart(d[0]) - dateChart.yChart(d[1]));
     };
   }
 }

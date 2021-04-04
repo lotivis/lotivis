@@ -54,6 +54,6 @@ export class MapChartSettingsPopup extends Popup {
    * @override
    */
   willShow() {
-    this.showLabelsCheckbox.setChecked(this.mapChart.isShowLabels);
+    this.showLabelsCheckbox.setChecked(this.mapChart.config.showLabels);
   }
 }

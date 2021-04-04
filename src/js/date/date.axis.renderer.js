@@ -5,7 +5,6 @@ export class DateAxisRenderer {
 
   /**
    * Creates a new instance of DateAxisRenderer.
-   *
    * @param dateChart The parental date chart.
    */
   constructor(dateChart) {
@@ -13,7 +12,7 @@ export class DateAxisRenderer {
     /**
      * Appends the `left` and `bottom` axis to the date chart.
      */
-    this.renderAxis = function () {
+    this.render = function () {
       let height = dateChart.config.height;
       let margin = dateChart.config.margin;
 

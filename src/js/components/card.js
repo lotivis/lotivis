@@ -35,13 +35,13 @@ export class Card extends Component {
       .attr('class', 'lotivis-row');
     this.headerLeftComponent = this.headerRow
       .append('div')
-      .attr('class', 'lotivis-col-3 lotivis-card-header-left');
+      .attr('class', 'lotivis-card-header-left');
     this.headerCenterComponent = this.headerRow
       .append('div')
-      .attr('class', 'lotivis-col-6 lotivis-card-header-center');
+      .attr('class', 'lotivis-card-header-center');
     this.headerRightComponent = this.headerRow
       .append('div')
-      .attr('class', 'lotivis-col-3 lotivis-card-header-right lotivis-button-group');
+      .attr('class', 'lotivis-card-header-right lotivis-button-group');
     this.titleLabel = this.headerLeftComponent
       .append('div')
       .attr('class', 'lotivis-title-label');

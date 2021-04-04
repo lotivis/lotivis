@@ -14,6 +14,7 @@ export class ChartCard extends Card {
    * Creates a new instance of ChartCard.
    *
    * @param parent The parental component.
+   * @param config The configuration
    */
   constructor(parent, config) {
     super(parent);
@@ -21,6 +22,7 @@ export class ChartCard extends Card {
     this.injectButtons();
     this.injectRadioGroup();
     this.injectChart();
+    this.setCardTitle((config && config.name) ? config.name : 'No Title');
   }
 
   /**

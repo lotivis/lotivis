@@ -14,12 +14,9 @@ export function clearAlreadyLogged() {
   alreadyLogged = [];
 }
 
-export const verbose_log = console.log;
+export var lotivis_log_once = function (message) {
 
-// export const debug_log = function (message) {
-//   if (!GlobalConfig.debugLog) return;
-//   console.log(prefix + message);
-// };
+};
 
 export var lotivis_log = () => null;
 

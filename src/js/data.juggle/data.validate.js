@@ -51,8 +51,8 @@ export function validateDataset(dataset) {
  */
 export function validateDataItem(item) {
   if (!item.date) {
-    throw new MissingPropertyError(`Missing date property for item.`);
+    throw new MissingPropertyError(`Missing date property for item.`, item);
   } else if (!item.location) {
-    throw new MissingPropertyError(`Missing location property for item.`);
+    throw new MissingPropertyError(`Missing location property for item.`, item);
   }
 }

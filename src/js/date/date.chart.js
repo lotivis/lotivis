@@ -145,7 +145,7 @@ export class DateChart extends Chart {
   draw() {
     this.renderSVG();
     if (!this.dataview || !this.dataview.datasetStacks || this.dataview.datasetStacks.length === 0) return;
-    this.axisRenderer.renderAxis();
+    this.axisRenderer.render();
     this.gridRenderer.createAxis();
     this.gridRenderer.renderGrid();
     this.ghostBarsRenderer.renderGhostBars();

@@ -3306,8 +3306,9 @@ class MapSelectionBoundsRenderer {
    */
   constructor(mapChart) {
 
+    let bounds;
     if (mapChart.svg) {
-      mapChart.svg
+      bounds = mapChart.svg
         .append('rect')
         .attr('class', 'lotivis-map-selection-rect')
         .style('fill-opacity', 0);

@@ -18,10 +18,10 @@ export class DataValidateError extends LotivisError {
 }
 
 export class MissingPropertyError extends DataValidateError {
-  // constructor(message, propertyName) {
-  //   super(message);
-  //   this.propertyName = propertyName;
-  // }
+  constructor(message, data) {
+    super(message + ' ' + JSON.stringify(data || {}));
+    this.data = data;
+  }
 }
 
 export class InvalidFormatError extends DataValidateError {
