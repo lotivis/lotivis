@@ -2,7 +2,6 @@ import {Component} from "./component";
 
 /**
  * A lotivis card.
- *
  * @class Card
  * @extends Component
  */

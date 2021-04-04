@@ -14,19 +14,22 @@ export function createGeoJSON(datasets) {
 
   loop1: for (let rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
     for (let itemIndex = 0; itemIndex < 5; itemIndex++) {
-      if (locations.length === 0) break loop1;
-      let location = locations.shift();
 
+      if (locations.length === 0) break loop1;
+
+      let location = locations.shift();
       let lat = (itemIndex + 1) * latSpan;
       let lng = (rowIndex + 1) * -lngSpan;
 
+      // start down left, counterclockwise
       let coordinates = [];
-
+      coordinates.push([lat + latSpan, lng + lngSpan]);
+      coordinates.push([lat + latSpan, lng]);
       coordinates.push([lat, lng]);
       coordinates.push([lat, lng + lngSpan]);
       coordinates.push([lat + latSpan, lng + lngSpan]);
-      coordinates.push([lat + latSpan, lng]);
-      coordinates.push([0, 0]);
+
+      console.log('location', location);
 
       let feature = {
         type: 'Feature',
@@ -48,8 +51,12 @@ export function createGeoJSON(datasets) {
     }
   }
 
-  return {
+  let geoJSON = {
     type: "FeatureCollection",
     features: features
   };
+
+  console.log(geoJSON);
+
+  return geoJSON;
 }

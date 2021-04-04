@@ -1,4 +1,4 @@
-import {GlobalConfig} from "../shared/config";
+import {LotivisConfig} from "../shared/config";
 
 /**
  * @class DateBarsRenderer
@@ -38,8 +38,8 @@ export class DateBarsRenderer {
         .enter()
         .append("rect")
         .attr('class', 'lotivis-date-chart-bar')
-        .attr("rx", isCombineStacks ? 0 : GlobalConfig.barRadius)
-        .attr("ry", isCombineStacks ? 0 : GlobalConfig.barRadius)
+        .attr("rx", isCombineStacks ? 0 : LotivisConfig.barRadius)
+        .attr("ry", isCombineStacks ? 0 : LotivisConfig.barRadius)
         .attr("x", (d) => dateChart.xChart(d.data.date) + dateChart.xStack(stack.label))
         .attr("y", (d) => dateChart.yChart(d[1]))
         .attr("width", dateChart.xStack.bandwidth())

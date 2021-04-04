@@ -68,7 +68,7 @@ export class DataCard extends Card {
     if (typeof newContent !== 'string') return;
     // let numberOfRows = newContent.split(`\n`).length;
     // this.textarea.attr('rows', numberOfRows);
-    this.textarea.attr('rows', 30);
+    this.textarea.attr('rows', 24);
   }
 
   /**

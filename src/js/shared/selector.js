@@ -17,7 +17,7 @@ export var createID;
  * @returns {string} The save version of the given id.
  */
 export function toSaveID(theID) {
-  return theID.replaceAll(' ', '-');
+  return theID.replaceAll(' ', '-').replaceAll('/', '-');
 }
 
 /**

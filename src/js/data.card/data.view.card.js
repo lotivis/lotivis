@@ -1,12 +1,12 @@
 import {DataCard} from "./data.card";
-import {DatasetJSONCard} from "./data.json.card";
+import {DatasetsJSONCard} from "./data.json.card";
 
 /**
  * A card containing a textarea which contains the JSON text of a dataset collection.
  * @class DataViewCard
  * @extends DataCard
  */
-export class DataViewCard extends DatasetJSONCard {
+export class DataViewCard extends DatasetsJSONCard {
 
   /**
    * Creates a new instance of DataViewCard.

@@ -9,7 +9,7 @@ import {MapExteriorBorderRenderer} from "./map.exterior.border.renderer";
 import {createGeoJSON} from "../geojson.juggle/create.geojson";
 import {MapMinimapRenderer} from "./map.minimap.renderer";
 import {MapSelectionBoundsRenderer} from "./map.selection.bounds.renderer";
-import {defaultMapChartConfig} from "./map.chart.config";
+import {MapChartConfig} from "./map.chart.config";
 import {MapBackgroundRenderer} from "./map.background.renderer";
 import {GeoJson} from "../geojson/geojson";
 
@@ -36,10 +36,10 @@ export class MapChart extends Chart {
   initialize() {
     let theConfig = this.config;
     let margin;
-    margin = Object.assign({}, defaultMapChartConfig.margin);
+    margin = Object.assign({}, MapChartConfig.margin);
     margin = Object.assign(margin, theConfig.margin || {});
 
-    let config = Object.assign({}, defaultMapChartConfig);
+    let config = Object.assign({}, MapChartConfig);
     this.config = Object.assign(config, this.config);
     this.config.margin = margin;
 
@@ -63,7 +63,6 @@ export class MapChart extends Chart {
   remove() {
     if (!this.svg) return;
     this.svg.remove();
-    // this.element.selectAll('svg').remove();
   }
 
   precalculate() {
@@ -71,8 +70,8 @@ export class MapChart extends Chart {
     if (!this.datasetController) return;
     this.dataview = this.datasetController.getLocationDataview();
     if (this.geoJSON) return;
-    this.geoJSON = createGeoJSON(this.datasetController.workingDatasets);
-    this.geoJSONDidChange();
+    let geoJSON = createGeoJSON(this.datasetController.workingDatasets);
+    this.setGeoJSON(geoJSON);
   }
 
   draw() {
@@ -130,7 +129,7 @@ export class MapChart extends Chart {
     } else {
       this.geoJSON = new GeoJson(newGeoJSON);
     }
-    this.presentedGeoJSON = newGeoJSON;
+    this.presentedGeoJSON = this.geoJSON;
     this.geoJSONDidChange();
   }
 
@@ -144,8 +143,8 @@ export class MapChart extends Chart {
     this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.excludedFeatureCodes);
     this.zoomTo(this.geoJSON);
 
-    this.backgroundRenderer.render();
-    this.exteriorBorderRenderer.render();
-    this.geoJSONRenderer.render();
+    // this.backgroundRenderer.render();
+    // this.exteriorBorderRenderer.render();
+    // this.geoJSONRenderer.render();
   }
 }

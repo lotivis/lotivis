@@ -1,11 +1,8 @@
-
 /**
  * Returns a new created instance of Feature combining the given Features.
  * @param geoJSON
- * @param features
  */
 export function joinFeatures(geoJSON) {
-  console.log(geoJSON);
   let topology = topojson.topology(geoJSON.features);
   let objects = extractObjects(topology);
 

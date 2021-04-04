@@ -21,7 +21,7 @@ export class MapChartSettingsPopup extends Popup {
       .card
       .content
       .append('div')
-      .classed('lotivis-row', true);
+      .classed('row', true);
 
     this.renderShowLabelsCheckbox();
   }
@@ -30,7 +30,7 @@ export class MapChartSettingsPopup extends Popup {
    * Injects a checkbox to toggle the visibility of the labels of the map chart.
    */
   renderShowLabelsCheckbox() {
-    let container = this.row.append('div').classed('lotivis-col-12', true);
+    let container = this.row.append('div').classed('col-12', true);
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText('Labels');
     this.showLabelsCheckbox.onClick = function (checked) {

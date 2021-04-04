@@ -2,7 +2,8 @@
  *
  * @class DateGhostBarsRenderer
  */
-import {GlobalConfig} from "../shared/config";
+import {LotivisConfig} from "../shared/config";
+import {toSaveID} from "../shared/selector";
 
 
 export class DateGhostBarsRenderer {
@@ -14,7 +15,7 @@ export class DateGhostBarsRenderer {
   constructor(dateChart) {
 
     function createID(date) {
-      return `ghost-rect-${String(date).replaceAll('.', '-')}`;
+      return `ghost-rect-${toSaveID(String(date))}`;
     }
 
     this.hideAll = function () {
@@ -66,8 +67,8 @@ export class DateGhostBarsRenderer {
         .attr("class", 'lotivis-selection-rect')
         .attr("id", date => createID(date))
         .attr("opacity", 0)
-        .attr("rx", GlobalConfig.barRadius)
-        .attr("ry", GlobalConfig.barRadius)
+        .attr("rx", LotivisConfig.barRadius)
+        .attr("ry", LotivisConfig.barRadius)
         .attr("x", (date) => dateChart.xChart(date))
         .attr("y", margin.top)
         .attr("width", dateChart.xChart.bandwidth())

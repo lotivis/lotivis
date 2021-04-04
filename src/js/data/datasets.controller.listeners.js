@@ -7,6 +7,7 @@ import {lotivis_log} from "../shared/debug";
  */
 DatasetsController.prototype.addListener = function (listener) {
   if (!this.listeners) this.listeners = [];
+  if (this.listeners.includes(listener)) return lotivis_log(`[lotivis]  Attempt to add listener twice (${listener}).`);
   this.listeners.push(listener);
 };
 

@@ -1,14 +1,14 @@
 import {PlotChartSort} from "./plot.chart.sort";
-import {GlobalConfig} from "../shared/config";
+import {LotivisConfig} from "../shared/config";
 
 export const defaultPlotChartConfig = {
   width: 1000,
   height: 600,
   margin: {
-    top: GlobalConfig.defaultMargin,
-    right: GlobalConfig.defaultMargin,
-    bottom: GlobalConfig.defaultMargin,
-    left: GlobalConfig.defaultMargin
+    top: LotivisConfig.defaultMargin,
+    right: LotivisConfig.defaultMargin,
+    bottom: LotivisConfig.defaultMargin,
+    left: LotivisConfig.defaultMargin
   },
   lineHeight: 28,
   radius: 23,

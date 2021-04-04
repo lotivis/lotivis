@@ -1,4 +1,5 @@
 import {flatDatasets} from "./data.flat";
+import {toValue} from "../shared/value";
 
 /**
  * Returns the set of dataset names from the given dataset collection.
@@ -7,7 +8,7 @@ import {flatDatasets} from "./data.flat";
  * @returns {[]} The array containing the flat samples.
  */
 export function extractLabelsFromDatasets(datasets) {
-  return toSet(datasets.map(dataset => dataset.label || 'unknown'));
+  return toSet(datasets.map(dataset => toValue(dataset.label)));
 }
 
 /**
@@ -18,7 +19,7 @@ export function extractLabelsFromDatasets(datasets) {
  * @returns {[]} The array containing the flat samples.
  */
 export function extractStacksFromDatasets(datasets) {
-  return toSet(datasets.map(dataset => dataset.stack || dataset.label || 'unknown'));
+  return toSet(datasets.map(dataset => toValue(dataset.stack || dataset.label)));
 }
 
 /**
@@ -48,7 +49,7 @@ export function extractLocationsFromDatasets(datasets) {
  * @returns {[]} The array containing the flat samples.
  */
 export function extractLabelsFromFlatData(flatData) {
-  return toSet(flatData.map(item => item.dataset || 'unknown'));
+  return toSet(flatData.map(item => toValue(item.dataset)));
 }
 
 /**
@@ -59,7 +60,7 @@ export function extractLabelsFromFlatData(flatData) {
  * @returns {[]} The array containing the flat samples.
  */
 export function extractStacksFromFlatData(flatData) {
-  return toSet(flatData.map(item => item.stack || item.dataset || 'unknown'));
+  return toSet(flatData.map(item => toValue(item.stack || item.dataset)));
 }
 
 /**
@@ -69,7 +70,7 @@ export function extractStacksFromFlatData(flatData) {
  * @returns {[]} The set containing the dates.
  */
 export function extractDatesFromFlatData(flatData) {
-  return toSet(flatData.map(item => item.date || 'unknown'));
+  return toSet(flatData.map(item => toValue(item.date)));
 }
 
 /**
@@ -79,7 +80,7 @@ export function extractDatesFromFlatData(flatData) {
  * @returns {[]} The set containing the locations.
  */
 export function extractLocationsFromFlatData(flatData) {
-  return toSet(flatData.map(item => item.location || "unknown"));
+  return toSet(flatData.map(item => toValue(item.location)));
 }
 
 /**
@@ -89,13 +90,14 @@ export function extractLocationsFromFlatData(flatData) {
  * @returns {any[]} The set version of the array.
  */
 function toSet(array) {
-  return Array.from(new Set(array));//.sort();
+  return Array.from(new Set(array));
 }
 
 /**
  * Returns the earliest date occurring in the flat array of items.
  *
  * @param flatData The flat samples array.
+ * @param dateAccess
  * @returns {*} The earliest date.
  */
 export function extractEarliestDate(flatData, dateAccess = (date) => date) {

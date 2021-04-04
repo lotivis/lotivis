@@ -8,7 +8,7 @@ import {DatasetsController} from "../data/datasets.controller";
 Chart.prototype.setDatasetController = function (newController) {
   this.datasetController = newController;
   this.datasetController.addListener(this);
-  this.update();
+  this.update(newController, 'registration');
 };
 
 /**
@@ -23,7 +23,7 @@ Chart.prototype.setDatasets = function (newDatasets) {
  * Returns the presented datasets.
  * @returns {[*]} The collection of datasets.
  */
-Chart.prototype.setDatasets = function () {
+Chart.prototype.getDatasets = function () {
   if (!this.datasetController || !Array.isArray(this.datasetController.datasets)) return [];
   return this.datasetController.datasets;
 };

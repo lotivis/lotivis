@@ -19,12 +19,22 @@ export class MapExteriorBorderRenderer {
      * Renders the exterior border of the presented geo json.
      */
     this.render = function () {
-      if (!self.topojson) return;
+      if (!self.topojson) {
+        lotivis_log('[lotivis]  Can\'t find topojson library.');
+        return;
+      }
       let geoJSON = mapChart.presentedGeoJSON;
-      if (!self.geoJSON) return lotivis_log('[lotivis]  No GeoJSON to render.');
+      if (!geoJSON) {
+        lotivis_log('[lotivis]  No GeoJSON to render.');
+        return;
+      }
       let borders = joinFeatures(geoJSON);
-      if (!borders) return lotivis_log('[lotivis]  No borders to render.');
+      if (!borders) {
+        return lotivis_log('[lotivis]  No borders to render.');
+      }
+
       mapChart.svg
+        .selectAll('path')
         .append('path')
         .datum(borders)
         .attr('d', mapChart.path)

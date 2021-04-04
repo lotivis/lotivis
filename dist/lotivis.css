@@ -122,6 +122,7 @@ button.lotivis-button-round:active {
   overflow: visible;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin: auto;
 }
 .lotivis-card-header .lotivis-card-header-left {
   overflow: visible;
@@ -381,8 +382,8 @@ input[type=checkbox] {
 .lotivis-map-exterior-borders {
   fill: white;
   fill-opacity: 0;
-  stroke: black;
-  stroke-width: 1;
+  stroke: green;
+  stroke-width: 3;
   pointer-events: none;
 }
 

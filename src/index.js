@@ -22,7 +22,7 @@ import {ChartCard} from "./js/components/chart.card";
 import {Dropdown} from "./js/components/dropdown";
 import {Popup} from "./js/components/popup";
 import {DataCard} from "./js/data.card/data.card";
-import {DatasetJSONCard} from "./js/data.card/data.json.card";
+import {DatasetsJSONCard} from "./js/data.card/data.json.card";
 import {DatasetCSVCard} from "./js/data.card/data.csv.card";
 import {DatasetCSVDateCard} from "./js/data.card/data.csv.date.card";
 import {
@@ -42,7 +42,7 @@ import "./js/dataview/dataview.date.combined.stacks";
 import "./js/dataview/dataview.plot";
 import "./js/dataview/dataview.location";
 import {UrlParameters} from "./js/shared/url.parameters";
-import {GlobalConfig} from "./js/shared/config";
+import {LotivisConfig} from "./js/shared/config";
 import {debug} from "./js/shared/debug";
 import {parseCSV} from "./js/data.parse/parse.csv";
 import {parseCSVDate} from "./js/data.parse/parse.csv.date";
@@ -82,7 +82,7 @@ exports.PlotChartCard = PlotChartCard;
 
 // datasets / csv cards
 exports.DatasetCard = DataCard;
-exports.DatasetJSONCard = DatasetJSONCard;
+exports.DatasetsJSONCard = DatasetsJSONCard;
 exports.DatasetCSVCard = DatasetCSVCard;
 exports.DatasetCSVDateCard = DatasetCSVDateCard;
 exports.DataViewCard = DataViewCard;
@@ -107,7 +107,7 @@ exports.parseCSV = parseCSV;
 exports.parseCSVDate = parseCSVDate;
 
 // constants
-exports.config = GlobalConfig;
+exports.config = LotivisConfig;
 exports.debug = debug;
 
 // date assessors

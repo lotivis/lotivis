@@ -161,7 +161,7 @@ var createID;
  * @returns {string} The save version of the given id.
  */
 function toSaveID(theID) {
-  return theID.replaceAll(' ', '-');
+  return theID.replaceAll(' ', '-').replaceAll('/', '-');
 }
 
 /**
@@ -520,7 +520,7 @@ class DateLegendRenderer {
   }
 }
 
-const GlobalConfig = {
+const LotivisConfig = {
   // The default margin to use for charts.
   defaultMargin: 60,
   // The default offset for the space between an object an the toolbar.
@@ -534,7 +534,9 @@ const GlobalConfig = {
   // A string which is used as prefix for download.
   downloadFilePrefix: 'lotivis',
   // A string which is used as separator between components when creating a file name.
-  filenameSeparator: '_'
+  filenameSeparator: '_',
+  // A string which is used for unknown values.
+  unknown: 'LOTIVIS_UNKNOWN'
 };
 
 /**
@@ -575,8 +577,8 @@ class DateBarsRenderer {
         .enter()
         .append("rect")
         .attr('class', 'lotivis-date-chart-bar')
-        .attr("rx", isCombineStacks ? 0 : GlobalConfig.barRadius)
-        .attr("ry", isCombineStacks ? 0 : GlobalConfig.barRadius)
+        .attr("rx", isCombineStacks ? 0 : LotivisConfig.barRadius)
+        .attr("ry", isCombineStacks ? 0 : LotivisConfig.barRadius)
         .attr("x", (d) => dateChart.xChart(d.data.date) + dateChart.xStack(stack.label))
         .attr("y", (d) => dateChart.yChart(d[1]))
         .attr("width", dateChart.xStack.bandwidth())
@@ -600,7 +602,7 @@ class DateGhostBarsRenderer {
   constructor(dateChart) {
 
     function createID(date) {
-      return `ghost-rect-${String(date).replaceAll('.', '-')}`;
+      return `ghost-rect-${toSaveID(String(date))}`;
     }
 
     this.hideAll = function () {
@@ -652,8 +654,8 @@ class DateGhostBarsRenderer {
         .attr("class", 'lotivis-selection-rect')
         .attr("id", date => createID(date))
         .attr("opacity", 0)
-        .attr("rx", GlobalConfig.barRadius)
-        .attr("ry", GlobalConfig.barRadius)
+        .attr("rx", LotivisConfig.barRadius)
+        .attr("ry", LotivisConfig.barRadius)
         .attr("x", (date) => dateChart.xChart(date))
         .attr("y", margin.top)
         .attr("width", dateChart.xChart.bandwidth())
@@ -675,8 +677,22 @@ function copy(object) {
   return JSON.parse(JSON.stringify(object));
 }
 
-function containsValue(value) {
-  return value || value === 0;
+/**
+ * Returns `true` if the given value not evaluates to false and is not 0. false else.
+ * @param value The value to check.
+ * @returns {boolean} A Boolean value indicating whether the given value is valid.
+ */
+function isValue(value) {
+  return Boolean(value || value === 0);
+}
+
+/**
+ * Returns the value if it evaluates to true or is 0.  Returns `GlobalConfig.unknown` else.
+ * @param value The value to check.
+ * @returns The value or `GlobalConfig.unknown`.
+ */
+function toValue(value) {
+  return value || (value === 0 ? 0 : LotivisConfig.unknown);
 }
 
 /**
@@ -700,14 +716,14 @@ function combine(flattenList) {
       entry.value += (listItem.value + 0);
     } else {
       let entry = {};
-      if (containsValue(listItem.label)) entry.label = listItem.label;
-      if (containsValue(listItem.dataset)) entry.dataset = listItem.dataset;
-      if (containsValue(listItem.stack)) entry.stack = listItem.stack;
-      if (containsValue(listItem.location)) entry.location = listItem.location;
-      if (containsValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
-      if (containsValue(listItem.date)) entry.date = listItem.date;
-      if (containsValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
-      if (containsValue(listItem.locationName)) entry.locationName = listItem.locationName;
+      if (isValue(listItem.label)) entry.label = listItem.label;
+      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (isValue(listItem.stack)) entry.stack = listItem.stack;
+      if (isValue(listItem.location)) entry.location = listItem.location;
+      if (isValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
+      if (isValue(listItem.date)) entry.date = listItem.date;
+      if (isValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
+      if (isValue(listItem.locationName)) entry.locationName = listItem.locationName;
       entry.value = (listItem.value || 0);
       combined.push(entry);
     }
@@ -737,14 +753,14 @@ function combineByStacks(flattenList) {
       entry.value += (listItem.value + 0);
     } else {
       let entry = {};
-      if (containsValue(listItem.label)) entry.label = listItem.label;
-      if (containsValue(listItem.dataset)) entry.dataset = listItem.dataset;
-      if (containsValue(listItem.stack)) entry.stack = listItem.stack;
-      if (containsValue(listItem.location)) entry.location = listItem.location;
-      if (containsValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
-      if (containsValue(listItem.date)) entry.date = listItem.date;
-      if (containsValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
-      if (containsValue(listItem.locationName)) entry.locationName = listItem.locationName;
+      if (isValue(listItem.label)) entry.label = listItem.label;
+      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (isValue(listItem.stack)) entry.stack = listItem.stack;
+      if (isValue(listItem.location)) entry.location = listItem.location;
+      if (isValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
+      if (isValue(listItem.date)) entry.date = listItem.date;
+      if (isValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
+      if (isValue(listItem.locationName)) entry.locationName = listItem.locationName;
       entry.value = (listItem.value || 0);
       combined.push(entry);
     }
@@ -771,11 +787,11 @@ function combineByDate(flatData) {
       entry.value += (listItem.value + 0);
     } else {
       let entry = {};
-      if (containsValue(listItem.label)) entry.label = listItem.label;
-      if (containsValue(listItem.dataset)) entry.dataset = listItem.dataset;
-      if (containsValue(listItem.stack)) entry.stack = listItem.stack;
-      if (containsValue(listItem.date)) entry.date = listItem.date;
-      if (containsValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
+      if (isValue(listItem.label)) entry.label = listItem.label;
+      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (isValue(listItem.stack)) entry.stack = listItem.stack;
+      if (isValue(listItem.date)) entry.date = listItem.date;
+      if (isValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
       entry.value = (listItem.value || 0);
       combined.push(entry);
     }
@@ -802,12 +818,12 @@ function combineByLocation(flatData) {
       entry.value += listItem.value;
     } else {
       let entry = {};
-      if (containsValue(listItem.label)) entry.label = listItem.label;
-      if (containsValue(listItem.dataset)) entry.dataset = listItem.dataset;
-      if (containsValue(listItem.stack)) entry.stack = listItem.stack;
-      if (containsValue(listItem.location)) entry.location = listItem.location;
-      if (containsValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
-      if (containsValue(listItem.locationName)) entry.locationName = listItem.locationName;
+      if (isValue(listItem.label)) entry.label = listItem.label;
+      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (isValue(listItem.stack)) entry.stack = listItem.stack;
+      if (isValue(listItem.location)) entry.location = listItem.location;
+      if (isValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
+      if (isValue(listItem.locationName)) entry.locationName = listItem.locationName;
       entry.value = listItem.value;
       combined.push(entry);
     }
@@ -875,7 +891,7 @@ class DateTooltipRenderer {
      */
     function getXLeft(date, factor, offset, tooltipSize) {
       let x = dateChart.xChart(date) * factor;
-      return x + offset[0] - tooltipSize[0] - 22 - GlobalConfig.tooltipOffset;
+      return x + offset[0] - tooltipSize[0] - 22 - LotivisConfig.tooltipOffset;
     }
 
     /**
@@ -890,7 +906,7 @@ class DateTooltipRenderer {
     function getXRight(date, factor, offset) {
       let x = dateChart.xChart(date) + dateChart.xChart.bandwidth();
       x *= factor;
-      x += offset[0] + GlobalConfig.tooltipOffset;
+      x += offset[0] + LotivisConfig.tooltipOffset;
       return x;
     }
 
@@ -987,24 +1003,18 @@ class Chart extends Component {
   constructor(parent, config) {
     super(parent);
 
-    // if (Object.getPrototypeOf(parent) === String.prototype) {
-    //   this.selector = parent;
-    //   this.element = d3.select('#' + parent);
-    //   if (this.element.empty()) {
-    //     throw new Error(`ID not found: ${parent}`);
-    //   }
-    // } else {
-    //   this.element = parent;
-    //   this.element.attr('id', this.selector);
-    // }
-
     this.svgSelector = (this.selector || createID()) + '-svg';
     this.element = this.parent;
     this.element.attr('id', this.selector);
     this.config = config || {};
     this.updateSensible = true;
     this.initialize();
-    this.update();
+
+    if (this.config.datasets) {
+      this.setDatasets(this.config.datasets);
+    } else {
+      this.update();
+    }
   }
 
   initialize() {
@@ -1104,10 +1114,10 @@ const defaultConfig = {
   width: 1000,
   height: 600,
   margin: {
-    top: GlobalConfig.defaultMargin,
-    right: GlobalConfig.defaultMargin,
-    bottom: GlobalConfig.defaultMargin,
-    left: GlobalConfig.defaultMargin
+    top: LotivisConfig.defaultMargin,
+    right: LotivisConfig.defaultMargin,
+    bottom: LotivisConfig.defaultMargin,
+    left: LotivisConfig.defaultMargin
   },
   showLabels: false,
   combineStacks: false,
@@ -1293,7 +1303,6 @@ class DateChart extends Chart {
 
 /**
  * A lotivis card.
- *
  * @class Card
  * @extends Component
  */
@@ -1433,8 +1442,7 @@ class Button extends Component {
 }
 
 /**
- *
- *
+ * A lotivis popup.
  * @class Popup
  * @extends Component
  */
@@ -1442,7 +1450,6 @@ class Popup extends Component {
 
   /**
    * Creates a new instance of Popup.
-   *
    * @param parent The parental component.
    */
   constructor(parent) {
@@ -1495,7 +1502,7 @@ class Popup extends Component {
    */
   injectCard() {
     this.card = new Card(this.element);
-    this.card.element.classed('lotivis-popup lotivis-arrow lotivis-arrow-right', true);
+    this.card.element.classed('lotivis-popup', true);
   }
 
   /**
@@ -2033,7 +2040,9 @@ class ChartCard extends Card {
     this.injectButtons();
     this.injectRadioGroup();
     this.injectChart();
-    this.setCardTitle((config && config.name) ? config.name : 'No Title');
+
+    let cardSelector = this.selector;
+    this.setCardTitle((config && config.title) ? config.title : (cardSelector || 'No Title'));
   }
 
   /**
@@ -2063,8 +2072,6 @@ class ChartCard extends Card {
     }.bind(this);
   }
 
-
-
   /**
    * Creates and injects a radio button group.
    */
@@ -2087,6 +2094,10 @@ class ChartCard extends Card {
     this.radioGroup.setOptions(options);
   }
 
+  /**
+   *
+   * @param datasets
+   */
   setDatasets(datasets) {
     this.datasets = datasets;
     this.updateRadioGroup();
@@ -2144,8 +2155,8 @@ function appendExtensionIfNeeded(filename, extension) {
 }
 
 function createDownloadFilename() {
-  let components = [GlobalConfig.downloadFilePrefix];
-  let separator = GlobalConfig.filenameSeparator;
+  let components = [LotivisConfig.downloadFilePrefix];
+  let separator = LotivisConfig.filenameSeparator;
   for (let i = 0; i < arguments.length; i++) {
     components.push(String(arguments[i]));
   }
@@ -2620,7 +2631,7 @@ class MapTooltipRenderer {
         let top = featureUpperRight[1] * factor;
         top -= tooltipSize[1];
         top += positionOffset[1];
-        top -= GlobalConfig.tooltipOffset;
+        top -= LotivisConfig.tooltipOffset;
         return top;
       }
 
@@ -2631,7 +2642,7 @@ class MapTooltipRenderer {
       function getTooltipLocationUnder() {
         let top = featureLowerLeft[1] * factor;
         top += positionOffset[1];
-        top += GlobalConfig.tooltipOffset;
+        top += LotivisConfig.tooltipOffset;
         return top;
       }
 
@@ -2718,7 +2729,7 @@ class MapLegendRenderer {
 
         let stackName = stackNames[index];
         let dataForStack = combinedData.filter(data => data.stack === stackName);
-        let max = d3.max(dataForStack, item => item.value);
+        let max = d3.max(dataForStack, item => item.value) || 0;
         let offset = index * 80;
         let color = Color.colorsForStack(index, 1)[0];
 
@@ -2960,6 +2971,8 @@ class MapGeoJSONRenderer {
       if (!geoJSON) return lotivis_log('[lotivis]  No GeoJSON to render.');
       let idAccessor = mapChart.config.featureIDAccessor;
 
+      lotivis_log('geoJSON', geoJSON);
+
       mapChart.areas = mapChart.svg
         .selectAll('path')
         .data(geoJSON.features)
@@ -2981,10 +2994,8 @@ class MapGeoJSONRenderer {
 /**
  * Returns a new created instance of Feature combining the given Features.
  * @param geoJSON
- * @param features
  */
 function joinFeatures(geoJSON) {
-  console.log(geoJSON);
   let topology = topojson.topology(geoJSON.features);
   let objects = extractObjects(topology);
 
@@ -3036,12 +3047,22 @@ class MapExteriorBorderRenderer {
      * Renders the exterior border of the presented geo json.
      */
     this.render = function () {
-      if (!self.topojson) return;
+      if (!self.topojson) {
+        lotivis_log('[lotivis]  Can\'t find topojson library.');
+        return;
+      }
       let geoJSON = mapChart.presentedGeoJSON;
-      if (!self.geoJSON) return lotivis_log('[lotivis]  No GeoJSON to render.');
+      if (!geoJSON) {
+        lotivis_log('[lotivis]  No GeoJSON to render.');
+        return;
+      }
       let borders = joinFeatures(geoJSON);
-      if (!borders) return lotivis_log('[lotivis]  No borders to render.');
+      if (!borders) {
+        return lotivis_log('[lotivis]  No borders to render.');
+      }
+
       mapChart.svg
+        .selectAll('path')
         .append('path')
         .datum(borders)
         .attr('d', mapChart.path)
@@ -3095,7 +3116,7 @@ function flatDataset(dataset) {
  * @returns {[]} The array containing the flat samples.
  */
 function extractLabelsFromDatasets(datasets) {
-  return toSet(datasets.map(dataset => dataset.label || 'unknown'));
+  return toSet(datasets.map(dataset => toValue(dataset.label)));
 }
 
 /**
@@ -3106,7 +3127,7 @@ function extractLabelsFromDatasets(datasets) {
  * @returns {[]} The array containing the flat samples.
  */
 function extractStacksFromDatasets(datasets) {
-  return toSet(datasets.map(dataset => dataset.stack || dataset.label || 'unknown'));
+  return toSet(datasets.map(dataset => toValue(dataset.stack || dataset.label)));
 }
 
 /**
@@ -3136,7 +3157,7 @@ function extractLocationsFromDatasets(datasets) {
  * @returns {[]} The set containing the dates.
  */
 function extractDatesFromFlatData(flatData) {
-  return toSet(flatData.map(item => item.date || 'unknown'));
+  return toSet(flatData.map(item => toValue(item.date)));
 }
 
 /**
@@ -3146,7 +3167,7 @@ function extractDatesFromFlatData(flatData) {
  * @returns {[]} The set containing the locations.
  */
 function extractLocationsFromFlatData(flatData) {
-  return toSet(flatData.map(item => item.location || "unknown"));
+  return toSet(flatData.map(item => toValue(item.location)));
 }
 
 /**
@@ -3156,13 +3177,14 @@ function extractLocationsFromFlatData(flatData) {
  * @returns {any[]} The set version of the array.
  */
 function toSet(array) {
-  return Array.from(new Set(array));//.sort();
+  return Array.from(new Set(array));
 }
 
 /**
  * Returns the earliest date occurring in the flat array of items.
  *
  * @param flatData The flat samples array.
+ * @param dateAccess
  * @returns {*} The earliest date.
  */
 function extractEarliestDate(flatData, dateAccess = (date) => date) {
@@ -3228,19 +3250,22 @@ function createGeoJSON(datasets) {
 
   loop1: for (let rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
     for (let itemIndex = 0; itemIndex < 5; itemIndex++) {
-      if (locations.length === 0) break loop1;
-      let location = locations.shift();
 
+      if (locations.length === 0) break loop1;
+
+      let location = locations.shift();
       let lat = (itemIndex + 1) * latSpan;
       let lng = (rowIndex + 1) * -lngSpan;
 
+      // start down left, counterclockwise
       let coordinates = [];
-
+      coordinates.push([lat + latSpan, lng + lngSpan]);
+      coordinates.push([lat + latSpan, lng]);
       coordinates.push([lat, lng]);
       coordinates.push([lat, lng + lngSpan]);
       coordinates.push([lat + latSpan, lng + lngSpan]);
-      coordinates.push([lat + latSpan, lng]);
-      coordinates.push([0, 0]);
+
+      console.log('location', location);
 
       let feature = {
         type: 'Feature',
@@ -3262,10 +3287,14 @@ function createGeoJSON(datasets) {
     }
   }
 
-  return {
+  let geoJSON = {
     type: "FeatureCollection",
     features: features
   };
+
+  console.log(geoJSON);
+
+  return geoJSON;
 }
 
 /**
@@ -3348,14 +3377,14 @@ class MapSelectionBoundsRenderer {
  *
  * @type {{}}
  */
-const defaultMapChartConfig = {
+const MapChartConfig = {
   width: 1000,
   height: 1000,
   margin: {
-    top: GlobalConfig.defaultMargin,
-    right: GlobalConfig.defaultMargin,
-    bottom: GlobalConfig.defaultMargin,
-    left: GlobalConfig.defaultMargin
+    top: LotivisConfig.defaultMargin,
+    right: LotivisConfig.defaultMargin,
+    bottom: LotivisConfig.defaultMargin,
+    left: LotivisConfig.defaultMargin
   },
   isShowLabels: true,
   geoJSON: null,
@@ -3364,16 +3393,16 @@ const defaultMapChartConfig = {
   drawRectangleAroundSelection: false,
   sendsNotifications: true,
   featureIDAccessor: function (feature) {
-    if (feature.id) return feature.id;
-    if (feature.properties && feature.properties.id) return feature.properties.id;
-    if (feature.properties && feature.properties.code) return feature.properties.code;
+    if (feature.id || feature.id === 0) return feature.id;
+    if (feature.properties && isValue(feature.properties.id)) return feature.properties.id;
+    if (feature.properties && isValue(feature.properties.code)) return feature.properties.code;
     return hashCode(feature.properties);
   },
   featureNameAccessor: function (feature) {
-    if (feature.name) return feature.name;
-    if (feature.properties && feature.properties.name) return feature.properties.name;
-    if (feature.properties && feature.properties.nom) return feature.properties.nom;
-    return 'Unknown';
+    if (isValue(feature.name)) return feature.name;
+    if (feature.properties && isValue(feature.properties.name)) return feature.properties.name;
+    if (feature.properties && isValue(feature.properties.nom)) return feature.properties.nom;
+    return LotivisConfig.unknown;
   }
 };
 
@@ -3568,10 +3597,10 @@ class MapChart extends Chart {
   initialize() {
     let theConfig = this.config;
     let margin;
-    margin = Object.assign({}, defaultMapChartConfig.margin);
+    margin = Object.assign({}, MapChartConfig.margin);
     margin = Object.assign(margin, theConfig.margin || {});
 
-    let config = Object.assign({}, defaultMapChartConfig);
+    let config = Object.assign({}, MapChartConfig);
     this.config = Object.assign(config, this.config);
     this.config.margin = margin;
 
@@ -3595,7 +3624,6 @@ class MapChart extends Chart {
   remove() {
     if (!this.svg) return;
     this.svg.remove();
-    // this.element.selectAll('svg').remove();
   }
 
   precalculate() {
@@ -3603,8 +3631,8 @@ class MapChart extends Chart {
     if (!this.datasetController) return;
     this.dataview = this.datasetController.getLocationDataview();
     if (this.geoJSON) return;
-    this.geoJSON = createGeoJSON(this.datasetController.workingDatasets);
-    this.geoJSONDidChange();
+    let geoJSON = createGeoJSON(this.datasetController.workingDatasets);
+    this.setGeoJSON(geoJSON);
   }
 
   draw() {
@@ -3662,7 +3690,7 @@ class MapChart extends Chart {
     } else {
       this.geoJSON = new GeoJson(newGeoJSON);
     }
-    this.presentedGeoJSON = newGeoJSON;
+    this.presentedGeoJSON = this.geoJSON;
     this.geoJSONDidChange();
   }
 
@@ -3676,9 +3704,9 @@ class MapChart extends Chart {
     this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.excludedFeatureCodes);
     this.zoomTo(this.geoJSON);
 
-    this.backgroundRenderer.render();
-    this.exteriorBorderRenderer.render();
-    this.geoJSONRenderer.render();
+    // this.backgroundRenderer.render();
+    // this.exteriorBorderRenderer.render();
+    // this.geoJSONRenderer.render();
   }
 }
 
@@ -3701,7 +3729,7 @@ class MapChartSettingsPopup extends Popup {
       .card
       .content
       .append('div')
-      .classed('lotivis-row', true);
+      .classed('row', true);
 
     this.renderShowLabelsCheckbox();
   }
@@ -3710,7 +3738,7 @@ class MapChartSettingsPopup extends Popup {
    * Injects a checkbox to toggle the visibility of the labels of the map chart.
    */
   renderShowLabelsCheckbox() {
-    let container = this.row.append('div').classed('lotivis-col-12', true);
+    let container = this.row.append('div').classed('col-12', true);
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText('Labels');
     this.showLabelsCheckbox.onClick = function (checked) {
@@ -4010,8 +4038,8 @@ class PlotTooltipRenderer {
 
       components.push('Label: ' + dataset.label);
       components.push('');
-      components.push('Start: ' + dataset.earliestDate);
-      components.push('End: ' + dataset.latestDate);
+      components.push('Start: ' + dataset.firstDate);
+      components.push('End: ' + dataset.lastDate);
       components.push('');
       components.push('Items: ' + dataset.data.map(item => item.value).reduce((acc, next) => +acc + +next, 0));
       components.push('');
@@ -4058,10 +4086,10 @@ class PlotTooltipRenderer {
       top += offset[1];
 
       if ((plotChart.yChart(dataset.label) - plotChart.config.margin.top) <= (plotChart.graphHeight / 2)) {
-        top += (plotChart.config.lineHeight * factor) + GlobalConfig.tooltipOffset;
+        top += (plotChart.config.lineHeight * factor) + LotivisConfig.tooltipOffset;
       } else {
         top -= tooltipHeight + 20; // subtract padding
-        top -= GlobalConfig.tooltipOffset;
+        top -= LotivisConfig.tooltipOffset;
       }
 
       let left = getTooltipLeftForDataset(dataset, factor, offset);
@@ -4193,10 +4221,10 @@ const defaultPlotChartConfig = {
   width: 1000,
   height: 600,
   margin: {
-    top: GlobalConfig.defaultMargin,
-    right: GlobalConfig.defaultMargin,
-    bottom: GlobalConfig.defaultMargin,
-    left: GlobalConfig.defaultMargin
+    top: LotivisConfig.defaultMargin,
+    right: LotivisConfig.defaultMargin,
+    bottom: LotivisConfig.defaultMargin,
+    left: LotivisConfig.defaultMargin
   },
   lineHeight: 28,
   radius: 23,
@@ -4862,7 +4890,7 @@ class PlotChartCard extends ChartCard {
 Chart.prototype.setDatasetController = function (newController) {
   this.datasetController = newController;
   this.datasetController.addListener(this);
-  this.update();
+  this.update(newController, 'registration');
 };
 
 /**
@@ -4877,7 +4905,7 @@ Chart.prototype.setDatasets = function (newDatasets) {
  * Returns the presented datasets.
  * @returns {[*]} The collection of datasets.
  */
-Chart.prototype.setDatasets = function () {
+Chart.prototype.getDatasets = function () {
   if (!this.datasetController || !Array.isArray(this.datasetController.datasets)) return [];
   return this.datasetController.datasets;
 };
@@ -5012,8 +5040,7 @@ function validateDataItem(item) {
 class Toast extends Component {
 
   /**
-   * Creates an instance of Toast.
-   *
+   * Creates a new instance of Toast.
    * @constructor
    * @param {Component} parent The parental component.
    */
@@ -5028,6 +5055,24 @@ class Toast extends Component {
   }
 
   /**
+   * Shows the toast.
+   * @override
+   */
+  show() {
+    super.show();
+    this.element.style('opacity', 1);
+  }
+
+  /**
+   * Hides the toast.
+   * @override
+   */
+  hide() {
+    super.hide();
+    this.element.style('opacity', 0);
+  }
+
+  /**
    * Sets the text of the Toast.
    * @param text The text of the Toast.
    */
@@ -5035,26 +5080,17 @@ class Toast extends Component {
     this.element.text(text);
   }
 
-  show() {
-    super.show();
-    this.element.style('opacity', 1);
-  }
-
-  hide() {
-    super.hide();
-    this.element.style('opacity', 0);
-  }
-
   /**
    * Sets the text of the status label.  If text is empty the status label will be hide.
    * @param newStatusMessage The new status message.
    */
   setStatusMessage(newStatusMessage) {
-    this.element.text(newStatusMessage);
-    if (newStatusMessage === "") {
-      this.hide();
-    } else {
+    let saveString = String(newStatusMessage).trim();
+    this.element.text(saveString);
+    if (saveString) {
       this.show();
+    } else {
+      this.hide();
     }
   }
 }
@@ -5121,7 +5157,7 @@ class DataCard extends Card {
     if (typeof newContent !== 'string') return;
     // let numberOfRows = newContent.split(`\n`).length;
     // this.textarea.attr('rows', numberOfRows);
-    this.textarea.attr('rows', 30);
+    this.textarea.attr('rows', 24);
   }
 
   /**
@@ -5231,10 +5267,10 @@ class DataCard extends Card {
 
 /**
  * A card containing a textarea which contains the JSON text of a dataset collection.
- * @class DatasetJSONCard
+ * @class DatasetsJSONCard
  * @extends DataCard
  */
-class DatasetJSONCard extends DataCard {
+class DatasetsJSONCard extends DataCard {
 
   /**
    * Creates a new instance of DatasetJSONCard.
@@ -5587,7 +5623,7 @@ class DatasetCSVDateCard extends DataCard {
  * @class DataViewCard
  * @extends DataCard
  */
-class DataViewCard extends DatasetJSONCard {
+class DataViewCard extends DatasetsJSONCard {
 
   /**
    * Creates a new instance of DataViewCard.
@@ -5679,6 +5715,7 @@ class DataViewDatasetsControllerCard extends DataViewCard {
  */
 DatasetsController.prototype.addListener = function (listener) {
   if (!this.listeners) this.listeners = [];
+  if (this.listeners.includes(listener)) return lotivis_log(`[lotivis]  Attempt to add listener twice (${listener}).`);
   this.listeners.push(listener);
 };
 
@@ -6232,7 +6269,7 @@ exports.PlotChartCard = PlotChartCard;
 
 // datasets / csv cards
 exports.DatasetCard = DataCard;
-exports.DatasetJSONCard = DatasetJSONCard;
+exports.DatasetsJSONCard = DatasetsJSONCard;
 exports.DatasetCSVCard = DatasetCSVCard;
 exports.DatasetCSVDateCard = DatasetCSVDateCard;
 exports.DataViewCard = DataViewCard;
@@ -6257,7 +6294,7 @@ exports.parseCSV = parseCSV;
 exports.parseCSVDate = parseCSVDate;
 
 // constants
-exports.config = GlobalConfig;
+exports.config = LotivisConfig;
 exports.debug = debug;
 
 // date assessors

@@ -1,8 +1,5 @@
 import {copy} from "../shared/copy";
-
-function containsValue(value) {
-  return value || value === 0;
-}
+import {isValue} from "../shared/value";
 
 /**
  *
@@ -25,14 +22,14 @@ export function combine(flattenList) {
       entry.value += (listItem.value + 0);
     } else {
       let entry = {};
-      if (containsValue(listItem.label)) entry.label = listItem.label;
-      if (containsValue(listItem.dataset)) entry.dataset = listItem.dataset;
-      if (containsValue(listItem.stack)) entry.stack = listItem.stack;
-      if (containsValue(listItem.location)) entry.location = listItem.location;
-      if (containsValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
-      if (containsValue(listItem.date)) entry.date = listItem.date;
-      if (containsValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
-      if (containsValue(listItem.locationName)) entry.locationName = listItem.locationName;
+      if (isValue(listItem.label)) entry.label = listItem.label;
+      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (isValue(listItem.stack)) entry.stack = listItem.stack;
+      if (isValue(listItem.location)) entry.location = listItem.location;
+      if (isValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
+      if (isValue(listItem.date)) entry.date = listItem.date;
+      if (isValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
+      if (isValue(listItem.locationName)) entry.locationName = listItem.locationName;
       entry.value = (listItem.value || 0);
       combined.push(entry);
     }
@@ -62,14 +59,14 @@ export function combineByStacks(flattenList) {
       entry.value += (listItem.value + 0);
     } else {
       let entry = {};
-      if (containsValue(listItem.label)) entry.label = listItem.label;
-      if (containsValue(listItem.dataset)) entry.dataset = listItem.dataset;
-      if (containsValue(listItem.stack)) entry.stack = listItem.stack;
-      if (containsValue(listItem.location)) entry.location = listItem.location;
-      if (containsValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
-      if (containsValue(listItem.date)) entry.date = listItem.date;
-      if (containsValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
-      if (containsValue(listItem.locationName)) entry.locationName = listItem.locationName;
+      if (isValue(listItem.label)) entry.label = listItem.label;
+      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (isValue(listItem.stack)) entry.stack = listItem.stack;
+      if (isValue(listItem.location)) entry.location = listItem.location;
+      if (isValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
+      if (isValue(listItem.date)) entry.date = listItem.date;
+      if (isValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
+      if (isValue(listItem.locationName)) entry.locationName = listItem.locationName;
       entry.value = (listItem.value || 0);
       combined.push(entry);
     }
@@ -96,11 +93,11 @@ export function combineByDate(flatData) {
       entry.value += (listItem.value + 0);
     } else {
       let entry = {};
-      if (containsValue(listItem.label)) entry.label = listItem.label;
-      if (containsValue(listItem.dataset)) entry.dataset = listItem.dataset;
-      if (containsValue(listItem.stack)) entry.stack = listItem.stack;
-      if (containsValue(listItem.date)) entry.date = listItem.date;
-      if (containsValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
+      if (isValue(listItem.label)) entry.label = listItem.label;
+      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (isValue(listItem.stack)) entry.stack = listItem.stack;
+      if (isValue(listItem.date)) entry.date = listItem.date;
+      if (isValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
       entry.value = (listItem.value || 0);
       combined.push(entry);
     }
@@ -127,12 +124,12 @@ export function combineByLocation(flatData) {
       entry.value += listItem.value;
     } else {
       let entry = {};
-      if (containsValue(listItem.label)) entry.label = listItem.label;
-      if (containsValue(listItem.dataset)) entry.dataset = listItem.dataset;
-      if (containsValue(listItem.stack)) entry.stack = listItem.stack;
-      if (containsValue(listItem.location)) entry.location = listItem.location;
-      if (containsValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
-      if (containsValue(listItem.locationName)) entry.locationName = listItem.locationName;
+      if (isValue(listItem.label)) entry.label = listItem.label;
+      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (isValue(listItem.stack)) entry.stack = listItem.stack;
+      if (isValue(listItem.location)) entry.location = listItem.location;
+      if (isValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
+      if (isValue(listItem.locationName)) entry.locationName = listItem.locationName;
       entry.value = listItem.value;
       combined.push(entry);
     }

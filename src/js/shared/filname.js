@@ -1,4 +1,4 @@
-import {GlobalConfig} from "./config";
+import {LotivisConfig} from "./config";
 
 /**
  * Returns the last path component of the given url.
@@ -22,8 +22,8 @@ export function appendExtensionIfNeeded(filename, extension) {
 }
 
 export function createDownloadFilename() {
-  let components = [GlobalConfig.downloadFilePrefix];
-  let separator = GlobalConfig.filenameSeparator;
+  let components = [LotivisConfig.downloadFilePrefix];
+  let separator = LotivisConfig.filenameSeparator;
   for (let i = 0; i < arguments.length; i++) {
     components.push(String(arguments[i]));
   }

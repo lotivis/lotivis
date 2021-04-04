@@ -22,7 +22,9 @@ export class ChartCard extends Card {
     this.injectButtons();
     this.injectRadioGroup();
     this.injectChart();
-    this.setCardTitle((config && config.name) ? config.name : 'No Title');
+
+    let cardSelector = this.selector;
+    this.setCardTitle((config && config.title) ? config.title : (cardSelector || 'No Title'));
   }
 
   /**
@@ -52,8 +54,6 @@ export class ChartCard extends Card {
     }.bind(this);
   }
 
-
-
   /**
    * Creates and injects a radio button group.
    */
@@ -76,6 +76,10 @@ export class ChartCard extends Card {
     this.radioGroup.setOptions(options);
   }
 
+  /**
+   *
+   * @param datasets
+   */
   setDatasets(datasets) {
     this.datasets = datasets;
     this.updateRadioGroup();

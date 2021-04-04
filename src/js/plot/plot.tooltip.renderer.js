@@ -1,4 +1,4 @@
-import {GlobalConfig} from "../shared/config";
+import {LotivisConfig} from "../shared/config";
 
 /**
  * Appends and updates the tooltip of a plot chart.
@@ -32,8 +32,8 @@ export class PlotTooltipRenderer {
 
       components.push('Label: ' + dataset.label);
       components.push('');
-      components.push('Start: ' + dataset.earliestDate);
-      components.push('End: ' + dataset.latestDate);
+      components.push('Start: ' + dataset.firstDate);
+      components.push('End: ' + dataset.lastDate);
       components.push('');
       components.push('Items: ' + dataset.data.map(item => item.value).reduce((acc, next) => +acc + +next, 0));
       components.push('');
@@ -80,10 +80,10 @@ export class PlotTooltipRenderer {
       top += offset[1];
 
       if ((plotChart.yChart(dataset.label) - plotChart.config.margin.top) <= (plotChart.graphHeight / 2)) {
-        top += (plotChart.config.lineHeight * factor) + GlobalConfig.tooltipOffset;
+        top += (plotChart.config.lineHeight * factor) + LotivisConfig.tooltipOffset;
       } else {
         top -= tooltipHeight + 20; // subtract padding
-        top -= GlobalConfig.tooltipOffset;
+        top -= LotivisConfig.tooltipOffset;
       }
 
       let left = getTooltipLeftForDataset(dataset, factor, offset);

@@ -4,10 +4,10 @@ import {createDownloadFilename} from "../shared/filname";
 
 /**
  * A card containing a textarea which contains the JSON text of a dataset collection.
- * @class DatasetJSONCard
+ * @class DatasetsJSONCard
  * @extends DataCard
  */
-export class DatasetJSONCard extends DataCard {
+export class DatasetsJSONCard extends DataCard {
 
   /**
    * Creates a new instance of DatasetJSONCard.

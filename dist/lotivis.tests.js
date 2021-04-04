@@ -307,8 +307,41 @@ function flatDataset(dataset) {
   return flatData;
 }
 
-function containsValue(value) {
-  return value || value === 0;
+const LotivisConfig = {
+  // The default margin to use for charts.
+  defaultMargin: 60,
+  // The default offset for the space between an object an the toolbar.
+  tooltipOffset: 7,
+  // The default radius to use for bars drawn on a chart.
+  barRadius: 5,
+  // A Boolean value indicating whether the debug logging is enabled.
+  debugLog: false,
+  // A Boolean value indicating whether the debug logging is enabled.
+  debug: true,
+  // A string which is used as prefix for download.
+  downloadFilePrefix: 'lotivis',
+  // A string which is used as separator between components when creating a file name.
+  filenameSeparator: '_',
+  // A string which is used for unknown values.
+  unknown: 'LOTIVIS_UNKNOWN'
+};
+
+/**
+ * Returns `true` if the given value not evaluates to false and is not 0. false else.
+ * @param value The value to check.
+ * @returns {boolean} A Boolean value indicating whether the given value is valid.
+ */
+function isValue(value) {
+  return Boolean(value || value === 0);
+}
+
+/**
+ * Returns the value if it evaluates to true or is 0.  Returns `GlobalConfig.unknown` else.
+ * @param value The value to check.
+ * @returns The value or `GlobalConfig.unknown`.
+ */
+function toValue(value) {
+  return value || (value === 0 ? 0 : LotivisConfig.unknown);
 }
 
 /**
@@ -332,14 +365,14 @@ function combine(flattenList) {
       entry.value += (listItem.value + 0);
     } else {
       let entry = {};
-      if (containsValue(listItem.label)) entry.label = listItem.label;
-      if (containsValue(listItem.dataset)) entry.dataset = listItem.dataset;
-      if (containsValue(listItem.stack)) entry.stack = listItem.stack;
-      if (containsValue(listItem.location)) entry.location = listItem.location;
-      if (containsValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
-      if (containsValue(listItem.date)) entry.date = listItem.date;
-      if (containsValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
-      if (containsValue(listItem.locationName)) entry.locationName = listItem.locationName;
+      if (isValue(listItem.label)) entry.label = listItem.label;
+      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (isValue(listItem.stack)) entry.stack = listItem.stack;
+      if (isValue(listItem.location)) entry.location = listItem.location;
+      if (isValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
+      if (isValue(listItem.date)) entry.date = listItem.date;
+      if (isValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
+      if (isValue(listItem.locationName)) entry.locationName = listItem.locationName;
       entry.value = (listItem.value || 0);
       combined.push(entry);
     }
@@ -369,14 +402,14 @@ function combineByStacks(flattenList) {
       entry.value += (listItem.value + 0);
     } else {
       let entry = {};
-      if (containsValue(listItem.label)) entry.label = listItem.label;
-      if (containsValue(listItem.dataset)) entry.dataset = listItem.dataset;
-      if (containsValue(listItem.stack)) entry.stack = listItem.stack;
-      if (containsValue(listItem.location)) entry.location = listItem.location;
-      if (containsValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
-      if (containsValue(listItem.date)) entry.date = listItem.date;
-      if (containsValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
-      if (containsValue(listItem.locationName)) entry.locationName = listItem.locationName;
+      if (isValue(listItem.label)) entry.label = listItem.label;
+      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (isValue(listItem.stack)) entry.stack = listItem.stack;
+      if (isValue(listItem.location)) entry.location = listItem.location;
+      if (isValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
+      if (isValue(listItem.date)) entry.date = listItem.date;
+      if (isValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
+      if (isValue(listItem.locationName)) entry.locationName = listItem.locationName;
       entry.value = (listItem.value || 0);
       combined.push(entry);
     }
@@ -403,11 +436,11 @@ function combineByDate(flatData) {
       entry.value += (listItem.value + 0);
     } else {
       let entry = {};
-      if (containsValue(listItem.label)) entry.label = listItem.label;
-      if (containsValue(listItem.dataset)) entry.dataset = listItem.dataset;
-      if (containsValue(listItem.stack)) entry.stack = listItem.stack;
-      if (containsValue(listItem.date)) entry.date = listItem.date;
-      if (containsValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
+      if (isValue(listItem.label)) entry.label = listItem.label;
+      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (isValue(listItem.stack)) entry.stack = listItem.stack;
+      if (isValue(listItem.date)) entry.date = listItem.date;
+      if (isValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
       entry.value = (listItem.value || 0);
       combined.push(entry);
     }
@@ -434,12 +467,12 @@ function combineByLocation(flatData) {
       entry.value += listItem.value;
     } else {
       let entry = {};
-      if (containsValue(listItem.label)) entry.label = listItem.label;
-      if (containsValue(listItem.dataset)) entry.dataset = listItem.dataset;
-      if (containsValue(listItem.stack)) entry.stack = listItem.stack;
-      if (containsValue(listItem.location)) entry.location = listItem.location;
-      if (containsValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
-      if (containsValue(listItem.locationName)) entry.locationName = listItem.locationName;
+      if (isValue(listItem.label)) entry.label = listItem.label;
+      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (isValue(listItem.stack)) entry.stack = listItem.stack;
+      if (isValue(listItem.location)) entry.location = listItem.location;
+      if (isValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
+      if (isValue(listItem.locationName)) entry.locationName = listItem.locationName;
       entry.value = listItem.value;
       combined.push(entry);
     }
@@ -454,7 +487,7 @@ function combineByLocation(flatData) {
  * @returns {[]} The array containing the flat samples.
  */
 function extractLabelsFromDatasets(datasets) {
-  return toSet(datasets.map(dataset => dataset.label || 'unknown'));
+  return toSet(datasets.map(dataset => toValue(dataset.label)));
 }
 
 /**
@@ -465,7 +498,7 @@ function extractLabelsFromDatasets(datasets) {
  * @returns {[]} The array containing the flat samples.
  */
 function extractStacksFromDatasets(datasets) {
-  return toSet(datasets.map(dataset => dataset.stack || dataset.label || 'unknown'));
+  return toSet(datasets.map(dataset => toValue(dataset.stack || dataset.label)));
 }
 
 /**
@@ -495,7 +528,7 @@ function extractLocationsFromDatasets(datasets) {
  * @returns {[]} The array containing the flat samples.
  */
 function extractLabelsFromFlatData(flatData) {
-  return toSet(flatData.map(item => item.dataset || 'unknown'));
+  return toSet(flatData.map(item => toValue(item.dataset)));
 }
 
 /**
@@ -506,7 +539,7 @@ function extractLabelsFromFlatData(flatData) {
  * @returns {[]} The array containing the flat samples.
  */
 function extractStacksFromFlatData(flatData) {
-  return toSet(flatData.map(item => item.stack || item.dataset || 'unknown'));
+  return toSet(flatData.map(item => toValue(item.stack || item.dataset)));
 }
 
 /**
@@ -516,7 +549,7 @@ function extractStacksFromFlatData(flatData) {
  * @returns {[]} The set containing the dates.
  */
 function extractDatesFromFlatData(flatData) {
-  return toSet(flatData.map(item => item.date || 'unknown'));
+  return toSet(flatData.map(item => toValue(item.date)));
 }
 
 /**
@@ -526,7 +559,7 @@ function extractDatesFromFlatData(flatData) {
  * @returns {[]} The set containing the locations.
  */
 function extractLocationsFromFlatData(flatData) {
-  return toSet(flatData.map(item => item.location || "unknown"));
+  return toSet(flatData.map(item => toValue(item.location)));
 }
 
 /**
@@ -536,13 +569,14 @@ function extractLocationsFromFlatData(flatData) {
  * @returns {any[]} The set version of the array.
  */
 function toSet(array) {
-  return Array.from(new Set(array));//.sort();
+  return Array.from(new Set(array));
 }
 
 /**
  * Returns the earliest date occurring in the flat array of items.
  *
  * @param flatData The flat samples array.
+ * @param dateAccess
  * @returns {*} The earliest date.
  */
 function extractEarliestDate(flatData, dateAccess = (date) => date) {
@@ -883,6 +917,7 @@ class DatasetsController {
  */
 DatasetsController.prototype.addListener = function (listener) {
   if (!this.listeners) this.listeners = [];
+  if (this.listeners.includes(listener)) return lotivis_log();
   this.listeners.push(listener);
 };
 
@@ -1476,19 +1511,22 @@ function createGeoJSON(datasets) {
 
   loop1: for (let rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
     for (let itemIndex = 0; itemIndex < 5; itemIndex++) {
-      if (locations.length === 0) break loop1;
-      let location = locations.shift();
 
+      if (locations.length === 0) break loop1;
+
+      let location = locations.shift();
       let lat = (itemIndex + 1) * latSpan;
       let lng = (rowIndex + 1) * -lngSpan;
 
+      // start down left, counterclockwise
       let coordinates = [];
-
+      coordinates.push([lat + latSpan, lng + lngSpan]);
+      coordinates.push([lat + latSpan, lng]);
       coordinates.push([lat, lng]);
       coordinates.push([lat, lng + lngSpan]);
       coordinates.push([lat + latSpan, lng + lngSpan]);
-      coordinates.push([lat + latSpan, lng]);
-      coordinates.push([0, 0]);
+
+      console.log('location', location);
 
       let feature = {
         type: 'Feature',
@@ -1510,19 +1548,21 @@ function createGeoJSON(datasets) {
     }
   }
 
-  return {
+  let geoJSON = {
     type: "FeatureCollection",
     features: features
   };
+
+  console.log(geoJSON);
+
+  return geoJSON;
 }
 
 /**
  * Returns a new created instance of Feature combining the given Features.
  * @param geoJSON
- * @param features
  */
 function joinFeatures(geoJSON) {
-  console.log(geoJSON);
   let topology = topojson.topology(geoJSON.features);
   let objects = extractObjects(topology);
 
@@ -1847,6 +1887,7 @@ exports.appendExtensionIfNeeded = appendExtensionIfNeeded;
 exports.validateDataset = validateDataset;
 exports.validateDatasets = validateDatasets;
 exports.validateDataItem = validateDataItem;
+exports.isValue = isValue;
 
 exports.DefaultDateAccess = DefaultDateAccess;
 exports.FormattedDateAccess = FormattedDateAccess;

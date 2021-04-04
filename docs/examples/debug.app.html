@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
+  <link rel="stylesheet" href="../css/lotivis.css"/>
+  <title>Lotivis Examples - App</title>
+</head>
+<body>
+
+<div class="lotivis-container-full">
+  <div class="lotivis-row">
+    <div class="lotivis-col-2">
+      <a class="lotivis-anchor-back" href="../index.html">
+        Back
+      </a>
+    </div>
+    <div class="lotivis-col-8 lotivis-headline">
+      <h1>App</h1>
+    </div>
+    <div class="lotivis-col-2">
+      <!-- Empty-->
+    </div>
+    <div class="lotivis-col-3">
+      <div id="datasets-json-card">
+        <!-- Datasets JSON Card Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-5">
+      <div id="date-chart-card">
+        <!-- Date Chart Card Here -->
+      </div>
+      <div id="plot-chart-card">
+        <!-- Plot Chart Card Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-4">
+      <div id="map-chart-card">
+        <!-- Map Chart Card Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-3">
+      <div id="dataview-datasets-controller-card">
+        <!-- Dataview Datasets Controller Card Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-3">
+      <div id="dataview-date-card">
+        <!-- Dataview Date Card Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-3">
+      <div id="dataview-plot-card">
+        <!-- Dataview Plot Card Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-3">
+      <div id="dataview-map-card">
+        <!-- Dataview Map Card Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-3">
+      <div id="dataview-flat-card">
+        <!-- Dataview Flat Card Here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
+<script src="../js/lotivis.js"></script>
+
+<script>
+
+  let datasets = [
+    {
+      label: 'dataset_1',
+      data: [
+        {location: 0, date: '2002/02/02', value: 2},
+        {location: 0, date: '2002/01/01', value: 1},
+        {location: 0, date: '2002/04/04', value: 4},
+        {location: 0, date: '2002/03/03', value: 3},
+      ]
+    }
+  ];
+
+  lotivis.debug(true);
+
+  let dateChartCard = new lotivis.DateChartCard('date-chart-card', {
+    width: 1000,
+    height: 300
+  });
+
+  let plotChartCard = new lotivis.PlotChartCard('plot-chart-card', {
+    width: 1000,
+    height: 500
+  });
+
+  let mapChartCard = new lotivis.MapChartCard('map-chart-card', {
+    width: 1000,
+    height: 690
+  });
+
+  let datasetsJSONCard = new lotivis.DatasetsJSONCard('datasets-json-card');
+  let dataViewDateCard = new lotivis.DataViewDateCard('dataview-date-card');
+  let dataViewPlotCard = new lotivis.DataViewPlotCard('dataview-plot-card');
+  let dataViewMapCard = new lotivis.DataViewMapCard('dataview-map-card');
+  let dataViewFlatCard = new lotivis.DataViewFlatCard('dataview-flat-card');
+  let dataViewDatasetsControllerCard = new lotivis.DataViewDatasetsControllerCard('dataview-datasets-controller-card');
+
+  let controller = new lotivis.DatasetController(datasets, {
+    dateAccess: lotivis.FormattedDateAccess
+  });
+
+  controller.register([
+    dateChartCard.chart,
+    plotChartCard.chart,
+    mapChartCard.chart,
+    datasetsJSONCard,
+    dataViewDateCard,
+    dataViewPlotCard,
+    dataViewMapCard,
+    dataViewFlatCard,
+    dataViewDatasetsControllerCard
+  ]);
+
+</script>
+
+</body>
+</html>

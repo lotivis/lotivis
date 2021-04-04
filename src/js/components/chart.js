@@ -20,24 +20,18 @@ export class Chart extends Component {
   constructor(parent, config) {
     super(parent);
 
-    // if (Object.getPrototypeOf(parent) === String.prototype) {
-    //   this.selector = parent;
-    //   this.element = d3.select('#' + parent);
-    //   if (this.element.empty()) {
-    //     throw new Error(`ID not found: ${parent}`);
-    //   }
-    // } else {
-    //   this.element = parent;
-    //   this.element.attr('id', this.selector);
-    // }
-
     this.svgSelector = (this.selector || createID()) + '-svg';
     this.element = this.parent;
     this.element.attr('id', this.selector);
     this.config = config || {};
     this.updateSensible = true;
     this.initialize();
-    this.update();
+
+    if (this.config.datasets) {
+      this.setDatasets(this.config.datasets);
+    } else {
+      this.update();
+    }
   }
 
   initialize() {

@@ -70,6 +70,7 @@ import {
   DateWeekAssessor
 } from "./js/data.date.assessor/date.assessor";
 import {validateDataItem, validateDataset, validateDatasets} from "./js/data.juggle/data.validate";
+import {isValue} from "./js/shared/value";
 
 exports.Color = Color;
 exports.DatasetController = DatasetsController;
@@ -112,6 +113,7 @@ exports.appendExtensionIfNeeded = appendExtensionIfNeeded;
 exports.validateDataset = validateDataset;
 exports.validateDatasets = validateDatasets;
 exports.validateDataItem = validateDataItem;
+exports.isValue = isValue;
 
 exports.DefaultDateAccess = DefaultDateAccess;
 exports.FormattedDateAccess = FormattedDateAccess;

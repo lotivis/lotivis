@@ -9,7 +9,7 @@
 </head>
 <body>
 
-<div class="lotivis-container">
+<div class="lotivis-container-full">
   <div class="lotivis-row">
     <div class="lotivis-col-2">
       <a class="lotivis-anchor-back" href="../index.html">
@@ -19,14 +19,28 @@
     <div class="lotivis-col-8 lotivis-headline">
       <h1>Map Empty</h1>
     </div>
-    <div class="lotivis-col-12">
-      <div id="map-chart-card">
-
+    <div class="lotivis-col-4">
+      <div id="map-chart-card-1">
+        <!-- Map Chart Card 1 Here -->
+      </div>
+      <div id="datasets-json-card-1">
+        <!-- Datasets JSON Card 1 Here -->
       </div>
     </div>
-    <div class="lotivis-col-12">
-      <div id="radio">
-
+    <div class="lotivis-col-4">
+      <div id="map-chart-card-2">
+        <!-- Map Chart Card 2 Here -->
+      </div>
+      <div id="datasets-json-card-2">
+        <!-- Datasets JSON Card 2 Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-4">
+      <div id="map-chart-card-3">
+        <!-- Map Chart Card 3 Here -->
+      </div>
+      <div id="datasets-json-card-3">
+        <!-- Datasets JSON Card 3 Here -->
       </div>
     </div>
   </div>
@@ -39,30 +53,68 @@
 
 <script>
 
-  const datasets = [
-    {
-      label: 'dataset1',
-      stack: 'dataset1',
-      data: [
-        {location: 'location_0', value: 0},
-        {location: 'location_1', value: 1},
-        {location: 'location_2', value: 2},
-        {location: 'location_3', value: 3},
-        {location: 'location_4', value: 4},
-        {location: 'location_5', value: 5},
-        {location: 'location_6', value: 6},
-        {location: 'location_7', value: 7},
-      ]
-    }
-  ]
-
   // print debug messages
   lotivis.debug(true);
 
-  const mapChartCard = new lotivis.MapChartCard('map-chart-card');
-  mapChartCard.chart.config.height = 300;
-  mapChartCard.chart.datasets = datasets;
-  mapChartCard.chart.update();
+  const datasetJSONCard1 = new lotivis.DatasetsJSONCard('datasets-json-card-1');
+  const mapChartCard1 = new lotivis.MapChartCard('map-chart-card-1', {
+    title: 'Dataset 1',
+    width: 600,
+    height: 300,
+    datasets: [
+      {
+        label: 'dataset1',
+        stack: 'dataset1',
+        data: [
+          {location: 'location_0', value: 0}
+        ]
+      }
+    ],
+  });
+  datasetJSONCard1.setDatasetController(mapChartCard1.chart.datasetController);
+
+  const datasetJSONCard2 = new lotivis.DatasetsJSONCard('datasets-json-card-2');
+  const mapChartCard2 = new lotivis.MapChartCard('map-chart-card-2', {
+    title: 'Dataset 2',
+    width: 600,
+    height: 300,
+    datasets: [
+      {
+        label: 'dataset1',
+        stack: 'dataset1',
+        data: [
+          {location: 'location_0', value: 0},
+          {location: 'location_1', value: 1},
+          {location: 'location_2', value: 2}
+        ]
+      }
+    ],
+  });
+  datasetJSONCard2.setDatasetController(mapChartCard2.chart.datasetController);
+
+  const datasetJSONCard3 = new lotivis.DatasetsJSONCard('datasets-json-card-3');
+  const mapChartCard3 = new lotivis.MapChartCard('map-chart-card-3', {
+    title: 'Dataset 3',
+    width: 600,
+    height: 300,
+    datasets: [
+      {
+        label: 'dataset1',
+        stack: 'dataset1',
+        data: [
+          {location: 'location_0', value: 0},
+          {location: 'location_1', value: 1},
+          {location: 'location_2', value: 2},
+          {location: 'location_3', value: 3},
+          {location: 'location_4', value: 4},
+          {location: 'location_5', value: 5},
+          {location: 'location_6', value: 6},
+          {location: 'location_7', value: 7},
+        ]
+      }
+    ],
+  });
+  datasetJSONCard3.setDatasetController(mapChartCard3.chart.datasetController);
 
 </script>
 

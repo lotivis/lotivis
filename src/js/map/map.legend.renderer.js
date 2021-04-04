@@ -44,7 +44,7 @@ export class MapLegendRenderer {
 
         let stackName = stackNames[index];
         let dataForStack = combinedData.filter(data => data.stack === stackName);
-        let max = d3.max(dataForStack, item => item.value);
+        let max = d3.max(dataForStack, item => item.value) || 0;
         let offset = index * 80;
         let color = Color.colorsForStack(index, 1)[0];
 

@@ -4,8 +4,7 @@ import {Card} from './card';
 import {Button} from './button';
 
 /**
- *
- *
+ * A lotivis popup.
  * @class Popup
  * @extends Component
  */
@@ -13,7 +12,6 @@ export class Popup extends Component {
 
   /**
    * Creates a new instance of Popup.
-   *
    * @param parent The parental component.
    */
   constructor(parent) {
@@ -66,7 +64,7 @@ export class Popup extends Component {
    */
   injectCard() {
     this.card = new Card(this.element);
-    this.card.element.classed('lotivis-popup lotivis-arrow lotivis-arrow-right', true);
+    this.card.element.classed('lotivis-popup', true);
   }
 
   /**

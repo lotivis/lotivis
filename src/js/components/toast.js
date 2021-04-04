@@ -9,8 +9,7 @@ import {Component} from "./component";
 export class Toast extends Component {
 
   /**
-   * Creates an instance of Toast.
-   *
+   * Creates a new instance of Toast.
    * @constructor
    * @param {Component} parent The parental component.
    */
@@ -25,6 +24,24 @@ export class Toast extends Component {
   }
 
   /**
+   * Shows the toast.
+   * @override
+   */
+  show() {
+    super.show();
+    this.element.style('opacity', 1);
+  }
+
+  /**
+   * Hides the toast.
+   * @override
+   */
+  hide() {
+    super.hide();
+    this.element.style('opacity', 0);
+  }
+
+  /**
    * Sets the text of the Toast.
    * @param text The text of the Toast.
    */
@@ -32,26 +49,17 @@ export class Toast extends Component {
     this.element.text(text);
   }
 
-  show() {
-    super.show();
-    this.element.style('opacity', 1);
-  }
-
-  hide() {
-    super.hide();
-    this.element.style('opacity', 0);
-  }
-
   /**
    * Sets the text of the status label.  If text is empty the status label will be hide.
    * @param newStatusMessage The new status message.
    */
   setStatusMessage(newStatusMessage) {
-    this.element.text(newStatusMessage);
-    if (newStatusMessage === "") {
-      this.hide();
-    } else {
+    let saveString = String(newStatusMessage).trim();
+    this.element.text(saveString);
+    if (saveString) {
       this.show();
+    } else {
+      this.hide();
     }
   }
 }
