@@ -1,4 +1,4 @@
-import {LogOnlyOnce} from "../shared/debug";
+import {lotivis_log_once} from "../shared/debug";
 
 /**
  *
@@ -16,7 +16,7 @@ export const DefaultDateAccess = (date) => date;
 export const FormattedDateAccess = function (dateString) {
   let value = Date.parse(dateString);
   if (isNaN(value)) {
-    LogOnlyOnce('isNaN', `Received NaN for date "${dateString}"`);
+    lotivis_log_once(`Received NaN for date "${dateString}"`);
   }
   return value;
 };

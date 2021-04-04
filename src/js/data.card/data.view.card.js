@@ -62,7 +62,7 @@ export class DataViewMapCard extends DataViewCard {
   }
 
   getDataView() {
-    return this.datasetController.getMapDataview();
+    return this.datasetController.getLocationDataview();
   }
 }
 

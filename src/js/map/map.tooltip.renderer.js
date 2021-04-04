@@ -1,5 +1,4 @@
 import {combineByLocation} from "../data.juggle/data.combine";
-import {Color} from "../color/color";
 import {styleForCSSClass} from "../shared/style";
 import {formatNumber} from "../shared/format";
 import {equals} from "../shared/equal";
@@ -13,13 +12,11 @@ export class MapTooltipRenderer {
 
   /**
    * Creates a new instance of MapTooltipRenderer.
-   *
-   * @param mapChart
+   * @param mapChart The parental map chart.
    */
   constructor(mapChart) {
     this.mapChart = mapChart;
 
-    let color = Color.defaultTint.rgbString();
     let tooltip = mapChart
       .element
       .append('div')
@@ -71,20 +68,6 @@ export class MapTooltipRenderer {
      * @param feature The drawn feature (area).
      */
     this.mouseEnter = function (event, feature) {
-      let mapID = featureMapID(feature);
-      mapChart
-        .svg
-        .selectAll(`#${mapID}`)
-        .raise() // bring element to top
-        .style('stroke', () => color)
-        .style('stroke-width', '2')
-        .style('stroke-dasharray', '0');
-
-      mapChart
-        .svg
-        .selectAll('.lotivis-map-label')
-        .raise();
-
 
       tooltip.html([htmlTitle(feature), htmlValues(feature)].join('<br>'));
 
@@ -162,12 +145,11 @@ export class MapTooltipRenderer {
     this.mouseOut = function (event, feature) {
       let style = styleForCSSClass('.lotivis-map-area');
       let mapID = featureMapID(feature);
-      d3.select(`#${mapID}`)
+      mapChart.svg.select(`#${mapID}`)
         .style('stroke', style.stroke || 'black')
         .style('stroke-width', style['stroke-width'] || '0.7')
         .style('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4');
       tooltip.style('opacity', 0);
-
     };
 
     /**

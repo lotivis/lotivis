@@ -6,18 +6,16 @@ export class MapSelectionBoundsRenderer {
 
   /**
    * Creates a new instance of MapSelectionBoundsRenderer.
-   *
    * @param mapChart The parental map chart.
    */
   constructor(mapChart) {
 
-    let bounds;
-    if (mapChart.svg) {
-      bounds = mapChart.svg
+    this.render = function () {
+      this.bounds = mapChart.svg
         .append('rect')
         .attr('class', 'lotivis-map-selection-rect')
         .style('fill-opacity', 0);
-    }
+    };
 
     /**
      * Tells this renderer that the mouse moved in an area.
@@ -32,7 +30,7 @@ export class MapSelectionBoundsRenderer {
       let featureUpperRight = projection(featureBounds[1]);
       let featureBoundsWidth = featureUpperRight[0] - featureLowerLeft[0];
       let featureBoundsHeight = featureLowerLeft[1] - featureUpperRight[1];
-      bounds
+      this.bounds
         .style('width', featureBoundsWidth + 'px')
         .style('height', featureBoundsHeight + 'px')
         .style('x', featureLowerLeft[0])
@@ -44,14 +42,14 @@ export class MapSelectionBoundsRenderer {
      * Tells this renderer that the mouse moved out of an area.
      */
     this.mouseOut = function () {
-      bounds.style('opacity', 0);
+      this.bounds.style('opacity', 0);
     };
 
     /**
      * Raises the rectangle which draws the bounds.
      */
     this.raise = function () {
-      bounds.raise();
+      this.bounds.raise();
     };
   }
 }

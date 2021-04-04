@@ -681,16 +681,17 @@ function dateToItemsRelation(datasets, dateAccess) {
   });
 }
 
+/**
+ * A collection of messages which already hast been printed.
+ * @type {*[]}
+ */
 let alreadyLogged = [];
 
-function LogOnlyOnce(id, message) {
-  if (alreadyLogged.includes(id)) return;
-  alreadyLogged.push(id);
-}
-
-function clearAlreadyLogged() {
-  alreadyLogged = [];
-}
+var lotivis_log_once = function (message) {
+  if (alreadyLogged.includes(message)) return;
+  alreadyLogged.push(message);
+  console.warn(`[lotivis]  Warning only once: ${message}`);
+};
 
 var lotivis_log = () => null;
 
@@ -710,7 +711,7 @@ const DefaultDateAccess = (date) => date;
 const FormattedDateAccess = function (dateString) {
   let value = Date.parse(dateString);
   if (isNaN(value)) {
-    LogOnlyOnce('isNaN');
+    lotivis_log_once(`Received NaN for date "${dateString}"`);
   }
   return value;
 };
@@ -1152,7 +1153,6 @@ class DatasetsColorsController {
 DatasetsController.prototype.setDatasets = function (datasets) {
   this.originalDatasets = datasets;
   this.datasets = copy(datasets);
-  clearAlreadyLogged();
   this.update();
 };
 
@@ -1402,14 +1402,32 @@ DatasetsController.prototype.getPlotDataview = function () {
 };
 
 /**
- * Returns a new generated map data view for the current enabled samples of dataset of this controller.
+ * Returns a new generated location dataview for the current selected data of datasets of this controller.
+ *
+ * A location dataview has the following form:
+ * ```
+ * {
+ *   stacks: [String],
+ *   items: [
+ *     {
+ *       dataset: String,
+ *       stack: String,
+ *       location: Any,
+ *       value: Number
+ *     }
+ *   ]
+ * }
+ * ```
  */
-DatasetsController.prototype.getMapDataview = function () {
+DatasetsController.prototype.getLocationDataview = function () {
 
   let dataview = {};
   let flatData = this.enabledFlatData();
   let combinedByStack = combineByStacks(flatData);
-  dataview.combinedData = combineByLocation(combinedByStack);
+  let combinedByLocation = combineByLocation(combinedByStack);
+
+  dataview.stacks = this.stacks;
+  dataview.combinedData = combinedByLocation;
 
   return dataview;
 };
@@ -1504,6 +1522,7 @@ function createGeoJSON(datasets) {
  * @param features
  */
 function joinFeatures(geoJSON) {
+  console.log(geoJSON);
   let topology = topojson.topology(geoJSON.features);
   let objects = extractObjects(topology);
 

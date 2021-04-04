@@ -220,17 +220,17 @@ exports.InvalidFormatError = InvalidFormatError;
 exports.GeoJSONValidateError = GeoJSONValidateError;
 
 /**
- *
+ * A lotivis component.
  * @class Component
  */
 class Component {
 
   /**
-   *
+   * Creates a new instance of Component.
    * @param parent
    */
   constructor(parent) {
-    if (!parent) throw 'No parent or selector specified.';
+    if (!parent) throw new LotivisError('No parent or selector specified.');
     if (typeof parent === 'string') {
       this.initializeFromSelector(parent);
     } else {
@@ -241,9 +241,7 @@ class Component {
   initializeFromSelector(selector) {
     this.selector = selector;
     this.parent = d3.select('#' + selector);
-    if (this.parent.empty()) {
-      throw new ElementNotFoundError(selector);
-    }
+    if (this.parent.empty()) throw new ElementNotFoundError(selector);
   }
 
   initializeFromParent(parent) {
@@ -269,12 +267,14 @@ class Component {
   }
 
   getElementEffectiveSize() {
+    if (!this.element) return [0, 0];
     let width = this.element.style('width').replace('px', '');
     let height = this.element.style('height').replace('px', '');
     return [Number(width), Number(height)];
   }
 
   getElementPosition() {
+    if (!this.element) return [0, 0];
     let element = document.getElementById(this.selector);
     if (!element) return [0, 0];
     let rect = element.getBoundingClientRect();
@@ -969,15 +969,17 @@ class DateTooltipRenderer {
 }
 
 /**
- *
+ * Superclass for lotivis charts.
  * @class Chart
  * @extends Component
+ * @see DateChart
+ * @see MapChart
+ * @see PlotChart
  */
 class Chart extends Component {
 
   /**
    * Creates an instance of DiachronicChart.
-   *
    * @constructor
    * @param {Component} parent The parental component.
    * @param config The configuration of the chart.
@@ -985,19 +987,21 @@ class Chart extends Component {
   constructor(parent, config) {
     super(parent);
 
-    if (Object.getPrototypeOf(parent) === String.prototype) {
-      this.selector = parent;
-      this.element = d3.select('#' + parent);
-      if (this.element.empty()) {
-        throw new Error(`ID not found: ${parent}`);
-      }
-    } else {
-      this.element = parent;
-      this.element.attr('id', this.selector);
-    }
+    // if (Object.getPrototypeOf(parent) === String.prototype) {
+    //   this.selector = parent;
+    //   this.element = d3.select('#' + parent);
+    //   if (this.element.empty()) {
+    //     throw new Error(`ID not found: ${parent}`);
+    //   }
+    // } else {
+    //   this.element = parent;
+    //   this.element.attr('id', this.selector);
+    // }
 
+    this.svgSelector = (this.selector || createID()) + '-svg';
+    this.element = this.parent;
+    this.element.attr('id', this.selector);
     this.config = config || {};
-    this.svgSelector = createID();
     this.updateSensible = true;
     this.initialize();
     this.update();
@@ -1116,9 +1120,9 @@ const defaultConfig = {
   }
 };
 
-/**¬
+/**
  *
- * @class Diachronic Chart Component
+ * @class DateChart
  * @extends Chart
  */
 class DateChart extends Chart {
@@ -1164,6 +1168,14 @@ class DateChart extends Chart {
   }
 
   /**
+   * Removes all `svg`s from the parental element.
+   * @override
+   */
+  remove() {
+    this.element.selectAll('svg').remove();
+  }
+
+  /**
    * @override
    */
   precalculate() {
@@ -1171,14 +1183,6 @@ class DateChart extends Chart {
     let margin = config.margin;
     this.graphWidth = config.width - margin.left - margin.right;
     this.graphHeight = config.height - margin.top - margin.bottom;
-    this.precalculateHelpData();
-    this.createScales();
-  }
-
-  /**
-   * Tells the receiving map chart that its `datasets` property did change.
-   */
-  precalculateHelpData() {
     if (!this.datasetController) return;
     let groupSize = this.config.groupSize || 1;
 
@@ -1187,6 +1191,7 @@ class DateChart extends Chart {
     } else {
       this.dataview = this.datasetController.getDateDataview(groupSize);
     }
+    this.createScales();
   }
 
   /**
@@ -1215,14 +1220,6 @@ class DateChart extends Chart {
       .nice()
       .rangeRound([config.height - margin.bottom, margin.top]);
 
-  }
-
-  /**
-   * Removes all `svg`s from the parental element.
-   * @override
-   */
-  remove() {
-    this.element.selectAll('svg').remove();
   }
 
   /**
@@ -2529,13 +2526,11 @@ class MapTooltipRenderer {
 
   /**
    * Creates a new instance of MapTooltipRenderer.
-   *
-   * @param mapChart
+   * @param mapChart The parental map chart.
    */
   constructor(mapChart) {
     this.mapChart = mapChart;
 
-    let color = Color.defaultTint.rgbString();
     let tooltip = mapChart
       .element
       .append('div')
@@ -2587,20 +2582,6 @@ class MapTooltipRenderer {
      * @param feature The drawn feature (area).
      */
     this.mouseEnter = function (event, feature) {
-      let mapID = featureMapID(feature);
-      mapChart
-        .svg
-        .selectAll(`#${mapID}`)
-        .raise() // bring element to top
-        .style('stroke', () => color)
-        .style('stroke-width', '2')
-        .style('stroke-dasharray', '0');
-
-      mapChart
-        .svg
-        .selectAll('.lotivis-map-label')
-        .raise();
-
 
       tooltip.html([htmlTitle(feature), htmlValues(feature)].join('<br>'));
 
@@ -2678,12 +2659,11 @@ class MapTooltipRenderer {
     this.mouseOut = function (event, feature) {
       let style = styleForCSSClass('.lotivis-map-area');
       let mapID = featureMapID(feature);
-      d3.select(`#${mapID}`)
+      mapChart.svg.select(`#${mapID}`)
         .style('stroke', style.stroke || 'black')
         .style('stroke-width', style['stroke-width'] || '0.7')
         .style('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4');
       tooltip.style('opacity', 0);
-
     };
 
     /**
@@ -2725,10 +2705,10 @@ class MapLegendRenderer {
     }
 
     this.render = function () {
-      if (!mapChart.datasetController) return;
+      if (!mapChart.dataview) return;
 
-      let stackNames = mapChart.datasetController.stacks;
-      let combinedData = mapChart.combinedData;
+      let stackNames = mapChart.dataview.stacks;
+      let combinedData = mapChart.dataview.combinedData;
 
       appendLegend();
       legend.raise();
@@ -2784,17 +2764,17 @@ class MapLegendRenderer {
   }
 }
 
+/**
+ * A collection of messages which already hast been printed.
+ * @type {*[]}
+ */
 let alreadyLogged = [];
 
-function LogOnlyOnce(id, message) {
-  if (alreadyLogged.includes(id)) return;
-  alreadyLogged.push(id);
-  lotivis_log(`[lotivis]  Warning only once! ${message}`);
-}
-
-function clearAlreadyLogged() {
-  alreadyLogged = [];
-}
+var lotivis_log_once = function (message) {
+  if (alreadyLogged.includes(message)) return;
+  alreadyLogged.push(message);
+  console.warn(`[lotivis]  Warning only once: ${message}`);
+};
 
 var lotivis_log = () => null;
 
@@ -2803,8 +2783,6 @@ var lotivis_log = () => null;
  * @param enabled A Boolean value indicating whether to enable debug logging.
  */
 function debug(enabled) {
-  GlobalConfig.debugLog = enabled;
-  GlobalConfig.debug = enabled;
   lotivis_log = enabled ? console.log : () => null;
   lotivis_log(`[lotivis]  debug ${enabled ? 'en' : 'dis'}abled`);
 }
@@ -2825,23 +2803,20 @@ class MapLabelRenderer {
      * Removes any old labels from the map.
      */
     function removeLabels() {
-      mapChart
-        .svg
-        .selectAll('.lotivis-map-label')
-        .remove();
+      mapChart.svg.selectAll('.lotivis-map-label').remove();
     }
 
     /**
      * Appends labels from datasets.
      */
     this.render = function () {
-      let geoJSON = mapChart.geoJSON;
-      if (!mapChart.geoJSON) return lotivis_log('No Geo JSON to render.');
-      let dataview = mapChart.dataview;
-      if (!dataview) return lotivis_log('No dataview in map.');
-
       removeLabels();
-      if (!mapChart.config.showLabels) return;
+
+      let geoJSON = mapChart.geoJSON;
+      if (!mapChart.geoJSON) return lotivis_log('[lotivis]  No GeoJSON to render.');
+      let dataview = mapChart.dataview;
+      if (!dataview) return lotivis_log('[lotivis]  No dataview in map.');
+      if (!mapChart.config.showLabels) return lotivis_log('[lotivis]  Skip rendering labels due to configuration.');
 
       mapChart.svg
         .selectAll('text')
@@ -2873,41 +2848,59 @@ class MapDatasetRenderer {
 
   /**
    * Creates a new instance of MapDatasetRenderer.
-   *
    * @param mapChart The parental map chart.
    */
   constructor(mapChart) {
 
     let generator = Color.colorGenerator(1);
 
-    /**
-     * Resets the `fill` and `fill-opacity` property of each area.
-     */
-    function resetAreas() {
-      styleForCSSClass('.lotivis-map-area');
-      mapChart.svg
-        .selectAll('.lotivis-map-area')
-        .style('fill', 'whitesmoke')
-        .style('fill-opacity', 1);
+    function featureMapID(feature) {
+      return `lotivis-map-area-${mapChart.config.featureIDAccessor(feature)}`;
     }
+
+    /**
+     * Called by map GeoJSON renderer when mouse enters an area drawn on the map.
+     * @param event The mouse event.
+     * @param feature The drawn feature (area).
+     */
+    this.mouseEnter = function (event, feature) {
+      let color = Color.defaultTint.rgbString();
+      let mapID = featureMapID(feature);
+      mapChart
+        .svg
+        .selectAll(`#${mapID}`)
+        .raise() // bring element to top
+        .style('stroke', () => color)
+        .style('stroke-width', '2')
+        .style('stroke-dasharray', '0');
+
+      mapChart
+        .svg
+        .selectAll('.lotivis-map-label')
+        .raise();
+    };
+
+    /**
+     * Tells this renderer that the mouse moved out of an area.
+     */
+    this.mouseOut = function () {
+    };
 
     /**
      * Iterates the datasets per stack and draws them on svg.
      */
     this.render = function () {
-      if (!mapChart.geoJSON) return;
-      if (!mapChart.datasetController) return;
+      if (!mapChart.geoJSON) return lotivis_log('[lotivis]  No GeoJSON to render.');
+      if (!mapChart.dataview) return lotivis_log('[lotivis]  No dataview property.');
 
-      let stackNames = mapChart.datasetController.stacks;
-      let combinedData = mapChart.combinedData;
-      resetAreas();
+      let stackNames = mapChart.dataview.stacks;
+      let combinedData = mapChart.dataview.combinedData;
 
       for (let index = 0; index < stackNames.length; index++) {
 
         let stackName = stackNames[index];
         let dataForStack = combinedData.filter(data => data.stack === stackName);
         let max = d3.max(dataForStack, item => item.value);
-        mapChart.datasetController.getColorForStack(stackName);
 
         for (let index = 0; index < dataForStack.length; index++) {
 
@@ -2927,12 +2920,12 @@ class MapDatasetRenderer {
 }
 
 /**
- * @class MapGeojsonRenderer
+ * @class MapGeoJSONRenderer
  */
-class MapGeojsonRenderer {
+class MapGeoJSONRenderer {
 
   /**
-   * Creates a new instance of MapGeojsonRenderer.
+   * Creates a new instance of MapGeoJSONRenderer.
    * @param mapChart The parental map chart.
    */
   constructor(mapChart) {
@@ -2943,6 +2936,7 @@ class MapGeojsonRenderer {
      * @param feature The drawn feature (area).
      */
     function mouseEnter(event, feature) {
+      mapChart.datasetRenderer.mouseEnter(event, feature);
       mapChart.tooltipRenderer.mouseEnter(event, feature);
       mapChart.selectionBoundsRenderer.mouseEnter(event, feature);
     }
@@ -2953,6 +2947,7 @@ class MapGeojsonRenderer {
      * @param feature The drawn feature (area).
      */
     function mouseOut(event, feature) {
+      mapChart.datasetRenderer.mouseOut(event, feature);
       mapChart.tooltipRenderer.mouseOut(event, feature);
       mapChart.selectionBoundsRenderer.mouseOut(event, feature);
     }
@@ -2962,7 +2957,7 @@ class MapGeojsonRenderer {
      */
     this.render = function () {
       let geoJSON = mapChart.presentedGeoJSON;
-      if (!geoJSON) return lotivis_log('No Geo JSON file to render.');
+      if (!geoJSON) return lotivis_log('[lotivis]  No GeoJSON to render.');
       let idAccessor = mapChart.config.featureIDAccessor;
 
       mapChart.areas = mapChart.svg
@@ -2974,6 +2969,8 @@ class MapGeojsonRenderer {
         .attr('id', feature => `lotivis-map-area-${idAccessor(feature)}`)
         .classed('lotivis-map-area', true)
         .style('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4')
+        .style('fill', 'whitesmoke')
+        .style('fill-opacity', 1)
         .on('click', mapChart.onSelectFeature.bind(mapChart))
         .on('mouseenter', mouseEnter)
         .on('mouseout', mouseOut);
@@ -2987,6 +2984,7 @@ class MapGeojsonRenderer {
  * @param features
  */
 function joinFeatures(geoJSON) {
+  console.log(geoJSON);
   let topology = topojson.topology(geoJSON.features);
   let objects = extractObjects(topology);
 
@@ -3028,12 +3026,11 @@ class MapExteriorBorderRenderer {
 
   /**
    * Creates a new instance of MapExteriorBorderRenderer.
-   *
    * @property mapChart The parental map chart.
    */
   constructor(mapChart) {
 
-    if (!self.topojson) lotivis_log('[lotivis]  Can\'t find topojson lib.  Skip rendering of exterior border.');
+    if (!self.topojson) lotivis_log_once('Can\'t find topojson lib.  Skip rendering of exterior border.');
 
     /**
      * Renders the exterior border of the presented geo json.
@@ -3041,8 +3038,9 @@ class MapExteriorBorderRenderer {
     this.render = function () {
       if (!self.topojson) return;
       let geoJSON = mapChart.presentedGeoJSON;
+      if (!self.geoJSON) return lotivis_log('[lotivis]  No GeoJSON to render.');
       let borders = joinFeatures(geoJSON);
-      if (!borders) return;
+      if (!borders) return lotivis_log('[lotivis]  No borders to render.');
       mapChart.svg
         .append('path')
         .datum(borders)
@@ -3298,18 +3296,16 @@ class MapSelectionBoundsRenderer {
 
   /**
    * Creates a new instance of MapSelectionBoundsRenderer.
-   *
    * @param mapChart The parental map chart.
    */
   constructor(mapChart) {
 
-    let bounds;
-    if (mapChart.svg) {
-      bounds = mapChart.svg
+    this.render = function () {
+      this.bounds = mapChart.svg
         .append('rect')
         .attr('class', 'lotivis-map-selection-rect')
         .style('fill-opacity', 0);
-    }
+    };
 
     /**
      * Tells this renderer that the mouse moved in an area.
@@ -3324,7 +3320,7 @@ class MapSelectionBoundsRenderer {
       let featureUpperRight = projection(featureBounds[1]);
       let featureBoundsWidth = featureUpperRight[0] - featureLowerLeft[0];
       let featureBoundsHeight = featureLowerLeft[1] - featureUpperRight[1];
-      bounds
+      this.bounds
         .style('width', featureBoundsWidth + 'px')
         .style('height', featureBoundsHeight + 'px')
         .style('x', featureLowerLeft[0])
@@ -3336,14 +3332,14 @@ class MapSelectionBoundsRenderer {
      * Tells this renderer that the mouse moved out of an area.
      */
     this.mouseOut = function () {
-      bounds.style('opacity', 0);
+      this.bounds.style('opacity', 0);
     };
 
     /**
      * Raises the rectangle which draws the bounds.
      */
     this.raise = function () {
-      bounds.raise();
+      this.bounds.raise();
     };
   }
 }
@@ -3366,6 +3362,7 @@ const defaultMapChartConfig = {
   departmentsData: [],
   excludedFeatureCodes: [],
   drawRectangleAroundSelection: false,
+  sendsNotifications: true,
   featureIDAccessor: function (feature) {
     if (feature.id) return feature.id;
     if (feature.properties && feature.properties.id) return feature.properties.id;
@@ -3388,10 +3385,19 @@ class MapBackgroundRenderer {
 
   /**
    * Creates a new instance of MapBackgroundRenderer.
-   *
    * @param mapChart The parental map chart.
    */
   constructor(mapChart) {
+
+    function mouseEnter() {
+      let controller = mapChart.datasetController;
+      if (!controller) return;
+      let filters = controller.locationFilters;
+      if (!filters || filters.length === 0) return;
+      mapChart.updateSensible = false;
+      controller.setLocationsFilter([]);
+      mapChart.updateSensible = true;
+    }
 
     /**
      * Appends a background rectangle.
@@ -3404,17 +3410,7 @@ class MapBackgroundRenderer {
         .attr('width', mapChart.config.width)
         .attr('height', mapChart.config.height)
         .attr('fill', 'white')
-        .on('mouseenter', function () {
-
-          let controller = mapChart.datasetController;
-          if (!controller) return;
-          let filters = controller.locationFilters;
-          if (!filters || filters.length === 0) return;
-          this.updateSensible = false;
-          controller.setLocationsFilter([]);
-          this.updateSensible = true;
-
-        }.bind(this));
+        .on('mouseenter', mouseEnter);
     };
   }
 }
@@ -3550,8 +3546,7 @@ class GeoJson {
 }
 
 /**
- * A component which renders a geo json with d3.
- *
+ * A component which renders a GeoJSON with d3.
  * @class MapChart
  * @extends Chart
  */
@@ -3559,17 +3554,12 @@ class MapChart extends Chart {
 
   /**
    * Creates a new instance of MapChart.
-   *
    * @param parent The parental component.
    * @param config The configuration of the map chart.
    */
   constructor(parent, config) {
     super(parent, config);
-    this.element = parent
-      .append('div')
-      .attr('id', this.selector);
-
-    this.initialize();
+    // empty. constructor defined for documentation.
   }
 
   /**
@@ -3587,9 +3577,12 @@ class MapChart extends Chart {
 
     this.projection = d3.geoMercator();
     this.path = d3.geoPath().projection(this.projection);
+    this.initializeRenderers();
+  }
 
+  initializeRenderers() {
     this.backgroundRenderer = new MapBackgroundRenderer(this);
-    this.geoJSONRenderer = new MapGeojsonRenderer(this);
+    this.geoJSONRenderer = new MapGeoJSONRenderer(this);
     this.datasetRenderer = new MapDatasetRenderer(this);
     this.exteriorBorderRenderer = new MapExteriorBorderRenderer(this);
     this.minimapRenderer = new MapMinimapRenderer(this);
@@ -3599,30 +3592,31 @@ class MapChart extends Chart {
     this.tooltipRenderer = new MapTooltipRenderer(this);
   }
 
+  remove() {
+    if (!this.svg) return;
+    this.svg.remove();
+    // this.element.selectAll('svg').remove();
+  }
+
   precalculate() {
-    if (this.svg) this.svg.remove();
     this.renderSVG();
     if (!this.datasetController) return;
-    if (!this.geoJSON) {
-      this.geoJSON = createGeoJSON(this.datasetController.workingDatasets);
-      this.geoJSONDidChange();
-    }
-    const combinedByStack = combineByStacks(this.datasetController.enabledFlatData());
-    this.combinedData = combineByLocation(combinedByStack);
-    this.dataview = this.datasetController.getMapDataview();
+    this.dataview = this.datasetController.getLocationDataview();
+    if (this.geoJSON) return;
+    this.geoJSON = createGeoJSON(this.datasetController.workingDatasets);
+    this.geoJSONDidChange();
   }
 
   draw() {
     this.backgroundRenderer.render();
     this.exteriorBorderRenderer.render();
     this.geoJSONRenderer.render();
-    this.tooltipRenderer.raise();
     this.legendRenderer.render();
     this.datasetRenderer.render();
     this.labelRenderer.render();
     this.minimapRenderer.render();
-
     this.tooltipRenderer.raise();
+    this.selectionBoundsRenderer.render();
     this.selectionBoundsRenderer.raise();
   }
 
@@ -3630,12 +3624,10 @@ class MapChart extends Chart {
    *
    */
   renderSVG() {
-    this.svg = d3
-      .select(`#${this.selector}`)
+    this.svg = this.element
       .append('svg')
       .attr('id', this.svgSelector)
       .attr('viewBox', `0 0 ${this.config.width} ${this.config.height}`);
-    this.selectionBoundsRenderer = new MapSelectionBoundsRenderer(this);
   }
 
   /**
@@ -3647,9 +3639,9 @@ class MapChart extends Chart {
   }
 
   /**
-   *
-   * @param event
-   * @param feature
+   * Tells this map chart that the given feature was selected with the mouse.
+   * @param event The mouse event.
+   * @param feature The feature.
    */
   onSelectFeature(event, feature) {
     if (!feature || !feature.properties) return;
@@ -3670,7 +3662,6 @@ class MapChart extends Chart {
     } else {
       this.geoJSON = new GeoJson(newGeoJSON);
     }
-
     this.presentedGeoJSON = newGeoJSON;
     this.geoJSONDidChange();
   }
@@ -3723,7 +3714,7 @@ class MapChartSettingsPopup extends Popup {
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText('Labels');
     this.showLabelsCheckbox.onClick = function (checked) {
-      this.mapChart.isShowLabels = checked;
+      this.mapChart.config.showLabels = checked;
       this.mapChart.update();
       UrlParameters.getInstance().setWithoutDeleting('map-show-labels', checked);
     }.bind(this);
@@ -3767,7 +3758,9 @@ class MapChartCard extends ChartCard {
    * Creates and injects the map chart.
    */
   injectChart() {
-    this.chart = new MapChart(this.body, this.config);
+    this.chartID = this.selector + '-chart';
+    this.body.attr('id', this.chartID);
+    this.chart = new MapChart(this.chartID, this.config);
   }
 
   /**
@@ -4231,7 +4224,7 @@ const DefaultDateAccess = (date) => date;
 const FormattedDateAccess = function (dateString) {
   let value = Date.parse(dateString);
   if (isNaN(value)) {
-    LogOnlyOnce('isNaN', `Received NaN for date "${dateString}"`);
+    lotivis_log_once(`Received NaN for date "${dateString}"`);
   }
   return value;
 };
@@ -5650,7 +5643,7 @@ class DataViewMapCard extends DataViewCard {
   }
 
   getDataView() {
-    return this.datasetController.getMapDataview();
+    return this.datasetController.getLocationDataview();
   }
 }
 
@@ -5933,7 +5926,6 @@ class DatasetsColorsController {
 DatasetsController.prototype.setDatasets = function (datasets) {
   this.originalDatasets = datasets;
   this.datasets = copy(datasets);
-  clearAlreadyLogged();
   this.update();
 };
 
@@ -6181,14 +6173,32 @@ DatasetsController.prototype.getDateDataviewCombinedStacks = function (groupSize
 };
 
 /**
- * Returns a new generated map data view for the current enabled samples of dataset of this controller.
+ * Returns a new generated location dataview for the current selected data of datasets of this controller.
+ *
+ * A location dataview has the following form:
+ * ```
+ * {
+ *   stacks: [String],
+ *   items: [
+ *     {
+ *       dataset: String,
+ *       stack: String,
+ *       location: Any,
+ *       value: Number
+ *     }
+ *   ]
+ * }
+ * ```
  */
-DatasetsController.prototype.getMapDataview = function () {
+DatasetsController.prototype.getLocationDataview = function () {
 
   let dataview = {};
   let flatData = this.enabledFlatData();
   let combinedByStack = combineByStacks(flatData);
-  dataview.combinedData = combineByLocation(combinedByStack);
+  let combinedByLocation = combineByLocation(combinedByStack);
+
+  dataview.stacks = this.stacks;
+  dataview.combinedData = combinedByLocation;
 
   return dataview;
 };

@@ -31,10 +31,10 @@ export class MapLegendRenderer {
     }
 
     this.render = function () {
-      if (!mapChart.datasetController) return;
+      if (!mapChart.dataview) return;
 
-      let stackNames = mapChart.datasetController.stacks;
-      let combinedData = mapChart.combinedData;
+      let stackNames = mapChart.dataview.stacks;
+      let combinedData = mapChart.dataview.combinedData;
 
       appendLegend();
       legend.raise();

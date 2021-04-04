@@ -34,7 +34,7 @@ export class MapChartSettingsPopup extends Popup {
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText('Labels');
     this.showLabelsCheckbox.onClick = function (checked) {
-      this.mapChart.isShowLabels = checked;
+      this.mapChart.config.showLabels = checked;
       this.mapChart.update();
       UrlParameters.getInstance().setWithoutDeleting('map-show-labels', checked);
     }.bind(this);

@@ -8,7 +8,6 @@ import {
   extractStacksFromDatasets
 } from "../data.juggle/data.extract";
 import {DatasetsColorsController} from "./datasets.controller.colors";
-import {clearAlreadyLogged} from "../shared/debug";
 
 /**
  * Updates the datasets of this controller.
@@ -17,7 +16,6 @@ import {clearAlreadyLogged} from "../shared/debug";
 DatasetsController.prototype.setDatasets = function (datasets) {
   this.originalDatasets = datasets;
   this.datasets = copy(datasets);
-  clearAlreadyLogged();
   this.update();
 };
 

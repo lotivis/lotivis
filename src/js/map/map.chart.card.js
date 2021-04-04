@@ -24,7 +24,9 @@ export class MapChartCard extends ChartCard {
    * Creates and injects the map chart.
    */
   injectChart() {
-    this.chart = new MapChart(this.body, this.config);
+    this.chartID = this.selector + '-chart';
+    this.body.attr('id', this.chartID);
+    this.chart = new MapChart(this.chartID, this.config);
   }
 
   /**

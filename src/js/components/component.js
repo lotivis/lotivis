@@ -1,18 +1,18 @@
 import {createID} from "../shared/selector";
-import {ElementNotFoundError} from "../data.juggle/data.validate.error";
+import {LotivisError, ElementNotFoundError} from "../data.juggle/data.validate.error";
 
 /**
- *
+ * A lotivis component.
  * @class Component
  */
 export class Component {
 
   /**
-   *
+   * Creates a new instance of Component.
    * @param parent
    */
   constructor(parent) {
-    if (!parent) throw 'No parent or selector specified.';
+    if (!parent) throw new LotivisError('No parent or selector specified.');
     if (typeof parent === 'string') {
       this.initializeFromSelector(parent);
     } else {
@@ -23,9 +23,7 @@ export class Component {
   initializeFromSelector(selector) {
     this.selector = selector;
     this.parent = d3.select('#' + selector);
-    if (this.parent.empty()) {
-      throw new ElementNotFoundError(selector);
-    }
+    if (this.parent.empty()) throw new ElementNotFoundError(selector);
   }
 
   initializeFromParent(parent) {
@@ -51,12 +49,14 @@ export class Component {
   }
 
   getElementEffectiveSize() {
+    if (!this.element) return [0, 0];
     let width = this.element.style('width').replace('px', '');
     let height = this.element.style('height').replace('px', '');
     return [Number(width), Number(height)];
   }
 
   getElementPosition() {
+    if (!this.element) return [0, 0];
     let element = document.getElementById(this.selector);
     if (!element) return [0, 0];
     let rect = element.getBoundingClientRect();

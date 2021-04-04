@@ -1,11 +1,10 @@
 import {Chart} from '../components/chart';
-import {combineByLocation, combineByStacks} from '../data.juggle/data.combine';
 import {removeFeatures} from "../geojson.juggle/remove.features";
 import {MapTooltipRenderer} from "./map.tooltip.renderer";
 import {MapLegendRenderer} from "./map.legend.renderer";
 import {MapLabelRenderer} from "./map.label.renderer";
 import {MapDatasetRenderer} from "./map.dataset.renderer";
-import {MapGeojsonRenderer} from "./map.geojson.renderer";
+import {MapGeoJSONRenderer} from "./map.geojson.renderer";
 import {MapExteriorBorderRenderer} from "./map.exterior.border.renderer";
 import {createGeoJSON} from "../geojson.juggle/create.geojson";
 import {MapMinimapRenderer} from "./map.minimap.renderer";
@@ -15,8 +14,7 @@ import {MapBackgroundRenderer} from "./map.background.renderer";
 import {GeoJson} from "../geojson/geojson";
 
 /**
- * A component which renders a geo json with d3.
- *
+ * A component which renders a GeoJSON with d3.
  * @class MapChart
  * @extends Chart
  */
@@ -24,17 +22,12 @@ export class MapChart extends Chart {
 
   /**
    * Creates a new instance of MapChart.
-   *
    * @param parent The parental component.
    * @param config The configuration of the map chart.
    */
   constructor(parent, config) {
     super(parent, config);
-    this.element = parent
-      .append('div')
-      .attr('id', this.selector);
-
-    this.initialize();
+    // empty. constructor defined for documentation.
   }
 
   /**
@@ -52,9 +45,12 @@ export class MapChart extends Chart {
 
     this.projection = d3.geoMercator();
     this.path = d3.geoPath().projection(this.projection);
+    this.initializeRenderers();
+  }
 
+  initializeRenderers() {
     this.backgroundRenderer = new MapBackgroundRenderer(this);
-    this.geoJSONRenderer = new MapGeojsonRenderer(this);
+    this.geoJSONRenderer = new MapGeoJSONRenderer(this);
     this.datasetRenderer = new MapDatasetRenderer(this);
     this.exteriorBorderRenderer = new MapExteriorBorderRenderer(this);
     this.minimapRenderer = new MapMinimapRenderer(this);
@@ -64,30 +60,31 @@ export class MapChart extends Chart {
     this.tooltipRenderer = new MapTooltipRenderer(this);
   }
 
+  remove() {
+    if (!this.svg) return;
+    this.svg.remove();
+    // this.element.selectAll('svg').remove();
+  }
+
   precalculate() {
-    if (this.svg) this.svg.remove();
     this.renderSVG();
     if (!this.datasetController) return;
-    if (!this.geoJSON) {
-      this.geoJSON = createGeoJSON(this.datasetController.workingDatasets);
-      this.geoJSONDidChange();
-    }
-    const combinedByStack = combineByStacks(this.datasetController.enabledFlatData());
-    this.combinedData = combineByLocation(combinedByStack);
-    this.dataview = this.datasetController.getMapDataview();
+    this.dataview = this.datasetController.getLocationDataview();
+    if (this.geoJSON) return;
+    this.geoJSON = createGeoJSON(this.datasetController.workingDatasets);
+    this.geoJSONDidChange();
   }
 
   draw() {
     this.backgroundRenderer.render();
     this.exteriorBorderRenderer.render();
     this.geoJSONRenderer.render();
-    this.tooltipRenderer.raise();
     this.legendRenderer.render();
     this.datasetRenderer.render();
     this.labelRenderer.render();
     this.minimapRenderer.render();
-
     this.tooltipRenderer.raise();
+    this.selectionBoundsRenderer.render();
     this.selectionBoundsRenderer.raise();
   }
 
@@ -95,12 +92,10 @@ export class MapChart extends Chart {
    *
    */
   renderSVG() {
-    this.svg = d3
-      .select(`#${this.selector}`)
+    this.svg = this.element
       .append('svg')
       .attr('id', this.svgSelector)
       .attr('viewBox', `0 0 ${this.config.width} ${this.config.height}`);
-    this.selectionBoundsRenderer = new MapSelectionBoundsRenderer(this);
   }
 
   /**
@@ -112,9 +107,9 @@ export class MapChart extends Chart {
   }
 
   /**
-   *
-   * @param event
-   * @param feature
+   * Tells this map chart that the given feature was selected with the mouse.
+   * @param event The mouse event.
+   * @param feature The feature.
    */
   onSelectFeature(event, feature) {
     if (!feature || !feature.properties) return;
@@ -135,7 +130,6 @@ export class MapChart extends Chart {
     } else {
       this.geoJSON = new GeoJson(newGeoJSON);
     }
-
     this.presentedGeoJSON = newGeoJSON;
     this.geoJSONDidChange();
   }

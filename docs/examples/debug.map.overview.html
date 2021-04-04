@@ -74,11 +74,22 @@
   let datasetsCard = new lotivis.DatasetJSONCard();
   let dataviewMapCard = new lotivis.DataViewMapCard('dataview-location-card');
 
-  let locationChartCard1 = new lotivis.MapChartCard('location-chart-card-1', {name: 'Standard'});
-  let locationChartCard2 = new lotivis.MapChartCard('location-chart-card-2', {name: 'Show Labels', showLabels: true});
-  let locationChartCard3 = new lotivis.MapChartCard('location-chart-card-3', {name: 'Standard'});
+  let locationChartCard1 = new lotivis.MapChartCard('location-chart-card-1', {
+    name: 'Standard',
+    sendsNotifications: false
+  });
+  let locationChartCard2 = new lotivis.MapChartCard('location-chart-card-2', {
+    name: 'Show Labels',
+    sendsNotifications: false,
+    showLabels: true
+  });
+  let locationChartCard3 = new lotivis.MapChartCard('location-chart-card-3', {
+    name: 'Standard',
+    sendsNotifications: false
+  });
   let locationChartCard4 = new lotivis.MapChartCard('location-chart-card-4', {
     name: 'Exclude Features',
+    sendsNotifications: false,
     excludedFeatureCodes: ['2A', '2B']
   });
 

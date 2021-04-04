@@ -44,7 +44,7 @@ import "./js/data/datasets.controller.colors";
 import "./js/data/datasets.controller.update";
 import "./js/dataview/dataview.date";
 import "./js/dataview/dataview.plot";
-import "./js/dataview/dataview.map";
+import "./js/dataview/dataview.location";
 import {renderCSV} from "./js/data.render/render.csv";
 import {createGeoJSON} from "./js/geojson.juggle/create.geojson";
 import {joinFeatures} from "./js/geojson.juggle/join.features";

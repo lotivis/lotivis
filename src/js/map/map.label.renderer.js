@@ -18,23 +18,20 @@ export class MapLabelRenderer {
      * Removes any old labels from the map.
      */
     function removeLabels() {
-      mapChart
-        .svg
-        .selectAll('.lotivis-map-label')
-        .remove();
+      mapChart.svg.selectAll('.lotivis-map-label').remove();
     }
 
     /**
      * Appends labels from datasets.
      */
     this.render = function () {
-      let geoJSON = mapChart.geoJSON;
-      if (!mapChart.geoJSON) return lotivis_log('No Geo JSON to render.');
-      let dataview = mapChart.dataview;
-      if (!dataview) return lotivis_log('No dataview in map.');
-
       removeLabels();
-      if (!mapChart.config.showLabels) return;
+
+      let geoJSON = mapChart.geoJSON;
+      if (!mapChart.geoJSON) return lotivis_log('[lotivis]  No GeoJSON to render.');
+      let dataview = mapChart.dataview;
+      if (!dataview) return lotivis_log('[lotivis]  No dataview in map.');
+      if (!mapChart.config.showLabels) return lotivis_log('[lotivis]  Skip rendering labels due to configuration.');
 
       mapChart.svg
         .selectAll('text')

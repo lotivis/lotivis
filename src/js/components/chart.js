@@ -2,15 +2,17 @@ import {Component} from "./component";
 import {createID} from "../shared/selector";
 
 /**
- *
+ * Superclass for lotivis charts.
  * @class Chart
  * @extends Component
+ * @see DateChart
+ * @see MapChart
+ * @see PlotChart
  */
 export class Chart extends Component {
 
   /**
    * Creates an instance of DiachronicChart.
-   *
    * @constructor
    * @param {Component} parent The parental component.
    * @param config The configuration of the chart.
@@ -18,19 +20,21 @@ export class Chart extends Component {
   constructor(parent, config) {
     super(parent);
 
-    if (Object.getPrototypeOf(parent) === String.prototype) {
-      this.selector = parent;
-      this.element = d3.select('#' + parent);
-      if (this.element.empty()) {
-        throw new Error(`ID not found: ${parent}`);
-      }
-    } else {
-      this.element = parent;
-      this.element.attr('id', this.selector);
-    }
+    // if (Object.getPrototypeOf(parent) === String.prototype) {
+    //   this.selector = parent;
+    //   this.element = d3.select('#' + parent);
+    //   if (this.element.empty()) {
+    //     throw new Error(`ID not found: ${parent}`);
+    //   }
+    // } else {
+    //   this.element = parent;
+    //   this.element.attr('id', this.selector);
+    // }
 
+    this.svgSelector = (this.selector || createID()) + '-svg';
+    this.element = this.parent;
+    this.element.attr('id', this.selector);
     this.config = config || {};
-    this.svgSelector = createID();
     this.updateSensible = true;
     this.initialize();
     this.update();

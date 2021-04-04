@@ -19,6 +19,7 @@ export const defaultMapChartConfig = {
   departmentsData: [],
   excludedFeatureCodes: [],
   drawRectangleAroundSelection: false,
+  sendsNotifications: true,
   featureIDAccessor: function (feature) {
     if (feature.id) return feature.id;
     if (feature.properties && feature.properties.id) return feature.properties.id;

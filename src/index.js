@@ -40,7 +40,7 @@ import "./js/data/datasets.controller.update";
 import "./js/dataview/dataview.date";
 import "./js/dataview/dataview.date.combined.stacks";
 import "./js/dataview/dataview.plot";
-import "./js/dataview/dataview.map";
+import "./js/dataview/dataview.location";
 import {UrlParameters} from "./js/shared/url.parameters";
 import {GlobalConfig} from "./js/shared/config";
 import {debug} from "./js/shared/debug";

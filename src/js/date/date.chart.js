@@ -29,9 +29,9 @@ const defaultConfig = {
   }
 };
 
-/**¬
+/**
  *
- * @class Diachronic Chart Component
+ * @class DateChart
  * @extends Chart
  */
 export class DateChart extends Chart {
@@ -77,6 +77,14 @@ export class DateChart extends Chart {
   }
 
   /**
+   * Removes all `svg`s from the parental element.
+   * @override
+   */
+  remove() {
+    this.element.selectAll('svg').remove();
+  }
+
+  /**
    * @override
    */
   precalculate() {
@@ -84,14 +92,6 @@ export class DateChart extends Chart {
     let margin = config.margin;
     this.graphWidth = config.width - margin.left - margin.right;
     this.graphHeight = config.height - margin.top - margin.bottom;
-    this.precalculateHelpData();
-    this.createScales();
-  }
-
-  /**
-   * Tells the receiving map chart that its `datasets` property did change.
-   */
-  precalculateHelpData() {
     if (!this.datasetController) return;
     let groupSize = this.config.groupSize || 1;
 
@@ -100,6 +100,7 @@ export class DateChart extends Chart {
     } else {
       this.dataview = this.datasetController.getDateDataview(groupSize);
     }
+    this.createScales();
   }
 
   /**
@@ -128,14 +129,6 @@ export class DateChart extends Chart {
       .nice()
       .rangeRound([config.height - margin.bottom, margin.top]);
 
-  }
-
-  /**
-   * Removes all `svg`s from the parental element.
-   * @override
-   */
-  remove() {
-    this.element.selectAll('svg').remove();
   }
 
   /**
