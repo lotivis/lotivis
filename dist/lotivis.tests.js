@@ -299,9 +299,13 @@ function flatDataset(dataset) {
     return flatData;
   }
   dataset.data.forEach(item => {
-    let newItem = copy(item);
+    let newItem = {};
     newItem.dataset = dataset.label;
-    newItem.stack = dataset.stack;
+    newItem.stack = item.stack;
+    newItem.location = item.location;
+    newItem.date = item.date;
+    newItem.dateNumeric = item.dateNumeric;
+    newItem.value = item.value;
     flatData.push(newItem);
   });
   return flatData;
@@ -668,9 +672,7 @@ function sumOfStack(flatData, stack) {
  * @returns {*}
  */
 function sumOfValues(flatData) {
-  return flatData
-    .map(item => +(item.value || 0))
-    .reduce((acc, next) => acc + next, 0);
+  return flatData.map(item => +(item.value || 0)).reduce((acc, next) => acc + next, 0);
 }
 
 /**
@@ -703,7 +705,7 @@ function dateToItemsRelation(datasets, dateAccess) {
         datasetDate.total = entry.dateTotal;
       });
 
-    // add zero values for empty datasets
+    // addDataset zero values for empty datasets
     for (let index = 0; index < listOfLabels.length; index++) {
       let label = listOfLabels[index];
       if (!datasetDate[label]) {
@@ -833,11 +835,18 @@ class GeoJSONValidateError extends LotivisError {
   // }
 }
 
+class LotivisUnimplementedMethodError extends LotivisError {
+  constructor(functionName) {
+    super(`Subclasses must override function '${functionName}'.`);
+  }
+}
+
 exports.LotivisError = LotivisError;
 exports.DataValidateError = DataValidateError;
 exports.MissingPropertyError = MissingPropertyError;
 exports.InvalidFormatError = InvalidFormatError;
 exports.GeoJSONValidateError = GeoJSONValidateError;
+exports.LotivisUnimplementedMethodError = LotivisUnimplementedMethodError;
 
 /**
  * Controls a collection of datasets.
@@ -852,9 +861,16 @@ class DatasetsController {
    */
   constructor(datasets, config) {
     if (!Array.isArray(datasets)) throw new InvalidFormatError();
-    this.config = config || {};
-    this.dateAccess = this.config.dateAccess || DefaultDateAccess;
+    this.initialize(config || {});
     this.setDatasets(datasets);
+  }
+
+  initialize(config) {
+    this.config = config;
+    this.dateAccess = this.config.dateAccess || DefaultDateAccess;
+    this.locationFilters = this.config.locationFilters || [];
+    this.dateFilters = this.config.dateFilters || [];
+    this.datasetFilters = this.config.datasetFilters || [];
   }
 
   getFlatDataCombinedStacks() {
@@ -913,17 +929,19 @@ class DatasetsController {
 
 /**
  * Appends the given listener to the collection of listeners.
- * @param listener The listener to add.
+ * @param listener The listener to addDataset.
  */
 DatasetsController.prototype.addListener = function (listener) {
   if (!this.listeners) this.listeners = [];
+  if (!listener.update) return lotivis_log();
   if (this.listeners.includes(listener)) return lotivis_log();
   this.listeners.push(listener);
+  listener.update(this, DatasetsController.NotificationReason.registration);
 };
 
 /**
  * Removes the given listener from the collection of listeners.
- * @param listener The listener to remove.
+ * @param listener The listener to removeDataset.
  */
 DatasetsController.prototype.removeListener = function (listener) {
   if (!this.listeners) return;
@@ -937,7 +955,7 @@ DatasetsController.prototype.removeListener = function (listener) {
  * @param reason The reason to send to the listener.  Default is 'none'.
  */
 DatasetsController.prototype.notifyListeners = function (reason = DatasetsController.NotificationReason.none) {
-  if (!this.listeners) return lotivis_log();
+  if (!this.listeners) return;
   for (let index = 0; index < this.listeners.length; index++) {
     let listener = this.listeners[index];
     if (!listener.update) continue;
@@ -953,13 +971,15 @@ DatasetsController.prototype.register = function (listeners) {
   if (!Array.isArray(listeners)) return;
   for (let index = 0; index < listeners.length; index++) {
     let listener = listeners[index];
-    if (!listener.setDatasetController) continue;
-    listener.setDatasetController(this);
+    if (!listener.setDatasetsController) continue;
+    listener.setDatasetsController(this);
   }
 };
 
 DatasetsController.NotificationReason = {
   none: 'none',
+  registration: 'registration',
+  datasetsSet: 'datasets-set',
   datasetsUpdate: 'datasets-update',
   filterDataset: 'dataset-filter',
   filterDates: 'dates-filter',
@@ -1010,9 +1030,9 @@ DatasetsController.prototype.setLocationsFilter = function (locations) {
   if (objectsEqual(this.locationFilters, stringVersions)) {
     return lotivis_log();
   }
-  this.resetFilters(false);
+  // this.resetFilters(false);
   this.locationFilters = stringVersions;
-  this.notifyListeners(DatasetsController.NotificationReason.locationFilters);
+  this.notifyListeners(DatasetsController.NotificationReason.filterLocations);
 };
 
 /**
@@ -1024,9 +1044,9 @@ DatasetsController.prototype.setDatesFilter = function (dates) {
   if (objectsEqual(this.dateFilters, stringVersions)) {
     return lotivis_log();
   }
-  this.resetFilters(false);
+  // this.resetFilters(false);
   this.dateFilters = stringVersions;
-  this.notifyListeners(DatasetsController.NotificationReason.dateFilters);
+  this.notifyListeners(DatasetsController.NotificationReason.filterDates);
 };
 
 /**
@@ -1038,7 +1058,7 @@ DatasetsController.prototype.setDatasetsFilter = function (datasets) {
   if (objectsEqual(this.datasetFilters, stringVersions)) {
     return lotivis_log();
   }
-  this.resetFilters(false);
+  // this.resetFilters(false);
   this.datasetFilters = stringVersions;
   this.notifyListeners(DatasetsController.NotificationReason.filterDataset);
 };
@@ -1182,16 +1202,6 @@ class DatasetsColorsController {
 }
 
 /**
- * Updates the datasets of this controller.
- * @param datasets The new datasets.
- */
-DatasetsController.prototype.setDatasets = function (datasets) {
-  this.originalDatasets = datasets;
-  this.datasets = copy(datasets);
-  this.update();
-};
-
-/**
  *
  */
 DatasetsController.prototype.update = function () {
@@ -1220,17 +1230,27 @@ DatasetsController.prototype.update = function () {
   //   return Date.parse(date);
   // };
 
-  this.locationFilters = [];
-  this.dateFilters = [];
-  this.datasetFilters = [];
+  // this.locationFilters = [];
+  // this.dateFilters = [];
+  // this.datasetFilters = [];
   this.notifyListeners(DatasetsController.NotificationReason.datasetsUpdate);
+};
+
+/**
+ * Updates the datasets of this controller.
+ * @param datasets The new datasets.
+ */
+DatasetsController.prototype.setDatasets = function (datasets) {
+  this.originalDatasets = datasets;
+  this.datasets = copy(datasets);
+  this.update();
 };
 
 /**
  * Appends the given dataset to this controller.
  * @param additionalDataset The dataset to append.
  */
-DatasetsController.prototype.add = function (additionalDataset) {
+DatasetsController.prototype.addDataset = function (additionalDataset) {
   if (this.datasets.find(dataset => dataset.label === additionalDataset.label)) {
     throw new Error(`DatasetsController already contains a dataset with the same label (${additionalDataset.label}).`);
   }
@@ -1241,10 +1261,9 @@ DatasetsController.prototype.add = function (additionalDataset) {
 /**
  * Removes the dataset with the given label from this controller. Will do nothing if no dataset
  * with the given label exists.
- *
- * @param label The label of the dataset to remove.
+ * @param label The label of the dataset to removeDataset.
  */
-DatasetsController.prototype.remove = function (label) {
+DatasetsController.prototype.removeDataset = function (label) {
   if (!this.datasets || !Array.isArray(this.datasets)) return;
   let candidate = this.datasets.find(dataset => dataset.label === label);
   if (!candidate) return;
@@ -1437,7 +1456,7 @@ DatasetsController.prototype.getPlotDataview = function () {
 };
 
 /**
- * Returns a new generated location dataview for the current selected data of datasets of this controller.
+ * Returns a new generated location dataview for the current selected datasets.controller of datasets of this controller.
  *
  * A location dataview has the following form:
  * ```
@@ -1463,6 +1482,10 @@ DatasetsController.prototype.getLocationDataview = function () {
 
   dataview.stacks = this.stacks;
   dataview.combinedData = combinedByLocation;
+
+  dataview.combinedData.forEach(item => {
+    item.stack = item.stack || item.label || item.dataset;
+  });
 
   return dataview;
 };
@@ -1526,8 +1549,6 @@ function createGeoJSON(datasets) {
       coordinates.push([lat, lng + lngSpan]);
       coordinates.push([lat + latSpan, lng + lngSpan]);
 
-      console.log('location', location);
-
       let feature = {
         type: 'Feature',
         id: location,
@@ -1552,8 +1573,6 @@ function createGeoJSON(datasets) {
     type: "FeatureCollection",
     features: features
   };
-
-  console.log(geoJSON);
 
   return geoJSON;
 }
@@ -1670,8 +1689,8 @@ function validateDataset(dataset) {
 }
 
 /**
- * Validates the given data item by ensuring it has a valid `date`, `location` and `value` property value.
- * @param item The data item to validate.
+ * Validates the given datasets.controller item by ensuring it has a valid `date`, `location` and `value` property value.
+ * @param item The datasets.controller item to validate.
  * @throws MissingPropertyError
  */
 function validateDataItem(item) {

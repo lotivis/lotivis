@@ -1,35 +1,21 @@
-import {Popup} from "../components/popup";
 import {Checkbox} from "../components/checkbox";
 import {UrlParameters} from "../shared/url.parameters";
+import {SettingsPopup} from "../components/settings.popup";
 
 /**
  * A popup presenting a settings panel for a map chart.
  *
  * @class MapChartSettingsPopup
- * @extends Popup
+ * @extends SettingsPopup
  */
-export class MapChartSettingsPopup extends Popup {
+export class MapChartSettingsPopup extends SettingsPopup {
 
   /**
    * Injects the elements of the settings panel.
    * @override
    */
   inject() {
-    this.card.setCardTitle('Settings');
-    this.card.content.classed('lotivis-card-body-settings', true);
-    this.row = this
-      .card
-      .content
-      .append('div')
-      .classed('row', true);
-
-    this.renderShowLabelsCheckbox();
-  }
-
-  /**
-   * Injects a checkbox to toggle the visibility of the labels of the map chart.
-   */
-  renderShowLabelsCheckbox() {
+    super.inject();
     let container = this.row.append('div').classed('col-12', true);
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText('Labels');
@@ -38,15 +24,6 @@ export class MapChartSettingsPopup extends Popup {
       this.mapChart.update();
       UrlParameters.getInstance().setWithoutDeleting('map-show-labels', checked);
     }.bind(this);
-  }
-
-  /**
-   * Returns the preferred size for this popup.
-   * @override
-   * @returns {{width: number, height: number}}
-   */
-  preferredSize() {
-    return {width: 240, height: 600};
   }
 
   /**

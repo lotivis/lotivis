@@ -1,34 +1,24 @@
-import {Popup} from "../components/popup";
 import {Checkbox} from "../components/checkbox";
 import {UrlParameters} from "../shared/url.parameters";
 import {Dropdown} from "../components/dropdown";
 import {Option} from "../components/option";
 import {PlotChartSort} from "./plot.chart.sort";
+import {SettingsPopup} from "../components/settings.popup";
 
 /**
  *
  * @class PlotChartSettingsPopup
- * @extends Popup
+ * @extends SettingsPopup
  */
-export class PlotChartSettingsPopup extends Popup {
+export class PlotChartSettingsPopup extends SettingsPopup {
 
   /**
    * Appends the headline and the content row of the popup.
    */
   inject() {
-    this.card.setCardTitle('Settings');
-    this.card.content.classed('lotivis-card-body-settings', true);
-    this.row = this.card.content
-      .append('div')
-      .classed('lotivis-row', true);
-    this.renderShowLabelsCheckbox();
-  }
+    super.inject();
 
-  /**
-   * Appends the checkboxes the popups content.
-   */
-  renderShowLabelsCheckbox() {
-    let container = this.row.append('div').classed('lotivis-col-12', true);
+    let container = this.row.append('div');
 
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText('Labels');
@@ -38,7 +28,7 @@ export class PlotChartSettingsPopup extends Popup {
       UrlParameters.getInstance().set(UrlParameters.chartShowLabels, checked);
     }.bind(this);
 
-    let dropdownContainer = this.row.append('div').classed('lotivis-col-12', true);
+    let dropdownContainer = this.row.append('div');
     this.sortDropdown = new Dropdown(dropdownContainer);
     this.sortDropdown.setLabelText('Sort');
     this.sortDropdown.setOptions([
@@ -51,14 +41,6 @@ export class PlotChartSettingsPopup extends Popup {
       this.chart.sort = value;
       this.chart.update();
     }.bind(this));
-  }
-
-  /**
-   * Returns the preferred size of the popup.
-   * @returns {{width: number, height: number}}
-   */
-  preferredSize() {
-    return {width: 240, height: 600};
   }
 
   /**

@@ -5,6 +5,11 @@ import {Button} from './button';
 
 /**
  * A lotivis popup.
+ *
+ * +----------------------------------------------------------------+
+ * |                                                                |
+ * |                                                                |
+ *
  * @class Popup
  * @extends Component
  */
@@ -14,7 +19,7 @@ export class Popup extends Component {
    * Creates a new instance of Popup.
    * @param parent The parental component.
    */
-  constructor(parent) {
+  constructor(parent = d3.select('body')) {
     super(parent);
     this.injectUnderground(parent);
     this.injectContainer();
@@ -28,7 +33,6 @@ export class Popup extends Component {
 
   /**
    * Appends components to this popup.
-   *
    * Should be overridden by subclasses.
    */
   inject() {

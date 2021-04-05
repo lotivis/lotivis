@@ -12,19 +12,19 @@ export class ChartCard extends Card {
 
   /**
    * Creates a new instance of ChartCard.
-   *
    * @param parent The parental component.
    * @param config The configuration
    */
   constructor(parent, config) {
     super(parent);
+    this.chart = null;
     this.config = config;
     this.injectButtons();
     this.injectRadioGroup();
     this.injectChart();
 
     let cardSelector = this.selector;
-    this.setCardTitle((config && config.title) ? config.title : (cardSelector || 'No Title'));
+    this.setTitle((config && config.title) ? config.title : (cardSelector || 'No Title'));
   }
 
   /**
@@ -42,16 +42,12 @@ export class ChartCard extends Card {
     this.screenshotButton = new Button(this.headerRightComponent);
     this.screenshotButton.setText('Screenshot');
     this.screenshotButton.element.classed('simple-button', true);
-    this.screenshotButton.onClick = function (event) {
-      this.screenshotButtonAction(event);
-    }.bind(this);
+    this.screenshotButton.onClick = this.screenshotButtonAction.bind(this);
 
     this.moreButton = new Button(this.headerRightComponent);
     this.moreButton.setText('More');
     this.moreButton.element.classed('simple-button', true);
-    this.moreButton.onClick = function (event) {
-      this.presentSettingsPopupAction(event);
-    }.bind(this);
+    this.moreButton.onClick = this.presentSettingsPopupAction.bind(this);
   }
 
   /**

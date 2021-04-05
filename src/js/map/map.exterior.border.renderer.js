@@ -1,4 +1,4 @@
-import {joinFeatures} from "../geojson.juggle/join.features";
+import {joinFeatures} from "../geojson/join.features";
 import {lotivis_log, lotivis_log_once} from "../shared/debug";
 
 /**

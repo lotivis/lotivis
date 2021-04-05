@@ -1,4 +1,4 @@
-import {DatasetsController} from "../data/datasets.controller";
+import {DatasetsController} from "../datasets.controller/datasets.controller";
 import {dateToItemsRelation} from "../data.juggle/data.relations";
 import {createStackModel} from "../data.juggle/data.stacks";
 import {copy} from "../shared/copy";

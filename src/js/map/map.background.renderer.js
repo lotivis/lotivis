@@ -16,7 +16,8 @@ export class MapBackgroundRenderer {
       let filters = controller.locationFilters;
       if (!filters || filters.length === 0) return;
       mapChart.updateSensible = false;
-      controller.setLocationsFilter([]);
+      // controller.setLocationsFilter([]);
+      controller.resetFilters();
       mapChart.updateSensible = true;
     }
 

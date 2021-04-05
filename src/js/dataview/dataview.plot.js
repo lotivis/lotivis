@@ -1,4 +1,4 @@
-import {DatasetsController} from "../data/datasets.controller";
+import {DatasetsController} from "../datasets.controller/datasets.controller";
 import {copy} from "../shared/copy";
 import {
   extractDatesFromDatasets,

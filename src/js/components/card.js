@@ -19,12 +19,18 @@ export class Card extends Component {
     this.injectFooter();
   }
 
+  /**
+   * Appends the card element.
+   */
   injectCard() {
     this.element = this.parent
       .append('div')
       .classed('lotivis-card', true);
   }
 
+  /**
+   * Appends the header of the card.
+   */
   injectHeader() {
     this.header = this.element
       .append('div')
@@ -46,6 +52,9 @@ export class Card extends Component {
       .attr('class', 'lotivis-title-label');
   }
 
+  /**
+   * Appends the body of the card.
+   */
   injectBody() {
     this.body = this.element
       .append('div')
@@ -55,6 +64,9 @@ export class Card extends Component {
       .attr('class', 'lotivis-card-body-content');
   }
 
+  /**
+   * Appends the footer of the card.
+   */
   injectFooter() {
     this.footer = this.element
       .append('div')
@@ -72,9 +84,10 @@ export class Card extends Component {
   }
 
   /**
+   * Sets the text of the title label.
    * @param newTitle The text of the title label.
    */
-  setCardTitle(newTitle) {
+  setTitle(newTitle) {
     this.titleLabel.text(newTitle);
   }
 

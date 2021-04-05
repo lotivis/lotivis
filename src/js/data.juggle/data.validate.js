@@ -45,8 +45,8 @@ export function validateDataset(dataset) {
 }
 
 /**
- * Validates the given data item by ensuring it has a valid `date`, `location` and `value` property value.
- * @param item The data item to validate.
+ * Validates the given datasets.controller item by ensuring it has a valid `date`, `location` and `value` property value.
+ * @param item The datasets.controller item to validate.
  * @throws MissingPropertyError
  */
 export function validateDataItem(item) {

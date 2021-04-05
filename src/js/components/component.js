@@ -1,5 +1,5 @@
-import {createID} from "../shared/selector";
-import {LotivisError, ElementNotFoundError} from "../data.juggle/data.validate.error";
+import {camel2title, createID} from "../shared/selector";
+import {LotivisError, LotivisElementNotFoundError} from "../data.juggle/data.validate.error";
 
 /**
  * A lotivis component.
@@ -9,21 +9,41 @@ export class Component {
 
   /**
    * Creates a new instance of Component.
-   * @param parent
+   * @param {Component|string|{}} parent The parental component or selector.
    */
   constructor(parent) {
     if (!parent) throw new LotivisError('No parent or selector specified.');
-    if (typeof parent === 'string') {
+    if (Object.getPrototypeOf(parent) === String.prototype) {
       this.initializeFromSelector(parent);
+    } else if (Object.getPrototypeOf(parent) === Object.prototype) {
+      this.initializeFromConfig(parent);
     } else {
       this.initializeFromParent(parent);
     }
+    this.element = undefined;
   }
 
+  /**
+   * Initializes this component from the given selector string.
+   * @param selector The selector of the parental
+   */
   initializeFromSelector(selector) {
     this.selector = selector;
     this.parent = d3.select('#' + selector);
-    if (this.parent.empty()) throw new ElementNotFoundError(selector);
+    if (this.parent.empty()) throw new LotivisElementNotFoundError(selector);
+  }
+
+  initializeFromConfig(config) {
+    this.config = config;
+    if (config.selector) {
+      this.initializeFromSelector(config.selector);
+    } else {
+      let selector = camel2title(this.constructor.name)
+        .toLowerCase()
+        .trim()
+        .replaceAll(' ', '-');
+      this.initializeFromSelector(selector);
+    }
   }
 
   initializeFromParent(parent) {
@@ -36,11 +56,13 @@ export class Component {
   show() {
     if (!this.element) return;
     this.element.style('display', '');
+    return this;
   }
 
   hide() {
     if (!this.element) return;
     this.element.style('display', 'none');
+    return this;
   }
 
   get isVisible() {
@@ -56,12 +78,22 @@ export class Component {
   }
 
   getElementPosition() {
-    if (!this.element) return [0, 0];
     let element = document.getElementById(this.selector);
     if (!element) return [0, 0];
     let rect = element.getBoundingClientRect();
     let xPosition = rect.x + window.scrollX;
     let yPosition = rect.y + window.scrollY;
     return [xPosition, yPosition];
+  }
+
+  /**
+   * Returns a string representation of this Component.
+   * @returns {string} A string representing this Component.
+   */
+  toString() {
+    let components = [this.constructor.name];
+    if (this.selector) components.push(`'${this.selector}'`);
+    // if (this.config) components.push(`config='${JSON.stringify(this.config)}'`);s
+    return `[${components.join(' ')}]`;
   }
 }

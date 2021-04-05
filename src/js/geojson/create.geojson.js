@@ -29,8 +29,6 @@ export function createGeoJSON(datasets) {
       coordinates.push([lat, lng + lngSpan]);
       coordinates.push([lat + latSpan, lng + lngSpan]);
 
-      console.log('location', location);
-
       let feature = {
         type: 'Feature',
         id: location,
@@ -55,8 +53,6 @@ export function createGeoJSON(datasets) {
     type: "FeatureCollection",
     features: features
   };
-
-  console.log(geoJSON);
 
   return geoJSON;
 }

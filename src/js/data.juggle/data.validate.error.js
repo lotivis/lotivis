@@ -5,7 +5,7 @@ export class LotivisError extends Error {
   }
 }
 
-export class ElementNotFoundError extends LotivisError {
+export class LotivisElementNotFoundError extends LotivisError {
   constructor(selector) {
     super(`Can't find an element with ID '${selector}'.`);
   }
@@ -36,8 +36,15 @@ export class GeoJSONValidateError extends LotivisError {
   // }
 }
 
+export class LotivisUnimplementedMethodError extends LotivisError {
+  constructor(functionName) {
+    super(`Subclasses must override function '${functionName}'.`);
+  }
+}
+
 exports.LotivisError = LotivisError;
 exports.DataValidateError = DataValidateError;
 exports.MissingPropertyError = MissingPropertyError;
 exports.InvalidFormatError = InvalidFormatError;
 exports.GeoJSONValidateError = GeoJSONValidateError;
+exports.LotivisUnimplementedMethodError = LotivisUnimplementedMethodError;

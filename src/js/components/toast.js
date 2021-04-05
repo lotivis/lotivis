@@ -1,4 +1,5 @@
 import {Component} from "./component";
+import {Button} from "./button";
 
 /**
  * A toast in the top of the page.
@@ -18,9 +19,20 @@ export class Toast extends Component {
     this.element = this
       .parent
       .append('div')
+      .attr('class', 'lotivis-data-card-status-tooltip')
       .style('opacity', 0)
-      .style('display', `none`)
-      .attr('class', 'lotivis-data-card-status-tooltip');
+      .style('display', `none`);
+    this.row = this.element
+      .append('div')
+      .attr('class', 'lotivis-row');
+    this.leftComponnt = this.row
+      .append('div')
+      .attr('class', 'lotivis-col-6');
+    this.rightComponent = this.row
+      .append('div')
+      .attr('class', 'lotivis-col-6');
+    this.hideButton = new Button(this.rightComponent)
+      .setText(`Hello`);
   }
 
   /**
@@ -30,6 +42,7 @@ export class Toast extends Component {
   show() {
     super.show();
     this.element.style('opacity', 1);
+    return this;
   }
 
   /**
@@ -54,7 +67,7 @@ export class Toast extends Component {
    * @param newStatusMessage The new status message.
    */
   setStatusMessage(newStatusMessage) {
-    let saveString = String(newStatusMessage).trim();
+    let saveString = String(newStatusMessage || "").trim();
     this.element.text(saveString);
     if (saveString) {
       this.show();

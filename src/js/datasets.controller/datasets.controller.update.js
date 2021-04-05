@@ -10,16 +10,6 @@ import {
 import {DatasetsColorsController} from "./datasets.controller.colors";
 
 /**
- * Updates the datasets of this controller.
- * @param datasets The new datasets.
- */
-DatasetsController.prototype.setDatasets = function (datasets) {
-  this.originalDatasets = datasets;
-  this.datasets = copy(datasets);
-  this.update();
-};
-
-/**
  *
  */
 DatasetsController.prototype.update = function () {
@@ -48,17 +38,27 @@ DatasetsController.prototype.update = function () {
   //   return Date.parse(date);
   // };
 
-  this.locationFilters = [];
-  this.dateFilters = [];
-  this.datasetFilters = [];
+  // this.locationFilters = [];
+  // this.dateFilters = [];
+  // this.datasetFilters = [];
   this.notifyListeners(DatasetsController.NotificationReason.datasetsUpdate);
+};
+
+/**
+ * Updates the datasets of this controller.
+ * @param datasets The new datasets.
+ */
+DatasetsController.prototype.setDatasets = function (datasets) {
+  this.originalDatasets = datasets;
+  this.datasets = copy(datasets);
+  this.update();
 };
 
 /**
  * Appends the given dataset to this controller.
  * @param additionalDataset The dataset to append.
  */
-DatasetsController.prototype.add = function (additionalDataset) {
+DatasetsController.prototype.addDataset = function (additionalDataset) {
   if (this.datasets.find(dataset => dataset.label === additionalDataset.label)) {
     throw new Error(`DatasetsController already contains a dataset with the same label (${additionalDataset.label}).`);
   }
@@ -69,10 +69,9 @@ DatasetsController.prototype.add = function (additionalDataset) {
 /**
  * Removes the dataset with the given label from this controller. Will do nothing if no dataset
  * with the given label exists.
- *
- * @param label The label of the dataset to remove.
+ * @param label The label of the dataset to removeDataset.
  */
-DatasetsController.prototype.remove = function (label) {
+DatasetsController.prototype.removeDataset = function (label) {
   if (!this.datasets || !Array.isArray(this.datasets)) return;
   let candidate = this.datasets.find(dataset => dataset.label === label);
   if (!candidate) return;

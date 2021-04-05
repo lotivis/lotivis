@@ -41,7 +41,7 @@ export class MapGeoJSONRenderer {
       if (!geoJSON) return lotivis_log('[lotivis]  No GeoJSON to render.');
       let idAccessor = mapChart.config.featureIDAccessor;
 
-      lotivis_log('geoJSON', geoJSON);
+      // lotivis_log('geoJSON', geoJSON);
 
       mapChart.areas = mapChart.svg
         .selectAll('path')

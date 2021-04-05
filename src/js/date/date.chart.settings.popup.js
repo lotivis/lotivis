@@ -1,52 +1,47 @@
-import {Popup} from "../components/popup";
 import {Checkbox} from "../components/checkbox";
 import {RadioGroup} from "../components/radio.group";
 import {UrlParameters} from "../shared/url.parameters";
 import {Option} from "../components/option";
+import {SettingsPopup} from "../components/settings.popup";
 
 /**
  *
  * @class DateChartSettingsPopup
- * @extends Popup
+ * @extends SettingsPopup
  */
-export class DateChartSettingsPopup extends Popup {
+export class DateChartSettingsPopup extends SettingsPopup {
 
   inject() {
-    this.card.setCardTitle('Settings');
-    this.card.content.classed('lotivis-card-body-settings', true);
-    this.row = this.card.content
-      .append('div')
-      .classed('row', true);
-
+    super.inject();
     this.injectShowLabelsCheckbox();
     this.injectCombineStacksCheckbox();
     this.injectRadios();
   }
 
   injectShowLabelsCheckbox() {
-    let container = this.row.append('div').classed('col-12', true);
+    let container = this.row.append('div');
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText('Labels');
     this.showLabelsCheckbox.onClick = function (checked) {
-      this.diachronicChart.config.showLabels = checked;
-      this.diachronicChart.update();
+      this.chart.config.showLabels = checked;
+      this.chart.update();
       UrlParameters.getInstance().set(UrlParameters.chartShowLabels + this.selector, checked);
     }.bind(this);
   }
 
   injectCombineStacksCheckbox() {
-    let container = this.row.append('div').classed('col-12', true);
+    let container = this.row.append('div');
     this.combineStacksCheckbox = new Checkbox(container);
     this.combineStacksCheckbox.setText('Combine Stacks');
     this.combineStacksCheckbox.onClick = function (checked) {
-      this.diachronicChart.config.combineStacks = checked;
-      this.diachronicChart.update();
+      this.chart.config.combineStacks = checked;
+      this.chart.update();
       UrlParameters.getInstance().set(UrlParameters.chartCombineStacks + this.selector, checked);
     }.bind(this);
   }
 
   injectRadios() {
-    let container = this.row.append('div').classed('col-12', true);
+    let container = this.row.append('div');
     this.typeRadioGroup = new RadioGroup(container);
     this.typeRadioGroup.setOptions([
       new Option('bar', 'Bar'),
@@ -54,28 +49,17 @@ export class DateChartSettingsPopup extends Popup {
     ]);
 
     this.typeRadioGroup.onChange = function (value) {
-      this.diachronicChart.type = value;
-      this.diachronicChart.update();
+      this.chart.type = value;
+      this.chart.update();
       UrlParameters.getInstance().set(UrlParameters.chartType + this.selector, value);
     }.bind(this);
   }
 
-  preferredSize() {
-    return {
-      width: 240,
-      height: 600
-    };
-  }
-
   willShow() {
-    this.loadValues();
-  }
-
-  loadValues() {
-    this.showLabelsCheckbox.setChecked(this.diachronicChart.isShowLabels);
+    this.showLabelsCheckbox.setChecked(this.chart.config.showLabels);
     // console.log('this.diachronicChart.showLabels: ' + this.diachronicChart.isShowLabels);
-    this.combineStacksCheckbox.setChecked(this.diachronicChart.isCombineStacks);
+    this.combineStacksCheckbox.setChecked(this.chart.config.combineStacks);
     // console.log('this.diachronicChart.combineGroups: ' + this.diachronicChart.isCombineStacks);
-    this.typeRadioGroup.setSelectedOption(this.diachronicChart.type);
+    this.typeRadioGroup.setSelectedOption(this.chart.type);
   }
 }

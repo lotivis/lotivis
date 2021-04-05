@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
+  <link rel="stylesheet" href="../css/lotivis.css"/>
+  <title>Lotivis Examples - Datasets Controller</title>
+</head>
+<body>
+
+<div class="lotivis-container-full">
+  <div class="lotivis-row">
+    <div class="lotivis-col-2">
+      <a class="lotivis-anchor-back" href="../index.html">
+        Back
+      </a>
+    </div>
+    <div class="lotivis-col-8 lotivis-headline">
+      <h1>Datasets Controller</h1>
+    </div>
+    <div class="lotivis-col-2">
+      <!-- Empty-->
+    </div>
+    <div class="lotivis-col-4">
+      <div id="locations-filter-card">
+        <!-- Locations Filter Card Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-4">
+      <div id="dates-filter-card">
+        <!-- Dates Filter Card Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-4">
+      <div id="datasets-filter-card">
+        <!-- Datasets Filter Card Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-4">
+      <div id="datasets-json-card">
+        <!-- Datasets JSON Card Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-3">
+      <div id="dataview-datasets-controller-card">
+        <!-- Dataview Datasets Controller Card Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-3">
+      <div id="dataview-datasets-controller-selection-card">
+        <!-- Dataview Datasets Controller Selection Card Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-2">
+      <div id="dataview-flat-card">
+        <!-- Dataview Datasets Controller Selection Card Here -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.js"></script>
+<script src="../js/lotivis.js"></script>
+
+<script>
+
+  lotivis.debug(true);
+
+  class LocationsFilterCard extends lotivis.EditableDataviewCard {
+
+    datasetsToText(datasets) {
+      if (!this.datasetsController) return '';
+      return this.datasetsController.locationFilters.join(',');
+    }
+
+    textToDatasets(text) {
+      if (!this.datasetsController) return '';
+      this.datasetsController.setLocationsFilter(text.split(',').map(item => item.trim()));
+    }
+  }
+
+  class DatesFilterCard extends lotivis.EditableDataviewCard {
+
+    datasetsToText() {
+      if (!this.datasetsController) return '';
+      return this.datasetsController.dateFilters.join(',');
+    }
+
+    textToDatasets(text) {
+      if (!this.datasetsController) return '';
+      this.datasetsController.setDatesFilter(text.split(',').map(item => item.trim()));
+    }
+  }
+
+  class DatasetsFilterCard extends lotivis.EditableDataviewCard {
+
+    datasetsToText(datasets) {
+      if (!this.datasetsController) return '';
+      return this.datasetsController.datasetFilters.join(',');
+    }
+
+    textToDatasets(text) {
+      if (!this.datasetsController) return '';
+      this.datasetsController.setDatasetsFilter(text.split(',').map(item => item.trim()));
+    }
+  }
+
+  let datasetsJSONCard = new lotivis.DatasetsJSONCard({lines: 400, updateSensible: false});
+  let dataviewDatasetsControllerCard = new lotivis.DataviewDatasetsControllerCard({lines: 400});
+  let dataviewDatasetsControllerSelectionCard = new lotivis.DataviewDatasetsControllerSelectionCard({lines: 400});
+  let dataviewFlatCard = new lotivis.DataviewFlatCard({lines: 400});
+  let locationsFilterCard = new LocationsFilterCard({title: 'Location Filters', lines: 1});
+  let datesFilterCard = new DatesFilterCard({title: 'Date Filters', lines: 1});
+  let datasetsFilterCard = new DatasetsFilterCard({title: 'Label Filters', lines: 1});
+  let controller = new lotivis.DatasetController([], {dateAccess: lotivis.FormattedDateAccess});
+
+  controller.register([
+    datasetsJSONCard,
+    dataviewDatasetsControllerCard,
+    dataviewDatasetsControllerSelectionCard,
+    locationsFilterCard,
+    datesFilterCard,
+    datasetsFilterCard,
+    dataviewFlatCard
+  ]);
+
+  controller.setLocationsFilter([1, 2]);
+  controller.setDatesFilter(['2002/02/02']);
+  controller.setDatasetsFilter(['dataset_1', 'dataset_2']);
+
+  datasetsJSONCard.setTextareaContent(`[
+  {
+    "label": "dataset_1",
+    "data": [
+      {"location": 1, "date": "2002/02/02", "value": 2},
+      {"location": 1, "date": "2002/01/01", "value": 1},
+      {"location": 2, "date": "2002/04/04", "value": 4},
+      {"location": 2, "date": "2002/03/03", "value": 3}
+    ]
+  },
+  {
+    "label": "dataset_2",
+    "data": [
+      {"location": 1, "date": "2002/02/04", "value": 2},
+      {"location": 1, "date": "2002/01/05", "value": 1},
+      {"location": 3, "date": "2002/05/04", "value": 4},
+      {"location": 3, "date": "2002/05/03", "value": 3}
+    ]
+  },
+  {
+    "label": "dataset_3",
+    "data": [
+      {"location": 3, "date": "2002/02/02", "value": 2},
+      {"location": 3, "date": "2002/01/01", "value": 1},
+      {"location": 2, "date": "2002/04/04", "value": 4},
+      {"location": 2, "date": "2002/03/03", "value": 3}
+    ]
+  }
+]
+`);
+  datasetsJSONCard.updateDatasetsOfController(true);
+
+  locationsFilterCard.config.updateSensible = false;
+  datesFilterCard.config.updateSensible = false;
+  datasetsFilterCard.config.updateSensible = false;
+
+</script>
+
+</body>
+</html>

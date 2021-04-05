@@ -9,14 +9,17 @@ body {
   text-decoration: none;
   color: #333;
 }
-.lotivis-container a:hover, .lotivis-container a:visited:hover, .lotivis-container-full a:hover, .lotivis-container-full a:visited:hover {
+.lotivis-container a:hover, .lotivis-container a:visited:hover, .lotivis-container a.lotivis-anchor-back:hover, .lotivis-container a.lotivis-anchor-back:visited:hover, .lotivis-container-full a:hover, .lotivis-container-full a:visited:hover, .lotivis-container-full a.lotivis-anchor-back:hover, .lotivis-container-full a.lotivis-anchor-back:visited:hover {
   color: dodgerblue;
 }
 .lotivis-container a:active, .lotivis-container-full a:active {
   opacity: 0.6;
 }
-
-.lotivis-anchor-back::before {
+.lotivis-container a.lotivis-anchor-back, .lotivis-container-full a.lotivis-anchor-back {
+  font-size: 25px;
+  color: #999999;
+}
+.lotivis-container a.lotivis-anchor-back::before, .lotivis-container-full a.lotivis-anchor-back::before {
   content: "←";
   margin: 0 5px 0 0;
 }
@@ -140,6 +143,10 @@ button.lotivis-button-round:active {
 .lotivis-card-body .lotivis-card-body-settings {
   margin: 10px;
 }
+.lotivis-card-body .lotivis-card-body-settings div {
+  display: block;
+  line-height: 1.2;
+}
 
 .lotivis-card-footer {
   padding: 10px;
@@ -149,6 +156,10 @@ button.lotivis-button-round:active {
 .no-padding {
   padding: 0 !important;
   margin: 0 !important;
+}
+
+.lotivis-disabled {
+  opacity: 0.6;
 }
 
 .text-center {
@@ -193,7 +204,7 @@ button.lotivis-button-round:active {
 
 .lotivis-headline {
   text-align: center;
-  margin-bottom: 5px;
+  margin-bottom: 0.5cm;
 }
 .lotivis-headline h1 {
   font-size: 26px;
@@ -222,12 +233,13 @@ button.lotivis-button-round:active {
 
 .lotivis-data-textarea {
   background-color: rgba(0, 0, 0, 0);
-  margin: 0;
-  width: 96%;
   border: 0 solid #cccccc;
-  padding: 5px;
+  width: 100%;
   font-family: monospace, sans-serif;
   outline: none;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 .lotivis-data-card-status-tooltip {
@@ -315,14 +327,14 @@ input[type=checkbox] {
 }
 
 .lotivis-container {
-  padding: 0 50px 0 50px;
+  padding: 10px 50px 0 50px;
   margin: auto;
   max-width: 1200px;
   font-size: 14px;
 }
 
 .lotivis-container-full {
-  padding: 0;
+  padding: 10px 0 0;
   margin: auto;
   font-size: 14px;
 }

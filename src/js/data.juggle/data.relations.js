@@ -35,7 +35,7 @@ export function dateToItemsRelation(datasets, dateAccess) {
         datasetDate.total = entry.dateTotal;
       });
 
-    // add zero values for empty datasets
+    // addDataset zero values for empty datasets
     for (let index = 0; index < listOfLabels.length; index++) {
       let label = listOfLabels[index];
       if (!datasetDate[label]) {

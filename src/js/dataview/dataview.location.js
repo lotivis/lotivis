@@ -1,8 +1,8 @@
-import {DatasetsController} from "../data/datasets.controller";
+import {DatasetsController} from "../datasets.controller/datasets.controller";
 import {combineByLocation, combineByStacks} from "../data.juggle/data.combine";
 
 /**
- * Returns a new generated location dataview for the current selected data of datasets of this controller.
+ * Returns a new generated location dataview for the current selected datasets.controller of datasets of this controller.
  *
  * A location dataview has the following form:
  * ```
@@ -28,6 +28,10 @@ DatasetsController.prototype.getLocationDataview = function () {
 
   dataview.stacks = this.stacks;
   dataview.combinedData = combinedByLocation;
+
+  dataview.combinedData.forEach(item => {
+    item.stack = item.stack || item.label || item.dataset;
+  });
 
   return dataview;
 };

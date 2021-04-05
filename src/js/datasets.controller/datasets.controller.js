@@ -17,9 +17,16 @@ export class DatasetsController {
    */
   constructor(datasets, config) {
     if (!Array.isArray(datasets)) throw new InvalidFormatError();
-    this.config = config || {};
-    this.dateAccess = this.config.dateAccess || DefaultDateAccess;
+    this.initialize(config || {});
     this.setDatasets(datasets);
+  }
+
+  initialize(config) {
+    this.config = config;
+    this.dateAccess = this.config.dateAccess || DefaultDateAccess;
+    this.locationFilters = this.config.locationFilters || [];
+    this.dateFilters = this.config.dateFilters || [];
+    this.datasetFilters = this.config.datasetFilters || [];
   }
 
   getFlatDataCombinedStacks() {

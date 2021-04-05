@@ -1,5 +1,5 @@
 import {Card} from "../components/card";
-import {DataCard} from "./data.card";
+import {EditableDataviewCard} from "./editable.dataview.card";
 import {parseCSV} from "../data.parse/parse.csv";
 import {renderCSV} from "../data.render/render.csv";
 import {downloadCSV} from "../shared/download";
@@ -10,7 +10,7 @@ import {createDownloadFilename} from "../shared/filname";
  * @class DatasetCSVCard
  * @extends Card
  */
-export class DatasetCSVCard extends DataCard {
+export class DatasetCSVCard extends EditableDataviewCard {
 
   /**
    * Creates a new instance of DatasetCSVCard.
@@ -18,7 +18,7 @@ export class DatasetCSVCard extends DataCard {
    */
   constructor(parent) {
     super(parent);
-    this.setCardTitle('Dataset CSV');
+    this.setTitle('Dataset CSV');
   }
 
   download(content) {

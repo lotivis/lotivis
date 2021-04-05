@@ -27,11 +27,11 @@ DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
 DatasetsController.prototype.setLocationsFilter = function (locations) {
   let stringVersions = locations.map(location => String(location));
   if (objectsEqual(this.locationFilters, stringVersions)) {
-    return lotivis_log(`[lotivis]  Date filters not changed.`);
+    return lotivis_log(`[lotivis]  Location filters not changed.`);
   }
-  this.resetFilters(false);
+  // this.resetFilters(false);
   this.locationFilters = stringVersions;
-  this.notifyListeners(DatasetsController.NotificationReason.locationFilters);
+  this.notifyListeners(DatasetsController.NotificationReason.filterLocations);
 };
 
 /**
@@ -43,9 +43,9 @@ DatasetsController.prototype.setDatesFilter = function (dates) {
   if (objectsEqual(this.dateFilters, stringVersions)) {
     return lotivis_log(`[lotivis]  Date filters not changed.`);
   }
-  this.resetFilters(false);
+  // this.resetFilters(false);
   this.dateFilters = stringVersions;
-  this.notifyListeners(DatasetsController.NotificationReason.dateFilters);
+  this.notifyListeners(DatasetsController.NotificationReason.filterDates);
 };
 
 /**
@@ -57,7 +57,7 @@ DatasetsController.prototype.setDatasetsFilter = function (datasets) {
   if (objectsEqual(this.datasetFilters, stringVersions)) {
     return lotivis_log(`[lotivis]  Dataset filters not changed.`);
   }
-  this.resetFilters(false);
+  // this.resetFilters(false);
   this.datasetFilters = stringVersions;
   this.notifyListeners(DatasetsController.NotificationReason.filterDataset);
 };

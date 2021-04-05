@@ -30,9 +30,13 @@ export function flatDataset(dataset) {
     return flatData;
   }
   dataset.data.forEach(item => {
-    let newItem = copy(item);
+    let newItem = {};
     newItem.dataset = dataset.label;
-    newItem.stack = dataset.stack;
+    newItem.stack = item.stack;
+    newItem.location = item.location;
+    newItem.date = item.date;
+    newItem.dateNumeric = item.dateNumeric;
+    newItem.value = item.value;
     flatData.push(newItem);
   });
   return flatData;

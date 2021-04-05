@@ -1,5 +1,5 @@
 import {Chart} from "./chart";
-import {DatasetsController} from "../data/datasets.controller";
+import {DatasetsController} from "../datasets.controller/datasets.controller";
 
 /**
  * Sets a new datasets controller.  The chart is updated automatically.

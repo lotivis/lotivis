@@ -10,7 +10,6 @@ import {createDownloadFilename} from "../shared/filname";
 
 /**
  * A card containing a plot chart.
- *
  * @class PlotChartCard
  * @extends Card
  */
@@ -18,31 +17,24 @@ export class PlotChartCard extends ChartCard {
 
   /**
    * Creates a new instance of PlotChartCard.
-   *
    * @param selector The selector
    * @param config
    */
   constructor(selector, config) {
     let theSelector = selector || 'plot-chart-card';
     super(theSelector, config);
-    this.selector = selector;
-    this.name = selector;
-    this.datasets = [];
     this.injectRadioGroup();
     this.applyURLParameters();
-    this.setCardTitle('Plot');
+    this.setTitle('Plot');
   }
 
   /**
    * Injects the plot chart in the body of the card.
    */
   injectChart() {
-    this.chart = new PlotChart(this.body, {
-      margin: {
-        left: 120,
-        right: 50
-      }
-    });
+    this.chartID = this.selector + '-chart';
+    this.body.attr('id', this.chartID);
+    this.chart = new PlotChart(this.chartID, this.config);
   }
 
   /**

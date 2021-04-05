@@ -47,22 +47,22 @@ describe('validate', function () {
       }, lotivis.MissingPropertyError);
     });
 
-    it('throws an error for missing `data` property', function () {
+    it('throws an error for missing `datasets.controller` property', function () {
       assert.throws(() => {
         lotivis.validateDataset({label: 'dataset_1'});
       }, lotivis.MissingPropertyError);
     });
 
-    it('throws an error for invalid `data` property', function () {
+    it('throws an error for invalid `datasets.controller` property', function () {
       assert.throws(() => {
-        lotivis.validateDataset({label: 'dataset_1', data: 'my data'});
+        lotivis.validateDataset({label: 'dataset_1', data: 'my datasets.controller'});
       }, lotivis.InvalidFormatError);
     });
 
   });
 
 
-  describe('validates the sample data', function () {
+  describe('validates the sample datasets.controller', function () {
 
     it('validates sample.dataset.1.json', function () {
       let dataset1 = samples.readJSON('sample.dataset.1.json');

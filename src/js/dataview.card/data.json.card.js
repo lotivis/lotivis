@@ -1,21 +1,24 @@
-import {DataCard} from "./data.card";
+import {EditableDataviewCard} from "./editable.dataview.card";
 import {downloadJSON} from "../shared/download";
 import {createDownloadFilename} from "../shared/filname";
 
 /**
  * A card containing a textarea which contains the JSON text of a dataset collection.
  * @class DatasetsJSONCard
- * @extends DataCard
+ * @extends EditableDataviewCard
  */
-export class DatasetsJSONCard extends DataCard {
+export class DatasetsJSONCard extends EditableDataviewCard {
 
   /**
    * Creates a new instance of DatasetJSONCard.
    * @param parent The parental element or a selector (id).
    */
   constructor(parent = 'datasets-json-card') {
+    if (Object.getPrototypeOf(parent) === Object.prototype) {
+      parent.selector = parent.selector || 'datasets-json-card';
+    }
     super(parent);
-    this.setCardTitle('Dataset JSON');
+    this.setTitle('Dataset JSON');
   }
 
   download(content) {

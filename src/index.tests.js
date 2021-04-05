@@ -37,17 +37,17 @@ import {
 import {
   dateToItemsRelation
 } from "./js/data.juggle/data.relations";
-import {DatasetsController} from "./js/data/datasets.controller";
-import "./js/data/datasets.controller.listeners";
-import "./js/data/datasets.controller.filter";
-import "./js/data/datasets.controller.colors";
-import "./js/data/datasets.controller.update";
+import {DatasetsController} from "./js/datasets.controller/datasets.controller";
+import "./js/datasets.controller/datasets.controller.listeners";
+import "./js/datasets.controller/datasets.controller.filter";
+import "./js/datasets.controller/datasets.controller.colors";
+import "./js/datasets.controller/datasets.controller.update";
 import "./js/dataview/dataview.date";
 import "./js/dataview/dataview.plot";
 import "./js/dataview/dataview.location";
 import {renderCSV} from "./js/data.render/render.csv";
-import {createGeoJSON} from "./js/geojson.juggle/create.geojson";
-import {joinFeatures} from "./js/geojson.juggle/join.features";
+import {createGeoJSON} from "./js/geojson/create.geojson";
+import {joinFeatures} from "./js/geojson/join.features";
 import {
   combineDatasetsByRatio,
   combineDataByGroupsize
