@@ -50,7 +50,6 @@ export function combineByStacks(flattenList) {
 
     let entry = combined.find(function (entryItem) {
       return entryItem.stack === listItem.stack
-        && entryItem.label === listItem.label
         && entryItem.location === listItem.location
         && entryItem.date === listItem.date;
     });

@@ -11,9 +11,10 @@ export class DataviewCard extends UpdatableDataviewCard {
    * Creates a new instance of DataviewCard.
    * @param parent The parental element or a selector (id).
    */
-  constructor(parent = 'dataview-card') {
-    parent.updatesHeight = parent.updatesHeight || true;
+  constructor(parent) {
     super(parent);
+    if (!this.config) this.config = {};
+    this.config.updatesHeight = this.config.updatesHeight || true;
     this.disableTextarea();
   }
 

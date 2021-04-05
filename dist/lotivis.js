@@ -385,6 +385,2493 @@ class Button extends Component {
 }
 
 /**
+ *
+ * @class RadioGroup
+ * @extends Component
+ */
+class RadioGroup extends Component {
+
+  /**
+   *
+   * @param parent The parental component.
+   */
+  constructor(parent) {
+    super(parent);
+
+    this.inputElements = [];
+    this.element = this.parent.append('form');
+    this.element.classed('radio-group', true);
+  }
+
+  /**
+   *
+   * @param optionId
+   * @param optionName
+   * @returns {*}
+   */
+  addOption(optionId, optionName) {
+    let inputElement = this.element
+      .append('input')
+      .attr('type', 'radio')
+      .attr('name', this.selector)
+      .attr('value', optionId)
+      .attr('id', optionId);
+
+    this.element
+      .append('label')
+      .attr('for', optionId)
+      .text(optionName || optionId);
+
+    let thisReference = this;
+    inputElement.on("click", function (event) {
+      thisReference.onClick(event);
+    });
+
+    return inputElement;
+  }
+
+  /**
+   *
+   * @param options
+   * @returns {RadioGroup}
+   */
+  setOptions(options) {
+    this.removeOptions();
+    this.inputElements = [];
+    for (let i = 0; i < options.length; i++) {
+      let id = options[i][0] || options[i].id;
+      let name = options[i][1] || options[i].translatedTitle;
+      let inputElement = this.addOption(id, name);
+      if (i === 0) {
+        inputElement.attr('checked', 'true');
+      }
+      this.inputElements.push(inputElement);
+    }
+    return this;
+  }
+
+  /**
+   *
+   * @param selectedOption
+   * @returns {RadioGroup}
+   */
+  setSelectedOption(selectedOption) {
+    for (let i = 0; i < this.inputElements.length; i++) {
+      let inputElement = this.inputElements[i];
+      let value = inputElement.attr('value');
+      if (value === selectedOption) {
+        inputElement.attr('checked', 'true');
+      }
+    }
+    return this;
+  }
+
+  /**
+   *
+   * @returns {RadioGroup}
+   */
+  removeOptions() {
+    this.element.selectAll('input').remove();
+    this.element.selectAll('label').remove();
+    this.inputElements = [];
+    return this;
+  }
+
+  /**
+   *
+   * @param event
+   */
+  onClick(event) {
+    let element = event.target;
+    if (!element) return;
+
+    let value = element.value;
+    if (!this.onChange) return;
+
+    this.onChange(value);
+
+    return this;
+  }
+
+  // onChange(newFunction) {
+  //     this.onChange = newFunction;
+  //     return this;
+  // }
+  onChange(value) {
+  }
+}
+
+/**
+ * A toast in the top of the page.
+ *
+ * @class Toast
+ * @extends Component
+ */
+class Toast extends Component {
+
+  /**
+   * Creates a new instance of Toast.
+   * @constructor
+   * @param {Component} parent The parental component.
+   */
+  constructor(parent) {
+    super(parent);
+    this.element = this
+      .parent
+      .append('div')
+      .attr('class', 'lotivis-data-card-status-tooltip')
+      .style('opacity', 0)
+      .style('display', `none`);
+    this.row = this.element
+      .append('div')
+      .attr('class', 'lotivis-row');
+    this.leftComponnt = this.row
+      .append('div')
+      .attr('class', 'lotivis-col-6');
+    this.rightComponent = this.row
+      .append('div')
+      .attr('class', 'lotivis-col-6');
+    this.hideButton = new Button(this.rightComponent)
+      .setText(`Hello`);
+  }
+
+  /**
+   * Shows the toast.
+   * @override
+   */
+  show() {
+    super.show();
+    this.element.style('opacity', 1);
+    return this;
+  }
+
+  /**
+   * Hides the toast.
+   * @override
+   */
+  hide() {
+    super.hide();
+    this.element.style('opacity', 0);
+  }
+
+  /**
+   * Sets the text of the Toast.
+   * @param text The text of the Toast.
+   */
+  setText(text) {
+    this.element.text(text);
+  }
+
+  /**
+   * Sets the text of the status label.  If text is empty the status label will be hide.
+   * @param newStatusMessage The new status message.
+   */
+  setStatusMessage(newStatusMessage) {
+    let saveString = String(newStatusMessage || "").trim();
+    this.element.text(saveString);
+    if (saveString) {
+      this.show();
+    } else {
+      this.hide();
+    }
+  }
+}
+
+/**
+ * Represents an option of a dropdown or radio group.
+ * @class Option
+ */
+class Option {
+
+  /**
+   * Creates a new instance of Option.
+   * @param title The title of the option.
+   */
+  constructor(title) {
+    this.title = title;
+    this.id = toSaveID(title);
+  }
+}
+
+/**
+ * Superclass for lotivis charts.
+ * @class Chart
+ * @extends Component
+ * @see DateChart
+ * @see MapChart
+ * @see PlotChart
+ */
+class Chart extends Component {
+
+  /**
+   * Creates an instance of DiachronicChart.
+   * @constructor
+   * @param {Component} parent The parental component.
+   * @param config The configuration of the chart.
+   */
+  constructor(parent, config) {
+    super(parent);
+
+    this.svgSelector = (this.selector || createID()) + '-svg';
+    this.element = this.parent;
+    this.element.attr('id', this.selector);
+    this.config = config || {};
+    this.updateSensible = true;
+    this.initialize();
+
+    if (this.config.datasets) {
+      this.setDatasets(this.config.datasets);
+    } else {
+      this.update();
+    }
+  }
+
+  initialize() {
+    // empty
+  }
+
+  update() {
+    if (!this.updateSensible) return;
+    this.remove();
+    this.precalculate();
+    this.draw();
+  }
+
+  precalculate() {
+    // empty
+  }
+
+  remove() {
+    // empty
+  }
+
+  draw() {
+    // empty
+  }
+
+  makeUpdateInsensible() {
+    this.updateSensible = false;
+  }
+
+  makeUpdateSensible() {
+    this.updateSensible = true;
+  }
+}
+
+/**
+ * Returns a copy of the passed object.  The copy is created by using the
+ * JSON's `parse` and `stringify` functions.
+ * @param object The java script object to copy.
+ * @returns {any} The copy of the object.
+ */
+function copy(object) {
+  return JSON.parse(JSON.stringify(object));
+}
+
+const LotivisConfig = {
+  // The default margin to use for charts.
+  defaultMargin: 60,
+  // The default offset for the space between an object an the toolbar.
+  tooltipOffset: 7,
+  // The default radius to use for bars drawn on a chart.
+  barRadius: 5,
+  // A Boolean value indicating whether the debug logging is enabled.
+  debugLog: false,
+  // A Boolean value indicating whether the debug logging is enabled.
+  debug: true,
+  // A string which is used as prefix for download.
+  downloadFilePrefix: 'lotivis',
+  // A string which is used as separator between components when creating a file name.
+  filenameSeparator: '_',
+  // A string which is used for unknown values.
+  unknown: 'LOTIVIS_UNKNOWN'
+};
+
+/**
+ * Returns `true` if the given value not evaluates to false and is not 0. false else.
+ * @param value The value to check.
+ * @returns {boolean} A Boolean value indicating whether the given value is valid.
+ */
+function isValue(value) {
+  return Boolean(value || value === 0);
+}
+
+/**
+ * Returns the value if it evaluates to true or is 0.  Returns `GlobalConfig.unknown` else.
+ * @param value The value to check.
+ * @returns The value or `GlobalConfig.unknown`.
+ */
+function toValue(value) {
+  return value || (value === 0 ? 0 : LotivisConfig.unknown);
+}
+
+/**
+ *
+ * @param flattenList
+ * @returns {[]}
+ */
+function combine(flattenList) {
+  let combined = [];
+  let copiedList = copy(flattenList);
+  for (let index = 0; index < copiedList.length; index++) {
+    let listItem = copiedList[index];
+    let entry = combined.find(function (entryItem) {
+      return entryItem.dataset === listItem.dataset
+        && entryItem.stack === listItem.stack
+        && entryItem.label === listItem.label
+        && entryItem.location === listItem.location
+        && entryItem.date === listItem.date;
+    });
+    if (entry) {
+      entry.value += (listItem.value + 0);
+    } else {
+      let entry = {};
+      if (isValue(listItem.label)) entry.label = listItem.label;
+      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (isValue(listItem.stack)) entry.stack = listItem.stack;
+      if (isValue(listItem.location)) entry.location = listItem.location;
+      if (isValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
+      if (isValue(listItem.date)) entry.date = listItem.date;
+      if (isValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
+      if (isValue(listItem.locationName)) entry.locationName = listItem.locationName;
+      entry.value = (listItem.value || 0);
+      combined.push(entry);
+    }
+  }
+  return combined;
+}
+
+/**
+ * Returns
+ *
+ * @param flattenList
+ * @returns {[]}
+ */
+function combineByStacks(flattenList) {
+  let combined = [];
+  for (let index = 0; index < flattenList.length; index++) {
+    let listItem = flattenList[index];
+
+    let entry = combined.find(function (entryItem) {
+      return entryItem.stack === listItem.stack
+        && entryItem.location === listItem.location
+        && entryItem.date === listItem.date;
+    });
+
+    if (entry) {
+      entry.value += (listItem.value + 0);
+    } else {
+      let entry = {};
+      if (isValue(listItem.label)) entry.label = listItem.label;
+      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (isValue(listItem.stack)) entry.stack = listItem.stack;
+      if (isValue(listItem.location)) entry.location = listItem.location;
+      if (isValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
+      if (isValue(listItem.date)) entry.date = listItem.date;
+      if (isValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
+      if (isValue(listItem.locationName)) entry.locationName = listItem.locationName;
+      entry.value = (listItem.value || 0);
+      combined.push(entry);
+    }
+  }
+  return combined;
+}
+
+/**
+ *
+ * @param flatData
+ * @returns {[]}
+ */
+function combineByDate(flatData) {
+  let combined = [];
+  for (let index = 0; index < flatData.length; index++) {
+    let listItem = flatData[index];
+    let entry = combined.find(function (entryItem) {
+      return entryItem.dataset === listItem.dataset
+        && entryItem.stack === listItem.stack
+        && entryItem.label === listItem.label
+        && entryItem.date === listItem.date;
+    });
+    if (entry) {
+      entry.value += (listItem.value + 0);
+    } else {
+      let entry = {};
+      if (isValue(listItem.label)) entry.label = listItem.label;
+      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (isValue(listItem.stack)) entry.stack = listItem.stack;
+      if (isValue(listItem.date)) entry.date = listItem.date;
+      if (isValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
+      entry.value = (listItem.value || 0);
+      combined.push(entry);
+    }
+  }
+  return combined;
+}
+
+/**
+ *
+ * @param flatData
+ * @returns {[]}
+ */
+function combineByLocation(flatData) {
+  let combined = [];
+  for (let index = 0; index < flatData.length; index++) {
+    let listItem = flatData[index];
+    let entry = combined.find(function (entryItem) {
+      return entryItem.dataset === listItem.dataset
+        && entryItem.stack === listItem.stack
+        && entryItem.label === listItem.label
+        && entryItem.location === listItem.location;
+    });
+    if (entry) {
+      entry.value += listItem.value;
+    } else {
+      let entry = {};
+      if (isValue(listItem.label)) entry.label = listItem.label;
+      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
+      if (isValue(listItem.stack)) entry.stack = listItem.stack;
+      if (isValue(listItem.location)) entry.location = listItem.location;
+      if (isValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
+      if (isValue(listItem.locationName)) entry.locationName = listItem.locationName;
+      entry.value = listItem.value;
+      combined.push(entry);
+    }
+  }
+  return combined;
+}
+
+/**
+ * Returns the sum of samples values for the given dataset.
+ *
+ * @param flatData The flat samples array.
+ * @param dataset The dataset name.
+ * @returns {*} The sum.
+ */
+function sumOfDataset(flatData, dataset) {
+  return sumOfValues(flatData.filter(item => item.dataset === dataset));
+}
+
+/**
+ * Returns the sum of samples values for the given label.
+ *
+ * @param flatData The flat samples array.
+ * @param label The label.
+ * @returns {*} The sum.
+ */
+function sumOfLabel(flatData, label) {
+  return sumOfValues(flatData.filter(item => item.label === label));
+}
+
+/**
+ * Returns the sum of samples values for the given stack.
+ *
+ * @param flatData The flat samples array.
+ * @param stack The stack name.
+ * @returns {*} The sum.
+ */
+function sumOfStack(flatData, stack) {
+  return sumOfValues(flatData.filter(item => item.stack === stack));
+}
+
+/**
+ * Returns the sum of the value properties of each item.
+ *
+ * @param flatData
+ * @returns {*}
+ */
+function sumOfValues(flatData) {
+  return flatData.map(item => +(item.value || 0)).reduce((acc, next) => acc + next, 0);
+}
+
+/**
+ * A collection of messages which already hast been printed.
+ * @type {*[]}
+ */
+let alreadyLogged = [];
+
+var lotivis_log_once = function (message) {
+  if (alreadyLogged.includes(message)) return;
+  alreadyLogged.push(message);
+  console.warn(`[lotivis]  Warning only once: ${message}`);
+};
+
+var lotivis_log = () => null;
+
+/**
+ * Sets whether lotivis prints debug log messages to the console.
+ * @param enabled A Boolean value indicating whether to enable debug logging.
+ * @param printConfig A Boolean value indicating whether to print the global lotivis configuration.  Default is false.
+ */
+function debug(enabled, printConfig = false) {
+  lotivis_log = enabled ? console.log : () => null;
+  lotivis_log(`[lotivis]  ${enabled ? 'En' : 'Dis'}abled debug mode.`);
+  if (!printConfig) return;
+  lotivis_log(`LotivisConfig = ${JSON.stringify(LotivisConfig, null, 2)}`);
+}
+
+/**
+ *
+ * @param date
+ * @constructor
+ */
+const DefaultDateAccess = (date) => date;
+
+/**
+ *
+ * @param dateString
+ * @returns {number}
+ * @constructor
+ */
+const FormattedDateAccess = function (dateString) {
+  let value = Date.parse(dateString);
+  if (isNaN(value)) {
+    lotivis_log_once(`Received NaN for date "${dateString}"`);
+  }
+  return value;
+};
+
+/**
+ *
+ * @param dateString
+ * @returns {number}
+ * @constructor
+ */
+const DateGermanAssessor = function (dateString) {
+  let saveDateString = String(dateString);
+  let components = saveDateString.split('.');
+  let day = components[0];
+  let month = components[1];
+  let year = components[2];
+  let date = new Date(`${year}-${month}-${day}`);
+  return Number(date);
+};
+
+/**
+ *
+ * @param weekday
+ * @returns {number}
+ * @constructor
+ */
+const DateWeekAssessor = function (weekday) {
+  let lowercase = weekday.toLowerCase();
+  switch (lowercase) {
+    case 'sunday':
+    case 'sun':
+      return 0;
+    case 'monday':
+    case 'mon':
+      return 1;
+    case 'tuesday':
+    case 'tue':
+      return 2;
+    case 'wednesday':
+    case 'wed':
+      return 3;
+    case 'thursday':
+    case 'thr':
+      return 4;
+    case 'friday':
+    case 'fri':
+      return 5;
+    case 'saturday':
+    case 'sat':
+      return 6;
+    default:
+      return -1;
+  }
+};
+
+/**
+ * Controls a collection of datasets.
+ * @class DatasetsController
+ */
+class DatasetsController {
+
+  /**
+   * Creates a new instance of DatasetsController
+   * @param datasets The datasets to control.
+   * @param config
+   */
+  constructor(datasets, config) {
+    if (!Array.isArray(datasets)) throw new InvalidFormatError();
+    this.initialize(config || {});
+    this.setDatasets(datasets);
+  }
+
+  initialize(config) {
+    this.config = config;
+    this.dateAccess = this.config.dateAccess || DefaultDateAccess;
+    this.locationFilters = this.config.locationFilters || [];
+    this.dateFilters = this.config.dateFilters || [];
+    this.datasetFilters = this.config.datasetFilters || [];
+    this.filters = {};
+    if (this.config.filters) {
+      this.filters.locations = this.config.filters.locations || [];
+      this.filters.dates = this.config.filters.dates || [];
+      this.filters.datasets = this.config.filters.datasets || [];
+    }
+  }
+
+  getFlatDataCombinedStacks() {
+    return combineByStacks(this.flatData);
+  }
+
+  getFlatDataCombinedDates() {
+    return combineByDate(this.flatData);
+  }
+
+  getFlatDataCombinedLocations() {
+    return combineByLocation(this.flatData);
+  }
+
+  getSumOfLabel(label) {
+    return sumOfLabel(this.flatData, label);
+  }
+
+  getSumOfDataset(dataset) {
+    return sumOfDataset(this.flatData, dataset);
+  }
+
+  getSumOfStack(stack) {
+    return sumOfStack(this.flatData, stack);
+  }
+
+  getMax() {
+    return d3LibraryAccess.max(this.workingDatasets, function (dataset) {
+      return d3LibraryAccess.max(dataset.data, function (item) {
+        return item.value;
+      });
+    });
+  }
+
+  // MARK: - Colors
+
+  getColorForDataset(label) {
+    return this.datasetsColorsController.colorForDataset(label);
+  }
+
+  getColorForStack(stack) {
+    return this.datasetsColorsController.colorForStack(stack);
+  }
+
+  getColorsForStack(stack) {
+    return this.datasetsColorsController.colorsForStack(stack);
+  }
+
+  /**
+   * Returns a string that can be used as filename for downloads.
+   */
+  getFilename() {
+    return this.labels.join(',');
+  }
+}
+
+/**
+ * Sets a new datasets controller.  The chart is updated automatically.
+ * @param newController The new datasets controller.
+ */
+Chart.prototype.setDatasetController = function (newController) {
+  this.datasetController = newController;
+  this.datasetController.addListener(this);
+  this.update(newController, 'registration');
+};
+
+/**
+ * Sets the datasets of this map chart.
+ * @param newDatasets The new dataset.
+ */
+Chart.prototype.setDatasets = function (newDatasets) {
+  this.setDatasetsController(new DatasetsController(newDatasets));
+};
+
+/**
+ * Returns the presented datasets.
+ * @returns {[*]} The collection of datasets.
+ */
+Chart.prototype.getDatasets = function () {
+  if (!this.datasetController || !Array.isArray(this.datasetController.datasets)) return [];
+  return this.datasetController.datasets;
+};
+
+/**
+ * A lotivis card.
+ * @class Card
+ * @extends Component
+ */
+class Card extends Component {
+
+  /**
+   * Creates a new instance of Card.
+   * @param parent The parental component.
+   */
+  constructor(parent) {
+    super(parent);
+    this.injectCard();
+    this.injectHeader();
+    this.injectBody();
+    this.injectFooter();
+  }
+
+  /**
+   * Appends the card element.
+   */
+  injectCard() {
+    this.element = this.parent
+      .append('div')
+      .classed('lotivis-card', true);
+  }
+
+  /**
+   * Appends the header of the card.
+   */
+  injectHeader() {
+    this.header = this.element
+      .append('div')
+      .attr('class', 'lotivis-card-header');
+    this.headerRow = this.header
+      .append('div')
+      .attr('class', 'lotivis-row');
+    this.headerLeftComponent = this.headerRow
+      .append('div')
+      .attr('class', 'lotivis-card-header-left');
+    this.headerCenterComponent = this.headerRow
+      .append('div')
+      .attr('class', 'lotivis-card-header-center');
+    this.headerRightComponent = this.headerRow
+      .append('div')
+      .attr('class', 'lotivis-card-header-right lotivis-button-group');
+    this.titleLabel = this.headerLeftComponent
+      .append('div')
+      .attr('class', 'lotivis-title-label');
+  }
+
+  /**
+   * Appends the body of the card.
+   */
+  injectBody() {
+    this.body = this.element
+      .append('div')
+      .attr('class', 'lotivis-card-body');
+    this.content = this.body
+      .append('div')
+      .attr('class', 'lotivis-card-body-content');
+  }
+
+  /**
+   * Appends the footer of the card.
+   */
+  injectFooter() {
+    this.footer = this.element
+      .append('div')
+      .attr('class', 'lotivis-card-footer');
+    this.footerRow = this.footer
+      .append('div')
+      .attr('class', 'lotivis-row');
+    this.footerLeftComponent = this.footerRow
+      .append('div')
+      .attr('class', 'lotivis-col-6');
+    this.footerRightComponent = this.footerRow
+      .append('div')
+      .attr('class', 'lotivis-col-6');
+    this.footer.style('display', 'none');
+  }
+
+  /**
+   * Sets the text of the title label.
+   * @param newTitle The text of the title label.
+   */
+  setTitle(newTitle) {
+    this.titleLabel.text(newTitle);
+  }
+
+  /**
+   * Shows the footer by resetting its style display value.
+   */
+  showFooter() {
+    this.footer.style('display', '');
+  }
+
+  /**
+   * Hides the footer by setting its style display value to `none`.
+   */
+  hideFooter() {
+    this.footer.style('display', 'none');
+  }
+}
+
+class Checkbox extends Component {
+  constructor(parent) {
+    super(parent);
+    this.renderInput();
+    this.renderLabel();
+  }
+
+  // MARK: - Life Cycle
+  renderInput() {
+    let thisReference = this;
+    this.element = this.parent
+      .classed('radio-group', true)
+      .append('input')
+      .attr('type', 'checkbox')
+      .attr('id', this.selector)
+      .on('click', function (event) {
+        if (!event.target) {
+          return;
+        }
+        let checkbox = event.target;
+        if (thisReference.onClick) {
+          thisReference.onClick(checkbox.checked);
+        }
+      });
+  }
+
+  renderLabel() {
+    this.label = this.parent
+      .append('label')
+      .attr('for', this.selector)
+      .text('Unknown');
+  }
+
+  // MARK: - Functions
+  setText(text) {
+    this.label.text(text);
+    return this;
+  }
+
+  setChecked(checked) {
+    this.element.attr('checked', checked === true ? checked : null);
+    return this;
+  }
+
+  onClick(checked) {
+    // empty
+    console.log('onClick: ' + checked);
+  }
+
+  enable() {
+    this.element.attr('disabled', null);
+    this.label.style('color', 'black');
+  }
+
+  disable() {
+    this.element.attr('disabled', true);
+    this.label.style('color', 'gray');
+  }
+}
+
+/**
+ * A lotivis popup.
+ *
+ * +----------------------------------------------------------------+
+ * |                                                                |
+ * |                                                                |
+ *
+ * @class Popup
+ * @extends Component
+ */
+class Popup extends Component {
+
+  /**
+   * Creates a new instance of Popup.
+   * @param parent The parental component.
+   */
+  constructor(parent = d3.select('body')) {
+    super(parent);
+    this.injectUnderground(parent);
+    this.injectContainer();
+    this.injectCard();
+    this.inject();
+    this.injectCloseButton();
+    this.addCloseActionListeners();
+  }
+
+  // MARK: - Render
+
+  /**
+   * Appends components to this popup.
+   * Should be overridden by subclasses.
+   */
+  inject() {
+    // empty
+  }
+
+  /**
+   * Appends the 'dim' background to the given parent.
+   *
+   * @param parent The parental element.
+   */
+  injectUnderground(parent) {
+    this.modalBackgroundId = createID();
+    this.modalBackground = parent
+      .append('div')
+      .classed('lotivis-popup-underground lotivis-fade-in', true)
+      .attr('id', this.modalBackgroundId);
+  }
+
+  /**
+   *
+   */
+  injectContainer() {
+    this.elementId = createID();
+    this.element = this.modalBackground
+      .append('div')
+      .classed('lotivis-popup', true)
+      .attr('id', this.elementId);
+  }
+
+  /**
+   *
+   */
+  injectCard() {
+    this.card = new Card(this.element);
+    this.card.element.classed('lotivis-popup', true);
+  }
+
+  /**
+   * Appends a close button to the right header component.
+   */
+  injectCloseButton() {
+    this.closeButton = new Button(this.card.headerRightComponent);
+    this.closeButton.element.classed('lotivis-button-small', true);
+    this.closeButton.setText('Close');
+  }
+
+  /**
+   * Appends an on click listener to the button.
+   */
+  addCloseActionListeners() {
+    let validIDs = [
+      this.closeButton.selector,
+      this.modalBackgroundId
+    ];
+    let popup = this;
+    this.modalBackground.on('click', function (event) {
+      if (!event || !event.target) return;
+      if (!validIDs.includes(event.target.id)) return;
+      popup.dismiss();
+    });
+  }
+
+  // MARK: - Life Cycle
+
+  /**
+   * Tells the receiving popup that it is about to be presented.
+   *
+   * Subclasses may override.
+   */
+  willShow() {
+    // empty
+  }
+
+  /**
+   * Tells the receiving popup that it is now presented.
+   *
+   * Subclasses may override.
+   */
+  didShow() {
+    // empty
+  }
+
+  /**
+   * Presents the popup.
+   */
+  show() {
+    if (this.willShow) this.willShow();
+    this.getUnderground().style.display = 'block';
+    if (this.didShow) this.didShow();
+  }
+
+  /**
+   * Tells the receiving popup that it is about to be dismissed.
+   *
+   * Subclasses may override.
+   */
+  willDismiss() {
+    // empty
+  }
+
+  /**
+   * Tells the receiving popup that the DOM element will be removed.
+   *
+   * Subclasses may override.
+   */
+  willRemoveDOMElement() {
+    // empty
+  }
+
+  /**
+   * Dismisses the popup.
+   */
+  dismiss() {
+    if (this.willDismiss) this.willDismiss();
+    this.getUnderground().style.display = 'none';
+    if (this.willRemoveDOMElement) this.willRemoveDOMElement();
+    this.getUnderground().remove();
+  }
+
+  getUnderground() {
+    return document.getElementById(this.modalBackgroundId);
+  }
+
+  showUnder(sourceElement, position = 'center') {
+    if (!sourceElement) return;
+
+    let preferredSize = this.preferredSize();
+    let origin = this.calculateBottomCenter(sourceElement);
+
+    if (position === 'left') {
+      origin.x -= origin.width / 2;
+    } else if (position === 'right') {
+      origin.x -= preferredSize.width - origin.width / 2;
+    } else { // assume center
+      origin.x -= (preferredSize.width / 2);
+    }
+
+    let id = this.elementId;
+    let popup = document.getElementById(id);
+
+    popup.style.position = 'absolute';
+    popup.style.width = preferredSize.width + 'px';
+    // popup.style.height = preferredSize.height + 'px';
+    popup.style.left = origin.x + 'px';
+    popup.style.top = origin.y + 'px';
+
+    this.show();
+  }
+
+  showBigModal() {
+    let id = this.elementId;
+    let popup = document.getElementById(id);
+    let preferredSize = this.preferredSize();
+
+    popup.style.position = 'relative';
+    popup.style.margin = '50px auto';
+    popup.style.width = preferredSize.width + 'px';
+
+    this.show();
+  }
+
+  /**
+   * Returns the preferred size of the popup.  Subclasses may override in order to
+   * change the size of the popup.
+   *
+   * @returns {{width: number, height: number}}
+   */
+  preferredSize() {
+    return {
+      width: 300,
+      height: 300
+    };
+  }
+
+  /**
+   * Returns the bottom middle point of the passed element.
+   *
+   * @param element
+   * @param respectWindowScroll
+   * @returns {{x: number, width: number, y: number, height: number}}
+   */
+  calculateBottomCenter(element, respectWindowScroll = false) {
+    let rect = element.getBoundingClientRect();
+    let x = rect.x + (rect.width / 2);
+    let y = rect.y + rect.height;
+
+    if (respectWindowScroll) {
+      x += window.scrollX;
+      y += window.scrollY;
+    }
+
+    return {
+      x: x,
+      y: y,
+      width: rect.width,
+      height: rect.height
+    };
+  }
+}
+
+/**
+ *
+ * @class ModalPopup
+ * @extends Popup
+ */
+class ModalPopup extends Popup {
+
+  /**
+   *
+   * @param parent
+   */
+  constructor(parent) {
+    super(parent);
+    this.modalBackground
+      .classed('popup-underground', false)
+      .classed('modal-underground', true);
+  }
+
+  /**
+   *
+   */
+  inject() {
+    super.inject();
+    this.renderRow();
+  }
+
+  /**
+   *
+   */
+  renderRow() {
+    this.row = this.card.body
+      .append('div')
+      .classed('row', true);
+    this.content = this.row
+      .append('div')
+      .classed('col-12 info-box-margin', true);
+  }
+
+  /**
+   *
+   */
+  loadContent(url) {
+    if (!url) return;
+    let content = this.content;
+
+    d3.text(url)
+      .then(function (text) {
+        console.log(text);
+        content.html(text);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+
+  /**
+   * Returns the preferred size. The default is 800, 600.
+   * @returns {{width: number, height: number}} The preferred size.
+   */
+  preferredSize() {
+    return {
+      width: 800,
+      height: 600
+    };
+  }
+}
+
+/**
+ *
+ * @class Dropdown
+ * @extends Component
+ */
+class Dropdown extends Component {
+
+  /**
+   * Creates a new instance of Dropdown.
+   * @param parent The parent or selector.
+   */
+  constructor(parent) {
+    super(parent);
+    this.inputElements = [];
+    this.selector = createID();
+    this.element = parent
+      .append('div')
+      .classed('dropdown-container', true);
+    this.selectId = createID();
+    this.renderLabel();
+    this.renderSelect();
+  }
+
+  renderLabel() {
+    this.label = this.element
+      .append('label')
+      .attr('for', this.selectId);
+  }
+
+  renderSelect() {
+    let thisReference = this;
+    this.select = this.element
+      .append('select')
+      .attr('id', this.selectId)
+      .on('change', function (event) {
+        thisReference.onClick(event);
+      });
+  }
+
+  addOption(optionId, optionName) {
+    return this.select
+      .append('option')
+      .attr('id', optionId)
+      .attr('value', optionId)
+      .text(optionName);
+  }
+
+  setOptions(options) {
+    this.removeAllInputs();
+    for (let i = 0; i < options.length; i++) {
+      let name;
+
+      if (Array.isArray(options[i])) {
+        options[i][0] || options[i].id;
+        name = options[i][1] || options[i].translatedTitle;
+      } else if (typeof options[i] === 'string') {
+        options[i];
+        name = options[i];
+      } else {
+        options[i].id;
+        name = options[i].title;
+      }
+
+      let inputElement = this.addOption(name, name);
+      this.inputElements.push(inputElement);
+    }
+    return this;
+  }
+
+  removeAllInputs() {
+    this.element.selectAll('input').remove();
+    return this;
+  }
+
+  onClick(event) {
+    let element = event.target;
+    if (!element) {
+      return;
+    }
+    let value = element.value;
+    if (!this.onChange) {
+      return;
+    }
+    this.onChange(value);
+    return this;
+  }
+
+  onChange(argument) {
+    console.log('argument: ' + argument);
+    if (typeof argument !== 'string') {
+      this.onChange = argument;
+    }
+    return this;
+  }
+
+  // MARK: - Chaining Setter
+
+  setLabelText(text) {
+    this.label.text(text);
+    return this;
+  }
+
+  setOnChange(callback) {
+    this.onChange = callback;
+    return this;
+  }
+
+  setSelectedOption(optionID) {
+    if (this.inputElements.find(function (item) {
+      return item.attr('value') === optionID;
+    }) !== undefined) {
+      this.value = optionID;
+    }
+    return this;
+  }
+
+  set value(optionID) {
+    document.getElementById(this.selectId).value = optionID;
+  }
+
+  get value() {
+    return document.getElementById(this.selectId).value;
+  }
+}
+
+Dropdown.create = function (selector, options, selectedOption, onChange) {
+  let div = d3.select(`#${selector}`);
+  let dropdown = new Dropdown(div);
+  dropdown.setLabelText('Group Size');
+  dropdown.setOptions(options);
+  dropdown.setSelectedOption(selectedOption);
+  dropdown.setOnChange(onChange);
+  return dropdown;
+};
+
+/**
+ * A lotivis card containing a textarea.
+ * @class TextareaCard
+ * @extends Card
+ */
+class TextareaCard extends Card {
+
+  /**
+   * Creates a new instance of TextareaCard.
+   * @param parent The parental element or a selector (id).
+   */
+  constructor(parent) {
+    super(parent);
+    this.render();
+    this.updateSensible = true;
+
+    if (this.config) {
+      this.textarea.attr('rows', this.config.lines || 25);
+      this.setTitle(this.config.title || 'TextareaCard');
+    } else {
+      this.textarea.attr('rows', 25);
+      this.setTitle('TextareaCard');
+    }
+  }
+
+  /**
+   * Appends the component to this card.
+   */
+  render() {
+    this.textareaID = createID();
+    this.textarea = this.body
+      .append('textarea')
+      .attr('id', this.textareaID)
+      .attr('name', this.textareaID)
+      .attr('class', 'lotivis-data-textarea')
+      .on('keyup', this.onKeyup.bind(this));
+    this.downloadButton = new Button(this.headerRightComponent);
+    this.downloadButton.setText('Download');
+    this.downloadButton.onClick = function (event) {
+      let content = this.getTextareaContent();
+      this.download(content);
+    }.bind(this);
+  }
+
+  /**
+   * Returns the text of the textarea.
+   * @returns {*} The text of the textarea.
+   */
+  getTextareaContent() {
+    return document.getElementById(this.textareaID).value || "";
+  }
+
+  /**
+   * Sets the text of the textarea.
+   * @param newContent The text for the textarea.
+   */
+  setTextareaContent(newContent) {
+    let textarea = document.getElementById(this.textareaID);
+    if (!textarea) return;
+    textarea.value = newContent;
+
+    if (this.config.updatesHeight !== true) return;
+    if (typeof newContent !== 'string') return;
+    let numberOfRows = newContent.split(`\n`).length;
+    this.textarea.attr('rows', numberOfRows);
+  }
+
+  /**
+   * Enable the textarea.
+   */
+  enableTextarea() {
+    this.textarea.attr('disabled', null);
+    [this.textarea, this.titleLabel].forEach(item => item.classed('lotivis-disabled', false));
+  }
+
+  /**
+   * Disables the textarea.
+   */
+  disableTextarea() {
+    this.textarea.attr('disabled', '');
+    [this.textarea, this.titleLabel].forEach(item => item.classed('lotivis-disabled', true));
+  }
+
+  /**
+   * Tells this dataset card that a 'keyup'-event occurred in the textarea.
+   * @param event The key event.
+   */
+  onKeyup(event) {
+    throw new LotivisUnimplementedMethodError(`onKeyup(event)`);
+  }
+
+  /**
+   * Initiates a download of the content of the textarea.
+   * @param content The new content of the textarea.
+   */
+  download(content) {
+    throw new LotivisUnimplementedMethodError(`download(content)`);
+  }
+}
+
+/**
+ *
+ * @class UpdatableDataviewCard
+ * @extends TextareaCard
+ */
+class UpdatableDataviewCard extends TextareaCard {
+
+  /**
+   * Creates a new instance of UpdatableDataviewCard.
+   * @param parent The parental element or a selector (id).
+   */
+  constructor(parent = {}) {
+    parent.title = parent.title || 'UpdatableDataviewCard';
+    super(parent);
+    this.updateSensible = true;
+    this.downloadButton.hide();
+  }
+
+  /**
+   * Sets the dataset controller.
+   * @param newDatasetController
+   */
+  setDatasetsController(newDatasetController) {
+    this.datasetsController = newDatasetController;
+    this.datasetsController.addListener(this);
+  }
+
+  /**
+   * Tells thi dataset card that the datasets of the datasets controller has changed.
+   * @param datasetsController The datasets controller.
+   * @param reason The reason of the update.
+   */
+  update(datasetsController, reason) {
+    if (!this.updateSensible) {
+      lotivis_log(`[lotivis]  NOT sensible ${this}. Reason '${reason}'.`);
+      return;
+    } else if (this.config.updateSensible === false) {
+      lotivis_log(`[lotivis]  NOT sensible (Config) ${this}. Reason '${reason}'.`);
+      return;
+    } else if (!datasetsController) {
+      lotivis_log(`[lotivis]  NO controller ${this}. Reason '${reason}'.`);
+      return;
+    }
+
+    let datasets = datasetsController.datasets;
+    let content = this.datasetsToText(datasetsController, datasets);
+
+    this.setTextareaContent(content);
+    this.cachedDatasets = datasets;
+
+    lotivis_log(`[lotivis]  Update ${this}. Reason '${reason}'.`);
+  }
+
+  /**
+   * Sets the content of the textarea by rendering the given datasets to text.  Subclasses should override.
+   * @param controller The datasets controller.
+   * @param datasets The datasets to render.
+   * @return {*}
+   */
+  datasetsToText(controller, datasets) {
+    throw new LotivisUnimplementedMethodError(`Subclasses should override.`);
+  }
+}
+
+/**
+ * Validates the given datasets.
+ * @param datasets The datasets to validate.
+ * @throws InvalidFormatError
+ */
+function validateDatasets(datasets) {
+
+  if (!datasets) {
+    throw new InvalidFormatError(`No dataset given.`);
+  } else if (!Array.isArray(datasets)) {
+    throw new InvalidFormatError(`Expecting array of datasets.`);
+  }
+
+  for (let index = 0; index < datasets.length; index++) {
+    validateDataset(datasets[index]);
+  }
+}
+
+/**
+ * Validates the given dataset.
+ * @param dataset The dataset to validate.
+ * @throws InvalidFormatError
+ * @throws MissingPropertyError
+ */
+function validateDataset(dataset) {
+  if (!dataset) {
+    throw new InvalidFormatError(`No dataset given.`);
+  } else if (!dataset.label) {
+    throw new MissingPropertyError(`Missing label for dataset. ${dataset}`);
+  } else if (!dataset.data) {
+    throw new MissingPropertyError(`Invalid data. Property is not an array. Dataset: ${dataset.label}`);
+  } else if (!Array.isArray(dataset.data)) {
+    throw new InvalidFormatError(`Invalid data. Property is not an array. Dataset: ${dataset.label}`);
+  }
+
+  let data = dataset;
+  for (let index = 0; index < data.length; index++) {
+    validateDataItem(data[index]);
+  }
+}
+
+/**
+ * Validates the given datasets.controller item by ensuring it has a valid `date`, `location` and `value` property value.
+ * @param item The datasets.controller item to validate.
+ * @throws MissingPropertyError
+ */
+function validateDataItem(item) {
+  if (!item.date) {
+    throw new MissingPropertyError(`Missing date property for item.`, item);
+  } else if (!item.location) {
+    throw new MissingPropertyError(`Missing location property for item.`, item);
+  }
+}
+
+/**
+ * Compares the string version of each oof the two given values for equality.
+ * @param value1 The first value to compare.
+ * @param value2 The second value to compare.
+ * @returns {boolean} `True` if the string versions are equal, `false` if not.
+ */
+function equals(value1, value2) {
+  return String(value1) === String(value2);
+}
+
+/**
+ * Returns a Boolean value indicating whether the JSON string version of the given two objects are equal.
+ * @param object1 The first object to compare.
+ * @param object2 The second object to compare.
+ * @returns {boolean} `True` if the JSON strings of the given objects are equal,`false` if not.
+ */
+function objectsEqual(object1, object2) {
+  if (object1 === object2) return true;
+  let string1 = JSON.stringify(object1);
+  let string2 = JSON.stringify(object2);
+  return string1 === string2;
+}
+
+/**
+ *
+ * @class EditableDataviewCard
+ * @extends UpdatableDataviewCard
+ */
+class EditableDataviewCard extends UpdatableDataviewCard {
+
+  /**
+   * Creates a new instance of DatasetCard.
+   * @param parent The parental element or a selector (id).
+   */
+  constructor(parent) {
+    super(parent);
+    this.toast = new Toast(this.parent);
+    this.downloadButton.show();
+  }
+
+  /**
+   * Tells this dataset card that a 'keyup'-event occurred in the textarea.
+   */
+  onKeyup() {
+    this.updateDatasetsOfController.bind(this)(true);
+  }
+
+  /**
+   * Tells
+   * @param notifyController A boolean value indicating whether the datasets controller should be notified about the
+   * update.
+   */
+  updateDatasetsOfController(notifyController = false) {
+
+    let content = this.getTextareaContent();
+    this.toast.setStatusMessage(null);
+
+    try {
+
+      // will throw an error if parsing is not possible
+      let parsedDatasets = this.textToDatasets(content);
+      if (!parsedDatasets) return;
+
+      // will throw an error if parsed datasets aren't valid.
+      validateDatasets(parsedDatasets);
+
+      if (notifyController === true) {
+
+        if (!this.datasetsController) {
+          return lotivis_log(`[lotivis]  No datasets controller.`);
+        }
+
+        if (objectsEqual(this.cachedDatasets, parsedDatasets)) {
+          return lotivis_log(`[lotivis]  No changes in datasets.`);
+        }
+
+        this.cachedDatasets = parsedDatasets;
+        this.updateSensible = false;
+        this.datasetsController.setDatasets(parsedDatasets);
+        this.updateSensible = true;
+      }
+
+    } catch (error) {
+      lotivis_log(`[lotivis]  ERROR: ${error}`);
+      this.toast.setStatusMessage(error);
+    }
+  }
+
+  datasetsToText(datasets) {
+    return new LotivisUnimplementedMethodError('datasetsToText(datasets)');
+  }
+}
+
+/**
+ * Appends the given string in extension to the given string filename if filename not already ends with this extension.
+ * @param filename A string with or without an extension.
+ * @param extension The extension the filename will end with.
+ * @returns {*|string} The filename with the given extension.
+ */
+function appendExtensionIfNeeded(filename, extension) {
+  if (extension === '' || extension === '.') return filename;
+  extension = extension.startsWith(".") ? extension : `.${extension}`;
+  return filename.endsWith(extension) ? filename : `${filename}${extension}`;
+}
+
+function createDownloadFilename() {
+  let components = [LotivisConfig.downloadFilePrefix];
+  let separator = LotivisConfig.filenameSeparator;
+  for (let i = 0; i < arguments.length; i++) {
+    components.push(String(arguments[i]));
+  }
+  return components.join(separator);
+}
+
+// http://bl.ocks.org/Rokotyan/0556f8facbaf344507cdc45dc3622177
+/**
+ * Parses a String from the given (D3.js) SVG node.
+ *
+ * @param svgNode The node of the SVG.
+ * @returns {string} The parsed String.
+ */
+function getSVGString(svgNode) {
+
+  svgNode.setAttribute('xlink', 'http://www.w3.org/1999/xlink');
+  let cssStyleText = getCSSStyles(svgNode);
+  appendCSS(cssStyleText, svgNode);
+
+  let serializer = new XMLSerializer();
+  let svgString = serializer.serializeToString(svgNode);
+
+  // Fix root xlink without namespace
+  svgString = svgString.replace(
+    /(\w+)?:?xlink=/g,
+    'xmlns:xlink='
+  );
+
+  // Safari NS namespace fix
+  svgString = svgString.replace(
+    /NS\d+:href/g,
+    'xlink:href'
+  );
+
+  return svgString;
+
+  function getCSSStyles(parentElement) {
+    let selectorTextArr = [];
+
+    // Add Parent element Id and Classes to the list
+    selectorTextArr.push('#' + parentElement.id);
+    for (let c = 0; c < parentElement.classList.length; c++) {
+      if (!contains('.' + parentElement.classList[c], selectorTextArr)) {
+        selectorTextArr.push('.' + parentElement.classList[c]);
+      }
+    }
+
+    // Add Children element Ids and Classes to the list
+    let nodes = parentElement.getElementsByTagName("*");
+    for (let i = 0; i < nodes.length; i++) {
+      let id = nodes[i].id;
+      if (!contains('#' + id, selectorTextArr)) {
+        selectorTextArr.push('#' + id);
+      }
+
+      let classes = nodes[i].classList;
+      for (let c = 0; c < classes.length; c++) {
+        if (!contains('.' + classes[c], selectorTextArr)) {
+          selectorTextArr.push('.' + classes[c]);
+        }
+      }
+    }
+
+    // Extract CSS Rules
+    let extractedCSSText = "";
+    for (let i = 0; i < document.styleSheets.length; i++) {
+      let s = document.styleSheets[i];
+
+      try {
+        if (!s.cssRules) continue;
+      } catch (e) {
+        if (e.name !== 'SecurityError') throw e; // for Firefox
+        continue;
+      }
+
+      let cssRules = s.cssRules;
+      for (let r = 0; r < cssRules.length; r++) {
+        if (contains(cssRules[r].selectorText, selectorTextArr)) {
+          extractedCSSText += cssRules[r].cssText;
+        }
+      }
+    }
+
+    return extractedCSSText;
+
+    function contains(str, arr) {
+      return arr.indexOf(str) !== -1;
+    }
+  }
+
+  function appendCSS(cssText, element) {
+    let styleElement = document.createElement("style");
+    styleElement.setAttribute("type", "text/css");
+    styleElement.innerHTML = cssText;
+    let refNode = element.hasChildNodes() ? element.children[0] : null;
+    element.insertBefore(styleElement, refNode);
+  }
+}
+
+/**
+ *
+ * @param svgString
+ * @param width
+ * @param height
+ * @param callback
+ */
+function svgString2Image(svgString, width, height, callback) {
+
+  // Convert SVG string to samples URL
+  let imageSource = 'datasets.controller:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+
+  let canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  let context = canvas.getContext("2d");
+  let image = new Image();
+  image.onload = function () {
+    context.clearRect(0, 0, width, height);
+    context.drawImage(image, 0, 0, width, height);
+
+    let data = canvas.toDataURL("image/png");
+    if (callback) callback(data);
+  };
+
+  image.src = imageSource;
+}
+
+/**
+ * Returns the size of the viewBox or the normal size of the given svg element.
+ *
+ * @param svgElement The svg element.
+ * @returns {number[]} The size [width, height].
+ */
+function getOriginalSizeOfSVG(svgElement) {
+  let viewBoxBaseValue = svgElement.viewBox.baseVal;
+  if (viewBoxBaseValue.width !== 0 && viewBoxBaseValue.height !== 0) {
+    return [
+      viewBoxBaseValue.width,
+      viewBoxBaseValue.height
+    ];
+  } else {
+    return [
+      svgElement.width.baseVal.value,
+      svgElement.height.baseVal.value,
+    ];
+  }
+}
+
+/**
+ * Creates and appends an anchor linked to the given samples which is then immediately clicked.
+ *
+ * @param blob The samples to be downloaded.
+ * @param filename The name of the file.
+ */
+function downloadBlob(blob, filename) {
+  if (window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveBlob(blob, filename);
+  } else {
+    let anchor = document.createElement("a");
+    anchor.href = URL.createObjectURL(blob);
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    document.body.removeChild(anchor);
+  }
+}
+
+/**
+ * Initiates a download of a JSON file with the given content and the given filename.
+ * @param jsonString The JSON content.
+ * @param filename The filename of the file to be downloaded. Will append '.json' extension
+ * if needed.
+ */
+function downloadJSON(jsonString, filename) {
+  let blob = new Blob([jsonString], {type: 'text/json'});
+  let saveFilename = appendExtensionIfNeeded(filename, 'json');
+  downloadBlob(blob, saveFilename);
+}
+
+function downloadCSV(jsonString, filename) {
+  let blob = new Blob([jsonString], {type: 'text/csv'});
+  let saveFilename = appendExtensionIfNeeded(filename, 'csv');
+  downloadBlob(blob, saveFilename);
+}
+
+/**
+ * Initiates a download of the PNG image of the SVG with the given selector (id).
+ *
+ * @param selector The id of the SVG element to create the image of.
+ * @param filename The name of the file which is been downloaded.
+ */
+function downloadImage(selector, filename) {
+  let svgElement = d3.select('#' + selector);
+  let node = svgElement.node();
+  let size = getOriginalSizeOfSVG(node);
+  let svgString = getSVGString(node);
+  svgString2Image(svgString, 2 * size[0], 2 * size[1], function (dataURL) {
+    fetch(dataURL)
+      .then(res => res.blob())
+      .then(function (dataBlob) {
+        let saveFilename = appendExtensionIfNeeded(filename, 'png');
+        downloadBlob(dataBlob, saveFilename);
+      });
+  });
+}
+
+/**
+ * A card containing a textarea which contains the JSON text of a dataset collection.
+ * @class DatasetsJSONCard
+ * @extends EditableDataviewCard
+ */
+class DatasetsJSONCard extends EditableDataviewCard {
+
+  /**
+   * Creates a new instance of DatasetJSONCard.
+   * @param parent The parental element or a selector (id).
+   */
+  constructor(parent = 'datasets-json-card') {
+    if (Object.getPrototypeOf(parent) === Object.prototype) {
+      parent.selector = parent.selector || 'datasets-json-card';
+    }
+    super(parent);
+    this.setTitle('Dataset JSON');
+  }
+
+  download(content) {
+    let filename = this.datasetController.getFilename();
+    let downloadFilename = createDownloadFilename(filename, `datasets`);
+    downloadJSON(content, downloadFilename);
+  }
+
+  textToDatasets(text) {
+    if (text === "") return [];
+    return JSON.parse(text.trim());
+  }
+
+  datasetsToText(datasets) {
+    return JSON.stringify(datasets, null, 2);
+  }
+}
+
+/*
+Following code from:
+https://gist.github.com/Jezternz/c8e9fafc2c114e079829974e3764db75
+
+We use this function to save samples.parse a CSV file.
+ */
+
+const csvStringToArray = strData => {
+  const objPattern = new RegExp(("(\\,|\\r?\\n|\\r|^)(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^\\,\\r\\n]*))"), "gi");
+  let arrMatches = null, arrData = [[]];
+  while (arrMatches = objPattern.exec(strData)) {
+    if (arrMatches[1].length && arrMatches[1] !== ",") arrData.push([]);
+    arrData[arrData.length - 1].push(arrMatches[2] ?
+      arrMatches[2].replace(new RegExp("\"\"", "g"), "\"") :
+      arrMatches[3]);
+  }
+  return arrData;
+};
+
+/**
+ * Returns a new version of the given string by trimming the given char from the beginning and the end of the string.
+ * @param string The string to be trimmed.
+ * @param character The character to trim.
+ * @returns {string} The trimmed version of the string.
+ */
+function trimByChar(string, character) {
+  const saveString = String(string);
+  const first = [...saveString].findIndex(char => char !== character);
+  const last = [...saveString].reverse().findIndex(char => char !== character);
+  return saveString.substring(first, saveString.length - last);
+}
+
+/**
+ * Returns a dataset collection created from the given flat samples collection.
+ * @param flatData The flat samples collection.
+ * @returns {[]} A collection of datasets.
+ */
+function createDatasets(flatData) {
+  let datasetsByLabel = {};
+
+  for (let itemIndex = 0; itemIndex < flatData.length; itemIndex++) {
+    let item = flatData[itemIndex];
+
+    if (!validateDataItem(item)) ;
+
+    let label = item.dataset || item.label;
+    let dataset = datasetsByLabel[label];
+
+    if (dataset) {
+      dataset.data.push({
+        date: item.date,
+        location: item.location,
+        value: item.value
+      });
+    } else {
+      datasetsByLabel[label] = {
+        label: label,
+        stack: item.stack,
+        data: [{
+          date: item.date,
+          location: item.location,
+          value: item.value
+        }]
+      };
+    }
+  }
+
+  let datasets = [];
+  let labels = Object.getOwnPropertyNames(datasetsByLabel);
+
+  for (let index = 0; index < labels.length; index++) {
+    let label = labels[index];
+    if (label.length === 0) continue;
+    datasets.push(datasetsByLabel[label]);
+  }
+
+  return datasets;
+}
+
+function parseCSV(text) {
+  let flatData = [];
+  let arrays = csvStringToArray(text);
+  let headlines = arrays.shift();
+
+  for (let lineIndex = 0; lineIndex < arrays.length; lineIndex++) {
+
+    let lineArray = arrays[lineIndex].map(element => trimByChar(element, `"`));
+
+    if (lineArray.length < 5) {
+      lotivis_log(`Skipping row: ${lineArray}`);
+      continue;
+    }
+
+    flatData.push({
+      label: lineArray[0],
+      stack: lineArray[1],
+      value: +lineArray[2],
+      date: lineArray[3],
+      location: lineArray[4]
+    });
+  }
+
+  let datasets = createDatasets(flatData);
+  datasets.csv = {
+    content: text,
+    headlines: headlines,
+    lines: arrays,
+  };
+
+  return datasets;
+}
+
+/**
+ * Returns a flat version of the given dataset collection.
+ *
+ * @param datasets The collection of datasets.
+ * @returns {[]} The array containing the flat samples.
+ */
+function flatDatasets(datasets) {
+  let flatData = [];
+  let datasetsCopy = datasets;
+  for (let datasetIndex = 0; datasetIndex < datasetsCopy.length; datasetIndex++) {
+    let dataset = datasetsCopy[datasetIndex];
+    let flatDataChunk = flatDataset(dataset);
+    flatData = flatData.concat(flatDataChunk);
+  }
+  return flatData;
+}
+
+/**
+ * Returns an array containing the flat samples of the given dataset.
+ *
+ * @param dataset The dataset with samples.
+ * @returns {[]} The array containing the flat samples.
+ */
+function flatDataset(dataset) {
+  let flatData = [];
+  if (!dataset.data) {
+    console.log('Lotivis: Flat samples for dataset without samples requested. Will return an empty array.');
+    return flatData;
+  }
+  dataset.data.forEach(item => {
+    let newItem = {};
+    newItem.dataset = dataset.label;
+    newItem.label = dataset.label;
+    newItem.stack = dataset.stack || dataset.label;
+    newItem.location = item.location;
+    newItem.date = item.date;
+    newItem.dateNumeric = item.dateNumeric;
+    newItem.value = item.value;
+    flatData.push(newItem);
+  });
+  return flatData;
+}
+
+/**
+ * Returns the given string with a quotation mark in the left and right.
+ * @param aString The string to surround by quotation marks.
+ * @returns {string} The string surrounded by quotation marks.
+ */
+function surroundWithQuotationMarks(aString) {
+  return `"${aString}"`;
+}
+
+/**
+ * Returns the CSV string of the given datasets.
+ * @param datasets The datasets to create the CSV of.
+ */
+function renderCSV(datasets) {
+  let flatData = flatDatasets(datasets);
+  let headlines = ['label', 'stack', 'value', 'date', 'location'];
+  let csvContent = `${headlines.join(',')}\n`;
+  for (let index = 0; index < flatData.length; index++) {
+    let data = flatData[index];
+    let components = [];
+    components.push(surroundWithQuotationMarks(data.dataset || 'Unknown'));
+    components.push(surroundWithQuotationMarks(data.stack || ''));
+    components.push(data.value || '0');
+    components.push(surroundWithQuotationMarks(data.date || ''));
+    components.push(surroundWithQuotationMarks(data.location || ''));
+    csvContent += `${components.join(`,`)}\n`;
+  }
+  return csvContent;
+}
+
+/**
+ * Presents the CSV version of datasets.  The presented CSV can be edited.
+ * @class DatasetCSVCard
+ * @extends Card
+ */
+class DatasetCSVCard extends EditableDataviewCard {
+
+  /**
+   * Creates a new instance of DatasetCSVCard.
+   * @param parent The parental element or a selector (id).
+   */
+  constructor(parent) {
+    super(parent);
+    this.setTitle('Dataset CSV');
+  }
+
+  download(content) {
+    let filename = this.datasetController.getFilename();
+    let downloadFilename = createDownloadFilename(filename, `datasets`);
+    downloadCSV(content, downloadFilename);
+  }
+
+  textToDatasets(text) {
+    if (text === "") return [];
+    return parseCSV(text);
+  }
+
+  datasetsToText(datasets) {
+    return renderCSV(datasets);
+  }
+}
+
+/**
+ * Returns a collection of datasets parsed from the given CSV content.
+ * @param text The CSV content.
+ * @returns {[]} The parsed datasets.
+ */
+function parseCSVDate(text) {
+  let arrays = csvStringToArray(text);
+  let datasetLabels = arrays.shift();
+  datasetLabels.shift();
+  let datasets = [];
+  let minLineLength = datasetLabels.length;
+
+  for (let index = 0; index < datasetLabels.length; index++) {
+    datasets.push({
+      label: datasetLabels[index],
+      data: []
+    });
+  }
+
+  for (let lineIndex = 0; lineIndex < arrays.length; lineIndex++) {
+    let lineArray = arrays[lineIndex].map(element => trimByChar(element, `"`));
+    if (lineArray.length < minLineLength) continue;
+
+    let date = lineArray.shift();
+
+    for (let columnIndex = 0; columnIndex < lineArray.length; columnIndex++) {
+      let value = lineArray[columnIndex];
+      datasets[columnIndex].data.push({
+        date: date,
+        value: value
+      });
+    }
+  }
+
+  datasets.csv = {
+    content: text,
+    headlines: datasetLabels.push(),
+    lines: arrays,
+  };
+
+  return datasets;
+}
+
+/**
+ * Returns the set of dataset names from the given dataset collection.
+ *
+ * @param datasets The collection of datasets.
+ * @returns {[]} The array containing the flat samples.
+ */
+function extractLabelsFromDatasets(datasets) {
+  return toSet(datasets.map(dataset => toValue(dataset.label)));
+}
+
+/**
+ * Returns the set of stacks from the given dataset collection.
+ * Will fallback on dataset property if stack property isn't present.
+ *
+ * @param datasets The collection of datasets.
+ * @returns {[]} The array containing the flat samples.
+ */
+function extractStacksFromDatasets(datasets) {
+  return toSet(datasets.map(dataset => toValue(dataset.stack || dataset.label)));
+}
+
+/**
+ * Returns the set of dates from the given dataset collection.
+ *
+ * @param datasets The collection of datasets.
+ * @returns {[]} The set containing the dates.
+ */
+function extractDatesFromDatasets(datasets) {
+  return extractDatesFromFlatData(flatDatasets(datasets));
+}
+
+/**
+ * Returns the set of locations from the given dataset collection.
+ *
+ * @param datasets The collection of datasets.
+ * @returns {[]} The set containing the locations.
+ */
+function extractLocationsFromDatasets(datasets) {
+  return extractLocationsFromFlatData(flatDatasets(datasets));
+}
+
+/**
+ * Returns the set of dates from the given dataset collection.
+ *
+ * @param flatData The flat samples array.
+ * @returns {[]} The set containing the dates.
+ */
+function extractDatesFromFlatData(flatData) {
+  return toSet(flatData.map(item => toValue(item.date)));
+}
+
+/**
+ * Returns the set of locations from the given dataset collection.
+ *
+ * @param flatData The flat samples array.
+ * @returns {[]} The set containing the locations.
+ */
+function extractLocationsFromFlatData(flatData) {
+  return toSet(flatData.map(item => toValue(item.location)));
+}
+
+/**
+ * Return an array containing each equal item of the given array only once.
+ *
+ * @param array The array to create a set of.
+ * @returns {any[]} The set version of the array.
+ */
+function toSet(array) {
+  return Array.from(new Set(array));
+}
+
+/**
+ * Returns the earliest date occurring in the flat array of items.
+ *
+ * @param flatData The flat samples array.
+ * @param dateAccess
+ * @returns {*} The earliest date.
+ */
+function extractEarliestDate(flatData, dateAccess = (date) => date) {
+  return extractDatesFromFlatData(flatData)
+    .sort((left, right) => dateAccess(left) - dateAccess(right)).shift();
+}
+
+/**
+ * Returns the earliest date occurring in the flat array of items.
+ *
+ * @param flatData The flat samples array.
+ * @param dateAccess
+ * @returns {*} The earliest date.
+ */
+function extractEarliestDateWithValue(flatData, dateAccess = (date) => date) {
+  return extractEarliestDate(filterWithValue(flatData), dateAccess);
+}
+
+/**
+ * Returns the latest date occurring in the flat array of items.
+ *
+ * @param flatData The flat samples array.
+ * @param dateAccess
+ * @returns {*} The latest date.
+ */
+function extractLatestDate(flatData, dateAccess = (date) => date) {
+  return extractDatesFromFlatData(flatData)
+    .sort((left, right) => dateAccess(left) - dateAccess(right)).pop();
+}
+
+/**
+ * Returns the latest date occurring in the flat array of items.
+ *
+ * @param flatData The flat samples array.
+ * @param dateAccess
+ * @returns {*} The latest date.
+ */
+function extractLatestDateWithValue(flatData, dateAccess = (date) => date) {
+  return extractLatestDate(filterWithValue(flatData), dateAccess);
+}
+
+/**
+ * Returns a filtered collection containing all items which have a valid value greater than 0.
+ *
+ * @param flatData The flat samples to filter.
+ * @returns {*} All items with a value greater 0.
+ */
+function filterWithValue(flatData) {
+  return flatData.filter(item => (item.value || 0) > 0);
+}
+
+/**
+ *
+ * @param datasets
+ * @param dateAccess
+ * @returns {{date: *}[]}
+ */
+function dateToItemsRelation(datasets, dateAccess) {
+
+  let flatData = flatDatasets(datasets);
+  flatData = combineByDate(flatData);
+
+  let listOfDates = extractDatesFromDatasets(datasets);
+  // verbose_log('listOfDates', listOfDates);
+  listOfDates = listOfDates.reverse();
+  // verbose_log('listOfDates', listOfDates);
+  // listOfDates = listOfDates.sort(function (left, right) {
+  //   return dateAccess(left) - dateAccess(right);
+  // });
+
+  let listOfLabels = extractLabelsFromDatasets(datasets);
+
+  return listOfDates.map(function (date) {
+    let datasetDate = {date: date};
+    flatData
+      .filter(item => item.date === date)
+      .forEach(function (entry) {
+        datasetDate[entry.dataset] = entry.value;
+        datasetDate.total = entry.dateTotal;
+      });
+
+    // addDataset zero values for empty datasets
+    for (let index = 0; index < listOfLabels.length; index++) {
+      let label = listOfLabels[index];
+      if (!datasetDate[label]) {
+        datasetDate[label] = 0;
+      }
+    }
+
+    return datasetDate;
+  });
+}
+
+/**
+ *
+ * @param datasets
+ */
+function renderCSVDate(datasets) {
+  let dateRelation = dateToItemsRelation(datasets);
+  let labels = extractLabelsFromDatasets(datasets);
+  let headlines = ['date'];
+
+  for (let labelIndex = 0; labelIndex < labels.length; labelIndex++) {
+    headlines.push(labels[labelIndex]);
+  }
+
+  let csvContent = `${headlines.join(',')}\n`;
+
+  for (let index = 0; index < dateRelation.length; index++) {
+    let dateRow = dateRelation[index];
+    let csvRow = `${dateRow.date}`;
+
+    for (let labelIndex = 0; labelIndex < labels.length; labelIndex++) {
+      let label = labels[labelIndex];
+      csvRow += `,${dateRow[label]}`;
+    }
+
+    csvContent += `${csvRow}\n`;
+  }
+
+  return csvContent;
+}
+
+/**
+ * Presents the CSV version of datasets.  The presented CSV can be edited.
+ * @class DatasetCSVDateCard
+ * @extends Card
+ */
+class DatasetCSVDateCard extends EditableDataviewCard {
+
+  /**
+   * Creates a new instance of DatasetCSVCard.
+   * @param parent The parental element or a selector (id).
+   */
+  constructor(parent) {
+    super(parent);
+    this.setTitle('Dataset CSV');
+  }
+
+  download(content) {
+    let filename = this.datasetController.getFilename();
+    let downloadFilename = createDownloadFilename(filename, `datasets`);
+    downloadCSV(content, downloadFilename);
+  }
+
+  textToDatasets(text) {
+    if (text === "") return [];
+    return parseCSVDate(text);
+  }
+
+  datasetsToText(datasets) {
+    return renderCSVDate(datasets);
+  }
+}
+
+/**
+ * A card containing a textarea which contains the JSON text of a dataset collection.
+ * @class DataviewCard
+ * @extends UpdatableDataviewCard
+ */
+class DataviewCard extends UpdatableDataviewCard {
+
+  /**
+   * Creates a new instance of DataviewCard.
+   * @param parent The parental element or a selector (id).
+   */
+  constructor(parent = 'dataview-card') {
+    parent.updatesHeight = parent.updatesHeight || true;
+    super(parent);
+    this.disableTextarea();
+  }
+
+  datasetsToText(datasets) {
+    if (!this.datasetsController) return "No datasets controller.";
+    let dataview = this.getDataview();
+    return JSON.stringify(dataview, null, 2);
+  }
+
+  getDataview() {
+    // empty
+  }
+}
+
+class DataviewDateCard extends DataviewCard {
+  getTitle() {
+    return 'Dataview Date';
+  }
+
+  getDataview() {
+    return this.datasetsController.getDateDataview();
+  }
+}
+
+class DataViewPlotCard extends DataviewCard {
+  getTitle() {
+    return 'Dataview Plot';
+  }
+
+  getDataview() {
+    return this.datasetsController.getPlotDataview();
+  }
+}
+
+class DataViewMapCard extends DataviewCard {
+  getTitle() {
+    return 'Dataview Map';
+  }
+
+  getDataview() {
+    return this.datasetsController.getLocationDataview();
+  }
+}
+
+class DataviewFlatCard extends DataviewCard {
+  getTitle() {
+    return 'Flat Data';
+  }
+
+  getDataview() {
+    return this.datasetsController.flatData;
+  }
+}
+
+/**
+ * @class DataviewDatasetsControllerCard
+ * @extends DataviewCard
+ */
+class DataviewDatasetsControllerCard extends DataviewCard {
+
+  /**
+   * Creates a new instance of DataviewDatasetsControllerCard.
+   */
+  constructor(parent) {
+    parent.title = parent.title || `DataviewDatasetsControllerCard`;
+    super(parent);
+  }
+
+  datasetsToText(datasets) {
+    return JSON.stringify({
+      labels: this.datasetsController.labels,
+      stacks: this.datasetsController.stacks,
+      dates: this.datasetsController.dates,
+      locations: this.datasetsController.locations,
+      filters: {
+        locations: this.datasetsController.locationFilters,
+        dates: this.datasetsController.dateFilters,
+        datasets: this.datasetsController.datasetFilters,
+      },
+      selection: {},
+      workingDatasets: this.datasetsController.workingDatasets,
+      flatData: this.datasetsController.flatData,
+      originalDatasets: this.datasetsController.originalDatasets
+    }, null, 2);
+  }
+}
+
+/**
+ * @class DataviewDatasetsControllerSelectionCard
+ * @extends DataviewCard
+ */
+class DataviewDatasetsControllerSelectionCard extends DataviewCard {
+
+  /**
+   * Creates a new instance of DataviewDatasetsControllerSelectionCard.
+   */
+  constructor(parent) {
+    parent.title = parent.title || `DataviewDatasetsControllerSelectionCard`;
+    super(parent);
+  }
+
+  datasetsToText(datasets) {
+    return JSON.stringify(this.datasetsController.getSelection(), null, 2);
+  }
+}
+
+/**
  * @class DateAxisRenderer
  */
 class DateAxisRenderer {
@@ -470,49 +2957,6 @@ class DateLabelRenderer {
         });
     };
   }
-}
-
-/**
- * Returns the sum of samples values for the given dataset.
- *
- * @param flatData The flat samples array.
- * @param dataset The dataset name.
- * @returns {*} The sum.
- */
-function sumOfDataset(flatData, dataset) {
-  return sumOfValues(flatData.filter(item => item.dataset === dataset));
-}
-
-/**
- * Returns the sum of samples values for the given label.
- *
- * @param flatData The flat samples array.
- * @param label The label.
- * @returns {*} The sum.
- */
-function sumOfLabel(flatData, label) {
-  return sumOfValues(flatData.filter(item => item.label === label));
-}
-
-/**
- * Returns the sum of samples values for the given stack.
- *
- * @param flatData The flat samples array.
- * @param stack The stack name.
- * @returns {*} The sum.
- */
-function sumOfStack(flatData, stack) {
-  return sumOfValues(flatData.filter(item => item.stack === stack));
-}
-
-/**
- * Returns the sum of the value properties of each item.
- *
- * @param flatData
- * @returns {*}
- */
-function sumOfValues(flatData) {
-  return flatData.map(item => +(item.value || 0)).reduce((acc, next) => acc + next, 0);
 }
 
 class DateLegendRenderer {
@@ -617,25 +3061,6 @@ class DateLegendRenderer {
     };
   }
 }
-
-const LotivisConfig = {
-  // The default margin to use for charts.
-  defaultMargin: 60,
-  // The default offset for the space between an object an the toolbar.
-  tooltipOffset: 7,
-  // The default radius to use for bars drawn on a chart.
-  barRadius: 5,
-  // A Boolean value indicating whether the debug logging is enabled.
-  debugLog: false,
-  // A Boolean value indicating whether the debug logging is enabled.
-  debug: true,
-  // A string which is used as prefix for download.
-  downloadFilePrefix: 'lotivis',
-  // A string which is used as separator between components when creating a file name.
-  filenameSeparator: '_',
-  // A string which is used for unknown values.
-  unknown: 'LOTIVIS_UNKNOWN'
-};
 
 /**
  * @class DateBarsRenderer
@@ -763,170 +3188,6 @@ class DateGhostBarsRenderer {
 
     };
   }
-}
-
-/**
- * Returns a copy of the passed object.  The copy is created by using the
- * JSON's `parse` and `stringify` functions.
- * @param object The java script object to copy.
- * @returns {any} The copy of the object.
- */
-function copy(object) {
-  return JSON.parse(JSON.stringify(object));
-}
-
-/**
- * Returns `true` if the given value not evaluates to false and is not 0. false else.
- * @param value The value to check.
- * @returns {boolean} A Boolean value indicating whether the given value is valid.
- */
-function isValue(value) {
-  return Boolean(value || value === 0);
-}
-
-/**
- * Returns the value if it evaluates to true or is 0.  Returns `GlobalConfig.unknown` else.
- * @param value The value to check.
- * @returns The value or `GlobalConfig.unknown`.
- */
-function toValue(value) {
-  return value || (value === 0 ? 0 : LotivisConfig.unknown);
-}
-
-/**
- *
- * @param flattenList
- * @returns {[]}
- */
-function combine(flattenList) {
-  let combined = [];
-  let copiedList = copy(flattenList);
-  for (let index = 0; index < copiedList.length; index++) {
-    let listItem = copiedList[index];
-    let entry = combined.find(function (entryItem) {
-      return entryItem.dataset === listItem.dataset
-        && entryItem.stack === listItem.stack
-        && entryItem.label === listItem.label
-        && entryItem.location === listItem.location
-        && entryItem.date === listItem.date;
-    });
-    if (entry) {
-      entry.value += (listItem.value + 0);
-    } else {
-      let entry = {};
-      if (isValue(listItem.label)) entry.label = listItem.label;
-      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
-      if (isValue(listItem.stack)) entry.stack = listItem.stack;
-      if (isValue(listItem.location)) entry.location = listItem.location;
-      if (isValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
-      if (isValue(listItem.date)) entry.date = listItem.date;
-      if (isValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
-      if (isValue(listItem.locationName)) entry.locationName = listItem.locationName;
-      entry.value = (listItem.value || 0);
-      combined.push(entry);
-    }
-  }
-  return combined;
-}
-
-/**
- * Returns
- *
- * @param flattenList
- * @returns {[]}
- */
-function combineByStacks(flattenList) {
-  let combined = [];
-  for (let index = 0; index < flattenList.length; index++) {
-    let listItem = flattenList[index];
-
-    let entry = combined.find(function (entryItem) {
-      return entryItem.stack === listItem.stack
-        && entryItem.label === listItem.label
-        && entryItem.location === listItem.location
-        && entryItem.date === listItem.date;
-    });
-
-    if (entry) {
-      entry.value += (listItem.value + 0);
-    } else {
-      let entry = {};
-      if (isValue(listItem.label)) entry.label = listItem.label;
-      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
-      if (isValue(listItem.stack)) entry.stack = listItem.stack;
-      if (isValue(listItem.location)) entry.location = listItem.location;
-      if (isValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
-      if (isValue(listItem.date)) entry.date = listItem.date;
-      if (isValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
-      if (isValue(listItem.locationName)) entry.locationName = listItem.locationName;
-      entry.value = (listItem.value || 0);
-      combined.push(entry);
-    }
-  }
-  return combined;
-}
-
-/**
- *
- * @param flatData
- * @returns {[]}
- */
-function combineByDate(flatData) {
-  let combined = [];
-  for (let index = 0; index < flatData.length; index++) {
-    let listItem = flatData[index];
-    let entry = combined.find(function (entryItem) {
-      return entryItem.dataset === listItem.dataset
-        && entryItem.stack === listItem.stack
-        && entryItem.label === listItem.label
-        && entryItem.date === listItem.date;
-    });
-    if (entry) {
-      entry.value += (listItem.value + 0);
-    } else {
-      let entry = {};
-      if (isValue(listItem.label)) entry.label = listItem.label;
-      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
-      if (isValue(listItem.stack)) entry.stack = listItem.stack;
-      if (isValue(listItem.date)) entry.date = listItem.date;
-      if (isValue(listItem.dateTotal)) entry.dateTotal = listItem.dateTotal;
-      entry.value = (listItem.value || 0);
-      combined.push(entry);
-    }
-  }
-  return combined;
-}
-
-/**
- *
- * @param flatData
- * @returns {[]}
- */
-function combineByLocation(flatData) {
-  let combined = [];
-  for (let index = 0; index < flatData.length; index++) {
-    let listItem = flatData[index];
-    let entry = combined.find(function (entryItem) {
-      return entryItem.dataset === listItem.dataset
-        && entryItem.stack === listItem.stack
-        && entryItem.label === listItem.label
-        && entryItem.location === listItem.location;
-    });
-    if (entry) {
-      entry.value += listItem.value;
-    } else {
-      let entry = {};
-      if (isValue(listItem.label)) entry.label = listItem.label;
-      if (isValue(listItem.dataset)) entry.dataset = listItem.dataset;
-      if (isValue(listItem.stack)) entry.stack = listItem.stack;
-      if (isValue(listItem.location)) entry.location = listItem.location;
-      if (isValue(listItem.locationTotal)) entry.locationTotal = listItem.locationTotal;
-      if (isValue(listItem.locationName)) entry.locationName = listItem.locationName;
-      entry.value = listItem.value;
-      combined.push(entry);
-    }
-  }
-  return combined;
 }
 
 /**
@@ -1079,71 +3340,6 @@ class DateTooltipRenderer {
       if (+tooltip.style('opacity') === 0) return;
       tooltip.style('opacity', 0);
     };
-  }
-}
-
-/**
- * Superclass for lotivis charts.
- * @class Chart
- * @extends Component
- * @see DateChart
- * @see MapChart
- * @see PlotChart
- */
-class Chart extends Component {
-
-  /**
-   * Creates an instance of DiachronicChart.
-   * @constructor
-   * @param {Component} parent The parental component.
-   * @param config The configuration of the chart.
-   */
-  constructor(parent, config) {
-    super(parent);
-
-    this.svgSelector = (this.selector || createID()) + '-svg';
-    this.element = this.parent;
-    this.element.attr('id', this.selector);
-    this.config = config || {};
-    this.updateSensible = true;
-    this.initialize();
-
-    if (this.config.datasets) {
-      this.setDatasets(this.config.datasets);
-    } else {
-      this.update();
-    }
-  }
-
-  initialize() {
-    // empty
-  }
-
-  update() {
-    if (!this.updateSensible) return;
-    this.remove();
-    this.precalculate();
-    this.draw();
-  }
-
-  precalculate() {
-    // empty
-  }
-
-  remove() {
-    // empty
-  }
-
-  draw() {
-    // empty
-  }
-
-  makeUpdateInsensible() {
-    this.updateSensible = false;
-  }
-
-  makeUpdateSensible() {
-    this.updateSensible = true;
   }
 }
 
@@ -1400,289 +3596,6 @@ class DateChart extends Chart {
 }
 
 /**
- * A lotivis card.
- * @class Card
- * @extends Component
- */
-class Card extends Component {
-
-  /**
-   * Creates a new instance of Card.
-   * @param parent The parental component.
-   */
-  constructor(parent) {
-    super(parent);
-    this.injectCard();
-    this.injectHeader();
-    this.injectBody();
-    this.injectFooter();
-  }
-
-  /**
-   * Appends the card element.
-   */
-  injectCard() {
-    this.element = this.parent
-      .append('div')
-      .classed('lotivis-card', true);
-  }
-
-  /**
-   * Appends the header of the card.
-   */
-  injectHeader() {
-    this.header = this.element
-      .append('div')
-      .attr('class', 'lotivis-card-header');
-    this.headerRow = this.header
-      .append('div')
-      .attr('class', 'lotivis-row');
-    this.headerLeftComponent = this.headerRow
-      .append('div')
-      .attr('class', 'lotivis-card-header-left');
-    this.headerCenterComponent = this.headerRow
-      .append('div')
-      .attr('class', 'lotivis-card-header-center');
-    this.headerRightComponent = this.headerRow
-      .append('div')
-      .attr('class', 'lotivis-card-header-right lotivis-button-group');
-    this.titleLabel = this.headerLeftComponent
-      .append('div')
-      .attr('class', 'lotivis-title-label');
-  }
-
-  /**
-   * Appends the body of the card.
-   */
-  injectBody() {
-    this.body = this.element
-      .append('div')
-      .attr('class', 'lotivis-card-body');
-    this.content = this.body
-      .append('div')
-      .attr('class', 'lotivis-card-body-content');
-  }
-
-  /**
-   * Appends the footer of the card.
-   */
-  injectFooter() {
-    this.footer = this.element
-      .append('div')
-      .attr('class', 'lotivis-card-footer');
-    this.footerRow = this.footer
-      .append('div')
-      .attr('class', 'lotivis-row');
-    this.footerLeftComponent = this.footerRow
-      .append('div')
-      .attr('class', 'lotivis-col-6');
-    this.footerRightComponent = this.footerRow
-      .append('div')
-      .attr('class', 'lotivis-col-6');
-    this.footer.style('display', 'none');
-  }
-
-  /**
-   * Sets the text of the title label.
-   * @param newTitle The text of the title label.
-   */
-  setTitle(newTitle) {
-    this.titleLabel.text(newTitle);
-  }
-
-  /**
-   * Shows the footer by resetting its style display value.
-   */
-  showFooter() {
-    this.footer.style('display', '');
-  }
-
-  /**
-   * Hides the footer by setting its style display value to `none`.
-   */
-  hideFooter() {
-    this.footer.style('display', 'none');
-  }
-}
-
-class Checkbox extends Component {
-  constructor(parent) {
-    super(parent);
-    this.renderInput();
-    this.renderLabel();
-  }
-
-  // MARK: - Life Cycle
-  renderInput() {
-    let thisReference = this;
-    this.element = this.parent
-      .classed('radio-group', true)
-      .append('input')
-      .attr('type', 'checkbox')
-      .attr('id', this.selector)
-      .on('click', function (event) {
-        if (!event.target) {
-          return;
-        }
-        let checkbox = event.target;
-        if (thisReference.onClick) {
-          thisReference.onClick(checkbox.checked);
-        }
-      });
-  }
-
-  renderLabel() {
-    this.label = this.parent
-      .append('label')
-      .attr('for', this.selector)
-      .text('Unknown');
-  }
-
-  // MARK: - Functions
-  setText(text) {
-    this.label.text(text);
-    return this;
-  }
-
-  setChecked(checked) {
-    this.element.attr('checked', checked === true ? checked : null);
-    return this;
-  }
-
-  onClick(checked) {
-    // empty
-    console.log('onClick: ' + checked);
-  }
-
-  enable() {
-    this.element.attr('disabled', null);
-    this.label.style('color', 'black');
-  }
-
-  disable() {
-    this.element.attr('disabled', true);
-    this.label.style('color', 'gray');
-  }
-}
-
-/**
- *
- * @class RadioGroup
- * @extends Component
- */
-class RadioGroup extends Component {
-
-  /**
-   *
-   * @param parent The parental component.
-   */
-  constructor(parent) {
-    super(parent);
-
-    this.inputElements = [];
-    this.element = this.parent.append('form');
-    this.element.classed('radio-group', true);
-  }
-
-  /**
-   *
-   * @param optionId
-   * @param optionName
-   * @returns {*}
-   */
-  addOption(optionId, optionName) {
-    let inputElement = this.element
-      .append('input')
-      .attr('type', 'radio')
-      .attr('name', this.selector)
-      .attr('value', optionId)
-      .attr('id', optionId);
-
-    this.element
-      .append('label')
-      .attr('for', optionId)
-      .text(optionName || optionId);
-
-    let thisReference = this;
-    inputElement.on("click", function (event) {
-      thisReference.onClick(event);
-    });
-
-    return inputElement;
-  }
-
-  /**
-   *
-   * @param options
-   * @returns {RadioGroup}
-   */
-  setOptions(options) {
-    this.removeOptions();
-    this.inputElements = [];
-    for (let i = 0; i < options.length; i++) {
-      let id = options[i][0] || options[i].id;
-      let name = options[i][1] || options[i].translatedTitle;
-      let inputElement = this.addOption(id, name);
-      if (i === 0) {
-        inputElement.attr('checked', 'true');
-      }
-      this.inputElements.push(inputElement);
-    }
-    return this;
-  }
-
-  /**
-   *
-   * @param selectedOption
-   * @returns {RadioGroup}
-   */
-  setSelectedOption(selectedOption) {
-    for (let i = 0; i < this.inputElements.length; i++) {
-      let inputElement = this.inputElements[i];
-      let value = inputElement.attr('value');
-      if (value === selectedOption) {
-        inputElement.attr('checked', 'true');
-      }
-    }
-    return this;
-  }
-
-  /**
-   *
-   * @returns {RadioGroup}
-   */
-  removeOptions() {
-    this.element.selectAll('input').remove();
-    this.element.selectAll('label').remove();
-    this.inputElements = [];
-    return this;
-  }
-
-  /**
-   *
-   * @param event
-   */
-  onClick(event) {
-    let element = event.target;
-    if (!element) return;
-
-    let value = element.value;
-    if (!this.onChange) return;
-
-    this.onChange(value);
-
-    return this;
-  }
-
-  // onChange(newFunction) {
-  //     this.onChange = newFunction;
-  //     return this;
-  // }
-  onChange(value) {
-  }
-}
-
-/**
  *
  * @class UrlParameters
  */
@@ -1765,253 +3678,6 @@ UrlParameters.startYear = 'start-year';
 UrlParameters.endYear = 'end-year';
 
 UrlParameters.showTestData = 'show-samples';
-
-/**
- * Represents an option of a dropdown or radio group.
- * @class Option
- */
-class Option {
-
-  /**
-   * Creates a new instance of Option.
-   * @param title The title of the option.
-   */
-  constructor(title) {
-    this.title = title;
-    this.id = toSaveID(title);
-  }
-}
-
-/**
- * A lotivis popup.
- *
- * +----------------------------------------------------------------+
- * |                                                                |
- * |                                                                |
- *
- * @class Popup
- * @extends Component
- */
-class Popup extends Component {
-
-  /**
-   * Creates a new instance of Popup.
-   * @param parent The parental component.
-   */
-  constructor(parent = d3.select('body')) {
-    super(parent);
-    this.injectUnderground(parent);
-    this.injectContainer();
-    this.injectCard();
-    this.inject();
-    this.injectCloseButton();
-    this.addCloseActionListeners();
-  }
-
-  // MARK: - Render
-
-  /**
-   * Appends components to this popup.
-   * Should be overridden by subclasses.
-   */
-  inject() {
-    // empty
-  }
-
-  /**
-   * Appends the 'dim' background to the given parent.
-   *
-   * @param parent The parental element.
-   */
-  injectUnderground(parent) {
-    this.modalBackgroundId = createID();
-    this.modalBackground = parent
-      .append('div')
-      .classed('lotivis-popup-underground lotivis-fade-in', true)
-      .attr('id', this.modalBackgroundId);
-  }
-
-  /**
-   *
-   */
-  injectContainer() {
-    this.elementId = createID();
-    this.element = this.modalBackground
-      .append('div')
-      .classed('lotivis-popup', true)
-      .attr('id', this.elementId);
-  }
-
-  /**
-   *
-   */
-  injectCard() {
-    this.card = new Card(this.element);
-    this.card.element.classed('lotivis-popup', true);
-  }
-
-  /**
-   * Appends a close button to the right header component.
-   */
-  injectCloseButton() {
-    this.closeButton = new Button(this.card.headerRightComponent);
-    this.closeButton.element.classed('lotivis-button-small', true);
-    this.closeButton.setText('Close');
-  }
-
-  /**
-   * Appends an on click listener to the button.
-   */
-  addCloseActionListeners() {
-    let validIDs = [
-      this.closeButton.selector,
-      this.modalBackgroundId
-    ];
-    let popup = this;
-    this.modalBackground.on('click', function (event) {
-      if (!event || !event.target) return;
-      if (!validIDs.includes(event.target.id)) return;
-      popup.dismiss();
-    });
-  }
-
-  // MARK: - Life Cycle
-
-  /**
-   * Tells the receiving popup that it is about to be presented.
-   *
-   * Subclasses may override.
-   */
-  willShow() {
-    // empty
-  }
-
-  /**
-   * Tells the receiving popup that it is now presented.
-   *
-   * Subclasses may override.
-   */
-  didShow() {
-    // empty
-  }
-
-  /**
-   * Presents the popup.
-   */
-  show() {
-    if (this.willShow) this.willShow();
-    this.getUnderground().style.display = 'block';
-    if (this.didShow) this.didShow();
-  }
-
-  /**
-   * Tells the receiving popup that it is about to be dismissed.
-   *
-   * Subclasses may override.
-   */
-  willDismiss() {
-    // empty
-  }
-
-  /**
-   * Tells the receiving popup that the DOM element will be removed.
-   *
-   * Subclasses may override.
-   */
-  willRemoveDOMElement() {
-    // empty
-  }
-
-  /**
-   * Dismisses the popup.
-   */
-  dismiss() {
-    if (this.willDismiss) this.willDismiss();
-    this.getUnderground().style.display = 'none';
-    if (this.willRemoveDOMElement) this.willRemoveDOMElement();
-    this.getUnderground().remove();
-  }
-
-  getUnderground() {
-    return document.getElementById(this.modalBackgroundId);
-  }
-
-  showUnder(sourceElement, position = 'center') {
-    if (!sourceElement) return;
-
-    let preferredSize = this.preferredSize();
-    let origin = this.calculateBottomCenter(sourceElement);
-
-    if (position === 'left') {
-      origin.x -= origin.width / 2;
-    } else if (position === 'right') {
-      origin.x -= preferredSize.width - origin.width / 2;
-    } else { // assume center
-      origin.x -= (preferredSize.width / 2);
-    }
-
-    let id = this.elementId;
-    let popup = document.getElementById(id);
-
-    popup.style.position = 'absolute';
-    popup.style.width = preferredSize.width + 'px';
-    // popup.style.height = preferredSize.height + 'px';
-    popup.style.left = origin.x + 'px';
-    popup.style.top = origin.y + 'px';
-
-    this.show();
-  }
-
-  showBigModal() {
-    let id = this.elementId;
-    let popup = document.getElementById(id);
-    let preferredSize = this.preferredSize();
-
-    popup.style.position = 'relative';
-    popup.style.margin = '50px auto';
-    popup.style.width = preferredSize.width + 'px';
-
-    this.show();
-  }
-
-  /**
-   * Returns the preferred size of the popup.  Subclasses may override in order to
-   * change the size of the popup.
-   *
-   * @returns {{width: number, height: number}}
-   */
-  preferredSize() {
-    return {
-      width: 300,
-      height: 300
-    };
-  }
-
-  /**
-   * Returns the bottom middle point of the passed element.
-   *
-   * @param element
-   * @param respectWindowScroll
-   * @returns {{x: number, width: number, y: number, height: number}}
-   */
-  calculateBottomCenter(element, respectWindowScroll = false) {
-    let rect = element.getBoundingClientRect();
-    let x = rect.x + (rect.width / 2);
-    let y = rect.y + rect.height;
-
-    if (respectWindowScroll) {
-      x += window.scrollX;
-      y += window.scrollY;
-    }
-
-    return {
-      x: x,
-      y: y,
-      width: rect.width,
-      height: rect.height
-    };
-  }
-}
 
 /**
  * @class SettingsPopup
@@ -2225,228 +3891,6 @@ class ChartCard extends Card {
 }
 
 /**
- * Appends the given string in extension to the given string filename if filename not already ends with this extension.
- * @param filename A string with or without an extension.
- * @param extension The extension the filename will end with.
- * @returns {*|string} The filename with the given extension.
- */
-function appendExtensionIfNeeded(filename, extension) {
-  if (extension === '' || extension === '.') return filename;
-  extension = extension.startsWith(".") ? extension : `.${extension}`;
-  return filename.endsWith(extension) ? filename : `${filename}${extension}`;
-}
-
-function createDownloadFilename() {
-  let components = [LotivisConfig.downloadFilePrefix];
-  let separator = LotivisConfig.filenameSeparator;
-  for (let i = 0; i < arguments.length; i++) {
-    components.push(String(arguments[i]));
-  }
-  return components.join(separator);
-}
-
-// http://bl.ocks.org/Rokotyan/0556f8facbaf344507cdc45dc3622177
-/**
- * Parses a String from the given (D3.js) SVG node.
- *
- * @param svgNode The node of the SVG.
- * @returns {string} The parsed String.
- */
-function getSVGString(svgNode) {
-
-  svgNode.setAttribute('xlink', 'http://www.w3.org/1999/xlink');
-  let cssStyleText = getCSSStyles(svgNode);
-  appendCSS(cssStyleText, svgNode);
-
-  let serializer = new XMLSerializer();
-  let svgString = serializer.serializeToString(svgNode);
-
-  // Fix root xlink without namespace
-  svgString = svgString.replace(
-    /(\w+)?:?xlink=/g,
-    'xmlns:xlink='
-  );
-
-  // Safari NS namespace fix
-  svgString = svgString.replace(
-    /NS\d+:href/g,
-    'xlink:href'
-  );
-
-  return svgString;
-
-  function getCSSStyles(parentElement) {
-    let selectorTextArr = [];
-
-    // Add Parent element Id and Classes to the list
-    selectorTextArr.push('#' + parentElement.id);
-    for (let c = 0; c < parentElement.classList.length; c++) {
-      if (!contains('.' + parentElement.classList[c], selectorTextArr)) {
-        selectorTextArr.push('.' + parentElement.classList[c]);
-      }
-    }
-
-    // Add Children element Ids and Classes to the list
-    let nodes = parentElement.getElementsByTagName("*");
-    for (let i = 0; i < nodes.length; i++) {
-      let id = nodes[i].id;
-      if (!contains('#' + id, selectorTextArr)) {
-        selectorTextArr.push('#' + id);
-      }
-
-      let classes = nodes[i].classList;
-      for (let c = 0; c < classes.length; c++) {
-        if (!contains('.' + classes[c], selectorTextArr)) {
-          selectorTextArr.push('.' + classes[c]);
-        }
-      }
-    }
-
-    // Extract CSS Rules
-    let extractedCSSText = "";
-    for (let i = 0; i < document.styleSheets.length; i++) {
-      let s = document.styleSheets[i];
-
-      try {
-        if (!s.cssRules) continue;
-      } catch (e) {
-        if (e.name !== 'SecurityError') throw e; // for Firefox
-        continue;
-      }
-
-      let cssRules = s.cssRules;
-      for (let r = 0; r < cssRules.length; r++) {
-        if (contains(cssRules[r].selectorText, selectorTextArr)) {
-          extractedCSSText += cssRules[r].cssText;
-        }
-      }
-    }
-
-    return extractedCSSText;
-
-    function contains(str, arr) {
-      return arr.indexOf(str) !== -1;
-    }
-  }
-
-  function appendCSS(cssText, element) {
-    let styleElement = document.createElement("style");
-    styleElement.setAttribute("type", "text/css");
-    styleElement.innerHTML = cssText;
-    let refNode = element.hasChildNodes() ? element.children[0] : null;
-    element.insertBefore(styleElement, refNode);
-  }
-}
-
-/**
- *
- * @param svgString
- * @param width
- * @param height
- * @param callback
- */
-function svgString2Image(svgString, width, height, callback) {
-
-  // Convert SVG string to samples URL
-  let imageSource = 'datasets.controller:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
-
-  let canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-
-  let context = canvas.getContext("2d");
-  let image = new Image();
-  image.onload = function () {
-    context.clearRect(0, 0, width, height);
-    context.drawImage(image, 0, 0, width, height);
-
-    let data = canvas.toDataURL("image/png");
-    if (callback) callback(data);
-  };
-
-  image.src = imageSource;
-}
-
-/**
- * Returns the size of the viewBox or the normal size of the given svg element.
- *
- * @param svgElement The svg element.
- * @returns {number[]} The size [width, height].
- */
-function getOriginalSizeOfSVG(svgElement) {
-  let viewBoxBaseValue = svgElement.viewBox.baseVal;
-  if (viewBoxBaseValue.width !== 0 && viewBoxBaseValue.height !== 0) {
-    return [
-      viewBoxBaseValue.width,
-      viewBoxBaseValue.height
-    ];
-  } else {
-    return [
-      svgElement.width.baseVal.value,
-      svgElement.height.baseVal.value,
-    ];
-  }
-}
-
-/**
- * Creates and appends an anchor linked to the given samples which is then immediately clicked.
- *
- * @param blob The samples to be downloaded.
- * @param filename The name of the file.
- */
-function downloadBlob(blob, filename) {
-  if (window.navigator.msSaveOrOpenBlob) {
-    window.navigator.msSaveBlob(blob, filename);
-  } else {
-    let anchor = document.createElement("a");
-    anchor.href = URL.createObjectURL(blob);
-    anchor.download = filename;
-    document.body.appendChild(anchor);
-    anchor.click();
-    document.body.removeChild(anchor);
-  }
-}
-
-/**
- * Initiates a download of a JSON file with the given content and the given filename.
- * @param jsonString The JSON content.
- * @param filename The filename of the file to be downloaded. Will append '.json' extension
- * if needed.
- */
-function downloadJSON(jsonString, filename) {
-  let blob = new Blob([jsonString], {type: 'text/json'});
-  let saveFilename = appendExtensionIfNeeded(filename, 'json');
-  downloadBlob(blob, saveFilename);
-}
-
-function downloadCSV(jsonString, filename) {
-  let blob = new Blob([jsonString], {type: 'text/csv'});
-  let saveFilename = appendExtensionIfNeeded(filename, 'csv');
-  downloadBlob(blob, saveFilename);
-}
-
-/**
- * Initiates a download of the PNG image of the SVG with the given selector (id).
- *
- * @param selector The id of the SVG element to create the image of.
- * @param filename The name of the file which is been downloaded.
- */
-function downloadImage(selector, filename) {
-  let svgElement = d3.select('#' + selector);
-  let node = svgElement.node();
-  let size = getOriginalSizeOfSVG(node);
-  let svgString = getSVGString(node);
-  svgString2Image(svgString, 2 * size[0], 2 * size[1], function (dataURL) {
-    fetch(dataURL)
-      .then(res => res.blob())
-      .then(function (dataBlob) {
-        let saveFilename = appendExtensionIfNeeded(filename, 'png');
-        downloadBlob(dataBlob, saveFilename);
-      });
-  });
-}
-
-/**
  * A lotivis date chart card.
  * @class DateChartCard
  * @extends Card
@@ -2584,29 +4028,6 @@ const numberFormat = new Intl.NumberFormat('de-DE', {
 function formatNumber(number) {
   if (typeof number !== 'number') return number;
   return numberFormat.format(number);
-}
-
-/**
- * Compares the string version of each oof the two given values for equality.
- * @param value1 The first value to compare.
- * @param value2 The second value to compare.
- * @returns {boolean} `True` if the string versions are equal, `false` if not.
- */
-function equals(value1, value2) {
-  return String(value1) === String(value2);
-}
-
-/**
- * Returns a Boolean value indicating whether the JSON string version of the given two objects are equal.
- * @param object1 The first object to compare.
- * @param object2 The second object to compare.
- * @returns {boolean} `True` if the JSON strings of the given objects are equal,`false` if not.
- */
-function objectsEqual(object1, object2) {
-  if (object1 === object2) return true;
-  let string1 = JSON.stringify(object1);
-  let string2 = JSON.stringify(object2);
-  return string1 === string2;
 }
 
 /**
@@ -2853,32 +4274,6 @@ class MapLegendRenderer {
       }
     };
   }
-}
-
-/**
- * A collection of messages which already hast been printed.
- * @type {*[]}
- */
-let alreadyLogged = [];
-
-var lotivis_log_once = function (message) {
-  if (alreadyLogged.includes(message)) return;
-  alreadyLogged.push(message);
-  console.warn(`[lotivis]  Warning only once: ${message}`);
-};
-
-var lotivis_log = () => null;
-
-/**
- * Sets whether lotivis prints debug log messages to the console.
- * @param enabled A Boolean value indicating whether to enable debug logging.
- * @param printConfig A Boolean value indicating whether to print the global lotivis configuration.  Default is false.
- */
-function debug(enabled, printConfig = false) {
-  lotivis_log = enabled ? console.log : () => null;
-  lotivis_log(`[lotivis]  ${enabled ? 'En' : 'Dis'}abled debug mode.`);
-  if (!printConfig) return;
-  lotivis_log(`LotivisConfig = ${JSON.stringify(LotivisConfig, null, 2)}`);
 }
 
 /**
@@ -3152,171 +4547,6 @@ class MapExteriorBorderRenderer {
         .attr('class', 'lotivis-map-exterior-borders');
     };
   }
-}
-
-/**
- * Returns a flat version of the given dataset collection.
- *
- * @param datasets The collection of datasets.
- * @returns {[]} The array containing the flat samples.
- */
-function flatDatasets(datasets) {
-  let flatData = [];
-  let datasetsCopy = datasets;
-  for (let datasetIndex = 0; datasetIndex < datasetsCopy.length; datasetIndex++) {
-    let dataset = datasetsCopy[datasetIndex];
-    let flatDataChunk = flatDataset(dataset);
-    flatData = flatData.concat(flatDataChunk);
-  }
-  return flatData;
-}
-
-/**
- * Returns an array containing the flat samples of the given dataset.
- *
- * @param dataset The dataset with samples.
- * @returns {[]} The array containing the flat samples.
- */
-function flatDataset(dataset) {
-  let flatData = [];
-  if (!dataset.data) {
-    console.log('Lotivis: Flat samples for dataset without samples requested. Will return an empty array.');
-    return flatData;
-  }
-  dataset.data.forEach(item => {
-    let newItem = copy(item);
-    newItem.dataset = dataset.label;
-    newItem.stack = dataset.stack;
-    flatData.push(newItem);
-  });
-  return flatData;
-}
-
-/**
- * Returns the set of dataset names from the given dataset collection.
- *
- * @param datasets The collection of datasets.
- * @returns {[]} The array containing the flat samples.
- */
-function extractLabelsFromDatasets(datasets) {
-  return toSet(datasets.map(dataset => toValue(dataset.label)));
-}
-
-/**
- * Returns the set of stacks from the given dataset collection.
- * Will fallback on dataset property if stack property isn't present.
- *
- * @param datasets The collection of datasets.
- * @returns {[]} The array containing the flat samples.
- */
-function extractStacksFromDatasets(datasets) {
-  return toSet(datasets.map(dataset => toValue(dataset.stack || dataset.label)));
-}
-
-/**
- * Returns the set of dates from the given dataset collection.
- *
- * @param datasets The collection of datasets.
- * @returns {[]} The set containing the dates.
- */
-function extractDatesFromDatasets(datasets) {
-  return extractDatesFromFlatData(flatDatasets(datasets));
-}
-
-/**
- * Returns the set of locations from the given dataset collection.
- *
- * @param datasets The collection of datasets.
- * @returns {[]} The set containing the locations.
- */
-function extractLocationsFromDatasets(datasets) {
-  return extractLocationsFromFlatData(flatDatasets(datasets));
-}
-
-/**
- * Returns the set of dates from the given dataset collection.
- *
- * @param flatData The flat samples array.
- * @returns {[]} The set containing the dates.
- */
-function extractDatesFromFlatData(flatData) {
-  return toSet(flatData.map(item => toValue(item.date)));
-}
-
-/**
- * Returns the set of locations from the given dataset collection.
- *
- * @param flatData The flat samples array.
- * @returns {[]} The set containing the locations.
- */
-function extractLocationsFromFlatData(flatData) {
-  return toSet(flatData.map(item => toValue(item.location)));
-}
-
-/**
- * Return an array containing each equal item of the given array only once.
- *
- * @param array The array to create a set of.
- * @returns {any[]} The set version of the array.
- */
-function toSet(array) {
-  return Array.from(new Set(array));
-}
-
-/**
- * Returns the earliest date occurring in the flat array of items.
- *
- * @param flatData The flat samples array.
- * @param dateAccess
- * @returns {*} The earliest date.
- */
-function extractEarliestDate(flatData, dateAccess = (date) => date) {
-  return extractDatesFromFlatData(flatData)
-    .sort((left, right) => dateAccess(left) - dateAccess(right)).shift();
-}
-
-/**
- * Returns the earliest date occurring in the flat array of items.
- *
- * @param flatData The flat samples array.
- * @param dateAccess
- * @returns {*} The earliest date.
- */
-function extractEarliestDateWithValue(flatData, dateAccess = (date) => date) {
-  return extractEarliestDate(filterWithValue(flatData), dateAccess);
-}
-
-/**
- * Returns the latest date occurring in the flat array of items.
- *
- * @param flatData The flat samples array.
- * @param dateAccess
- * @returns {*} The latest date.
- */
-function extractLatestDate(flatData, dateAccess = (date) => date) {
-  return extractDatesFromFlatData(flatData)
-    .sort((left, right) => dateAccess(left) - dateAccess(right)).pop();
-}
-
-/**
- * Returns the latest date occurring in the flat array of items.
- *
- * @param flatData The flat samples array.
- * @param dateAccess
- * @returns {*} The latest date.
- */
-function extractLatestDateWithValue(flatData, dateAccess = (date) => date) {
-  return extractLatestDate(filterWithValue(flatData), dateAccess);
-}
-
-/**
- * Returns a filtered collection containing all items which have a valid value greater than 0.
- *
- * @param flatData The flat samples to filter.
- * @returns {*} All items with a value greater 0.
- */
-function filterWithValue(flatData) {
-  return flatData.filter(item => (item.value || 0) > 0);
 }
 
 /**
@@ -4295,153 +5525,6 @@ const defaultPlotChartConfig = {
 
 /**
  *
- * @param date
- * @constructor
- */
-const DefaultDateAccess = (date) => date;
-
-/**
- *
- * @param dateString
- * @returns {number}
- * @constructor
- */
-const FormattedDateAccess = function (dateString) {
-  let value = Date.parse(dateString);
-  if (isNaN(value)) {
-    lotivis_log_once(`Received NaN for date "${dateString}"`);
-  }
-  return value;
-};
-
-/**
- *
- * @param dateString
- * @returns {number}
- * @constructor
- */
-const DateGermanAssessor = function (dateString) {
-  let saveDateString = String(dateString);
-  let components = saveDateString.split('.');
-  let day = components[0];
-  let month = components[1];
-  let year = components[2];
-  let date = new Date(`${year}-${month}-${day}`);
-  return Number(date);
-};
-
-/**
- *
- * @param weekday
- * @returns {number}
- * @constructor
- */
-const DateWeekAssessor = function (weekday) {
-  let lowercase = weekday.toLowerCase();
-  switch (lowercase) {
-    case 'sunday':
-    case 'sun':
-      return 0;
-    case 'monday':
-    case 'mon':
-      return 1;
-    case 'tuesday':
-    case 'tue':
-      return 2;
-    case 'wednesday':
-    case 'wed':
-      return 3;
-    case 'thursday':
-    case 'thr':
-      return 4;
-    case 'friday':
-    case 'fri':
-      return 5;
-    case 'saturday':
-    case 'sat':
-      return 6;
-    default:
-      return -1;
-  }
-};
-
-/**
- * Controls a collection of datasets.
- * @class DatasetsController
- */
-class DatasetsController {
-
-  /**
-   * Creates a new instance of DatasetsController
-   * @param datasets The datasets to control.
-   * @param config
-   */
-  constructor(datasets, config) {
-    if (!Array.isArray(datasets)) throw new InvalidFormatError();
-    this.config = config || {};
-    this.dateAccess = this.config.dateAccess || DefaultDateAccess;
-    this.locationFilters = this.config.locationFilters || [];
-    this.dateFilters = this.config.dateFilters || [];
-    this.datasetFilters = this.config.datasetFilters || [];
-    this.setDatasets(datasets);
-  }
-
-  getFlatDataCombinedStacks() {
-    return combineByStacks(this.flatData);
-  }
-
-  getFlatDataCombinedDates() {
-    return combineByDate(this.flatData);
-  }
-
-  getFlatDataCombinedLocations() {
-    return combineByLocation(this.flatData);
-  }
-
-  getSumOfLabel(label) {
-    return sumOfLabel(this.flatData, label);
-  }
-
-  getSumOfDataset(dataset) {
-    return sumOfDataset(this.flatData, dataset);
-  }
-
-  getSumOfStack(stack) {
-    return sumOfStack(this.flatData, stack);
-  }
-
-  getMax() {
-    return d3LibraryAccess.max(this.workingDatasets, function (dataset) {
-      return d3LibraryAccess.max(dataset.data, function (item) {
-        return item.value;
-      });
-    });
-  }
-
-  // MARK: - Colors
-
-  getColorForDataset(label) {
-    return this.datasetsColorsController.colorForDataset(label);
-  }
-
-  getColorForStack(stack) {
-    return this.datasetsColorsController.colorForStack(stack);
-  }
-
-  getColorsForStack(stack) {
-    return this.datasetsColorsController.colorsForStack(stack);
-  }
-
-  /**
-   * Returns a string that can be used as filename for downloads.
-   */
-  getFilename() {
-    return this.labels.join(',');
-  }
-}
-
-/**
- *
  * @param dataset
  * @param dateAccess
  * @returns {{}}
@@ -4655,141 +5738,6 @@ class PlotChart extends Chart {
 
 /**
  *
- * @class Dropdown
- * @extends Component
- */
-class Dropdown extends Component {
-
-  /**
-   * Creates a new instance of Dropdown.
-   * @param parent The parent or selector.
-   */
-  constructor(parent) {
-    super(parent);
-    this.inputElements = [];
-    this.selector = createID();
-    this.element = parent
-      .append('div')
-      .classed('dropdown-container', true);
-    this.selectId = createID();
-    this.renderLabel();
-    this.renderSelect();
-  }
-
-  renderLabel() {
-    this.label = this.element
-      .append('label')
-      .attr('for', this.selectId);
-  }
-
-  renderSelect() {
-    let thisReference = this;
-    this.select = this.element
-      .append('select')
-      .attr('id', this.selectId)
-      .on('change', function (event) {
-        thisReference.onClick(event);
-      });
-  }
-
-  addOption(optionId, optionName) {
-    return this.select
-      .append('option')
-      .attr('id', optionId)
-      .attr('value', optionId)
-      .text(optionName);
-  }
-
-  setOptions(options) {
-    this.removeAllInputs();
-    for (let i = 0; i < options.length; i++) {
-      let name;
-
-      if (Array.isArray(options[i])) {
-        options[i][0] || options[i].id;
-        name = options[i][1] || options[i].translatedTitle;
-      } else if (typeof options[i] === 'string') {
-        options[i];
-        name = options[i];
-      } else {
-        options[i].id;
-        name = options[i].title;
-      }
-
-      let inputElement = this.addOption(name, name);
-      this.inputElements.push(inputElement);
-    }
-    return this;
-  }
-
-  removeAllInputs() {
-    this.element.selectAll('input').remove();
-    return this;
-  }
-
-  onClick(event) {
-    let element = event.target;
-    if (!element) {
-      return;
-    }
-    let value = element.value;
-    if (!this.onChange) {
-      return;
-    }
-    this.onChange(value);
-    return this;
-  }
-
-  onChange(argument) {
-    console.log('argument: ' + argument);
-    if (typeof argument !== 'string') {
-      this.onChange = argument;
-    }
-    return this;
-  }
-
-  // MARK: - Chaining Setter
-
-  setLabelText(text) {
-    this.label.text(text);
-    return this;
-  }
-
-  setOnChange(callback) {
-    this.onChange = callback;
-    return this;
-  }
-
-  setSelectedOption(optionID) {
-    if (this.inputElements.find(function (item) {
-      return item.attr('value') === optionID;
-    }) !== undefined) {
-      this.value = optionID;
-    }
-    return this;
-  }
-
-  set value(optionID) {
-    document.getElementById(this.selectId).value = optionID;
-  }
-
-  get value() {
-    return document.getElementById(this.selectId).value;
-  }
-}
-
-Dropdown.create = function (selector, options, selectedOption, onChange) {
-  let div = d3.select(`#${selector}`);
-  let dropdown = new Dropdown(div);
-  dropdown.setLabelText('Group Size');
-  dropdown.setOptions(options);
-  dropdown.setSelectedOption(selectedOption);
-  dropdown.setOnChange(onChange);
-  return dropdown;
-};
-
-/**
- *
  * @class PlotChartSettingsPopup
  * @extends SettingsPopup
  */
@@ -4918,889 +5866,6 @@ class PlotChartCard extends ChartCard {
 }
 
 /**
- * A toast in the top of the page.
- *
- * @class Toast
- * @extends Component
- */
-class Toast extends Component {
-
-  /**
-   * Creates a new instance of Toast.
-   * @constructor
-   * @param {Component} parent The parental component.
-   */
-  constructor(parent) {
-    super(parent);
-    this.element = this
-      .parent
-      .append('div')
-      .attr('class', 'lotivis-data-card-status-tooltip')
-      .style('opacity', 0)
-      .style('display', `none`);
-    this.row = this.element
-      .append('div')
-      .attr('class', 'lotivis-row');
-    this.leftComponnt = this.row
-      .append('div')
-      .attr('class', 'lotivis-col-6');
-    this.rightComponent = this.row
-      .append('div')
-      .attr('class', 'lotivis-col-6');
-    this.hideButton = new Button(this.rightComponent)
-      .setText(`Hello`);
-  }
-
-  /**
-   * Shows the toast.
-   * @override
-   */
-  show() {
-    super.show();
-    this.element.style('opacity', 1);
-    return this;
-  }
-
-  /**
-   * Hides the toast.
-   * @override
-   */
-  hide() {
-    super.hide();
-    this.element.style('opacity', 0);
-  }
-
-  /**
-   * Sets the text of the Toast.
-   * @param text The text of the Toast.
-   */
-  setText(text) {
-    this.element.text(text);
-  }
-
-  /**
-   * Sets the text of the status label.  If text is empty the status label will be hide.
-   * @param newStatusMessage The new status message.
-   */
-  setStatusMessage(newStatusMessage) {
-    let saveString = String(newStatusMessage || "").trim();
-    this.element.text(saveString);
-    if (saveString) {
-      this.show();
-    } else {
-      this.hide();
-    }
-  }
-}
-
-/**
- * Sets a new datasets controller.  The chart is updated automatically.
- * @param newController The new datasets controller.
- */
-Chart.prototype.setDatasetController = function (newController) {
-  this.datasetController = newController;
-  this.datasetController.addListener(this);
-  this.update(newController, 'registration');
-};
-
-/**
- * Sets the datasets of this map chart.
- * @param newDatasets The new dataset.
- */
-Chart.prototype.setDatasets = function (newDatasets) {
-  this.setDatasetController(new DatasetsController(newDatasets));
-};
-
-/**
- * Returns the presented datasets.
- * @returns {[*]} The collection of datasets.
- */
-Chart.prototype.getDatasets = function () {
-  if (!this.datasetController || !Array.isArray(this.datasetController.datasets)) return [];
-  return this.datasetController.datasets;
-};
-
-/**
- *
- * @class ModalPopup
- * @extends Popup
- */
-class ModalPopup extends Popup {
-
-  /**
-   *
-   * @param parent
-   */
-  constructor(parent) {
-    super(parent);
-    this.modalBackground
-      .classed('popup-underground', false)
-      .classed('modal-underground', true);
-  }
-
-  /**
-   *
-   */
-  inject() {
-    super.inject();
-    this.renderRow();
-  }
-
-  /**
-   *
-   */
-  renderRow() {
-    this.row = this.card.body
-      .append('div')
-      .classed('row', true);
-    this.content = this.row
-      .append('div')
-      .classed('col-12 info-box-margin', true);
-  }
-
-  /**
-   *
-   */
-  loadContent(url) {
-    if (!url) return;
-    let content = this.content;
-
-    d3.text(url)
-      .then(function (text) {
-        console.log(text);
-        content.html(text);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-  }
-
-  /**
-   * Returns the preferred size. The default is 800, 600.
-   * @returns {{width: number, height: number}} The preferred size.
-   */
-  preferredSize() {
-    return {
-      width: 800,
-      height: 600
-    };
-  }
-}
-
-/**
- * Validates the given datasets.
- * @param datasets The datasets to validate.
- * @throws InvalidFormatError
- */
-function validateDatasets(datasets) {
-
-  if (!datasets) {
-    throw new InvalidFormatError(`No dataset given.`);
-  } else if (!Array.isArray(datasets)) {
-    throw new InvalidFormatError(`Expecting array of datasets.`);
-  }
-
-  for (let index = 0; index < datasets.length; index++) {
-    validateDataset(datasets[index]);
-  }
-}
-
-/**
- * Validates the given dataset.
- * @param dataset The dataset to validate.
- * @throws InvalidFormatError
- * @throws MissingPropertyError
- */
-function validateDataset(dataset) {
-  if (!dataset) {
-    throw new InvalidFormatError(`No dataset given.`);
-  } else if (!dataset.label) {
-    throw new MissingPropertyError(`Missing label for dataset. ${dataset}`);
-  } else if (!dataset.data) {
-    throw new MissingPropertyError(`Invalid data. Property is not an array. Dataset: ${dataset.label}`);
-  } else if (!Array.isArray(dataset.data)) {
-    throw new InvalidFormatError(`Invalid data. Property is not an array. Dataset: ${dataset.label}`);
-  }
-
-  let data = dataset;
-  for (let index = 0; index < data.length; index++) {
-    validateDataItem(data[index]);
-  }
-}
-
-/**
- * Validates the given datasets.controller item by ensuring it has a valid `date`, `location` and `value` property value.
- * @param item The datasets.controller item to validate.
- * @throws MissingPropertyError
- */
-function validateDataItem(item) {
-  if (!item.date) {
-    throw new MissingPropertyError(`Missing date property for item.`, item);
-  } else if (!item.location) {
-    throw new MissingPropertyError(`Missing location property for item.`, item);
-  }
-}
-
-/**
- * A lotivis card containing a textarea.
- * @class TextareaCard
- * @extends Card
- */
-class TextareaCard extends Card {
-
-  /**
-   * Creates a new instance of TextareaCard.
-   * @param parent The parental element or a selector (id).
-   */
-  constructor(parent) {
-    super(parent);
-    this.render();
-    this.updateSensible = true;
-
-    if (this.config) {
-      this.textarea.attr('rows', this.config.lines || 25);
-      this.setTitle(this.config.title || 'TextareaCard');
-    } else {
-      this.textarea.attr('rows', 25);
-      this.setTitle('TextareaCard');
-    }
-  }
-
-  /**
-   * Appends the component to this card.
-   */
-  render() {
-    this.textareaID = createID();
-    this.textarea = this.body
-      .append('textarea')
-      .attr('id', this.textareaID)
-      .attr('name', this.textareaID)
-      .attr('class', 'lotivis-data-textarea')
-      .on('keyup', this.onKeyup.bind(this));
-    this.downloadButton = new Button(this.headerRightComponent);
-    this.downloadButton.setText('Download');
-    this.downloadButton.onClick = function (event) {
-      let content = this.getTextareaContent();
-      this.download(content);
-    }.bind(this);
-  }
-
-  /**
-   * Returns the text of the textarea.
-   * @returns {*} The text of the textarea.
-   */
-  getTextareaContent() {
-    return document.getElementById(this.textareaID).value || "";
-  }
-
-  /**
-   * Sets the text of the textarea.
-   * @param newContent The text for the textarea.
-   */
-  setTextareaContent(newContent) {
-    let textarea = document.getElementById(this.textareaID);
-    if (!textarea) return;
-    textarea.value = newContent;
-
-    // if (typeof newContent !== 'string') return;
-    // let numberOfRows = newContent.split(`\n`).length;
-    // this.textarea.attr('rows', numberOfRows);
-    // this.textarea.attr('rows', 24);
-  }
-
-  /**
-   * Enable the textarea.
-   */
-  enableTextarea() {
-    this.textarea.attr('disabled', null);
-    [this.textarea, this.titleLabel].forEach(item => item.classed('lotivis-disabled', false));
-  }
-
-  /**
-   * Disables the textarea.
-   */
-  disableTextarea() {
-    this.textarea.attr('disabled', '');
-    [this.textarea, this.titleLabel].forEach(item => item.classed('lotivis-disabled', true));
-  }
-
-  /**
-   * Tells this dataset card that a 'keyup'-event occurred in the textarea.
-   * @param event The key event.
-   */
-  onKeyup(event) {
-    throw new LotivisUnimplementedMethodError(`onKeyup(event)`);
-  }
-
-  /**
-   * Initiates a download of the content of the textarea.
-   * @param content The new content of the textarea.
-   */
-  download(content) {
-    throw new LotivisUnimplementedMethodError(`download(content)`);
-  }
-}
-
-/**
- *
- * @class UpdatableDataviewCard
- * @extends TextareaCard
- */
-class UpdatableDataviewCard extends TextareaCard {
-
-  /**
-   * Creates a new instance of UpdatableDataviewCard.
-   * @param parent The parental element or a selector (id).
-   */
-  constructor(parent = {}) {
-    parent.title = parent.title || 'UpdatableDataviewCard';
-    super(parent);
-    this.updateSensible = true;
-    this.downloadButton.hide();
-  }
-
-  /**
-   * Sets the dataset controller.
-   * @param newDatasetController
-   */
-  setDatasetsController(newDatasetController) {
-    this.datasetsController = newDatasetController;
-    this.datasetsController.addListener(this);
-  }
-
-  /**
-   * Tells thi dataset card that the datasets of the datasets controller has changed.
-   * @param datasetsController The datasets controller.
-   * @param reason The reason of the update.
-   */
-  update(datasetsController, reason) {
-    if (!this.updateSensible) {
-      lotivis_log(`[lotivis]  NOT sensible ${this}. Reason '${reason}'.`);
-      return;
-    } else if (this.config.updateSensible === false) {
-      lotivis_log(`[lotivis]  NOT sensible (Config) ${this}. Reason '${reason}'.`);
-      return;
-    }
-
-    this.updateContentsOfTextarea();
-
-    lotivis_log(`[lotivis]  Update ${this}. Reason '${reason}'.`);
-  }
-
-  /**
-   * Tells this datasets card to update the content of the textarea by rendering the datasets to text.
-   */
-  updateContentsOfTextarea() {
-    if (!this.datasetsController || !this.datasetsController.datasets) return;
-    let datasets = this.datasetsController.datasets;
-    let content = this.datasetsToText(datasets);
-    this.setTextareaContent(content);
-    this.cachedDatasets = datasets;
-  }
-
-  /**
-   * Sets the content of the textarea by rendering the given datasets to text.  Subclasses should override.
-   * @param datasets The datasets to render.
-   * @return {*}
-   */
-  datasetsToText(datasets) {
-    throw new LotivisUnimplementedMethodError(`Subclasses should override.`);
-  }
-}
-
-/**
- *
- * @class EditableDataviewCard
- * @extends UpdatableDataviewCard
- */
-class EditableDataviewCard extends UpdatableDataviewCard {
-
-  /**
-   * Creates a new instance of DatasetCard.
-   * @param parent The parental element or a selector (id).
-   */
-  constructor(parent) {
-    super(parent);
-    this.toast = new Toast(this.parent);
-  }
-
-  /**
-   * Tells this dataset card that a 'keyup'-event occurred in the textarea.
-   */
-  onKeyup() {
-    this.updateDatasetsOfController.bind(this)(true);
-  }
-
-  /**
-   * Tells
-   * @param notifyController A boolean value indicating whether the datasets controller should be notified about the
-   * update.
-   */
-  updateDatasetsOfController(notifyController = false) {
-
-    let content = this.getTextareaContent();
-    this.toast.setStatusMessage(null);
-
-    try {
-
-      // will throw an error if parsing is not possible
-      let parsedDatasets = this.textToDatasets(content);
-      if (!parsedDatasets) return;
-
-      // will throw an error if parsed datasets aren't valid.
-      validateDatasets(parsedDatasets);
-
-      if (notifyController === true) {
-
-        if (!this.datasetsController) {
-          return lotivis_log(`[lotivis]  No datasets controller.`);
-        }
-
-        if (objectsEqual(this.cachedDatasets, parsedDatasets)) {
-          return lotivis_log(`[lotivis]  No changes in datasets.`);
-        }
-
-        this.cachedDatasets = parsedDatasets;
-        this.updateSensible = false;
-        this.datasetsController.setDatasets(parsedDatasets);
-        this.updateSensible = true;
-      }
-
-    } catch (error) {
-      lotivis_log(`[lotivis]  ERROR: ${error}`);
-      this.toast.setStatusMessage(error);
-    }
-  }
-
-  datasetsToText(datasets) {
-    return new LotivisUnimplementedMethodError('datasetsToText(datasets)');
-  }
-}
-
-/**
- * A card containing a textarea which contains the JSON text of a dataset collection.
- * @class DatasetsJSONCard
- * @extends EditableDataviewCard
- */
-class DatasetsJSONCard extends EditableDataviewCard {
-
-  /**
-   * Creates a new instance of DatasetJSONCard.
-   * @param parent The parental element or a selector (id).
-   */
-  constructor(parent = 'datasets-json-card') {
-    if (Object.getPrototypeOf(parent) === Object.prototype) {
-      parent.selector = parent.selector || 'datasets-json-card';
-    }
-    super(parent);
-    this.setTitle('Dataset JSON');
-  }
-
-  download(content) {
-    let filename = this.datasetController.getFilename();
-    let downloadFilename = createDownloadFilename(filename, `datasets`);
-    downloadJSON(content, downloadFilename);
-  }
-
-  textToDatasets(text) {
-    if (text === "") return [];
-    return JSON.parse(text.trim());
-  }
-
-  datasetsToText(datasets) {
-    return JSON.stringify(datasets, null, 2);
-  }
-}
-
-/*
-Following code from:
-https://gist.github.com/Jezternz/c8e9fafc2c114e079829974e3764db75
-
-We use this function to save samples.parse a CSV file.
- */
-
-const csvStringToArray = strData => {
-  const objPattern = new RegExp(("(\\,|\\r?\\n|\\r|^)(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^\\,\\r\\n]*))"), "gi");
-  let arrMatches = null, arrData = [[]];
-  while (arrMatches = objPattern.exec(strData)) {
-    if (arrMatches[1].length && arrMatches[1] !== ",") arrData.push([]);
-    arrData[arrData.length - 1].push(arrMatches[2] ?
-      arrMatches[2].replace(new RegExp("\"\"", "g"), "\"") :
-      arrMatches[3]);
-  }
-  return arrData;
-};
-
-/**
- * Returns a new version of the given string by trimming the given char from the beginning and the end of the string.
- * @param string The string to be trimmed.
- * @param character The character to trim.
- * @returns {string} The trimmed version of the string.
- */
-function trimByChar(string, character) {
-  const saveString = String(string);
-  const first = [...saveString].findIndex(char => char !== character);
-  const last = [...saveString].reverse().findIndex(char => char !== character);
-  return saveString.substring(first, saveString.length - last);
-}
-
-/**
- * Returns a dataset collection created from the given flat samples collection.
- * @param flatData The flat samples collection.
- * @returns {[]} A collection of datasets.
- */
-function createDatasets(flatData) {
-  let datasetsByLabel = {};
-
-  for (let itemIndex = 0; itemIndex < flatData.length; itemIndex++) {
-    let item = flatData[itemIndex];
-
-    if (!validateDataItem(item)) ;
-
-    let label = item.dataset || item.label;
-    let dataset = datasetsByLabel[label];
-
-    if (dataset) {
-      dataset.data.push({
-        date: item.date,
-        location: item.location,
-        value: item.value
-      });
-    } else {
-      datasetsByLabel[label] = {
-        label: label,
-        stack: item.stack,
-        data: [{
-          date: item.date,
-          location: item.location,
-          value: item.value
-        }]
-      };
-    }
-  }
-
-  let datasets = [];
-  let labels = Object.getOwnPropertyNames(datasetsByLabel);
-
-  for (let index = 0; index < labels.length; index++) {
-    let label = labels[index];
-    if (label.length === 0) continue;
-    datasets.push(datasetsByLabel[label]);
-  }
-
-  return datasets;
-}
-
-function parseCSV(text) {
-  let flatData = [];
-  let arrays = csvStringToArray(text);
-  let headlines = arrays.shift();
-
-  for (let lineIndex = 0; lineIndex < arrays.length; lineIndex++) {
-
-    let lineArray = arrays[lineIndex].map(element => trimByChar(element, `"`));
-
-    if (lineArray.length < 5) {
-      lotivis_log(`Skipping row: ${lineArray}`);
-      continue;
-    }
-
-    flatData.push({
-      label: lineArray[0],
-      stack: lineArray[1],
-      value: +lineArray[2],
-      date: lineArray[3],
-      location: lineArray[4]
-    });
-  }
-
-  let datasets = createDatasets(flatData);
-  datasets.csv = {
-    content: text,
-    headlines: headlines,
-    lines: arrays,
-  };
-
-  return datasets;
-}
-
-/**
- * Returns the given string with a quotation mark in the left and right.
- * @param aString The string to surround by quotation marks.
- * @returns {string} The string surrounded by quotation marks.
- */
-function surroundWithQuotationMarks(aString) {
-  return `"${aString}"`;
-}
-
-/**
- * Returns the CSV string of the given datasets.
- * @param datasets The datasets to create the CSV of.
- */
-function renderCSV(datasets) {
-  let flatData = flatDatasets(datasets);
-  let headlines = ['label', 'stack', 'value', 'date', 'location'];
-  let csvContent = `${headlines.join(',')}\n`;
-  for (let index = 0; index < flatData.length; index++) {
-    let data = flatData[index];
-    let components = [];
-    components.push(surroundWithQuotationMarks(data.dataset || 'Unknown'));
-    components.push(surroundWithQuotationMarks(data.stack || ''));
-    components.push(data.value || '0');
-    components.push(surroundWithQuotationMarks(data.date || ''));
-    components.push(surroundWithQuotationMarks(data.location || ''));
-    csvContent += `${components.join(`,`)}\n`;
-  }
-  return csvContent;
-}
-
-/**
- * Presents the CSV version of datasets.  The presented CSV can be edited.
- * @class DatasetCSVCard
- * @extends Card
- */
-class DatasetCSVCard extends EditableDataviewCard {
-
-  /**
-   * Creates a new instance of DatasetCSVCard.
-   * @param parent The parental element or a selector (id).
-   */
-  constructor(parent) {
-    super(parent);
-    this.setTitle('Dataset CSV');
-  }
-
-  download(content) {
-    let filename = this.datasetController.getFilename();
-    let downloadFilename = createDownloadFilename(filename, `datasets`);
-    downloadCSV(content, downloadFilename);
-  }
-
-  textToDatasets(text) {
-    if (text === "") return [];
-    return parseCSV(text);
-  }
-
-  datasetsToText(datasets) {
-    return renderCSV(datasets);
-  }
-}
-
-/**
- * Returns a collection of datasets parsed from the given CSV content.
- * @param text The CSV content.
- * @returns {[]} The parsed datasets.
- */
-function parseCSVDate(text) {
-  let arrays = csvStringToArray(text);
-  let datasetLabels = arrays.shift();
-  datasetLabels.shift();
-  let datasets = [];
-  let minLineLength = datasetLabels.length;
-
-  for (let index = 0; index < datasetLabels.length; index++) {
-    datasets.push({
-      label: datasetLabels[index],
-      data: []
-    });
-  }
-
-  for (let lineIndex = 0; lineIndex < arrays.length; lineIndex++) {
-    let lineArray = arrays[lineIndex].map(element => trimByChar(element, `"`));
-    if (lineArray.length < minLineLength) continue;
-
-    let date = lineArray.shift();
-
-    for (let columnIndex = 0; columnIndex < lineArray.length; columnIndex++) {
-      let value = lineArray[columnIndex];
-      datasets[columnIndex].data.push({
-        date: date,
-        value: value
-      });
-    }
-  }
-
-  datasets.csv = {
-    content: text,
-    headlines: datasetLabels.push(),
-    lines: arrays,
-  };
-
-  return datasets;
-}
-
-/**
- *
- * @param datasets
- * @param dateAccess
- * @returns {{date: *}[]}
- */
-function dateToItemsRelation(datasets, dateAccess) {
-
-  let flatData = flatDatasets(datasets);
-  flatData = combineByDate(flatData);
-
-  let listOfDates = extractDatesFromDatasets(datasets);
-  // verbose_log('listOfDates', listOfDates);
-  listOfDates = listOfDates.reverse();
-  // verbose_log('listOfDates', listOfDates);
-  // listOfDates = listOfDates.sort(function (left, right) {
-  //   return dateAccess(left) - dateAccess(right);
-  // });
-
-  let listOfLabels = extractLabelsFromDatasets(datasets);
-
-  return listOfDates.map(function (date) {
-    let datasetDate = {date: date};
-    flatData
-      .filter(item => item.date === date)
-      .forEach(function (entry) {
-        datasetDate[entry.dataset] = entry.value;
-        datasetDate.total = entry.dateTotal;
-      });
-
-    // addDataset zero values for empty datasets
-    for (let index = 0; index < listOfLabels.length; index++) {
-      let label = listOfLabels[index];
-      if (!datasetDate[label]) {
-        datasetDate[label] = 0;
-      }
-    }
-
-    return datasetDate;
-  });
-}
-
-/**
- *
- * @param datasets
- */
-function renderCSVDate(datasets) {
-  let dateRelation = dateToItemsRelation(datasets);
-  let labels = extractLabelsFromDatasets(datasets);
-  let headlines = ['date'];
-
-  for (let labelIndex = 0; labelIndex < labels.length; labelIndex++) {
-    headlines.push(labels[labelIndex]);
-  }
-
-  let csvContent = `${headlines.join(',')}\n`;
-
-  for (let index = 0; index < dateRelation.length; index++) {
-    let dateRow = dateRelation[index];
-    let csvRow = `${dateRow.date}`;
-
-    for (let labelIndex = 0; labelIndex < labels.length; labelIndex++) {
-      let label = labels[labelIndex];
-      csvRow += `,${dateRow[label]}`;
-    }
-
-    csvContent += `${csvRow}\n`;
-  }
-
-  return csvContent;
-}
-
-/**
- * Presents the CSV version of datasets.  The presented CSV can be edited.
- * @class DatasetCSVDateCard
- * @extends Card
- */
-class DatasetCSVDateCard extends EditableDataviewCard {
-
-  /**
-   * Creates a new instance of DatasetCSVCard.
-   * @param parent The parental element or a selector (id).
-   */
-  constructor(parent) {
-    super(parent);
-    this.setTitle('Dataset CSV');
-  }
-
-  download(content) {
-    let filename = this.datasetController.getFilename();
-    let downloadFilename = createDownloadFilename(filename, `datasets`);
-    downloadCSV(content, downloadFilename);
-  }
-
-  textToDatasets(text) {
-    if (text === "") return [];
-    return parseCSVDate(text);
-  }
-
-  datasetsToText(datasets) {
-    return renderCSVDate(datasets);
-  }
-}
-
-/**
- * A card containing a textarea which contains the JSON text of a dataset collection.
- * @class DataviewCard
- * @extends UpdatableDataviewCard
- */
-class DataviewCard extends UpdatableDataviewCard {
-
-  /**
-   * Creates a new instance of DataviewCard.
-   * @param parent The parental element or a selector (id).
-   */
-  constructor(parent = 'dataview-card') {
-    super(parent);
-    this.disableTextarea();
-  }
-
-  datasetsToText(datasets) {
-    if (!this.datasetsController) return "No datasets controller.";
-    let dataview = this.getDataview();
-    return JSON.stringify(dataview, null, 2);
-  }
-
-  getDataview() {
-    // empty
-  }
-}
-
-class DataviewDateCard extends DataviewCard {
-  getTitle() {
-    return 'Dataview Date';
-  }
-
-  getDataview() {
-    return this.datasetsController.getDateDataview();
-  }
-}
-
-class DataViewPlotCard extends DataviewCard {
-  getTitle() {
-    return 'Dataview Plot';
-  }
-
-  getDataview() {
-    return this.datasetsController.getPlotDataview();
-  }
-}
-
-class DataViewMapCard extends DataviewCard {
-  getTitle() {
-    return 'Dataview Map';
-  }
-
-  getDataview() {
-    return this.datasetsController.getLocationDataview();
-  }
-}
-
-class DataviewFlatCard extends DataviewCard {
-  getTitle() {
-    return 'Flat Data';
-  }
-
-  getDataview() {
-    return this.datasetsController.flatData;
-  }
-}
-
-/**
  * Appends the given listener to the collection of listeners.
  * @param listener The listener to addDataset.
  */
@@ -5831,7 +5896,10 @@ DatasetsController.prototype.notifyListeners = function (reason = DatasetsContro
   if (!this.listeners) return;
   for (let index = 0; index < this.listeners.length; index++) {
     let listener = this.listeners[index];
-    if (!listener.update) continue;
+    if (!listener.update) {
+      lotivis_log('Listener unqualified.');
+      continue;
+    }
     listener.update(this, reason);
   }
 };
@@ -5867,6 +5935,7 @@ DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
   this.locationFilters = [];
   this.dateFilters = [];
   this.datasetFilters = [];
+  this.calculateSelection();
   if (!notifyListeners) return;
   this.notifyListeners(DatasetsController.NotificationReason.resetFilters);
 };
@@ -5876,12 +5945,13 @@ DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
  * @param locations The locations to filter.
  */
 DatasetsController.prototype.setLocationsFilter = function (locations) {
-  let stringVersions = locations.map(location => String(location));
+  let stringVersions = locations.map(location => String(location)).filter(item => item.length > 0);
   if (objectsEqual(this.locationFilters, stringVersions)) {
     return lotivis_log(`[lotivis]  Location filters not changed.`);
   }
   // this.resetFilters(false);
   this.locationFilters = stringVersions;
+  this.calculateSelection();
   this.notifyListeners(DatasetsController.NotificationReason.filterLocations);
 };
 
@@ -5890,12 +5960,13 @@ DatasetsController.prototype.setLocationsFilter = function (locations) {
  * @param dates The dates to filter.
  */
 DatasetsController.prototype.setDatesFilter = function (dates) {
-  let stringVersions = dates.map(date => String(date));
+  let stringVersions = dates.map(date => String(date)).filter(item => item.length > 0);
   if (objectsEqual(this.dateFilters, stringVersions)) {
     return lotivis_log(`[lotivis]  Date filters not changed.`);
   }
   // this.resetFilters(false);
   this.dateFilters = stringVersions;
+  this.calculateSelection();
   this.notifyListeners(DatasetsController.NotificationReason.filterDates);
 };
 
@@ -5904,12 +5975,13 @@ DatasetsController.prototype.setDatesFilter = function (dates) {
  * @param datasets The datasets to filter.
  */
 DatasetsController.prototype.setDatasetsFilter = function (datasets) {
-  let stringVersions = datasets.map(dataset => String(dataset));
+  let stringVersions = datasets.map(dataset => String(dataset)).filter(item => item.length > 0);
   if (objectsEqual(this.datasetFilters, stringVersions)) {
     return lotivis_log(`[lotivis]  Dataset filters not changed.`);
   }
   // this.resetFilters(false);
   this.datasetFilters = stringVersions;
+  this.calculateSelection();
   this.notifyListeners(DatasetsController.NotificationReason.filterDataset);
 };
 
@@ -5918,7 +5990,7 @@ DatasetsController.prototype.setDatasetsFilter = function (datasets) {
  * @param label The label of the dataset.
  * @param notifyListeners A boolean value indicating whether to notify the listeners.  Default is `true`.
  */
-DatasetsController.prototype.toggleDataset = function (label, notifyListeners=true) {
+DatasetsController.prototype.toggleDataset = function (label, notifyListeners = true) {
   this.workingDatasets.forEach(function (dataset) {
     if (dataset.label === label) {
       dataset.isEnabled = !dataset.isEnabled;
@@ -5970,7 +6042,9 @@ DatasetsController.prototype.enabledDatasets = function () {
     });
   }
 
-  return enabled;
+  let withValue = enabled.filter(dataset => dataset.data.length > 0);
+
+  return withValue;
 };
 
 /**
@@ -6003,6 +6077,45 @@ DatasetsController.prototype.enabledStacks = function () {
  */
 DatasetsController.prototype.enabledDates = function () {
   return extractDatesFromDatasets(this.enabledDatasets());
+};
+
+/**
+ * Updates the datasets of this controller.
+ * @param datasets The new datasets.
+ */
+DatasetsController.prototype.setDatasets = function (datasets) {
+  this.originalDatasets = datasets;
+  this.datasets = copy(datasets);
+  this.update();
+};
+
+/**
+ * Appends the given dataset to this controller.
+ * @param additionalDataset The dataset to append.
+ */
+DatasetsController.prototype.addDataset = function (additionalDataset) {
+  if (this.datasets.find(dataset => dataset.label === additionalDataset.label)) {
+    throw new Error(`DatasetsController already contains a dataset with the same label (${additionalDataset.label}).`);
+  }
+  this.datasets.push(additionalDataset);
+  this.calculateSelection();
+  this.update();
+};
+
+/**
+ * Removes the dataset with the given label from this controller. Will do nothing if no dataset
+ * with the given label exists.
+ * @param label The label of the dataset to removeDataset.
+ */
+DatasetsController.prototype.removeDataset = function (label) {
+  if (!this.datasets || !Array.isArray(this.datasets)) return;
+  let candidate = this.datasets.find(dataset => dataset.label === label);
+  if (!candidate) return;
+  let index = this.datasets.indexOf(candidate);
+  if (index < 0) return;
+  this.datasets = this.datasets.splice(index, 1);
+  this.calculateSelection();
+  this.update();
 };
 
 /**
@@ -6054,73 +6167,24 @@ class DatasetsColorsController {
 /**
  *
  */
-DatasetsController.prototype.update = function () {
-  if (!this.datasets || !Array.isArray(this.datasets)) return;
-
-  let dateAccess = this.dateAccess;
-  this.workingDatasets = copy(this.datasets)
-    .sort((left, right) => left.label > right.label);
-  this.workingDatasets.forEach(function (dataset) {
-    dataset.isEnabled = true;
-    dataset.data.forEach(function (item) {
-      item.dateNumeric = dateAccess(item.date);
-    });
-    dataset.data = dataset.data
-      .sort((left, right) => left.dateNumeric - right.dateNumeric);
-  });
-
-  this.flatData = flatDatasets(this.workingDatasets);
-  this.labels = extractLabelsFromDatasets(this.datasets);
-  this.stacks = extractStacksFromDatasets(this.datasets);
-  this.dates = extractDatesFromDatasets(this.datasets)
-    .sort((left, right) => dateAccess(left) - dateAccess(right));
-  this.locations = extractLocationsFromDatasets(this.datasets);
-  this.datasetsColorsController = new DatasetsColorsController(this.workingDatasets, this.stacks);
-  // this.dateAccess = function (date) {
-  //   return Date.parse(date);
-  // };
-
-  // this.locationFilters = [];
-  // this.dateFilters = [];
-  // this.datasetFilters = [];
-  this.notifyListeners(DatasetsController.NotificationReason.datasetsUpdate);
+DatasetsController.prototype.getSelection = function () {
+  return this.selection;
 };
 
 /**
- * Updates the datasets of this controller.
- * @param datasets The new datasets.
+ *
  */
-DatasetsController.prototype.setDatasets = function (datasets) {
-  this.originalDatasets = datasets;
-  this.datasets = copy(datasets);
-  this.update();
-};
-
-/**
- * Appends the given dataset to this controller.
- * @param additionalDataset The dataset to append.
- */
-DatasetsController.prototype.addDataset = function (additionalDataset) {
-  if (this.datasets.find(dataset => dataset.label === additionalDataset.label)) {
-    throw new Error(`DatasetsController already contains a dataset with the same label (${additionalDataset.label}).`);
-  }
-  this.datasets.push(additionalDataset);
-  this.update();
-};
-
-/**
- * Removes the dataset with the given label from this controller. Will do nothing if no dataset
- * with the given label exists.
- * @param label The label of the dataset to removeDataset.
- */
-DatasetsController.prototype.removeDataset = function (label) {
-  if (!this.datasets || !Array.isArray(this.datasets)) return;
-  let candidate = this.datasets.find(dataset => dataset.label === label);
-  if (!candidate) return;
-  let index = this.datasets.indexOf(candidate);
-  if (index < 0) return;
-  this.datasets = this.datasets.splice(index, 1);
-  this.update();
+DatasetsController.prototype.calculateSelection = function () {
+  let selectedData = this.enabledDatasets();
+  let flatData = flatDatasets(selectedData);
+  this.selection = {
+    labels: extractLabelsFromDatasets(selectedData),
+    stacks: extractStacksFromDatasets(selectedData),
+    dates: extractDatesFromFlatData(flatData),
+    locations: extractLocationsFromFlatData(flatData),
+    datasets: selectedData,
+    flatData: flatData,
+  };
 };
 
 /**
@@ -6146,8 +6210,12 @@ DatasetsController.prototype.update = function () {
   this.stacks = extractStacksFromDatasets(this.datasets);
   this.dates = extractDatesFromDatasets(this.datasets)
     .sort((left, right) => dateAccess(left) - dateAccess(right));
+
   this.locations = extractLocationsFromDatasets(this.datasets);
   this.datasetsColorsController = new DatasetsColorsController(this.workingDatasets, this.stacks);
+
+  this.calculateSelection();
+
   // this.dateAccess = function (date) {
   //   return Date.parse(date);
   // };
@@ -6156,43 +6224,6 @@ DatasetsController.prototype.update = function () {
   // this.dateFilters = [];
   // this.datasetFilters = [];
   this.notifyListeners(DatasetsController.NotificationReason.datasetsUpdate);
-};
-
-/**
- * Updates the datasets of this controller.
- * @param datasets The new datasets.
- */
-DatasetsController.prototype.setDatasets = function (datasets) {
-  this.originalDatasets = datasets;
-  this.datasets = copy(datasets);
-  this.update();
-};
-
-/**
- * Appends the given dataset to this controller.
- * @param additionalDataset The dataset to append.
- */
-DatasetsController.prototype.addDataset = function (additionalDataset) {
-  if (this.datasets.find(dataset => dataset.label === additionalDataset.label)) {
-    throw new Error(`DatasetsController already contains a dataset with the same label (${additionalDataset.label}).`);
-  }
-  this.datasets.push(additionalDataset);
-  this.update();
-};
-
-/**
- * Removes the dataset with the given label from this controller. Will do nothing if no dataset
- * with the given label exists.
- * @param label The label of the dataset to removeDataset.
- */
-DatasetsController.prototype.removeDataset = function (label) {
-  if (!this.datasets || !Array.isArray(this.datasets)) return;
-  let candidate = this.datasets.find(dataset => dataset.label === label);
-  if (!candidate) return;
-  let index = this.datasets.indexOf(candidate);
-  if (index < 0) return;
-  this.datasets = this.datasets.splice(index, 1);
-  this.update();
 };
 
 /**
@@ -6410,61 +6441,6 @@ DatasetsController.prototype.getLocationDataview = function () {
   return dataview;
 };
 
-/**
- * @class DataviewDatasetsControllerCard
- * @extends DataviewCard
- */
-class DataviewDatasetsControllerCard extends DataviewCard {
-
-  /**
-   * Creates a new instance of DataviewDatasetsControllerCard.
-   */
-  constructor(parent) {
-    parent.title = parent.title || `DataviewDatasetsControllerCard`;
-    super(parent);
-  }
-
-  datasetsToText(datasets) {
-    return JSON.stringify({
-      labels: this.datasetsController.labels,
-      stacks: this.datasetsController.stacks,
-      dates: this.datasetsController.dates,
-      locations: this.datasetsController.locations,
-      filters: {
-        locations: this.datasetsController.locationFilters,
-        dates: this.datasetsController.dateFilters,
-        datasets: this.datasetsController.datasetFilters,
-      },
-      selection: {},
-      workingDatasets: this.datasetsController.workingDatasets,
-      flatData: this.datasetsController.flatData,
-      originalDatasets: this.datasetsController.originalDatasets
-    }, null, 2);
-  }
-}
-
-/**
- * @class DataviewDatasetsControllerSelectionCard
- * @extends DataviewCard
- */
-class DataviewDatasetsControllerSelectionCard extends DataviewCard {
-
-  /**
-   * Creates a new instance of DataviewDatasetsControllerSelectionCard.
-   */
-  constructor(parent) {
-    parent.title = parent.title || `DataviewDatasetsControllerSelectionCard`;
-    super(parent);
-  }
-
-  datasetsToText(datasets) {
-    let labels = this.datasetsController.enabledLabels();
-    return JSON.stringify({
-      labels: labels
-    }, null, 2);
-  }
-}
-
 // colors
 exports.Color = Color;
 
@@ -6480,18 +6456,6 @@ exports.RadioGroup = RadioGroup;
 exports.Option = Option;
 exports.Toast = Toast;
 
-// date
-exports.DateChart = DateChart;
-exports.DateChartCard = DateChartCard;
-
-// map
-exports.MapChart = MapChart;
-exports.MapChartCard = MapChartCard;
-
-// plot
-exports.PlotChart = PlotChart;
-exports.PlotChartCard = PlotChartCard;
-
 // datasets / csv cards
 exports.DatasetsJSONCard = DatasetsJSONCard;
 exports.DatasetCSVCard = DatasetCSVCard;
@@ -6505,6 +6469,18 @@ exports.DataviewDatasetsControllerCard = DataviewDatasetsControllerCard;
 exports.DataviewDatasetsControllerSelectionCard = DataviewDatasetsControllerSelectionCard;
 exports.UpdatableDataviewCard = UpdatableDataviewCard;
 exports.EditableDataviewCard = EditableDataviewCard;
+
+// date
+exports.DateChart = DateChart;
+exports.DateChartCard = DateChartCard;
+
+// map
+exports.MapChart = MapChart;
+exports.MapChartCard = MapChartCard;
+
+// plot
+exports.PlotChart = PlotChart;
+exports.PlotChartCard = PlotChartCard;
 
 // datasets
 exports.DatasetController = DatasetsController;
@@ -6528,7 +6504,7 @@ exports.URLParameters = UrlParameters;
 
 var exports$1 = exports;
 
-console.log('lotivis v.');
+console.log(`[lotivis]  lotivis library loaded.`);
 
 exports.default = exports$1;
 

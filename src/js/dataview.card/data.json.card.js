@@ -22,7 +22,7 @@ export class DatasetsJSONCard extends EditableDataviewCard {
   }
 
   download(content) {
-    let filename = this.datasetController.getFilename();
+    let filename = this.datasetsController.getFilename();
     let downloadFilename = createDownloadFilename(filename, `datasets`);
     downloadJSON(content, downloadFilename);
   }
@@ -32,7 +32,7 @@ export class DatasetsJSONCard extends EditableDataviewCard {
     return JSON.parse(text.trim());
   }
 
-  datasetsToText(datasets) {
-    return JSON.stringify(datasets, null, 2);
+  datasetsToText(datasetsController) {
+    return JSON.stringify(datasetsController.datasets, null, 2) || "";
   }
 }

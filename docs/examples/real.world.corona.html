@@ -76,8 +76,8 @@
   let datasetsController = new lotivis.DatasetController([]);
   datasetsController.dateAccess = lotivis.GermanDateAccess;
 
-  dateChart.setDatasetController(datasetsController);
-  plotChart.setDatasetController(datasetsController);
+  dateChart.setDatasetsController(datasetsController);
+  plotChart.setDatasetsController(datasetsController);
   csvCard.setDatasetController(datasetsController);
 
   let dropdown = new lotivis.Dropdown.create(

@@ -5,7 +5,7 @@ import {DatasetsController} from "../datasets.controller/datasets.controller";
  * Sets a new datasets controller.  The chart is updated automatically.
  * @param newController The new datasets controller.
  */
-Chart.prototype.setDatasetController = function (newController) {
+Chart.prototype.setDatasetsController = function (newController) {
   this.datasetController = newController;
   this.datasetController.addListener(this);
   this.update(newController, 'registration');
@@ -16,7 +16,7 @@ Chart.prototype.setDatasetController = function (newController) {
  * @param newDatasets The new dataset.
  */
 Chart.prototype.setDatasets = function (newDatasets) {
-  this.setDatasetController(new DatasetsController(newDatasets));
+  this.setDatasetsController(new DatasetsController(newDatasets));
 };
 
 /**

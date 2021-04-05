@@ -10,7 +10,6 @@ export class DataviewDatasetsControllerCard extends DataviewCard {
    * Creates a new instance of DataviewDatasetsControllerCard.
    */
   constructor(parent) {
-    parent.title = parent.title || `DataviewDatasetsControllerCard`;
     super(parent);
   }
 

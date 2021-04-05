@@ -2,9 +2,9 @@ import {DatasetsController} from "./datasets.controller";
 import {copy} from "../shared/copy";
 import {flatDatasets} from "../data.juggle/data.flat";
 import {
-  extractDatesFromDatasets,
+  extractDatesFromDatasets, extractDatesFromFlatData,
   extractLabelsFromDatasets,
-  extractLocationsFromDatasets,
+  extractLocationsFromDatasets, extractLocationsFromFlatData,
   extractStacksFromDatasets
 } from "../data.juggle/data.extract";
 import {DatasetsColorsController} from "./datasets.controller.colors";
@@ -16,13 +16,21 @@ DatasetsController.prototype.getSelection = function () {
   return this.selection;
 };
 
+/**
+ *
+ */
 DatasetsController.prototype.calculateSelection = function () {
   let selectedData = this.enabledDatasets();
+  let flatData = flatDatasets(selectedData);
   this.selection = {
-
+    labels: extractLabelsFromDatasets(selectedData),
+    stacks: extractStacksFromDatasets(selectedData),
+    dates: extractDatesFromFlatData(flatData),
+    locations: extractLocationsFromFlatData(flatData),
+    datasets: selectedData,
+    flatData: flatData,
   };
 };
-
 
 /**
  *

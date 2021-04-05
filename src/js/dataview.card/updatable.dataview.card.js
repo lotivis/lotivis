@@ -14,7 +14,7 @@ export class UpdatableDataviewCard extends TextareaCard {
    * @param parent The parental element or a selector (id).
    */
   constructor(parent = {}) {
-    parent.title = parent.title || 'UpdatableDataviewCard';
+    // parent.title = parent.title || 'UpdatableDataviewCard';
     super(parent);
     this.updateSensible = true;
     this.downloadButton.hide();
@@ -38,33 +38,30 @@ export class UpdatableDataviewCard extends TextareaCard {
     if (!this.updateSensible) {
       lotivis_log(`[lotivis]  NOT sensible ${this}. Reason '${reason}'.`);
       return;
-    } else if (this.config.updateSensible === false) {
+    } else if (this.config && this.config.updateSensible === false) {
       lotivis_log(`[lotivis]  NOT sensible (Config) ${this}. Reason '${reason}'.`);
+      return;
+    } else if (!datasetsController) {
+      lotivis_log(`[lotivis]  NO controller ${this}. Reason '${reason}'.`);
       return;
     }
 
-    this.updateContentsOfTextarea();
+    let datasets = datasetsController.datasets;
+    let content = this.datasetsToText(datasetsController, datasets);
+
+    this.setTextareaContent(content);
+    this.cachedDatasets = datasets;
 
     lotivis_log(`[lotivis]  Update ${this}. Reason '${reason}'.`);
   }
 
   /**
-   * Tells this datasets card to update the content of the textarea by rendering the datasets to text.
-   */
-  updateContentsOfTextarea() {
-    if (!this.datasetsController || !this.datasetsController.datasets) return;
-    let datasets = this.datasetsController.datasets;
-    let content = this.datasetsToText(datasets, this.datasetsController);
-    this.setTextareaContent(content);
-    this.cachedDatasets = datasets;
-  }
-
-  /**
    * Sets the content of the textarea by rendering the given datasets to text.  Subclasses should override.
+   * @param controller The datasets controller.
    * @param datasets The datasets to render.
    * @return {*}
    */
-  datasetsToText(datasets) {
+  datasetsToText(controller, datasets) {
     throw new LotivisUnimplementedMethodError(`Subclasses should override.`);
   }
 }

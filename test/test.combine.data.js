@@ -33,6 +33,9 @@ describe('dataset', function() {
     let flat = lotivis.flatDatasets(datasets);
     let combined = lotivis.combineByStacks(flat);
 
+    console.log(flat);
+    console.log(combined);
+
     it('should have the right length', function() {
       assert.strictEqual(combined.length, 20);
     });

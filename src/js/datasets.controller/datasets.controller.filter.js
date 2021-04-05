@@ -16,6 +16,7 @@ DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
   this.locationFilters = [];
   this.dateFilters = [];
   this.datasetFilters = [];
+  this.calculateSelection();
   if (!notifyListeners) return;
   this.notifyListeners(DatasetsController.NotificationReason.resetFilters);
 };
@@ -25,12 +26,13 @@ DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
  * @param locations The locations to filter.
  */
 DatasetsController.prototype.setLocationsFilter = function (locations) {
-  let stringVersions = locations.map(location => String(location));
+  let stringVersions = locations.map(location => String(location)).filter(item => item.length > 0);
   if (objectsEqual(this.locationFilters, stringVersions)) {
     return lotivis_log(`[lotivis]  Location filters not changed.`);
   }
   // this.resetFilters(false);
   this.locationFilters = stringVersions;
+  this.calculateSelection();
   this.notifyListeners(DatasetsController.NotificationReason.filterLocations);
 };
 
@@ -39,12 +41,13 @@ DatasetsController.prototype.setLocationsFilter = function (locations) {
  * @param dates The dates to filter.
  */
 DatasetsController.prototype.setDatesFilter = function (dates) {
-  let stringVersions = dates.map(date => String(date));
+  let stringVersions = dates.map(date => String(date)).filter(item => item.length > 0);
   if (objectsEqual(this.dateFilters, stringVersions)) {
     return lotivis_log(`[lotivis]  Date filters not changed.`);
   }
   // this.resetFilters(false);
   this.dateFilters = stringVersions;
+  this.calculateSelection();
   this.notifyListeners(DatasetsController.NotificationReason.filterDates);
 };
 
@@ -53,12 +56,13 @@ DatasetsController.prototype.setDatesFilter = function (dates) {
  * @param datasets The datasets to filter.
  */
 DatasetsController.prototype.setDatasetsFilter = function (datasets) {
-  let stringVersions = datasets.map(dataset => String(dataset));
+  let stringVersions = datasets.map(dataset => String(dataset)).filter(item => item.length > 0);
   if (objectsEqual(this.datasetFilters, stringVersions)) {
     return lotivis_log(`[lotivis]  Dataset filters not changed.`);
   }
   // this.resetFilters(false);
   this.datasetFilters = stringVersions;
+  this.calculateSelection();
   this.notifyListeners(DatasetsController.NotificationReason.filterDataset);
 };
 
@@ -67,7 +71,7 @@ DatasetsController.prototype.setDatasetsFilter = function (datasets) {
  * @param label The label of the dataset.
  * @param notifyListeners A boolean value indicating whether to notify the listeners.  Default is `true`.
  */
-DatasetsController.prototype.toggleDataset = function (label, notifyListeners=true) {
+DatasetsController.prototype.toggleDataset = function (label, notifyListeners = true) {
   this.workingDatasets.forEach(function (dataset) {
     if (dataset.label === label) {
       dataset.isEnabled = !dataset.isEnabled;
@@ -119,7 +123,9 @@ DatasetsController.prototype.enabledDatasets = function () {
     });
   }
 
-  return enabled;
+  let withValue = enabled.filter(dataset => dataset.data.length > 0);
+
+  return withValue;
 };
 
 /**

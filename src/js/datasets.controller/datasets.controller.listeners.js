@@ -32,7 +32,10 @@ DatasetsController.prototype.notifyListeners = function (reason = DatasetsContro
   if (!this.listeners) return;
   for (let index = 0; index < this.listeners.length; index++) {
     let listener = this.listeners[index];
-    if (!listener.update) continue;
+    if (!listener.update) {
+      lotivis_log('Listener unqualified.');
+      continue;
+    }
     listener.update(this, reason);
   }
 };

@@ -32,7 +32,8 @@ export function flatDataset(dataset) {
   dataset.data.forEach(item => {
     let newItem = {};
     newItem.dataset = dataset.label;
-    newItem.stack = item.stack;
+    newItem.label = dataset.label;
+    newItem.stack = dataset.stack || dataset.label;
     newItem.location = item.location;
     newItem.date = item.date;
     newItem.dateNumeric = item.dateNumeric;

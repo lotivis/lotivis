@@ -27,6 +27,12 @@ export class DatasetsController {
     this.locationFilters = this.config.locationFilters || [];
     this.dateFilters = this.config.dateFilters || [];
     this.datasetFilters = this.config.datasetFilters || [];
+    this.filters = {};
+    if (this.config.filters) {
+      this.filters.locations = this.config.filters.locations || [];
+      this.filters.dates = this.config.filters.dates || [];
+      this.filters.datasets = this.config.filters.datasets || [];
+    }
   }
 
   getFlatDataCombinedStacks() {

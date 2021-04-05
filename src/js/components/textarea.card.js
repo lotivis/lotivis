@@ -64,7 +64,7 @@ export class TextareaCard extends Card {
     if (!textarea) return;
     textarea.value = newContent;
 
-    if (this.config.updatesHeight !== true) return;
+    if (this.config && this.config.updatesHeight !== true) return;
     if (typeof newContent !== 'string') return;
     let numberOfRows = newContent.split(`\n`).length;
     this.textarea.attr('rows', numberOfRows);

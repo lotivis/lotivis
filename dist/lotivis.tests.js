@@ -301,7 +301,8 @@ function flatDataset(dataset) {
   dataset.data.forEach(item => {
     let newItem = {};
     newItem.dataset = dataset.label;
-    newItem.stack = item.stack;
+    newItem.label = dataset.label;
+    newItem.stack = dataset.stack || dataset.label;
     newItem.location = item.location;
     newItem.date = item.date;
     newItem.dateNumeric = item.dateNumeric;
@@ -397,7 +398,6 @@ function combineByStacks(flattenList) {
 
     let entry = combined.find(function (entryItem) {
       return entryItem.stack === listItem.stack
-        && entryItem.label === listItem.label
         && entryItem.location === listItem.location
         && entryItem.date === listItem.date;
     });
@@ -871,6 +871,12 @@ class DatasetsController {
     this.locationFilters = this.config.locationFilters || [];
     this.dateFilters = this.config.dateFilters || [];
     this.datasetFilters = this.config.datasetFilters || [];
+    this.filters = {};
+    if (this.config.filters) {
+      this.filters.locations = this.config.filters.locations || [];
+      this.filters.dates = this.config.filters.dates || [];
+      this.filters.datasets = this.config.filters.datasets || [];
+    }
   }
 
   getFlatDataCombinedStacks() {
@@ -958,7 +964,9 @@ DatasetsController.prototype.notifyListeners = function (reason = DatasetsContro
   if (!this.listeners) return;
   for (let index = 0; index < this.listeners.length; index++) {
     let listener = this.listeners[index];
-    if (!listener.update) continue;
+    if (!listener.update) {
+      continue;
+    }
     listener.update(this, reason);
   }
 };
@@ -1017,6 +1025,7 @@ DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
   this.locationFilters = [];
   this.dateFilters = [];
   this.datasetFilters = [];
+  this.calculateSelection();
   if (!notifyListeners) return;
   this.notifyListeners(DatasetsController.NotificationReason.resetFilters);
 };
@@ -1026,12 +1035,13 @@ DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
  * @param locations The locations to filter.
  */
 DatasetsController.prototype.setLocationsFilter = function (locations) {
-  let stringVersions = locations.map(location => String(location));
+  let stringVersions = locations.map(location => String(location)).filter(item => item.length > 0);
   if (objectsEqual(this.locationFilters, stringVersions)) {
     return lotivis_log();
   }
   // this.resetFilters(false);
   this.locationFilters = stringVersions;
+  this.calculateSelection();
   this.notifyListeners(DatasetsController.NotificationReason.filterLocations);
 };
 
@@ -1040,12 +1050,13 @@ DatasetsController.prototype.setLocationsFilter = function (locations) {
  * @param dates The dates to filter.
  */
 DatasetsController.prototype.setDatesFilter = function (dates) {
-  let stringVersions = dates.map(date => String(date));
+  let stringVersions = dates.map(date => String(date)).filter(item => item.length > 0);
   if (objectsEqual(this.dateFilters, stringVersions)) {
     return lotivis_log();
   }
   // this.resetFilters(false);
   this.dateFilters = stringVersions;
+  this.calculateSelection();
   this.notifyListeners(DatasetsController.NotificationReason.filterDates);
 };
 
@@ -1054,12 +1065,13 @@ DatasetsController.prototype.setDatesFilter = function (dates) {
  * @param datasets The datasets to filter.
  */
 DatasetsController.prototype.setDatasetsFilter = function (datasets) {
-  let stringVersions = datasets.map(dataset => String(dataset));
+  let stringVersions = datasets.map(dataset => String(dataset)).filter(item => item.length > 0);
   if (objectsEqual(this.datasetFilters, stringVersions)) {
     return lotivis_log();
   }
   // this.resetFilters(false);
   this.datasetFilters = stringVersions;
+  this.calculateSelection();
   this.notifyListeners(DatasetsController.NotificationReason.filterDataset);
 };
 
@@ -1068,7 +1080,7 @@ DatasetsController.prototype.setDatasetsFilter = function (datasets) {
  * @param label The label of the dataset.
  * @param notifyListeners A boolean value indicating whether to notify the listeners.  Default is `true`.
  */
-DatasetsController.prototype.toggleDataset = function (label, notifyListeners=true) {
+DatasetsController.prototype.toggleDataset = function (label, notifyListeners = true) {
   this.workingDatasets.forEach(function (dataset) {
     if (dataset.label === label) {
       dataset.isEnabled = !dataset.isEnabled;
@@ -1120,7 +1132,9 @@ DatasetsController.prototype.enabledDatasets = function () {
     });
   }
 
-  return enabled;
+  let withValue = enabled.filter(dataset => dataset.data.length > 0);
+
+  return withValue;
 };
 
 /**
@@ -1202,6 +1216,68 @@ class DatasetsColorsController {
 }
 
 /**
+ * Updates the datasets of this controller.
+ * @param datasets The new datasets.
+ */
+DatasetsController.prototype.setDatasets = function (datasets) {
+  this.originalDatasets = datasets;
+  this.datasets = copy(datasets);
+  this.update();
+};
+
+/**
+ * Appends the given dataset to this controller.
+ * @param additionalDataset The dataset to append.
+ */
+DatasetsController.prototype.addDataset = function (additionalDataset) {
+  if (this.datasets.find(dataset => dataset.label === additionalDataset.label)) {
+    throw new Error(`DatasetsController already contains a dataset with the same label (${additionalDataset.label}).`);
+  }
+  this.datasets.push(additionalDataset);
+  this.calculateSelection();
+  this.update();
+};
+
+/**
+ * Removes the dataset with the given label from this controller. Will do nothing if no dataset
+ * with the given label exists.
+ * @param label The label of the dataset to removeDataset.
+ */
+DatasetsController.prototype.removeDataset = function (label) {
+  if (!this.datasets || !Array.isArray(this.datasets)) return;
+  let candidate = this.datasets.find(dataset => dataset.label === label);
+  if (!candidate) return;
+  let index = this.datasets.indexOf(candidate);
+  if (index < 0) return;
+  this.datasets = this.datasets.splice(index, 1);
+  this.calculateSelection();
+  this.update();
+};
+
+/**
+ *
+ */
+DatasetsController.prototype.getSelection = function () {
+  return this.selection;
+};
+
+/**
+ *
+ */
+DatasetsController.prototype.calculateSelection = function () {
+  let selectedData = this.enabledDatasets();
+  let flatData = flatDatasets(selectedData);
+  this.selection = {
+    labels: extractLabelsFromDatasets(selectedData),
+    stacks: extractStacksFromDatasets(selectedData),
+    dates: extractDatesFromFlatData(flatData),
+    locations: extractLocationsFromFlatData(flatData),
+    datasets: selectedData,
+    flatData: flatData,
+  };
+};
+
+/**
  *
  */
 DatasetsController.prototype.update = function () {
@@ -1224,8 +1300,12 @@ DatasetsController.prototype.update = function () {
   this.stacks = extractStacksFromDatasets(this.datasets);
   this.dates = extractDatesFromDatasets(this.datasets)
     .sort((left, right) => dateAccess(left) - dateAccess(right));
+
   this.locations = extractLocationsFromDatasets(this.datasets);
   this.datasetsColorsController = new DatasetsColorsController(this.workingDatasets, this.stacks);
+
+  this.calculateSelection();
+
   // this.dateAccess = function (date) {
   //   return Date.parse(date);
   // };
@@ -1234,43 +1314,6 @@ DatasetsController.prototype.update = function () {
   // this.dateFilters = [];
   // this.datasetFilters = [];
   this.notifyListeners(DatasetsController.NotificationReason.datasetsUpdate);
-};
-
-/**
- * Updates the datasets of this controller.
- * @param datasets The new datasets.
- */
-DatasetsController.prototype.setDatasets = function (datasets) {
-  this.originalDatasets = datasets;
-  this.datasets = copy(datasets);
-  this.update();
-};
-
-/**
- * Appends the given dataset to this controller.
- * @param additionalDataset The dataset to append.
- */
-DatasetsController.prototype.addDataset = function (additionalDataset) {
-  if (this.datasets.find(dataset => dataset.label === additionalDataset.label)) {
-    throw new Error(`DatasetsController already contains a dataset with the same label (${additionalDataset.label}).`);
-  }
-  this.datasets.push(additionalDataset);
-  this.update();
-};
-
-/**
- * Removes the dataset with the given label from this controller. Will do nothing if no dataset
- * with the given label exists.
- * @param label The label of the dataset to removeDataset.
- */
-DatasetsController.prototype.removeDataset = function (label) {
-  if (!this.datasets || !Array.isArray(this.datasets)) return;
-  let candidate = this.datasets.find(dataset => dataset.label === label);
-  if (!candidate) return;
-  let index = this.datasets.indexOf(candidate);
-  if (index < 0) return;
-  this.datasets = this.datasets.splice(index, 1);
-  this.update();
 };
 
 /**
