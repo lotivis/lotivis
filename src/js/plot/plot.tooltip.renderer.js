@@ -55,7 +55,7 @@ export class PlotTooltipRenderer {
      * @returns {*} The left pixel position for the tooltip.
      */
     function getTooltipLeftForDataset(dataset, factor, offset) {
-      let left = plotChart.xChart(dataset.earliestDate);
+      let left = plotChart.xChart(dataset.firstDate);
       left *= factor;
       left += offset[0];
       return left;

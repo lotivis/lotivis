@@ -904,7 +904,7 @@ class DatasetsController {
   }
 
   getMax() {
-    return d3LibraryAccess.max(this.workingDatasets, function (dataset) {
+    return d3LibraryAccess.max(this.datasets, function (dataset) {
       return d3LibraryAccess.max(dataset.data, function (item) {
         return item.value;
       });
@@ -932,6 +932,30 @@ class DatasetsController {
     return this.labels.join(',');
   }
 }
+
+/**
+ *
+ * @type {{
+ * datasetsUpdate: string,
+ * filterDates: string,
+ * filterDataset: string,
+ * filterLocations: string
+ * resetFilters: string,
+ * registration: string,
+ * none: string,
+ * datasetsSet: string
+ * }}
+ */
+DatasetsController.NotificationReason = {
+  none: 'none',
+  registration: 'registration',
+  datasetsSet: 'datasets-set',
+  datasetsUpdate: 'datasets-update',
+  filterDataset: 'dataset-filter',
+  filterDates: 'dates-filter',
+  filterLocations: 'location-filter',
+  resetFilters: 'reset-filters'
+};
 
 /**
  * Appends the given listener to the collection of listeners.
@@ -984,17 +1008,6 @@ DatasetsController.prototype.register = function (listeners) {
   }
 };
 
-DatasetsController.NotificationReason = {
-  none: 'none',
-  registration: 'registration',
-  datasetsSet: 'datasets-set',
-  datasetsUpdate: 'datasets-update',
-  filterDataset: 'dataset-filter',
-  filterDates: 'dates-filter',
-  filterLocations: 'location-filter',
-  resetFilters: 'reset-filters'
-};
-
 /**
  * Compares the string version of each oof the two given values for equality.
  * @param value1 The first value to compare.
@@ -1039,7 +1052,6 @@ DatasetsController.prototype.setLocationsFilter = function (locations) {
   if (objectsEqual(this.locationFilters, stringVersions)) {
     return lotivis_log();
   }
-  // this.resetFilters(false);
   this.locationFilters = stringVersions;
   this.calculateSelection();
   this.notifyListeners(DatasetsController.NotificationReason.filterLocations);
@@ -1051,10 +1063,7 @@ DatasetsController.prototype.setLocationsFilter = function (locations) {
  */
 DatasetsController.prototype.setDatesFilter = function (dates) {
   let stringVersions = dates.map(date => String(date)).filter(item => item.length > 0);
-  if (objectsEqual(this.dateFilters, stringVersions)) {
-    return lotivis_log();
-  }
-  // this.resetFilters(false);
+  if (objectsEqual(this.dateFilters, stringVersions)) return lotivis_log();
   this.dateFilters = stringVersions;
   this.calculateSelection();
   this.notifyListeners(DatasetsController.NotificationReason.filterDates);
@@ -1066,10 +1075,7 @@ DatasetsController.prototype.setDatesFilter = function (dates) {
  */
 DatasetsController.prototype.setDatasetsFilter = function (datasets) {
   let stringVersions = datasets.map(dataset => String(dataset)).filter(item => item.length > 0);
-  if (objectsEqual(this.datasetFilters, stringVersions)) {
-    return lotivis_log();
-  }
-  // this.resetFilters(false);
+  if (objectsEqual(this.datasetFilters, stringVersions)) return lotivis_log();
   this.datasetFilters = stringVersions;
   this.calculateSelection();
   this.notifyListeners(DatasetsController.NotificationReason.filterDataset);
@@ -1081,10 +1087,9 @@ DatasetsController.prototype.setDatasetsFilter = function (datasets) {
  * @param notifyListeners A boolean value indicating whether to notify the listeners.  Default is `true`.
  */
 DatasetsController.prototype.toggleDataset = function (label, notifyListeners = true) {
-  this.workingDatasets.forEach(function (dataset) {
-    if (dataset.label === label) {
-      dataset.isEnabled = !dataset.isEnabled;
-    }
+  this.datasets.forEach((dataset) => {
+    if (dataset.label !== label) return;
+    dataset.isEnabled = !dataset.isEnabled;
   });
   if (!notifyListeners) return;
   this.notifyListeners('dataset-toggle');
@@ -1094,47 +1099,8 @@ DatasetsController.prototype.toggleDataset = function (label, notifyListeners = 
  * Enables all datasets.  Notifies listeners.
  */
 DatasetsController.prototype.enableAllDatasets = function () {
-  this.workingDatasets.forEach(function (dataset) {
-    dataset.isEnabled = true;
-  });
+  this.datasets.forEach(dataset => dataset.isEnabled = true);
   this.notifyListeners('dataset-enable-all');
-};
-
-/**
- * Returns a newly generated collection containing all enabled datasets.
- * @returns {*} The collection of enabled datasets.
- */
-DatasetsController.prototype.enabledDatasets = function () {
-  let aCopy = copy(this.workingDatasets);
-
-  let enabled = aCopy
-    .filter(dataset => dataset.isEnabled === true);
-
-  if (this.datasetFilters && this.datasetFilters.length > 0) {
-    enabled = enabled.filter(dataset => this.datasetFilters.includes(dataset.label));
-  }
-
-  if (this.locationFilters && this.locationFilters.length > 0) {
-    let locationFilters = this.locationFilters;
-    enabled = enabled.map(function (dataset) {
-      dataset.data = dataset.data
-        .filter(data => locationFilters.includes(String(data.location))) || [];
-      return dataset;
-    });
-  }
-
-  if (this.dateFilters && this.dateFilters.length > 0) {
-    let dateFilters = this.dateFilters;
-    enabled = enabled.map(function (dataset) {
-      dataset.data = dataset.data
-        .filter(data => dateFilters.includes(String(data.date))) || [];
-      return dataset;
-    });
-  }
-
-  let withValue = enabled.filter(dataset => dataset.data.length > 0);
-
-  return withValue;
 };
 
 /**
@@ -1167,6 +1133,42 @@ DatasetsController.prototype.enabledStacks = function () {
  */
 DatasetsController.prototype.enabledDates = function () {
   return extractDatesFromDatasets(this.enabledDatasets());
+};
+
+/**
+ * Returns a newly generated collection containing all enabled datasets.
+ * @returns {*} The collection of enabled datasets.
+ */
+DatasetsController.prototype.enabledDatasets = function () {
+  console.log('enabledDatasets', this);
+  let aCopy = copy(this.datasets);
+
+  let enabled = aCopy
+    .filter(dataset => dataset.isEnabled === true);
+
+  if (this.datasetFilters && this.datasetFilters.length > 0) {
+    enabled = enabled.filter(dataset => this.datasetFilters.includes(dataset.label));
+  }
+
+  if (this.locationFilters && this.locationFilters.length > 0) {
+    let locationFilters = this.locationFilters;
+    enabled = enabled.map(function (dataset) {
+      dataset.data = dataset.data
+        .filter(data => locationFilters.includes(String(data.location))) || [];
+      return dataset;
+    });
+  }
+
+  if (this.dateFilters && this.dateFilters.length > 0) {
+    let dateFilters = this.dateFilters;
+    enabled = enabled.map(function (dataset) {
+      dataset.data = dataset.data
+        .filter(data => dateFilters.includes(String(data.date))) || [];
+      return dataset;
+    });
+  }
+
+  return enabled.filter(dataset => dataset.data.length > 0);
 };
 
 /**
@@ -1216,53 +1218,144 @@ class DatasetsColorsController {
 }
 
 /**
+ * Validates the given datasets.
+ * @param datasets The datasets to validate.
+ * @throws InvalidFormatError
+ */
+function validateDatasets(datasets) {
+
+  if (!datasets) {
+    throw new InvalidFormatError(`No dataset given.`);
+  } else if (!Array.isArray(datasets)) {
+    throw new InvalidFormatError(`Expecting array of datasets.`);
+  }
+
+  for (let index = 0; index < datasets.length; index++) {
+    validateDataset(datasets[index]);
+  }
+}
+
+/**
+ * Validates the given dataset.
+ * @param dataset The dataset to validate.
+ * @throws InvalidFormatError
+ * @throws MissingPropertyError
+ */
+function validateDataset(dataset) {
+  if (!dataset) {
+    throw new InvalidFormatError(`No dataset given.`);
+  } else if (!dataset.label) {
+    throw new MissingPropertyError(`Missing label for dataset. ${dataset}`);
+  } else if (!dataset.data) {
+    throw new MissingPropertyError(`Invalid data. Property is not an array. Dataset: ${dataset.label}`);
+  } else if (!Array.isArray(dataset.data)) {
+    throw new InvalidFormatError(`Invalid data. Property is not an array. Dataset: ${dataset.label}`);
+  }
+
+  let data = dataset;
+  for (let index = 0; index < data.length; index++) {
+    validateDataItem(data[index]);
+  }
+}
+
+/**
+ * Validates the given datasets.controller item by ensuring it has a valid `date`, `location` and `value` property value.
+ * @param item The datasets.controller item to validate.
+ * @throws MissingPropertyError
+ */
+function validateDataItem(item) {
+  if (!item.date) {
+    throw new MissingPropertyError(`Missing date property for item.`, item);
+  } else if (!item.location) {
+    throw new MissingPropertyError(`Missing location property for item.`, item);
+  }
+}
+
+/*
+CRUD:
+- create
+- read
+- update
+- delete
+ */
+
+/**
+ * Sets the given dataset.
+ * @param dataset The new dataset.
+ */
+DatasetsController.prototype.setDataset = function (dataset) {
+  this.setDatasets([dataset]);
+};
+
+/**
  * Updates the datasets of this controller.
  * @param datasets The new datasets.
  */
 DatasetsController.prototype.setDatasets = function (datasets) {
   this.originalDatasets = datasets;
   this.datasets = copy(datasets);
-  this.update();
+  validateDatasets(datasets);
+  this.datasetsDidChange();
 };
 
 /**
  * Appends the given dataset to this controller.
- * @param additionalDataset The dataset to append.
+ * @param dataset The dataset to append.
  */
-DatasetsController.prototype.addDataset = function (additionalDataset) {
-  if (this.datasets.find(dataset => dataset.label === additionalDataset.label)) {
-    throw new Error(`DatasetsController already contains a dataset with the same label (${additionalDataset.label}).`);
-  }
-  this.datasets.push(additionalDataset);
-  this.calculateSelection();
-  this.update();
+DatasetsController.prototype.addDataset = function (dataset) {
+  this.addDatasets([dataset]);
 };
 
 /**
- * Removes the dataset with the given label from this controller. Will do nothing if no dataset
+ * Appends the given datasets to this controller.
+ * @param datasets The collection of datasets to add.
+ */
+DatasetsController.prototype.addDatasets = function (datasets) {
+  if (!this.datasets || !Array.isArray(this.datasets)) return;
+  if (!datasets || !Array.isArray(datasets)) return;
+  if (this.datasets.find(dataset => dataset.label === datasets.label)) {
+    throw new Error(`DatasetsController already contains a dataset with the same label (${datasets.label}).`);
+  }
+  datasets.forEach(dataset => this.datasets.push(dataset));
+  this.datasetsDidChange();
+  this.notifyListeners(DatasetsController.NotificationReason.datasetsUpdate);
+};
+
+/**
+ * Removes the dataset with the given label from this controller.  Will do nothing if no dataset
  * with the given label exists.
  * @param label The label of the dataset to removeDataset.
  */
 DatasetsController.prototype.removeDataset = function (label) {
-  if (!this.datasets || !Array.isArray(this.datasets)) return;
-  let candidate = this.datasets.find(dataset => dataset.label === label);
-  if (!candidate) return;
-  let index = this.datasets.indexOf(candidate);
-  if (index < 0) return;
-  this.datasets = this.datasets.splice(index, 1);
-  this.calculateSelection();
-  this.update();
+  this.removeDatasets([label]);
 };
 
 /**
- *
+ * Removes the given datasets from this controller.  Datasets this controller already containing will be ignored.
+ * @param labels The collection of labels to remove.
+ */
+DatasetsController.prototype.removeDatasets = function (labels) {
+  if (!this.datasets || !Array.isArray(this.datasets)) return;
+  if (!labels || !Array.isArray(labels)) return;
+  labels.forEach(function (label) {
+    let candidate = this.datasets.find(dataset => dataset.label === label);
+    if (!candidate) return;
+    let index = this.datasets.indexOf(candidate);
+    if (index < 0) return;
+    this.datasets = this.datasets.splice(index, 1);
+  }.bind(this));
+  this.datasetsDidChange();
+};
+
+/**
+ * Returns the current selection.
  */
 DatasetsController.prototype.getSelection = function () {
   return this.selection;
 };
 
 /**
- *
+ * Calculates the current selection dependant on the set filters.
  */
 DatasetsController.prototype.calculateSelection = function () {
   let selectedData = this.enabledDatasets();
@@ -1278,15 +1371,15 @@ DatasetsController.prototype.calculateSelection = function () {
 };
 
 /**
- *
+ * Calculates the additional data.
  */
-DatasetsController.prototype.update = function () {
-  if (!this.datasets || !Array.isArray(this.datasets)) return;
-
+DatasetsController.prototype.calculateAdditionalData = function () {
   let dateAccess = this.dateAccess;
-  this.workingDatasets = copy(this.datasets)
+
+  this.datasets = copy(this.datasets)
     .sort((left, right) => left.label > right.label);
-  this.workingDatasets.forEach(function (dataset) {
+
+  this.datasets.forEach(function (dataset) {
     dataset.isEnabled = true;
     dataset.data.forEach(function (item) {
       item.dateNumeric = dateAccess(item.date);
@@ -1295,24 +1388,26 @@ DatasetsController.prototype.update = function () {
       .sort((left, right) => left.dateNumeric - right.dateNumeric);
   });
 
-  this.flatData = flatDatasets(this.workingDatasets);
+  this.flatData = flatDatasets(this.datasets);
   this.labels = extractLabelsFromDatasets(this.datasets);
   this.stacks = extractStacksFromDatasets(this.datasets);
   this.dates = extractDatesFromDatasets(this.datasets)
     .sort((left, right) => dateAccess(left) - dateAccess(right));
 
   this.locations = extractLocationsFromDatasets(this.datasets);
-  this.datasetsColorsController = new DatasetsColorsController(this.workingDatasets, this.stacks);
+  this.datasetsColorsController = new DatasetsColorsController(this.datasets, this.stacks);
+};
 
+/**
+ * Tells this datasets controller that its datasets did change.
+ */
+DatasetsController.prototype.datasetsDidChange = function () {
+  if (!this.datasets || !Array.isArray(this.datasets)) {
+    return;
+  }
+
+  this.calculateAdditionalData();
   this.calculateSelection();
-
-  // this.dateAccess = function (date) {
-  //   return Date.parse(date);
-  // };
-
-  // this.locationFilters = [];
-  // this.dateFilters = [];
-  // this.datasetFilters = [];
   this.notifyListeners(DatasetsController.NotificationReason.datasetsUpdate);
 };
 
@@ -1416,24 +1511,24 @@ function combineDataByGroupsize(data, ratio) {
  */
 DatasetsController.prototype.getDateDataview = function (groupSize) {
   this.dateAccess;
-  let workingDatasets = copy(this.workingDatasets);
-  let enabledDatasets = copy(this.enabledDatasets() || workingDatasets);
+  let datasets = copy(this.datasets);
+  let enabledDatasets = copy(this.enabledDatasets() || datasets);
   let dataview = {};
   let saveGroupSize = groupSize || 1;
 
   dataview.groupSize = saveGroupSize;
   if (saveGroupSize <= 1) {
-    dataview.datasets = workingDatasets;
+    dataview.datasets = datasets;
     dataview.enabledDatasets = enabledDatasets;
   } else {
-    workingDatasets = combineDatasetsByRatio(workingDatasets, saveGroupSize);
+    workingDatasets = combineDatasetsByRatio(datasets, saveGroupSize);
     enabledDatasets = combineDatasetsByRatio(enabledDatasets, saveGroupSize);
-    dataview.datasets = workingDatasets;
+    dataview.datasets = datasets;
   }
 
-  dataview.dateToItemsRelation = dateToItemsRelation(workingDatasets);
+  dataview.dateToItemsRelation = dateToItemsRelation(datasets);
   dataview.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets);
-  dataview.datasetStacks = createStackModel(this, workingDatasets, dataview.dateToItemsRelation);
+  dataview.datasetStacks = createStackModel(this, datasets, dataview.dateToItemsRelation);
   dataview.datasetStacksPresented = createStackModel(this, enabledDatasets, dataview.dateToItemsRelationPresented);
 
   dataview.max = d3.max(dataview.datasetStacksPresented, function (stack) {
@@ -1691,60 +1786,6 @@ function trimByChar(string, character) {
 }
 
 /**
- * Validates the given datasets.
- * @param datasets The datasets to validate.
- * @throws InvalidFormatError
- */
-function validateDatasets(datasets) {
-
-  if (!datasets) {
-    throw new InvalidFormatError(`No dataset given.`);
-  } else if (!Array.isArray(datasets)) {
-    throw new InvalidFormatError(`Expecting array of datasets.`);
-  }
-
-  for (let index = 0; index < datasets.length; index++) {
-    validateDataset(datasets[index]);
-  }
-}
-
-/**
- * Validates the given dataset.
- * @param dataset The dataset to validate.
- * @throws InvalidFormatError
- * @throws MissingPropertyError
- */
-function validateDataset(dataset) {
-  if (!dataset) {
-    throw new InvalidFormatError(`No dataset given.`);
-  } else if (!dataset.label) {
-    throw new MissingPropertyError(`Missing label for dataset. ${dataset}`);
-  } else if (!dataset.data) {
-    throw new MissingPropertyError(`Invalid data. Property is not an array. Dataset: ${dataset.label}`);
-  } else if (!Array.isArray(dataset.data)) {
-    throw new InvalidFormatError(`Invalid data. Property is not an array. Dataset: ${dataset.label}`);
-  }
-
-  let data = dataset;
-  for (let index = 0; index < data.length; index++) {
-    validateDataItem(data[index]);
-  }
-}
-
-/**
- * Validates the given datasets.controller item by ensuring it has a valid `date`, `location` and `value` property value.
- * @param item The datasets.controller item to validate.
- * @throws MissingPropertyError
- */
-function validateDataItem(item) {
-  if (!item.date) {
-    throw new MissingPropertyError(`Missing date property for item.`, item);
-  } else if (!item.location) {
-    throw new MissingPropertyError(`Missing location property for item.`, item);
-  }
-}
-
-/**
  * Returns a dataset collection created from the given flat samples collection.
  * @param flatData The flat samples collection.
  * @returns {[]} A collection of datasets.
@@ -1909,7 +1950,7 @@ function appendExtensionIfNeeded(filename, extension) {
 }
 
 exports.Color = Color;
-exports.DatasetController = DatasetsController;
+exports.DatasetsController = DatasetsController;
 exports.GeoJson = GeoJson;
 exports.Feature = Feature;
 exports.joinFeatures = joinFeatures;

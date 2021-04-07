@@ -43,6 +43,7 @@ import "./js/datasets.controller/datasets.controller.listeners";
 import "./js/datasets.controller/datasets.controller.filter";
 import "./js/datasets.controller/datasets.controller.data";
 import "./js/datasets.controller/datasets.controller.selection";
+import "./js/datasets.controller/datasets.controller.notification.reason";
 
 import {parseCSV} from "./js/data.parse/parse.csv";
 import {parseCSVDate} from "./js/data.parse/parse.csv.date";

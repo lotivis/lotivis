@@ -22,7 +22,7 @@ export class DatasetCSVCard extends EditableDataviewCard {
   }
 
   download(content) {
-    let filename = this.datasetController.getFilename();
+    let filename = this.datasetsController.getFilename();
     let downloadFilename = createDownloadFilename(filename, `datasets`);
     downloadCSV(content, downloadFilename);
   }
@@ -32,7 +32,7 @@ export class DatasetCSVCard extends EditableDataviewCard {
     return parseCSV(text);
   }
 
-  datasetsToText(datasets) {
-    return renderCSV(datasets);
+  datasetsToText(datasetsController) {
+    return renderCSV(datasetsController.datasets);
   }
 }

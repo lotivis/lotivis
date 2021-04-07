@@ -1,4 +1,5 @@
 import {Color} from "../color/color";
+import "../color/color.stacks";
 
 /**
  *

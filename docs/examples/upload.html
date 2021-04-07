@@ -88,16 +88,16 @@
 
       let controller = new lotivis.DatasetController(json);
 
-      dateChartCard.chart.setDatasetController(controller);
+      dateChartCard.chart.setDatasetsController(controller);
       dateChartCard.chart.update();
 
-      mapChartCard.chart.setDatasetController(controller);
+      mapChartCard.chart.setDatasetsController(controller);
       mapChartCard.chart.update();
 
-      plotChartCard.chart.setDatasetController(controller);
+      plotChartCard.chart.setDatasetsController(controller);
 
-      datasetCard.setDatasetController(controller);
-      csvCard.setDatasetController(controller);
+      datasetCard.setDatasetsController(controller);
+      csvCard.setDatasetsController(controller);
 
     });
 

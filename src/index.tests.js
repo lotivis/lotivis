@@ -43,6 +43,7 @@ import "./js/datasets.controller/datasets.controller.filter";
 import "./js/datasets.controller/datasets.controller.colors";
 import "./js/datasets.controller/datasets.controller.data";
 import "./js/datasets.controller/datasets.controller.selection";
+import "./js/datasets.controller/datasets.controller.notification.reason";
 import "./js/dataview/dataview.date";
 import "./js/dataview/dataview.plot";
 import "./js/dataview/dataview.location";
@@ -74,7 +75,7 @@ import {validateDataItem, validateDataset, validateDatasets} from "./js/data.jug
 import {isValue} from "./js/shared/value";
 
 exports.Color = Color;
-exports.DatasetController = DatasetsController;
+exports.DatasetsController = DatasetsController;
 exports.GeoJson = GeoJson;
 exports.Feature = Feature;
 exports.joinFeatures = joinFeatures;

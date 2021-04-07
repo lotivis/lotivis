@@ -48,9 +48,9 @@
   lotivis.debug(true);
 
   let datasetsCard = new lotivis.DatasetsJSONCard();
-  let dateChartCard1 = new lotivis.DateChartCard('date-chart-card-1', {name: 'Standard'});
-  let dateChartCard2 = new lotivis.DateChartCard('date-chart-card-2', {name: 'Labels on', showLabels: true});
-  let dateChartCard3 = new lotivis.DateChartCard('date-chart-card-3', {name: 'Combine Stacks', combineStacks: true});
+  let dateChartCard1 = new lotivis.DateChartCard('date-chart-card-1', {title: 'Standard'});
+  let dateChartCard2 = new lotivis.DateChartCard('date-chart-card-2', {title: 'Labels on', showLabels: true});
+  let dateChartCard3 = new lotivis.DateChartCard('date-chart-card-3', {title: 'Combine Stacks', combineStacks: true});
 
   fetch('/assets/example-datasets-location-time-grouped-stacked.json')
     .then(response => response.text())

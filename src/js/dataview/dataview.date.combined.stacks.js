@@ -13,12 +13,12 @@ import {createDatasets} from "../data.juggle/data.create.datasets";
  */
 DatasetsController.prototype.getDateDataviewCombinedStacks = function (groupSize) {
   let dateAccess = this.dateAccess;
-  let workingDatasets = copy(this.workingDatasets);
-  let enabledDatasets = copy(this.enabledDatasets() || workingDatasets);
+  let datasets = copy(this.datasets);
+  let enabledDatasets = copy(this.enabledDatasets() || datasets);
   let dataview = {};
   let saveGroupSize = groupSize || 1;
 
-  workingDatasets.forEach(function (dataset) {
+  datasets.forEach(function (dataset) {
     dataset.label = dataset.stack || dataset.label;
   });
 
@@ -26,22 +26,22 @@ DatasetsController.prototype.getDateDataviewCombinedStacks = function (groupSize
     dataset.label = dataset.stack || dataset.label;
   });
 
-  workingDatasets = createDatasets(combine(flatDatasets(workingDatasets)));
+  datasets = createDatasets(combine(flatDatasets(datasets)));
   enabledDatasets = createDatasets(combine(flatDatasets(enabledDatasets)));
 
   dataview.groupSize = saveGroupSize;
   if (saveGroupSize <= 1) {
-    dataview.datasets = workingDatasets;
+    dataview.datasets = datasets;
     dataview.enabledDatasets = enabledDatasets;
   } else {
-    workingDatasets = combineDatasetsByRatio(workingDatasets, saveGroupSize);
+    datasets = combineDatasetsByRatio(datasets, saveGroupSize);
     enabledDatasets = combineDatasetsByRatio(enabledDatasets, saveGroupSize);
-    dataview.datasets = workingDatasets;
+    dataview.datasets = datasets;
   }
 
-  dataview.dateToItemsRelation = dateToItemsRelation(workingDatasets, dateAccess);
+  dataview.dateToItemsRelation = dateToItemsRelation(datasets, dateAccess);
   dataview.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets, dateAccess);
-  dataview.datasetStacks = createStackModel(this, workingDatasets, dataview.dateToItemsRelation);
+  dataview.datasetStacks = createStackModel(this, datasets, dataview.dateToItemsRelation);
   dataview.datasetStacksPresented = createStackModel(this, enabledDatasets, dataview.dateToItemsRelationPresented);
 
   dataview.max = d3.max(dataview.datasetStacksPresented, function (stack) {

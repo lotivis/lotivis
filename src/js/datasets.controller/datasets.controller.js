@@ -60,7 +60,7 @@ export class DatasetsController {
   }
 
   getMax() {
-    return d3LibraryAccess.max(this.workingDatasets, function (dataset) {
+    return d3LibraryAccess.max(this.datasets, function (dataset) {
       return d3LibraryAccess.max(dataset.data, function (item) {
         return item.value;
       });
@@ -88,3 +88,27 @@ export class DatasetsController {
     return this.labels.join(',');
   }
 }
+
+/**
+ *
+ * @type {{
+ * datasetsUpdate: string,
+ * filterDates: string,
+ * filterDataset: string,
+ * filterLocations: string
+ * resetFilters: string,
+ * registration: string,
+ * none: string,
+ * datasetsSet: string
+ * }}
+ */
+DatasetsController.NotificationReason = {
+  none: 'none',
+  registration: 'registration',
+  datasetsSet: 'datasets-set',
+  datasetsUpdate: 'datasets-update',
+  filterDataset: 'dataset-filter',
+  filterDates: 'dates-filter',
+  filterLocations: 'location-filter',
+  resetFilters: 'reset-filters'
+};

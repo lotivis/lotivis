@@ -25,7 +25,7 @@ export class DataviewDatasetsControllerCard extends DataviewCard {
         datasets: this.datasetsController.datasetFilters,
       },
       selection: {},
-      workingDatasets: this.datasetsController.workingDatasets,
+      datasets: this.datasetsController.datasets,
       flatData: this.datasetsController.flatData,
       originalDatasets: this.datasetsController.originalDatasets
     }, null, 2);

@@ -21,10 +21,10 @@ export class TextareaCard extends Card {
 
     if (this.config) {
       this.textarea.attr('rows', this.config.lines || 25);
-      this.setTitle(this.config.title || 'TextareaCard');
+      this.setTitle(this.config.title || this.getClassname());
     } else {
       this.textarea.attr('rows', 25);
-      this.setTitle('TextareaCard');
+      this.setTitle(this.getClassname());
     }
   }
 

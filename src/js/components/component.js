@@ -96,4 +96,8 @@ export class Component {
     // if (this.config) components.push(`config='${JSON.stringify(this.config)}'`);s
     return `[${components.join(' ')}]`;
   }
+
+  getClassname() {
+    return this.constructor.name;
+  }
 }

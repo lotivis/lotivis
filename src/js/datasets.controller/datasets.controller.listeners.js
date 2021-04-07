@@ -52,14 +52,3 @@ DatasetsController.prototype.register = function (listeners) {
     listener.setDatasetsController(this);
   }
 };
-
-DatasetsController.NotificationReason = {
-  none: 'none',
-  registration: 'registration',
-  datasetsSet: 'datasets-set',
-  datasetsUpdate: 'datasets-update',
-  filterDataset: 'dataset-filter',
-  filterDates: 'dates-filter',
-  filterLocations: 'location-filter',
-  resetFilters: 'reset-filters'
-};
