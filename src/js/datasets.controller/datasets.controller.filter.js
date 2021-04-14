@@ -118,7 +118,6 @@ DatasetsController.prototype.enabledDates = function () {
  * @returns {*} The collection of enabled datasets.
  */
 DatasetsController.prototype.enabledDatasets = function () {
-  console.log('enabledDatasets', this);
   let aCopy = copy(this.datasets);
 
   let enabled = aCopy

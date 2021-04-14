@@ -2,9 +2,10 @@ import {Card} from "./card";
 import {Button} from "./button";
 import {RadioGroup} from "./radio.group";
 import {Option} from "./option";
+import {LotivisUnimplementedMethodError} from "../data.juggle/data.validate.error";
 
 /**
- *
+ * A lotivis card with a chart.
  * @class ChartCard
  * @extends Card
  */
@@ -16,7 +17,14 @@ export class ChartCard extends Card {
    * @param config The configuration
    */
   constructor(parent, config) {
-    super(parent);
+
+    if (parent && config && typeof parent === 'string') {
+      config.selector = parent;
+      super(config);
+    } else {
+      super(parent);
+    }
+
     this.chart = null;
     this.config = config;
     this.injectButtons();
@@ -32,7 +40,7 @@ export class ChartCard extends Card {
    * Should be overridden by subclasses.
    */
   injectChart() {
-    // empty
+    return new LotivisUnimplementedMethodError(`injectChart()`);
   }
 
   /**
@@ -98,7 +106,7 @@ export class ChartCard extends Card {
    * Should be overridden by subclasses.
    */
   screenshotButtonAction() {
-    // empty
+    return new LotivisUnimplementedMethodError(`screenshotButtonAction()`);
   }
 
   /**
@@ -107,7 +115,7 @@ export class ChartCard extends Card {
    * Should be overridden by subclasses.
    */
   presentSettingsPopupAction() {
-    // empty
+    return new LotivisUnimplementedMethodError(`presentSettingsPopupAction()`);
   }
 
   /**
@@ -116,6 +124,6 @@ export class ChartCard extends Card {
    * Should be overridden by subclasses.
    */
   onSelectedDatasetChanged() {
-    // empty
+    return new LotivisUnimplementedMethodError(`onSelectedDatasetChanged()`);
   }
 }

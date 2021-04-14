@@ -2,6 +2,9 @@ import {sumOfStack} from "../data.juggle/data.sum";
 import {Color} from "../color/color";
 import "../color/color.stacks";
 
+/**
+ *
+ */
 export class DateLegendRenderer {
 
   constructor(dateChart) {
@@ -9,7 +12,7 @@ export class DateLegendRenderer {
     this.renderNormalLegend = function () {
       let config = dateChart.config;
       let controller = dateChart.datasetController;
-      let datasets = controller.workingDatasets;
+      let datasets = controller.datasets;
       let datasetNames = controller.labels;
       let circleRadius = 6;
       let labelMargin = 50;

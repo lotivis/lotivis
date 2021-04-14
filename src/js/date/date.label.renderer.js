@@ -1,30 +1,31 @@
 /**
- *
+ * Appends labels on top of the bars of a date chart.
+ * @class DateLabelRenderer
  */
 export class DateLabelRenderer {
 
   /**
-   *
-   * @param timeChart
+   * Creates a new instance of DateLabelRenderer.
+   * @param dateChart The parental date chart.
    */
-  constructor(timeChart) {
+  constructor(dateChart) {
 
     /**
-     *
-     * @param stack
-     * @param index
+     * Appends a label for the given stack.
+     * @param stack The stack to create a label for.
      */
-    this.renderBarLabels = function (stack, index) {
-      let xChartRef = timeChart.xChart;
-      let yChartRef = timeChart.yChart;
-      let xStackRef = timeChart.xStack;
-      let numberFormat = timeChart.numberFormat;
-      let labelColor = timeChart.labelColor;
+    this.renderBarLabels = function (stack) {
+
+      let xChartRef = dateChart.xChart;
+      let yChartRef = dateChart.yChart;
+      let xStackRef = dateChart.xStack;
+      let numberFormat = dateChart.numberFormat;
+      let labelColor = dateChart.labelColor;
       let numberOfSeries = stack.length;
       let seriesIndex = 0;
       let bandwidth = xStackRef.bandwidth() / 2;
 
-      timeChart
+      dateChart
         .svg
         .append("g")
         .selectAll('g')

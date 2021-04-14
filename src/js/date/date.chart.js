@@ -21,6 +21,7 @@ const defaultConfig = {
   showLabels: false,
   combineStacks: false,
   sendsNotifications: true,
+  labelColor: new Color(155, 155, 155),
   numberFormat: Intl.NumberFormat('de-DE', {
     maximumFractionDigits: 3
   }),
@@ -128,7 +129,6 @@ export class DateChart extends Chart {
       .domain([0, this.dataview.max])
       .nice()
       .rangeRound([config.height - margin.bottom, margin.top]);
-
   }
 
   /**
@@ -164,8 +164,6 @@ export class DateChart extends Chart {
     this.svg = this.element
       .append('svg')
       .attr('class', 'lotivis-chart-svg lotivis-date-chart')
-      // .attr('width', this.config.width)
-      // .attr('height', this.height)
       .attr('preserveAspectRatio', 'xMidYMid meet')
       .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`)
       .attr('id', this.svgSelector);
@@ -186,16 +184,10 @@ export class DateChart extends Chart {
 
   /**
    * Toggle the enabled of the dataset with the given label.
-   *
    * @param label The label of the dataset.
    */
   toggleDataset(label) {
-    console.log('toggleDataset');
-    if (this.config.sendsNotifications) {
-      this.datasetController.toggleDataset(label);
-    } else {
-      this.datasetController.toggleDataset(label, false);
-      this.update();
-    }
+    this.datasetController.toggleDataset(label, this.config.sendsNotifications === true);
+    this.update();
   }
 }

@@ -1140,7 +1140,6 @@ DatasetsController.prototype.enabledDates = function () {
  * @returns {*} The collection of enabled datasets.
  */
 DatasetsController.prototype.enabledDatasets = function () {
-  console.log('enabledDatasets', this);
   let aCopy = copy(this.datasets);
 
   let enabled = aCopy
@@ -1521,7 +1520,7 @@ DatasetsController.prototype.getDateDataview = function (groupSize) {
     dataview.datasets = datasets;
     dataview.enabledDatasets = enabledDatasets;
   } else {
-    workingDatasets = combineDatasetsByRatio(datasets, saveGroupSize);
+    datasets = combineDatasetsByRatio(datasets, saveGroupSize);
     enabledDatasets = combineDatasetsByRatio(enabledDatasets, saveGroupSize);
     dataview.datasets = datasets;
   }

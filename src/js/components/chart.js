@@ -1,5 +1,6 @@
 import {Component} from "./component";
 import {createID} from "../shared/selector";
+import {LotivisUnimplementedMethodError} from "../data.juggle/data.validate.error";
 
 /**
  * Superclass for lotivis charts.
@@ -34,10 +35,22 @@ export class Chart extends Component {
     }
   }
 
+  /**
+   * Initializes this chart.
+   */
   initialize() {
-    // empty
+    return new LotivisUnimplementedMethodError(`initialize()`);
   }
 
+  /**
+   * Updates the content of this chart by calling the 'update'-chain:
+   *
+   * ```
+   * precalculate();
+   * remove();
+   * draw();
+   * ```
+   */
   update() {
     if (!this.updateSensible) return;
     this.remove();
@@ -45,22 +58,40 @@ export class Chart extends Component {
     this.draw();
   }
 
+  /**
+   * Precalculates data for this chart.
+   * @returns {LotivisUnimplementedMethodError}
+   */
   precalculate() {
-    // empty
+    return new LotivisUnimplementedMethodError(`precalculate()`);
   }
 
+  /**
+   * Removes any old content from this chart.
+   * @returns {LotivisUnimplementedMethodError}
+   */
   remove() {
-    // empty
+    return new LotivisUnimplementedMethodError(`remove()`);
   }
 
+  /**
+   * Appends / draw the components of this chart.
+   * @returns {LotivisUnimplementedMethodError}
+   */
   draw() {
-    // empty
+    return new LotivisUnimplementedMethodError(`draw()`);
   }
 
+  /**
+   * Tells this chart to ignore updates of a datasets controller.
+   */
   makeUpdateInsensible() {
     this.updateSensible = false;
   }
 
+  /**
+   * Tells this chart to listen to update of a datasets controller.
+   */
   makeUpdateSensible() {
     this.updateSensible = true;
   }

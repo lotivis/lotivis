@@ -93,11 +93,15 @@ export class Component {
   toString() {
     let components = [this.constructor.name];
     if (this.selector) components.push(`'${this.selector}'`);
-    // if (this.config) components.push(`config='${JSON.stringify(this.config)}'`);s
     return `[${components.join(' ')}]`;
   }
 
+  /**
+   * Returns the name of the constructor of this component if present. Will return the result of `typeof` else.
+   * @returns {*|"undefined"|"object"|"boolean"|"number"|"string"|"function"|"symbol"|"bigint"}
+   */
   getClassname() {
+    if (!this.constructor || !this.constructor.name) return (typeof this);
     return this.constructor.name;
   }
 }

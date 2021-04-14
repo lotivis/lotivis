@@ -14,7 +14,7 @@ typeof define === 'function' && define.amd ? define(['exports'], factory) :
  * Color defined by r,g,b.
  * @class Color
  */
-class Color {
+class Color$1 {
 
   /**
    * Creates a new instance of Color.
@@ -49,30 +49,30 @@ class Color {
   }
 
   colorAdding(r, g, b) {
-    return new Color(this.r + r, this.g + g, this.b + b);
+    return new Color$1(this.r + r, this.g + g, this.b + b);
   }
 }
 
-Color.defaultTint = new Color(0, 122, 255);
-Color.organgeLow = new Color(250, 211, 144);
-Color.organgeHigh = new Color(229, 142, 38);
-Color.redLow = new Color(248, 194, 145);
-Color.redHigh = new Color(183, 21, 64);
-Color.blueLow = new Color(106, 137, 204);
-Color.blueHigh = new Color(12, 36, 97);
-Color.lightBlueLow = new Color(130, 204, 221);
-Color.lightBlueHight = new Color(10, 61, 98);
-Color.greenLow = new Color(184, 233, 148);
-Color.greenHight = new Color(7, 153, 146);
-Color.stackColors = [
-  [Color.blueHigh, Color.blueLow],
-  [Color.redHigh, Color.redLow],
-  [Color.greenHight, Color.greenLow],
-  [Color.organgeHigh, Color.organgeLow],
-  [Color.lightBlueHight, Color.lightBlueLow],
+Color$1.defaultTint = new Color$1(0, 122, 255);
+Color$1.organgeLow = new Color$1(250, 211, 144);
+Color$1.organgeHigh = new Color$1(229, 142, 38);
+Color$1.redLow = new Color$1(248, 194, 145);
+Color$1.redHigh = new Color$1(183, 21, 64);
+Color$1.blueLow = new Color$1(106, 137, 204);
+Color$1.blueHigh = new Color$1(12, 36, 97);
+Color$1.lightBlueLow = new Color$1(130, 204, 221);
+Color$1.lightBlueHight = new Color$1(10, 61, 98);
+Color$1.greenLow = new Color$1(184, 233, 148);
+Color$1.greenHight = new Color$1(7, 153, 146);
+Color$1.stackColors = [
+  [Color$1.blueHigh, Color$1.blueLow],
+  [Color$1.redHigh, Color$1.redLow],
+  [Color$1.greenHight, Color$1.greenLow],
+  [Color$1.organgeHigh, Color$1.organgeLow],
+  [Color$1.lightBlueHight, Color$1.lightBlueLow],
 ];
 
-Color.colorGenerator = function (till) {
+Color$1.colorGenerator = function (till) {
   return d3
     .scaleLinear()
     .domain([0, 1 / 3 * till, 2 / 3 * till, till])
@@ -84,7 +84,7 @@ Color.colorGenerator = function (till) {
  * @param till
  * @returns {*}
  */
-Color.plotColor = function (till) {
+Color$1.plotColor = function (till) {
   return d3
     .scaleLinear()
     .domain([0, 1 / 2 * till, till])
@@ -95,7 +95,7 @@ Color.plotColor = function (till) {
  * Returns a randomly generated color.
  * @returns {string}
  */
-Color.randomColor = function () {
+Color$1.randomColor = function () {
   return "rgb(" +
     (Math.random() * 255) + ", " +
     (Math.random() * 255) + "," +
@@ -113,8 +113,8 @@ try {
  * Returns a randomly generated color.
  * @returns {[]}
  */
-Color.colorsForStack = function (stackNumber, amount = 1) {
-  let colorCouple = Color.stackColors[stackNumber % Color.stackColors.length];
+Color$1.colorsForStack = function (stackNumber, amount = 1) {
+  let colorCouple = Color$1.stackColors[stackNumber % Color$1.stackColors.length];
   let colorGenerator = d3LibraryAccess
     .scaleLinear()
     .domain([0, amount])
@@ -123,7 +123,7 @@ Color.colorsForStack = function (stackNumber, amount = 1) {
   let colors = [];
   for (let i = 0; i < amount; i++) {
     let color = colorGenerator(i);
-    colors.push(new Color(color));
+    colors.push(new Color$1(color));
   }
 
   return colors;
@@ -335,11 +335,15 @@ class Component {
   toString() {
     let components = [this.constructor.name];
     if (this.selector) components.push(`'${this.selector}'`);
-    // if (this.config) components.push(`config='${JSON.stringify(this.config)}'`);s
     return `[${components.join(' ')}]`;
   }
 
+  /**
+   * Returns the name of the constructor of this component if present. Will return the result of `typeof` else.
+   * @returns {*|"undefined"|"object"|"boolean"|"number"|"string"|"function"|"symbol"|"bigint"}
+   */
   getClassname() {
+    if (!this.constructor || !this.constructor.name) return (typeof this);
     return this.constructor.name;
   }
 }
@@ -633,10 +637,22 @@ class Chart extends Component {
     }
   }
 
+  /**
+   * Initializes this chart.
+   */
   initialize() {
-    // empty
+    return new LotivisUnimplementedMethodError(`initialize()`);
   }
 
+  /**
+   * Updates the content of this chart by calling the 'update'-chain:
+   *
+   * ```
+   * precalculate();
+   * remove();
+   * draw();
+   * ```
+   */
   update() {
     if (!this.updateSensible) return;
     this.remove();
@@ -644,22 +660,40 @@ class Chart extends Component {
     this.draw();
   }
 
+  /**
+   * Precalculates data for this chart.
+   * @returns {LotivisUnimplementedMethodError}
+   */
   precalculate() {
-    // empty
+    return new LotivisUnimplementedMethodError(`precalculate()`);
   }
 
+  /**
+   * Removes any old content from this chart.
+   * @returns {LotivisUnimplementedMethodError}
+   */
   remove() {
-    // empty
+    return new LotivisUnimplementedMethodError(`remove()`);
   }
 
+  /**
+   * Appends / draw the components of this chart.
+   * @returns {LotivisUnimplementedMethodError}
+   */
   draw() {
-    // empty
+    return new LotivisUnimplementedMethodError(`draw()`);
   }
 
+  /**
+   * Tells this chart to ignore updates of a datasets controller.
+   */
   makeUpdateInsensible() {
     this.updateSensible = false;
   }
 
+  /**
+   * Tells this chart to listen to update of a datasets controller.
+   */
   makeUpdateSensible() {
     this.updateSensible = true;
   }
@@ -2936,32 +2970,33 @@ class DateAxisRenderer {
 }
 
 /**
- *
+ * Appends labels on top of the bars of a date chart.
+ * @class DateLabelRenderer
  */
 class DateLabelRenderer {
 
   /**
-   *
-   * @param timeChart
+   * Creates a new instance of DateLabelRenderer.
+   * @param dateChart The parental date chart.
    */
-  constructor(timeChart) {
+  constructor(dateChart) {
 
     /**
-     *
-     * @param stack
-     * @param index
+     * Appends a label for the given stack.
+     * @param stack The stack to create a label for.
      */
-    this.renderBarLabels = function (stack, index) {
-      let xChartRef = timeChart.xChart;
-      let yChartRef = timeChart.yChart;
-      let xStackRef = timeChart.xStack;
-      let numberFormat = timeChart.numberFormat;
-      let labelColor = timeChart.labelColor;
+    this.renderBarLabels = function (stack) {
+
+      let xChartRef = dateChart.xChart;
+      let yChartRef = dateChart.yChart;
+      let xStackRef = dateChart.xStack;
+      let numberFormat = dateChart.numberFormat;
+      let labelColor = dateChart.labelColor;
       let numberOfSeries = stack.length;
       let seriesIndex = 0;
       let bandwidth = xStackRef.bandwidth() / 2;
 
-      timeChart
+      dateChart
         .svg
         .append("g")
         .selectAll('g')
@@ -2989,6 +3024,9 @@ class DateLabelRenderer {
   }
 }
 
+/**
+ *
+ */
 class DateLegendRenderer {
 
   constructor(dateChart) {
@@ -2996,7 +3034,7 @@ class DateLegendRenderer {
     this.renderNormalLegend = function () {
       let config = dateChart.config;
       let controller = dateChart.datasetController;
-      let datasets = controller.workingDatasets;
+      let datasets = controller.datasets;
       let datasetNames = controller.labels;
       let circleRadius = 6;
       let labelMargin = 50;
@@ -3068,7 +3106,7 @@ class DateLegendRenderer {
         }.bind(this))
         .style('cursor', 'pointer')
         .style("fill", function (item, index) {
-          return Color.colorsForStack(index)[0].rgbString();
+          return Color$1.colorsForStack(index)[0].rgbString();
         }.bind(this))
         .text(function (item) {
           return `${item} (${sumOfStack(dateChart.datasetController.flatData, item)})`;
@@ -3081,10 +3119,10 @@ class DateLegendRenderer {
         .attr("cy", dateChart.graphHeight + labelMargin - circleRadius + 2)
         .style('cursor', 'pointer')
         .style("stroke", function (item, index) {
-          return Color.colorsForStack(index)[0].rgbString();
+          return Color$1.colorsForStack(index)[0].rgbString();
         }.bind(this))
         .style("fill", function (item, index) {
-          return item.isEnabled ? Color.colorsForStack(index)[0].rgbString() : 'white';
+          return item.isEnabled ? Color$1.colorsForStack(index)[0].rgbString() : 'white';
         }.bind(this))
         .style("stroke-width", 2);
 
@@ -3093,6 +3131,7 @@ class DateLegendRenderer {
 }
 
 /**
+ * Appends the bars to a date chart.
  * @class DateBarsRenderer
  */
 class DateBarsRenderer {
@@ -3104,13 +3143,16 @@ class DateBarsRenderer {
   constructor(dateChart) {
 
     /**
-     *
-     * @param stack
-     * @param stackIndex
+     * Appends the bar for the given stack.
+     * @param stack The stack to append the bar for.
      */
-    this.renderBars = function (stack, stackIndex) {
-      let isCombineStacks = dateChart.config.combineStacks;
-      let colors = dateChart.datasetController.getColorsForStack(stack.stack);
+    this.renderBars = function (stack) {
+
+      let config = dateChart.config || {};
+      let isCombineStacks = config.combineStacks || false;
+      let colors = dateChart.datasetController.getColorsForStack(stack.stack) || Color.defaultTint;
+      let barRadius = config.barRadius || LotivisConfig.barRadius;
+
       dateChart
         .svg
         .append("g")
@@ -3118,20 +3160,14 @@ class DateBarsRenderer {
         .data(stack)
         .enter()
         .append("g")
-        .attr("fill", function (stackData, index) {
-          if (isCombineStacks) {
-            return colors[0].rgbString();
-          } else {
-            return stack.colors[index].rgbString();
-          }
-        })
+        .attr("fill", (stackData, index) => isCombineStacks ? colors[0] : stack.colors[index])
         .selectAll("rect")
         .data((data) => data)
         .enter()
         .append("rect")
         .attr('class', 'lotivis-date-chart-bar')
-        .attr("rx", isCombineStacks ? 0 : LotivisConfig.barRadius)
-        .attr("ry", isCombineStacks ? 0 : LotivisConfig.barRadius)
+        .attr("rx", isCombineStacks ? 0 : barRadius)
+        .attr("ry", isCombineStacks ? 0 : barRadius)
         .attr("x", (d) => dateChart.xChart(d.data.date) + dateChart.xStack(stack.label))
         .attr("y", (d) => dateChart.yChart(d[1]))
         .attr("width", dateChart.xStack.bandwidth())
@@ -3446,6 +3482,7 @@ const defaultConfig = {
   showLabels: false,
   combineStacks: false,
   sendsNotifications: true,
+  labelColor: new Color$1(155, 155, 155),
   numberFormat: Intl.NumberFormat('de-DE', {
     maximumFractionDigits: 3
   }),
@@ -3483,7 +3520,7 @@ class DateChart extends Chart {
 
     this.datasets = [];
 
-    this.labelColor = new Color(155, 155, 155).rgbString();
+    this.labelColor = new Color$1(155, 155, 155).rgbString();
     this.type = 'bar';
 
     this.numberFormat = new Intl.NumberFormat('de-DE', {
@@ -3553,7 +3590,6 @@ class DateChart extends Chart {
       .domain([0, this.dataview.max])
       .nice()
       .rangeRound([config.height - margin.bottom, margin.top]);
-
   }
 
   /**
@@ -3589,8 +3625,6 @@ class DateChart extends Chart {
     this.svg = this.element
       .append('svg')
       .attr('class', 'lotivis-chart-svg lotivis-date-chart')
-      // .attr('width', this.config.width)
-      // .attr('height', this.height)
       .attr('preserveAspectRatio', 'xMidYMid meet')
       .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`)
       .attr('id', this.svgSelector);
@@ -3611,17 +3645,11 @@ class DateChart extends Chart {
 
   /**
    * Toggle the enabled of the dataset with the given label.
-   *
    * @param label The label of the dataset.
    */
   toggleDataset(label) {
-    console.log('toggleDataset');
-    if (this.config.sendsNotifications) {
-      this.datasetController.toggleDataset(label);
-    } else {
-      this.datasetController.toggleDataset(label, false);
-      this.update();
-    }
+    this.datasetController.toggleDataset(label, this.config.sendsNotifications === true);
+    this.update();
   }
 }
 
@@ -3804,7 +3832,7 @@ class DateChartSettingsPopup extends SettingsPopup {
 }
 
 /**
- *
+ * A lotivis card with a chart.
  * @class ChartCard
  * @extends Card
  */
@@ -3816,7 +3844,14 @@ class ChartCard extends Card {
    * @param config The configuration
    */
   constructor(parent, config) {
-    super(parent);
+
+    if (parent && config && typeof parent === 'string') {
+      config.selector = parent;
+      super(config);
+    } else {
+      super(parent);
+    }
+
     this.chart = null;
     this.config = config;
     this.injectButtons();
@@ -3832,7 +3867,7 @@ class ChartCard extends Card {
    * Should be overridden by subclasses.
    */
   injectChart() {
-    // empty
+    return new LotivisUnimplementedMethodError(`injectChart()`);
   }
 
   /**
@@ -3898,7 +3933,7 @@ class ChartCard extends Card {
    * Should be overridden by subclasses.
    */
   screenshotButtonAction() {
-    // empty
+    return new LotivisUnimplementedMethodError(`screenshotButtonAction()`);
   }
 
   /**
@@ -3907,7 +3942,7 @@ class ChartCard extends Card {
    * Should be overridden by subclasses.
    */
   presentSettingsPopupAction() {
-    // empty
+    return new LotivisUnimplementedMethodError(`presentSettingsPopupAction()`);
   }
 
   /**
@@ -3916,7 +3951,7 @@ class ChartCard extends Card {
    * Should be overridden by subclasses.
    */
   onSelectedDatasetChanged() {
-    // empty
+    return new LotivisUnimplementedMethodError(`onSelectedDatasetChanged()`);
   }
 }
 
@@ -4262,11 +4297,11 @@ class MapLegendRenderer {
         let dataForStack = combinedData.filter(data => data.stack === stackName);
         let max = d3.max(dataForStack, item => item.value) || 0;
         let offset = index * 80;
-        let color = Color.colorsForStack(index, 1)[0];
+        let color = Color$1.colorsForStack(index, 1)[0];
 
         let steps = 4;
         let data = [0, 1 / 4 * max, 1 / 2 * max, 3 / 4 * max, max];
-        let generator = Color.colorGenerator(max);
+        let generator = Color$1.colorGenerator(max);
 
         legend
           .append('text')
@@ -4371,7 +4406,7 @@ class MapDatasetRenderer {
    */
   constructor(mapChart) {
 
-    let generator = Color.colorGenerator(1);
+    let generator = Color$1.colorGenerator(1);
 
     function featureMapID(feature) {
       return `lotivis-map-area-${mapChart.config.featureIDAccessor(feature)}`;
@@ -4383,7 +4418,7 @@ class MapDatasetRenderer {
      * @param feature The drawn feature (area).
      */
     this.mouseEnter = function (event, feature) {
-      let color = Color.defaultTint.rgbString();
+      let color = Color$1.defaultTint.rgbString();
       let mapID = featureMapID(feature);
       mapChart
         .svg
@@ -4971,7 +5006,7 @@ class MapChart extends Chart {
     if (!this.datasetController) return;
     this.dataview = this.datasetController.getLocationDataview();
     if (this.geoJSON) return;
-    let geoJSON = createGeoJSON(this.datasetController.workingDatasets);
+    let geoJSON = createGeoJSON(this.datasetController.datasets);
     this.setGeoJSON(geoJSON);
   }
 
@@ -5189,7 +5224,7 @@ class PlotGradientCreator {
    */
   constructor(plotChart) {
     this.plotChart = plotChart;
-    this.colorGenerator = Color.plotColor(1);
+    this.colorGenerator = Color$1.plotColor(1);
   }
 
   /**
@@ -6056,7 +6091,6 @@ DatasetsController.prototype.enabledDates = function () {
  * @returns {*} The collection of enabled datasets.
  */
 DatasetsController.prototype.enabledDatasets = function () {
-  console.log('enabledDatasets', this);
   let aCopy = copy(this.datasets);
 
   let enabled = aCopy
@@ -6188,7 +6222,7 @@ class DatasetsColorsController {
         return dataset.label === stack || dataset.stack === stack;
       });
 
-      let colors = Color.colorsForStack(sIndex, filtered.length);
+      let colors = Color$1.colorsForStack(sIndex, filtered.length);
       stackToColors[stack] = colors;
       for (let dIndex = 0; dIndex < filtered.length; dIndex++) {
         labelToColor[filtered[dIndex].label] = colors[dIndex];
@@ -6196,11 +6230,11 @@ class DatasetsColorsController {
     }
 
     this.colorForDataset = function (label) {
-      return labelToColor[label] || Color.defaultTint;
+      return labelToColor[label] || Color$1.defaultTint;
     };
 
     this.colorForStack = function (stack) {
-      return stackToColors[stack][0] || Color.defaultTint;
+      return stackToColors[stack][0] || Color$1.defaultTint;
     };
 
     this.colorsForStack = function (stack) {
@@ -6384,7 +6418,7 @@ DatasetsController.prototype.getDateDataview = function (groupSize) {
     dataview.datasets = datasets;
     dataview.enabledDatasets = enabledDatasets;
   } else {
-    workingDatasets = combineDatasetsByRatio(datasets, saveGroupSize);
+    datasets = combineDatasetsByRatio(datasets, saveGroupSize);
     enabledDatasets = combineDatasetsByRatio(enabledDatasets, saveGroupSize);
     dataview.datasets = datasets;
   }
@@ -6490,7 +6524,7 @@ DatasetsController.prototype.getLocationDataview = function () {
 };
 
 // colors
-exports.Color = Color;
+exports.Color = Color$1;
 
 // components
 exports.Button = Button;

@@ -1,6 +1,7 @@
 import {LotivisConfig} from "../shared/config";
 
 /**
+ * Appends the bars to a date chart.
  * @class DateBarsRenderer
  */
 export class DateBarsRenderer {
@@ -12,13 +13,16 @@ export class DateBarsRenderer {
   constructor(dateChart) {
 
     /**
-     *
-     * @param stack
-     * @param stackIndex
+     * Appends the bar for the given stack.
+     * @param stack The stack to append the bar for.
      */
-    this.renderBars = function (stack, stackIndex) {
-      let isCombineStacks = dateChart.config.combineStacks;
-      let colors = dateChart.datasetController.getColorsForStack(stack.stack);
+    this.renderBars = function (stack) {
+
+      let config = dateChart.config || {};
+      let isCombineStacks = config.combineStacks || false;
+      let colors = dateChart.datasetController.getColorsForStack(stack.stack) || Color.defaultTint;
+      let barRadius = config.barRadius || LotivisConfig.barRadius;
+
       dateChart
         .svg
         .append("g")
@@ -26,20 +30,14 @@ export class DateBarsRenderer {
         .data(stack)
         .enter()
         .append("g")
-        .attr("fill", function (stackData, index) {
-          if (isCombineStacks) {
-            return colors[0].rgbString();
-          } else {
-            return stack.colors[index].rgbString();
-          }
-        })
+        .attr("fill", (stackData, index) => isCombineStacks ? colors[0] : stack.colors[index])
         .selectAll("rect")
         .data((data) => data)
         .enter()
         .append("rect")
         .attr('class', 'lotivis-date-chart-bar')
-        .attr("rx", isCombineStacks ? 0 : LotivisConfig.barRadius)
-        .attr("ry", isCombineStacks ? 0 : LotivisConfig.barRadius)
+        .attr("rx", isCombineStacks ? 0 : barRadius)
+        .attr("ry", isCombineStacks ? 0 : barRadius)
         .attr("x", (d) => dateChart.xChart(d.data.date) + dateChart.xStack(stack.label))
         .attr("y", (d) => dateChart.yChart(d[1]))
         .attr("width", dateChart.xStack.bandwidth())

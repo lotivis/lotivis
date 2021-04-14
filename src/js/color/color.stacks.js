@@ -1,5 +1,6 @@
 import {Color} from "./color";
 import {d3LibraryAccess} from "../shared/d3libaccess";
+import './color.defaults';
 
 /**
  * Returns a randomly generated color.

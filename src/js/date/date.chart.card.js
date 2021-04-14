@@ -1,7 +1,6 @@
 import {Card} from "../components/card";
 import {DateChart} from "./date.chart";
 import {DateChartSettingsPopup} from "./date.chart.settings.popup";
-import {UrlParameters} from "../shared/url.parameters";
 import {RadioGroup} from "../components/radio.group";
 import {Option} from "../components/option";
 import {ChartCard} from "../components/chart.card";

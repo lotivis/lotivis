@@ -70,7 +70,7 @@ export class MapChart extends Chart {
     if (!this.datasetController) return;
     this.dataview = this.datasetController.getLocationDataview();
     if (this.geoJSON) return;
-    let geoJSON = createGeoJSON(this.datasetController.workingDatasets);
+    let geoJSON = createGeoJSON(this.datasetController.datasets);
     this.setGeoJSON(geoJSON);
   }
 

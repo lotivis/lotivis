@@ -20,7 +20,7 @@ DatasetsController.prototype.getDateDataview = function (groupSize) {
     dataview.datasets = datasets;
     dataview.enabledDatasets = enabledDatasets;
   } else {
-    workingDatasets = combineDatasetsByRatio(datasets, saveGroupSize);
+    datasets = combineDatasetsByRatio(datasets, saveGroupSize);
     enabledDatasets = combineDatasetsByRatio(enabledDatasets, saveGroupSize);
     dataview.datasets = datasets;
   }
