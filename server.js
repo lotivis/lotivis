@@ -2,7 +2,7 @@
  * server.js lotivis
  *
  * Discussion:
- * Serves the docs of lotivis.  Using an Node.js express app as server.
+ * Serves the public of lotivis.  Using an Node.js express app as server.
  *
  * Author:
  *  - Lukas Danckwerth
@@ -12,8 +12,8 @@ const app = express();
 const version = require('./package.json').version;
 const port = process.env.PORT || 80;
 
-app.use('/', express.static(__dirname + '/docs'));
+app.use('/', express.static(__dirname + '/public'));
 app.listen(port, function () {
-  console.log("start lotivis docs " + version);
+  console.log("start lotivis " + version);
   console.log("listening on port: " + port);
 });

@@ -22,7 +22,7 @@
     "build": "npm run build:js && npm run build:css:sass",
     "build:js": "rollup -c",
     "build:css:sass": "sass src/index.scss > dist/lotivis.css",
-    "copy-to-dist": "cp docs/js/lotivis.* dist/ && cp docs/css/lotivis.* dist/",
+    "copy-to-dist": "cp public/js/lotivis.* dist/ && cp public/css/lotivis.* dist/",
     "lint-js": "eslint src/js/**/*.js test/*.js",
     "test": "npm run copy-to-dist && mocha",
     "serve:example": "node server.js"

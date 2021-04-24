@@ -7,7 +7,7 @@ import {
   extractLatestDateWithValue
 } from "../data.juggle/data.extract";
 import {combineByDate} from "../data.juggle/data.combine";
-import {sumOfDataset, sumOfLabel, sumOfValues} from "../data.juggle/data.sum";
+import {sumOfValues} from "../data.juggle/data.sum";
 import {flatDataset} from "../data.juggle/data.flat";
 
 /**

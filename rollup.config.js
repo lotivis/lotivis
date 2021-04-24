@@ -18,7 +18,7 @@ module.exports = [
     output: {
       sourcemap: true,
       name: 'lotivis',
-      file: 'docs/js/lotivis.js',
+    file: 'public/js/lotivis.js',
       banner,
       format: 'umd',
       esModule: false,
@@ -36,7 +36,7 @@ module.exports = [
     ],
     output: {
       name: 'lotivis',
-      file: 'docs/css/lotivis.css',
+      file: 'public/css/lotivis.css',
     },
   },
   // Tests

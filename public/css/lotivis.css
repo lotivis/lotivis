@@ -276,8 +276,19 @@ button.lotivis-button-round:active {
   fill: dodgerblue;
 }
 
+.lotivis-menu li {
+  margin-top: 5px;
+}
 .lotivis-menu a, .lotivis-menu a:visited {
-  color: #333;
+  color: dodgerblue;
+  opacity: 0.8;
+}
+.lotivis-menu a:hover, .lotivis-menu a:visited:hover {
+  color: dodgerblue;
+  opacity: 1;
+}
+.lotivis-menu a:active {
+  opacity: 0.6;
 }
 .lotivis-menu a::after {
   content: "→";
@@ -445,21 +456,6 @@ input[type=checkbox] {
 .lotivis-map-legend-rect {
   stroke: black;
   stroke-width: 1;
-}
-
-.lotivis-menu li {
-  margin-top: 5px;
-}
-.lotivis-menu a, .lotivis-menu a:visited {
-  color: dodgerblue;
-  opacity: 0.8;
-}
-.lotivis-menu a:hover, .lotivis-menu a:visited:hover {
-  color: dodgerblue;
-  opacity: 1;
-}
-.lotivis-menu a:active {
-  opacity: 0.6;
 }
 
 .lotivis-plot-background {

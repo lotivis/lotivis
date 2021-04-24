@@ -1,5 +1,5 @@
 /*!
- * lotivis.js v1.0.48
+ * lotivis.js v1.0.49
  * https://github.com/lukasdanckwerth/lotivis#readme
  * (c) 2021 lotivis.js Lukas Danckwerth
  * Released under the MIT License
@@ -254,7 +254,6 @@ class Component {
    * @param {Component|string|{}} parent The parental component or selector.
    */
   constructor(parent) {
-    console.log('parent', parent);
     if (!parent) throw new LotivisError('No parent or selector specified.');
     if (Object.getPrototypeOf(parent) === String.prototype) {
       this.initializeFromSelector(parent);
@@ -277,7 +276,6 @@ class Component {
   }
 
   initializeFromConfig(config) {
-    console.log('initializeFromConfig', config);
     this.config = config;
     if (config.selector) {
       this.initializeFromSelector(config.selector);
@@ -337,11 +335,15 @@ class Component {
   toString() {
     let components = [this.constructor.name];
     if (this.selector) components.push(`'${this.selector}'`);
-    // if (this.config) components.push(`config='${JSON.stringify(this.config)}'`);s
     return `[${components.join(' ')}]`;
   }
 
+  /**
+   * Returns the name of the constructor of this component if present. Will return the result of `typeof` else.
+   * @returns {*|"undefined"|"object"|"boolean"|"number"|"string"|"function"|"symbol"|"bigint"}
+   */
   getClassname() {
+    if (!this.constructor || !this.constructor.name) return (typeof this);
     return this.constructor.name;
   }
 }
@@ -635,10 +637,22 @@ class Chart extends Component {
     }
   }
 
+  /**
+   * Initializes this chart.
+   */
   initialize() {
-    // empty
+    return new LotivisUnimplementedMethodError(`initialize()`);
   }
 
+  /**
+   * Updates the content of this chart by calling the 'update'-chain:
+   *
+   * ```
+   * precalculate();
+   * remove();
+   * draw();
+   * ```
+   */
   update() {
     if (!this.updateSensible) return;
     this.remove();
@@ -646,22 +660,40 @@ class Chart extends Component {
     this.draw();
   }
 
+  /**
+   * Precalculates data for this chart.
+   * @returns {LotivisUnimplementedMethodError}
+   */
   precalculate() {
-    // empty
+    return new LotivisUnimplementedMethodError(`precalculate()`);
   }
 
+  /**
+   * Removes any old content from this chart.
+   * @returns {LotivisUnimplementedMethodError}
+   */
   remove() {
-    // empty
+    return new LotivisUnimplementedMethodError(`remove()`);
   }
 
+  /**
+   * Appends / draw the components of this chart.
+   * @returns {LotivisUnimplementedMethodError}
+   */
   draw() {
-    // empty
+    return new LotivisUnimplementedMethodError(`draw()`);
   }
 
+  /**
+   * Tells this chart to ignore updates of a datasets controller.
+   */
   makeUpdateInsensible() {
     this.updateSensible = false;
   }
 
+  /**
+   * Tells this chart to listen to update of a datasets controller.
+   */
   makeUpdateSensible() {
     this.updateSensible = true;
   }
@@ -3800,7 +3832,7 @@ class DateChartSettingsPopup extends SettingsPopup {
 }
 
 /**
- *
+ * A lotivis card with a chart.
  * @class ChartCard
  * @extends Card
  */
@@ -3812,15 +3844,13 @@ class ChartCard extends Card {
    * @param config The configuration
    */
   constructor(parent, config) {
-    // console.log(parent);
-    // console.log(config);
+
     if (parent && config && typeof parent === 'string') {
       config.selector = parent;
       super(config);
     } else {
       super(parent);
     }
-    // console.log(config);
 
     this.chart = null;
     this.config = config;
@@ -3837,7 +3867,7 @@ class ChartCard extends Card {
    * Should be overridden by subclasses.
    */
   injectChart() {
-    // empty
+    return new LotivisUnimplementedMethodError(`injectChart()`);
   }
 
   /**
@@ -3903,7 +3933,7 @@ class ChartCard extends Card {
    * Should be overridden by subclasses.
    */
   screenshotButtonAction() {
-    // empty
+    return new LotivisUnimplementedMethodError(`screenshotButtonAction()`);
   }
 
   /**
@@ -3912,7 +3942,7 @@ class ChartCard extends Card {
    * Should be overridden by subclasses.
    */
   presentSettingsPopupAction() {
-    // empty
+    return new LotivisUnimplementedMethodError(`presentSettingsPopupAction()`);
   }
 
   /**
@@ -3921,7 +3951,7 @@ class ChartCard extends Card {
    * Should be overridden by subclasses.
    */
   onSelectedDatasetChanged() {
-    // empty
+    return new LotivisUnimplementedMethodError(`onSelectedDatasetChanged()`);
   }
 }
 
