@@ -42,7 +42,7 @@
   let datasetsCard = new lotivis.DatasetsJSONCard();
   let dateChartCard = new lotivis.DateChartCard();
 
-  fetch('/assets/datasets-chart.json')
+  fetch('../assets/datasets-chart.json')
     .then(response => response.text())
     .then(text => JSON.parse(text))
     .then(function (json) {

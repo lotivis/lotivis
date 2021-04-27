@@ -42,7 +42,7 @@
   let datasetsCard = new lotivis.DatasetsJSONCard();
   let dateChartCard = new lotivis.DateChartCard();
 
-  fetch('/assets/example-datasets-location-time-grouped.json')
+  fetch('../assets/example-datasets-location-time-grouped.json')
     .then(response => response.text())
     .then(text => JSON.parse(text))
     .then(function (json) {
