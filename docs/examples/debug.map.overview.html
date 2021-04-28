@@ -93,7 +93,7 @@
     excludedFeatureCodes: ['2A', '2B']
   });
 
-  fetch('/assets/departements.geojson')
+  fetch('../assets/departements.geojson')
     .then(response => response.text())
     .then(text => JSON.parse(text))
     .then(geoJSON => {
@@ -101,7 +101,7 @@
       locationChartCard2.chart.setGeoJSON(geoJSON);
       locationChartCard3.chart.setGeoJSON(geoJSON);
       locationChartCard4.chart.setGeoJSON(geoJSON);
-      return fetch('/assets/example-datasets-location-time-grouped-stacked.json');
+      return fetch('../assets/example-datasets-location-time-grouped-stacked.json');
     })
     .then(response => response.text())
     .then(text => JSON.parse(text))

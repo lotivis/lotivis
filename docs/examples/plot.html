@@ -43,7 +43,7 @@
   let datasetJSONCard = new lotivis.DatasetsJSONCard('datasets-json-card');
 
   d3
-    .json('/assets/example-datasets-plot.json')
+    .json('../assets/example-datasets-plot.json')
     .then(function (json) {
 
       let controller = new lotivis.DatasetController(json);

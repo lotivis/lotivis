@@ -52,7 +52,7 @@
   let dateChartCard2 = new lotivis.DateChartCard('date-chart-card-2', {title: 'Labels on', showLabels: true});
   let dateChartCard3 = new lotivis.DateChartCard('date-chart-card-3', {title: 'Combine Stacks', combineStacks: true});
 
-  fetch('./assets/example-datasets-location-time-grouped-stacked.json')
+  fetch('../assets/example-datasets-location-time-grouped-stacked.json')
     .then(response => response.text())
     .then(text => JSON.parse(text))
     .then(function (json) {
