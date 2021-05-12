@@ -2192,7 +2192,7 @@ function getSVGString(svgNode) {
 function svgString2Image(svgString, width, height, callback) {
 
   // Convert SVG string to samples URL
-  let imageSource = 'datasets.controller:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+  let imageSource = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
 
   let canvas = document.createElement("canvas");
   canvas.width = width;
@@ -2276,15 +2276,22 @@ function downloadCSV(jsonString, filename) {
  * @param filename The name of the file which is been downloaded.
  */
 function downloadImage(selector, filename) {
+  console.log('selector:' + selector);
+  console.log('filename:' + filename);
   let svgElement = d3.select('#' + selector);
   let node = svgElement.node();
   let size = getOriginalSizeOfSVG(node);
   let svgString = getSVGString(node);
+
   svgString2Image(svgString, 2 * size[0], 2 * size[1], function (dataURL) {
+    console.log('dataURL:' + dataURL);
     fetch(dataURL)
       .then(res => res.blob())
       .then(function (dataBlob) {
         let saveFilename = appendExtensionIfNeeded(filename, 'png');
+
+        console.log('saveFilename:' + saveFilename);
+
         downloadBlob(dataBlob, saveFilename);
       });
   });

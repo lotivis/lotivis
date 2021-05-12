@@ -101,7 +101,7 @@ export function getSVGString(svgNode) {
 export function svgString2Image(svgString, width, height, callback) {
 
   // Convert SVG string to samples URL
-  let imageSource = 'datasets.controller:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+  let imageSource = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
 
   let canvas = document.createElement("canvas");
   canvas.width = width;

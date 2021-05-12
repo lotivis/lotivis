@@ -1,4 +1,3 @@
-import {styleForCSSClass} from "../shared/style";
 import {equals} from "../shared/equal";
 import {Color} from "../color/color";
 import '../color/color.map';
