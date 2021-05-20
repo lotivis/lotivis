@@ -36,18 +36,7 @@ export class PlotChartCard extends ChartCard {
     this.body.attr('id', this.chartID);
     this.chart = new PlotChart(this.chartID, this.config);
   }
-
-  /**
-   * Injects the radio group in the top.
-   */
-  injectRadioGroup() {
-    this.radioGroup = new RadioGroup(this.headerCenterComponent);
-    this.radioGroup.onChange = function (value) {
-      let dataset = this.datasets.find(dataset => dataset.label === value);
-      this.setDataset(dataset);
-    }.bind(this);
-  }
-
+  
   /**
    * Applies possible url parameters.
    */

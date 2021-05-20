@@ -3,6 +3,7 @@ import {Button} from "./button";
 import {RadioGroup} from "./radio.group";
 import {Option} from "./option";
 import {LotivisUnimplementedMethodError} from "../data.juggle/data.validate.error";
+import {lotivis_log} from "../shared/debug";
 
 /**
  * A lotivis card with a chart.
@@ -65,6 +66,7 @@ export class ChartCard extends Card {
     this.radioGroup = new RadioGroup(this.headerCenterComponent);
     this.radioGroup.onChange = function (value) {
       let dataset = this.datasets.find(dataset => dataset.label === value);
+      if (!dataset) return lotivis_log(`Can't find dataset with label ${value}`);
       this.chart.datasets = [dataset];
       this.chart.update();
     }.bind(this);
