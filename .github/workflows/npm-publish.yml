@@ -10,14 +10,14 @@ jobs:
     name: Publish npm
     runs-on: ubuntu-latest
     steps:
-      - name: publish
-      - id: publish
       - uses: actions/checkout@v2
       - uses: martinbeentjes/npm-get-version-action@master
       - uses: actions/setup-node@v1
         with:
           node-version: 12
           registry-url: https://registry.npmjs.org/
+      - name: publish
+      - id: publish
       - run: npm ci
       - run: npm run build --if-present
       - run: npm run copy-to-dist
