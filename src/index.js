@@ -128,4 +128,4 @@ exports.URLParameters = UrlParameters;
 
 export default exports;
 
-console.log(`[lotivis]  lotivis library loaded.`);
+console.log(`[lotivis]  lotivis module loaded.`);
