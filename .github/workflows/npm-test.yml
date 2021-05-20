@@ -2,6 +2,8 @@ name: Node.js Test
 
 on:
   push:
+    branches:
+      - '*'
     tags-ignore:
       - '**'
 
