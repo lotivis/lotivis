@@ -75,7 +75,7 @@ export class ChartCard extends Card {
    */
   updateRadioGroup() {
     if (!this.datasets) return;
-    let names = this.datasets.map(dataset => dataset.label);
+    let names = this.datasets.map(dataset => dataset.label || 'Unknown Label');
     let options = names.map(name => new Option(name));
     this.radioGroup.setOptions(options);
   }
