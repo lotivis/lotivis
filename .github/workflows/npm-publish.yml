@@ -29,18 +29,38 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
       - run: echo "Printing current version:"
       - run: echo ${{ steps.package-version.outputs.current-version }}
-      - name: 'Call API'
+
+      - name: 'Purge CSS'
         uses: indiesdev/curl@v1
-        id: api
         with:
-          url: http://purge.jsdelivr.net/
-          method: 'POST'
+          url: https://purge.jsdelivr.net/npm/lotivis@${{ steps.package-version.outputs.current-version }}/dist/lotivis.css
           accept: 200
           timeout: 10000
-          headers: '{ "cache-control": "no-cache", "content-type": "application/json" }'
-          body: '{ "path": ["/npm/lotivis@${{ steps.package-version.outputs.current-version }}/dist/lotivis.css","/npm/lotivis@${{ steps.package-version.outputs.current-version }}/dist/lotivis.min.js","/npm/lotivis@${{ steps.package-version.outputs.current-version }}/dist/lotivis.js","/npm/lotivis@${{ steps.package-version.outputs.current-version }}/dist/lotivis.js.map"]}'
-      - name: 'Use response'
-        run: echo ${{ steps.api.outputs.response }}
+
+      - name: 'Purge JS Min'
+        uses: indiesdev/curl@v1
+        with:
+          url: https://purge.jsdelivr.net/npm/lotivis@${{ steps.package-version.outputs.current-version }}/dist/lotivis.min.js
+          accept: 200
+          timeout: 10000
+
+      - name: 'Purge JS'
+        uses: indiesdev/curl@v1
+        with:
+          url: https://purge.jsdelivr.net/npm/lotivis@${{ steps.package-version.outputs.current-version }}/dist/lotivis.js
+          accept: 200
+          timeout: 10000
+
+      - name: 'Purge JS Map'
+        uses: indiesdev/curl@v1
+        with:
+          url: https://purge.jsdelivr.net/npm/lotivis@${{ steps.package-version.outputs.current-version }}/dist/lotivis.js.map
+          accept: 200
+          timeout: 10000
+
+#      - name: 'Use response'
+#        run: echo ${{ steps.api.outputs.response }}
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
