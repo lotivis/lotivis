@@ -1,0 +1,5573 @@
+[
+  {
+    "label": "Amel Bent",
+    "data": [
+      {
+        "label": "J'ai changé d'avis",
+        "value": 1,
+        "date": 2007,
+        "location": 93
+      },
+      {
+        "label": "Chanson pour Papa",
+        "value": 1,
+        "date": 2007,
+        "location": 93
+      },
+      {
+        "label": "Croyez-en moi",
+        "value": 1,
+        "date": 2007,
+        "location": 93
+      },
+      {
+        "label": "Comme tous les Soirs",
+        "value": 1,
+        "date": 2007,
+        "location": 93
+      },
+      {
+        "label": "Je voulais juste que tu m'aimes",
+        "value": 1,
+        "date": 2007,
+        "location": 93
+      },
+      {
+        "label": "Désolée",
+        "value": 1,
+        "date": 2007,
+        "location": 93
+      },
+      {
+        "label": "Compliquée",
+        "value": 1,
+        "date": 2007,
+        "location": 93
+      },
+      {
+        "label": "A 20 ans",
+        "value": 1,
+        "date": 2007,
+        "location": 93
+      },
+      {
+        "label": "Je reste seule",
+        "value": 1,
+        "date": 2007,
+        "location": 93
+      },
+      {
+        "label": "Je Reste",
+        "value": 1,
+        "date": 2011,
+        "location": 93
+      },
+      {
+        "label": "Je dois savoir",
+        "value": 1,
+        "date": 2011,
+        "location": 93
+      },
+      {
+        "label": "À quoi tu penses",
+        "value": 1,
+        "date": 2011,
+        "location": 93
+      },
+      {
+        "label": "Délit",
+        "value": 1,
+        "date": 2011,
+        "location": 93
+      },
+      {
+        "label": "Je me l'interdis",
+        "value": 1,
+        "date": 2011,
+        "location": 93
+      },
+      {
+        "label": "Il marche",
+        "value": 1,
+        "date": 2011,
+        "location": 93
+      },
+      {
+        "label": "C'est arrivé aujourd'hui",
+        "value": 1,
+        "date": 2011,
+        "location": 93
+      },
+      {
+        "label": "Attendez-moi",
+        "value": 1,
+        "date": 2019,
+        "location": 93
+      },
+      {
+        "label": "La fête",
+        "value": 1,
+        "date": 2019,
+        "location": 93
+      },
+      {
+        "label": "C'est la folie",
+        "value": 1,
+        "date": 2019,
+        "location": 93
+      },
+      {
+        "label": "Dis-moi qui tu es",
+        "value": 1,
+        "date": 2019,
+        "location": 93
+      },
+      {
+        "label": "J'aimerais",
+        "value": 1,
+        "date": 2019,
+        "location": 93
+      },
+      {
+        "label": "Charles",
+        "value": 1,
+        "date": 2019,
+        "location": 93
+      },
+      {
+        "label": "À mes filles",
+        "value": 1,
+        "date": 2019,
+        "location": 93
+      },
+      {
+        "label": "Demain",
+        "value": 1,
+        "date": 2019,
+        "location": 93
+      },
+      {
+        "label": "Jusqu’au bout",
+        "value": 1,
+        "date": 2020,
+        "location": 93
+      }
+    ]
+  },
+  {
+    "label": "Amy",
+    "data": [
+      {
+        "label": "Comment tu t’appelles",
+        "value": 1,
+        "date": 2019,
+        "location": 94
+      },
+      {
+        "label": "Fin de partie",
+        "value": 1,
+        "date": 2019,
+        "location": 94
+      },
+      {
+        "label": "La route est longue",
+        "value": 1,
+        "date": 2019,
+        "location": 94
+      },
+      {
+        "label": "Les fleurs du mâle",
+        "value": 1,
+        "date": 2019,
+        "location": 94
+      },
+      {
+        "label": "Jump",
+        "value": 1,
+        "date": 2019,
+        "location": 94
+      },
+      {
+        "label": "Immortelle",
+        "value": 1,
+        "date": 2019,
+        "location": 94
+      },
+      {
+        "label": "NLDPMM",
+        "value": 1,
+        "date": 2019,
+        "location": 94
+      },
+      {
+        "label": "Pigalle",
+        "value": 1,
+        "date": 2019,
+        "location": 94
+      },
+      {
+        "label": "Tombouctou",
+        "value": 1,
+        "date": 2019,
+        "location": 94
+      },
+      {
+        "label": "Douillée",
+        "value": 1,
+        "date": 2019,
+        "location": 94
+      },
+      {
+        "label": "Si loin des anges",
+        "value": 1,
+        "date": 2019,
+        "location": 94
+      },
+      {
+        "label": "Dans nos lifes",
+        "value": 1,
+        "date": 2019,
+        "location": 94
+      },
+      {
+        "label": "Mauvais côté",
+        "value": 1,
+        "date": 2019,
+        "location": 94
+      },
+      {
+        "label": "Intro",
+        "value": 1,
+        "date": 2019,
+        "location": 94
+      },
+      {
+        "label": "Mytho",
+        "value": 1,
+        "date": 2019,
+        "location": 94
+      },
+      {
+        "label": "Va là-bas",
+        "value": 1,
+        "date": 2019,
+        "location": 94
+      },
+      {
+        "label": "Cookie Lyon",
+        "value": 1,
+        "date": 2016,
+        "location": 94
+      },
+      {
+        "label": "Djandjou",
+        "value": 1,
+        "date": 2017,
+        "location": 94
+      }
+    ]
+  },
+  {
+    "label": "Antha",
+    "data": [
+      {
+        "label": "ÉMERAUDE RUBIS SAPHIR",
+        "value": 1,
+        "date": 2019,
+        "location": 91
+      },
+      {
+        "label": "HÉROÏNE",
+        "value": 1,
+        "date": 2019,
+        "location": 91
+      },
+      {
+        "label": "LES TOURMENTS",
+        "value": 1,
+        "date": 2019,
+        "location": 91
+      },
+      {
+        "label": "LOLITA",
+        "value": 1,
+        "date": 2019,
+        "location": 91
+      },
+      {
+        "label": "NÉONS NOIRS",
+        "value": 1,
+        "date": 2019,
+        "location": 91
+      },
+      {
+        "label": "INFERNO",
+        "value": 1,
+        "date": 2019,
+        "location": 91
+      },
+      {
+        "label": "ÉCLIPSE",
+        "value": 1,
+        "date": 2019,
+        "location": 91
+      },
+      {
+        "label": "GOTHIQUES STALACTITES",
+        "value": 1,
+        "date": 2019,
+        "location": 91
+      },
+      {
+        "label": "LES ALGUES",
+        "value": 1,
+        "date": 2019,
+        "location": 91
+      },
+      {
+        "label": "INTÉRIEUR CUIR",
+        "value": 1,
+        "date": 2019,
+        "location": 91
+      },
+      {
+        "label": "FRA ANGELICO",
+        "value": 1,
+        "date": 2019,
+        "location": 91
+      }
+    ]
+  },
+  {
+    "label": "Assia",
+    "data": [
+      {
+        "label": "Politiquement correcte",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Encore et encore",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Je te veux",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Illegal Love",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Le blues ce soir",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "On s’est tout fait",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "P’tit bout",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "L’étoile filante",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Entre Les Deux Rives",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Célébrer La Vie",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Je chante",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      }
+    ]
+  },
+  {
+    "label": "Atheena",
+    "data": [
+      {
+        "label": "Français",
+        "value": 1,
+        "date": 2012,
+        "location": 75
+      }
+    ]
+  },
+  {
+    "label": "Aya Nakamura",
+    "data": [
+      {
+        "label": "Jalousie",
+        "value": 1,
+        "date": 2017,
+        "location": 93
+      },
+      {
+        "label": "Debout",
+        "value": 1,
+        "date": 2017,
+        "location": 93
+      },
+      {
+        "label": "Karma",
+        "value": 1,
+        "date": 2017,
+        "location": 93
+      },
+      {
+        "label": "Angela",
+        "value": 1,
+        "date": 2017,
+        "location": 93
+      },
+      {
+        "label": "Comportement",
+        "value": 1,
+        "date": 2017,
+        "location": 93
+      },
+      {
+        "label": "Papys",
+        "value": 1,
+        "date": 2017,
+        "location": 93
+      },
+      {
+        "label": "J'ai mal part. 2",
+        "value": 1,
+        "date": 2017,
+        "location": 93
+      },
+      {
+        "label": "Moi",
+        "value": 1,
+        "date": 2017,
+        "location": 93
+      },
+      {
+        "label": "Brisé",
+        "value": 1,
+        "date": 2015,
+        "location": 93
+      },
+      {
+        "label": "Oublier",
+        "value": 1,
+        "date": 2016,
+        "location": 93
+      },
+      {
+        "label": "Je n'ai pas besoin de toi",
+        "value": 1,
+        "date": 2017,
+        "location": 93
+      },
+      {
+        "label": "Oumou Sangaré",
+        "value": 1,
+        "date": 2017,
+        "location": 93
+      },
+      {
+        "label": "Fuego",
+        "value": 1,
+        "date": 2017,
+        "location": 93
+      },
+      {
+        "label": "Orphelin",
+        "value": 1,
+        "date": 2017,
+        "location": 93
+      },
+      {
+        "label": "Love",
+        "value": 1,
+        "date": 2017,
+        "location": 93
+      },
+      {
+        "label": "Oula",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "Djadja",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "Dans ma bulle",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "Ça fait mal",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "Gangster",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "Faya",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "Copines",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "La dot",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "Pompom",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "40%",
+        "value": 1,
+        "date": 2019,
+        "location": 93
+      },
+      {
+        "label": "Claqué",
+        "value": 1,
+        "date": 2019,
+        "location": 93
+      },
+      {
+        "label": "Idiot",
+        "value": 1,
+        "date": 2019,
+        "location": 93
+      },
+      {
+        "label": "Cadeau",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "Jolie nana",
+        "value": 1,
+        "date": 2020,
+        "location": 93
+      },
+      {
+        "label": "Drogué",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "Monaco",
+        "value": 1,
+        "date": 2019,
+        "location": 93
+      },
+      {
+        "label": "Djadja (Afro B Remix)",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "Djadja Remix",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      }
+    ]
+  },
+  {
+    "label": "Ayna",
+    "data": [
+      {
+        "label": "21 grammes",
+        "value": 1,
+        "date": 2014,
+        "location": 94
+      },
+      {
+        "label": "Héritage (Remix)",
+        "value": 1,
+        "date": 2014,
+        "location": 94
+      },
+      {
+        "label": "Comme moi",
+        "value": 1,
+        "date": 2014,
+        "location": 94
+      },
+      {
+        "label": "Héritage",
+        "value": 1,
+        "date": 2014,
+        "location": 94
+      },
+      {
+        "label": "Comme moi (Remix)",
+        "value": 1,
+        "date": 2014,
+        "location": 94
+      },
+      {
+        "label": "Poids plume (feat Youssoupha)",
+        "value": 1,
+        "date": 2012,
+        "location": 94
+      },
+      {
+        "label": "Le Bilan",
+        "value": 1,
+        "date": 2012,
+        "location": 94
+      },
+      {
+        "label": "Cette Vie M'emporte",
+        "value": 1,
+        "date": 2015,
+        "location": 94
+      },
+      {
+        "label": "J'attends mon heure",
+        "value": 1,
+        "date": 2016,
+        "location": 94
+      },
+      {
+        "label": "Ne dis plus jamais",
+        "value": 1,
+        "date": 2016,
+        "location": 94
+      }
+    ]
+  },
+  {
+    "label": "Bams",
+    "data": [
+      {
+        "label": "Fais tourner",
+        "value": 1,
+        "date": 1998,
+        "location": 75
+      }
+    ]
+  },
+  {
+    "label": "Billie Brelok",
+    "data": [
+      {
+        "label": "Intro",
+        "value": 1,
+        "date": 2013,
+        "location": 92
+      },
+      {
+        "label": "Bâtarde",
+        "value": 1,
+        "date": 2013,
+        "location": 92
+      },
+      {
+        "label": "Pertes & fracas",
+        "value": 1,
+        "date": 2017,
+        "location": 92
+      },
+      {
+        "label": "La Mutante 5",
+        "value": 1,
+        "date": 2020,
+        "location": 92
+      }
+    ]
+  },
+  {
+    "label": "Black Barbie",
+    "data": [
+      {
+        "label": "Ma Negritude",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "Naufragée du système",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "Dis-le",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "1 pour toute",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "Tête dure",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "Reste en chienne (part I)",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "La reine du 9.3",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "Bordel",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "Black Barbie Style",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "Underground",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "Flashback - Faut qu'on soit",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "9 mois",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "Rap de bonne femme",
+        "value": 1,
+        "date": 2009,
+        "location": 93
+      },
+      {
+        "label": "Ma life",
+        "value": 1,
+        "date": 2009,
+        "location": 93
+      }
+    ]
+  },
+  {
+    "label": "Casey",
+    "data": [
+      {
+        "label": "Une lame dans ma veste",
+        "value": 1,
+        "date": 2006,
+        "location": 93
+      },
+      {
+        "label": "Ma haine",
+        "value": 1,
+        "date": 2006,
+        "location": 93
+      },
+      {
+        "label": "Chez moi",
+        "value": 1,
+        "date": 2006,
+        "location": 93
+      },
+      {
+        "label": "Banlieue Nord",
+        "value": 1,
+        "date": 2006,
+        "location": 93
+      },
+      {
+        "label": "Délit de faciès",
+        "value": 1,
+        "date": 2006,
+        "location": 93
+      },
+      {
+        "label": "Horreur Et Guerre",
+        "value": 1,
+        "date": 2006,
+        "location": 93
+      },
+      {
+        "label": "Parité",
+        "value": 1,
+        "date": 2006,
+        "location": 93
+      },
+      {
+        "label": "Primates Des Caraibes",
+        "value": 1,
+        "date": 2010,
+        "location": 93
+      },
+      {
+        "label": "A La Gloire De Mon Glaire",
+        "value": 1,
+        "date": 2010,
+        "location": 93
+      },
+      {
+        "label": "Apprends à t'taire",
+        "value": 1,
+        "date": 2010,
+        "location": 93
+      },
+      {
+        "label": "Créature ratée",
+        "value": 1,
+        "date": 2010,
+        "location": 93
+      },
+      {
+        "label": "Aux Ordres du Maître",
+        "value": 1,
+        "date": 2010,
+        "location": 93
+      },
+      {
+        "label": "Dernière mise au point",
+        "value": 1,
+        "date": 2007,
+        "location": 93
+      }
+    ]
+  },
+  {
+    "label": "Cayene",
+    "data": [
+      {
+        "label": "Plus Rien Ne Me Choque",
+        "value": 1,
+        "date": 2015,
+        "location": 12
+      },
+      {
+        "label": "Grizzly",
+        "value": 1,
+        "date": 2015,
+        "location": 12
+      },
+      {
+        "label": "Récit Écorché",
+        "value": 1,
+        "date": 2015,
+        "location": 12
+      },
+      {
+        "label": "Chaque Matin",
+        "value": 1,
+        "date": 2015,
+        "location": 12
+      },
+      {
+        "label": "Prendre L'air",
+        "value": 1,
+        "date": 2015,
+        "location": 12
+      },
+      {
+        "label": "Quelques Notes",
+        "value": 1,
+        "date": 2015,
+        "location": 12
+      },
+      {
+        "label": "Petite Blédarde",
+        "value": 1,
+        "date": 2015,
+        "location": 12
+      },
+      {
+        "label": "Faut Qu'on Se Lève",
+        "value": 1,
+        "date": 2015,
+        "location": 12
+      },
+      {
+        "label": "C'est quoi cette meuf ?",
+        "value": 1,
+        "date": 2013,
+        "location": 12
+      }
+    ]
+  },
+  {
+    "label": "Charly Bell",
+    "data": [
+      {
+        "label": "Fastlife",
+        "value": 1,
+        "date": 2015,
+        "location": 75
+      },
+      {
+        "label": "Je m'ennuie",
+        "value": 1,
+        "date": 2015,
+        "location": 75
+      },
+      {
+        "label": "Pourquoi tu m'appelles pas ?",
+        "value": 1,
+        "date": 2015,
+        "location": 75
+      },
+      {
+        "label": "Cool",
+        "value": 1,
+        "date": 2013,
+        "location": 75
+      },
+      {
+        "label": "Tulututu",
+        "value": 1,
+        "date": 2013,
+        "location": 75
+      },
+      {
+        "label": "Pousse la fonte",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      },
+      {
+        "label": "Fever",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      },
+      {
+        "label": "T'as rien compris",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      },
+      {
+        "label": "Accorde moi",
+        "value": 1,
+        "date": 2012,
+        "location": 75
+      }
+    ]
+  },
+  {
+    "label": "Chilla",
+    "data": [
+      {
+        "label": "Jungle",
+        "value": 1,
+        "date": 2019,
+        "location": 1
+      },
+      {
+        "label": "La nuit",
+        "value": 1,
+        "date": 2019,
+        "location": 1
+      },
+      {
+        "label": "Bridget",
+        "value": 1,
+        "date": 2019,
+        "location": 1
+      },
+      {
+        "label": "1er jour d'école",
+        "value": 1,
+        "date": 2018,
+        "location": 1
+      },
+      {
+        "label": "Ego",
+        "value": 1,
+        "date": 2019,
+        "location": 1
+      },
+      {
+        "label": "Mira",
+        "value": 1,
+        "date": 2019,
+        "location": 1
+      },
+      {
+        "label": "Dans le movie #1",
+        "value": 1,
+        "date": 2019,
+        "location": 1
+      },
+      {
+        "label": "Aimer",
+        "value": 1,
+        "date": 2019,
+        "location": 1
+      },
+      {
+        "label": "Cœur sombre",
+        "value": 1,
+        "date": 2019,
+        "location": 1
+      },
+      {
+        "label": "Am stram gram",
+        "value": 1,
+        "date": 2019,
+        "location": 1
+      },
+      {
+        "label": "#Frenchman - Saison 2 - Chilla",
+        "value": 1,
+        "date": 2018,
+        "location": 1
+      },
+      {
+        "label": "Carpe Diem",
+        "value": 1,
+        "date": 2017,
+        "location": 1
+      },
+      {
+        "label": "Chico",
+        "value": 1,
+        "date": 2017,
+        "location": 1
+      },
+      {
+        "label": "Millionaire",
+        "value": 1,
+        "date": 2017,
+        "location": 1
+      },
+      {
+        "label": "Je viens de nulle part",
+        "value": 1,
+        "date": 2017,
+        "location": 1
+      },
+      {
+        "label": "Aller sans retour",
+        "value": 1,
+        "date": 2017,
+        "location": 1
+      },
+      {
+        "label": "Fais Belek",
+        "value": 1,
+        "date": 2019,
+        "location": 1
+      },
+      {
+        "label": "Les miens",
+        "value": 1,
+        "date": 2019,
+        "location": 1
+      },
+      {
+        "label": "Amazon",
+        "value": 1,
+        "date": 2019,
+        "location": 1
+      },
+      {
+        "label": "Balance ton porc",
+        "value": 1,
+        "date": 2017,
+        "location": 1
+      },
+      {
+        "label": "Dis-leur",
+        "value": 1,
+        "date": 2019,
+        "location": 1
+      },
+      {
+        "label": "Amanda",
+        "value": 1,
+        "date": 2017,
+        "location": 1
+      },
+      {
+        "label": "M.B.D (Métro boulot dodo)",
+        "value": 1,
+        "date": 2017,
+        "location": 1
+      },
+      {
+        "label": "Cool",
+        "value": 1,
+        "date": 2020,
+        "location": 1
+      },
+      {
+        "label": "Indigo",
+        "value": 1,
+        "date": 2016,
+        "location": 1
+      },
+      {
+        "label": "Good Bye",
+        "value": 1,
+        "date": 2016,
+        "location": 1
+      },
+      {
+        "label": "Freestyle Planète Rap",
+        "value": 1,
+        "date": 2016,
+        "location": 1
+      },
+      {
+        "label": "Le sommeil",
+        "value": 1,
+        "date": 2016,
+        "location": 1
+      },
+      {
+        "label": "Mélodrame",
+        "value": 1,
+        "date": 2017,
+        "location": 1
+      },
+      {
+        "label": "Exil",
+        "value": 1,
+        "date": 2017,
+        "location": 1
+      },
+      {
+        "label": "Espérance",
+        "value": 1,
+        "date": 2016,
+        "location": 1
+      },
+      {
+        "label": "Jardin d’Alice",
+        "value": 1,
+        "date": 2016,
+        "location": 1
+      },
+      {
+        "label": "Lettre au président",
+        "value": 1,
+        "date": 2016,
+        "location": 1
+      },
+      {
+        "label": "Dans La Ville",
+        "value": 1,
+        "date": 2018,
+        "location": 1
+      },
+      {
+        "label": "Loin de tous",
+        "value": 1,
+        "date": 2016,
+        "location": 1
+      }
+    ]
+  },
+  {
+    "label": "Diam’s",
+    "data": [
+      {
+        "label": "Cruelle à vie",
+        "value": 1,
+        "date": 2009,
+        "location": 91
+      },
+      {
+        "label": "1980",
+        "value": 1,
+        "date": 2009,
+        "location": 91
+      },
+      {
+        "label": "Amoré",
+        "value": 1,
+        "date": 2009,
+        "location": 91
+      },
+      {
+        "label": "Incassables",
+        "value": 1,
+        "date": 2009,
+        "location": 91
+      },
+      {
+        "label": "Evasion",
+        "value": 1,
+        "date": 2009,
+        "location": 91
+      },
+      {
+        "label": "DJ",
+        "value": 1,
+        "date": 2009,
+        "location": 91
+      },
+      {
+        "label": "Daddy",
+        "value": 1,
+        "date": 2009,
+        "location": 91
+      },
+      {
+        "label": "Dans ma bulle",
+        "value": 1,
+        "date": 2006,
+        "location": 91
+      },
+      {
+        "label": "Confessions nocturnes",
+        "value": 1,
+        "date": 2006,
+        "location": 91
+      },
+      {
+        "label": "Feuille blanche",
+        "value": 1,
+        "date": 2006,
+        "location": 91
+      },
+      {
+        "label": "Big up",
+        "value": 1,
+        "date": 2006,
+        "location": 91
+      },
+      {
+        "label": "Introduction",
+        "value": 1,
+        "date": 2006,
+        "location": 91
+      },
+      {
+        "label": "Cause à effet",
+        "value": 1,
+        "date": 2006,
+        "location": 91
+      },
+      {
+        "label": "T.S.",
+        "value": 1,
+        "date": 2006,
+        "location": 91
+      },
+      {
+        "label": "La boulette",
+        "value": 1,
+        "date": 2006,
+        "location": 91
+      },
+      {
+        "label": "Car tu portes mon nom",
+        "value": 1,
+        "date": 2006,
+        "location": 91
+      },
+      {
+        "label": "Marine",
+        "value": 1,
+        "date": 2006,
+        "location": 91
+      },
+      {
+        "label": "Diamant",
+        "value": 1,
+        "date": 2001,
+        "location": 91
+      },
+      {
+        "label": "Peter Pan",
+        "value": 1,
+        "date": 2010,
+        "location": 91
+      },
+      {
+        "label": "I am somebody",
+        "value": 1,
+        "date": 2010,
+        "location": 91
+      },
+      {
+        "label": "L’Honneur d’un Peuple",
+        "value": 1,
+        "date": 2010,
+        "location": 91
+      },
+      {
+        "label": "Mélanie",
+        "value": 1,
+        "date": 2010,
+        "location": 91
+      },
+      {
+        "label": "Dans le noir",
+        "value": 1,
+        "date": 2009,
+        "location": 91
+      },
+      {
+        "label": "Enfants du désert",
+        "value": 1,
+        "date": 2009,
+        "location": 91
+      },
+      {
+        "label": "Coeur de Bombe",
+        "value": 1,
+        "date": 2009,
+        "location": 91
+      },
+      {
+        "label": "Lili",
+        "value": 1,
+        "date": 2010,
+        "location": 91
+      }
+    ]
+  },
+  {
+    "label": "Dieselle",
+    "data": [
+      {
+        "label": "DJ",
+        "value": 1,
+        "date": 2015,
+        "location": 95
+      }
+    ]
+  },
+  {
+    "label": "Eli MC",
+    "data": [
+      {
+        "label": "Solitaire",
+        "value": 1,
+        "date": 2012,
+        "location": 44
+      },
+      {
+        "label": "Sur le même fil",
+        "value": 1,
+        "date": 2012,
+        "location": 44
+      },
+      {
+        "label": "Au poète il faut le spleen",
+        "value": 1,
+        "date": 2013,
+        "location": 44
+      },
+      {
+        "label": "Les pieds sur terre",
+        "value": 1,
+        "date": 2013,
+        "location": 44
+      },
+      {
+        "label": "Freestyle #2",
+        "value": 1,
+        "date": 2012,
+        "location": 44
+      },
+      {
+        "label": "Je n'oublie pas",
+        "value": 1,
+        "date": 2013,
+        "location": 44
+      },
+      {
+        "label": "Manque moi",
+        "value": 1,
+        "date": 2017,
+        "location": 44
+      },
+      {
+        "label": "Mona Lisa",
+        "value": 1,
+        "date": 2017,
+        "location": 44
+      },
+      {
+        "label": "Ce qu'il nous reste",
+        "value": 1,
+        "date": 2017,
+        "location": 44
+      },
+      {
+        "label": "C'était là",
+        "value": 1,
+        "date": 2017,
+        "location": 44
+      },
+      {
+        "label": "Je veux avoir le temps",
+        "value": 1,
+        "date": 2017,
+        "location": 44
+      },
+      {
+        "label": "Interlude 2",
+        "value": 1,
+        "date": 2017,
+        "location": 44
+      },
+      {
+        "label": "Interlude 1",
+        "value": 1,
+        "date": 2017,
+        "location": 44
+      },
+      {
+        "label": "Au-delà des Coups",
+        "value": 1,
+        "date": 2015,
+        "location": 44
+      },
+      {
+        "label": "Écrire un texte",
+        "value": 1,
+        "date": 2015,
+        "location": 44
+      },
+      {
+        "label": "Troisième Doigt",
+        "value": 1,
+        "date": 2015,
+        "location": 44
+      },
+      {
+        "label": "En crachant tout mon paquet d'clopes",
+        "value": 1,
+        "date": 2015,
+        "location": 44
+      }
+    ]
+  },
+  {
+    "label": "Fanny Polly",
+    "data": [
+      {
+        "label": "One shot",
+        "value": 1,
+        "date": 2019,
+        "location": 6
+      },
+      {
+        "label": "Dunk",
+        "value": 1,
+        "date": 2019,
+        "location": 6
+      },
+      {
+        "label": "J’ai pas les mots",
+        "value": 1,
+        "date": 2018,
+        "location": 6
+      },
+      {
+        "label": "J'rentre dans l'Cypher",
+        "value": 1,
+        "date": 2018,
+        "location": 6
+      }
+    ]
+  },
+  {
+    "label": "Gen Renard",
+    "data": [
+      {
+        "label": "Avec la rage",
+        "value": 1,
+        "date": 2006,
+        "location": 75
+      },
+      {
+        "label": "Prends Soin de Moi",
+        "value": 1,
+        "date": 2006,
+        "location": 75
+      },
+      {
+        "label": "Exilés",
+        "value": 1,
+        "date": 2006,
+        "location": 75
+      },
+      {
+        "label": "Chanteuse parmi des millions",
+        "value": 1,
+        "date": 2006,
+        "location": 75
+      },
+      {
+        "label": "Gangsta",
+        "value": 1,
+        "date": 2006,
+        "location": 75
+      },
+      {
+        "label": "Une balle",
+        "value": 1,
+        "date": 2006,
+        "location": 75
+      },
+      {
+        "label": "Mon nom c’est",
+        "value": 1,
+        "date": 2006,
+        "location": 75
+      }
+    ]
+  },
+  {
+    "label": "Illustre",
+    "data": [
+      {
+        "label": "Type chelou",
+        "value": 1,
+        "date": 2020,
+        "location": 60
+      },
+      {
+        "label": "Mémoire",
+        "value": 1,
+        "date": 2020,
+        "location": 60
+      },
+      {
+        "label": "Maladif",
+        "value": 1,
+        "date": 2020,
+        "location": 60
+      },
+      {
+        "label": "Vautour",
+        "value": 1,
+        "date": 2020,
+        "location": 60
+      },
+      {
+        "label": "Autant que tu pourras",
+        "value": 1,
+        "date": 2017,
+        "location": 60
+      },
+      {
+        "label": "Miroir",
+        "value": 1,
+        "date": 2016,
+        "location": 60
+      },
+      {
+        "label": "Le Bon, la Bête et le Truand",
+        "value": 1,
+        "date": 2016,
+        "location": 60
+      },
+      {
+        "label": "Permuter",
+        "value": 1,
+        "date": 2016,
+        "location": 60
+      }
+    ]
+  },
+  {
+    "label": "Isleym",
+    "data": [
+      {
+        "label": "Oublie-moi",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      },
+      {
+        "label": "Partir",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      },
+      {
+        "label": "Avec le temps",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      },
+      {
+        "label": "Où a te mène",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      },
+      {
+        "label": "Qu'une histoire",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      },
+      {
+        "label": "A quoi tu penses",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      },
+      {
+        "label": "Ange gardien",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      },
+      {
+        "label": "Petit bateau",
+        "value": 1,
+        "date": 2013,
+        "location": 75
+      },
+      {
+        "label": "Besoin d'ailes",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      },
+      {
+        "label": "Encore et encore",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      },
+      {
+        "label": "Accélère",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      }
+    ]
+  },
+  {
+    "label": "K-Reen",
+    "data": [
+      {
+        "label": "Faut laisser donner",
+        "value": 1,
+        "date": 1998,
+        "location": 75
+      },
+      {
+        "label": "Je suis en panique",
+        "value": 1,
+        "date": 1998,
+        "location": 75
+      },
+      {
+        "label": "Au bout de ton rêve",
+        "value": 1,
+        "date": 1998,
+        "location": 75
+      },
+      {
+        "label": "Oui-non",
+        "value": 1,
+        "date": 2001,
+        "location": 75
+      },
+      {
+        "label": "Comme avant",
+        "value": 1,
+        "date": 2011,
+        "location": 75
+      },
+      {
+        "label": "Anticonformiste",
+        "value": 1,
+        "date": 2007,
+        "location": 75
+      },
+      {
+        "label": "Savoir dire non",
+        "value": 1,
+        "date": 1997,
+        "location": 75
+      },
+      {
+        "label": "Soleil de ma vie",
+        "value": 1,
+        "date": 2017,
+        "location": 75
+      }
+    ]
+  },
+  {
+    "label": "Kayliah",
+    "data": [
+      {
+        "label": "Belly Dance",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Pour le meilleur et pour le pire (bang bang)",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Laissez-moi",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Quand une fille est love",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Oh Boy",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Le code de l’honneur",
+        "value": 1,
+        "date": 2004,
+        "location": 94
+      }
+    ]
+  },
+  {
+    "label": "Keny Arkana",
+    "data": [
+      {
+        "label": "Eh Connard",
+        "value": 1,
+        "date": 2006,
+        "location": 13
+      },
+      {
+        "label": "Entre les lignes : cloué au sol",
+        "value": 1,
+        "date": 2006,
+        "location": 13
+      },
+      {
+        "label": "Entre les mots : Enfant de la terre",
+        "value": 1,
+        "date": 2006,
+        "location": 13
+      },
+      {
+        "label": "Entre les mots : du local au global",
+        "value": 1,
+        "date": 2006,
+        "location": 13
+      },
+      {
+        "label": "Entre les lignes : une goutte de plus",
+        "value": 1,
+        "date": 2006,
+        "location": 13
+      },
+      {
+        "label": "Cueille ta vie",
+        "value": 1,
+        "date": 2006,
+        "location": 13
+      },
+      {
+        "label": "Freestyle Du Maquis",
+        "value": 1,
+        "date": 2011,
+        "location": 13
+      },
+      {
+        "label": "De l'Opéra à la Plaine 2",
+        "value": 1,
+        "date": 2011,
+        "location": 13
+      },
+      {
+        "label": "À l'ombre des jugements",
+        "value": 1,
+        "date": 2011,
+        "location": 13
+      },
+      {
+        "label": "Au milieu du chaos",
+        "value": 1,
+        "date": 2011,
+        "location": 13
+      },
+      {
+        "label": "A la vibe & mektoub",
+        "value": 1,
+        "date": 2011,
+        "location": 13
+      },
+      {
+        "label": "Elève-toi",
+        "value": 1,
+        "date": 2011,
+        "location": 13
+      },
+      {
+        "label": "Buenos Dias",
+        "value": 1,
+        "date": 2011,
+        "location": 13
+      },
+      {
+        "label": "Casse le schéma",
+        "value": 1,
+        "date": 2012,
+        "location": 13
+      },
+      {
+        "label": "Cynisme vous a tué ?",
+        "value": 1,
+        "date": 2012,
+        "location": 13
+      },
+      {
+        "label": "Esprits Libres",
+        "value": 1,
+        "date": 2012,
+        "location": 13
+      },
+      {
+        "label": "Entre les lignes #1: Nous sommes le monde",
+        "value": 1,
+        "date": 2012,
+        "location": 13
+      },
+      {
+        "label": "Fille du vent",
+        "value": 1,
+        "date": 2013,
+        "location": 13
+      },
+      {
+        "label": "Capitale de la rupture",
+        "value": 1,
+        "date": 2012,
+        "location": 13
+      },
+      {
+        "label": "Cherche en toi",
+        "value": 1,
+        "date": 2012,
+        "location": 13
+      },
+      {
+        "label": "À la vibe et mektoub",
+        "value": 1,
+        "date": 2011,
+        "location": 13
+      },
+      {
+        "label": "Entre les lignes #2 : 20.12",
+        "value": 1,
+        "date": 2012,
+        "location": 13
+      },
+      {
+        "label": "Abracadabra",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "Freestyle Beatbox",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "Fourmilière",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "Élément Air",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "Couleur Molotov",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "Laissez-moi",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "Élément Eau",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "Élément Terre",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "De l'Opéra à la Plaine 3",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "Élément feu",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "Désobéissance civile",
+        "value": 1,
+        "date": 2008,
+        "location": 13
+      },
+      {
+        "label": "Alterlude : Pachamama",
+        "value": 1,
+        "date": 2008,
+        "location": 13
+      },
+      {
+        "label": "Cinquième Soleil",
+        "value": 1,
+        "date": 2008,
+        "location": 13
+      },
+      {
+        "label": "Etat d'urgence",
+        "value": 1,
+        "date": 2016,
+        "location": 13
+      },
+      {
+        "label": "De quoi es-tu si sûr ?",
+        "value": 1,
+        "date": 2016,
+        "location": 13
+      },
+      {
+        "label": "Effort de Paix",
+        "value": 1,
+        "date": 2016,
+        "location": 13
+      },
+      {
+        "label": "Fruit de la Zone",
+        "value": 1,
+        "date": 2009,
+        "location": 13
+      },
+      {
+        "label": "De l'opéra à la plaine",
+        "value": 1,
+        "date": 2005,
+        "location": 13
+      },
+      {
+        "label": "Ça nous correspond pas",
+        "value": 1,
+        "date": 2005,
+        "location": 13
+      },
+      {
+        "label": "Faut qu'on s'en sorte",
+        "value": 1,
+        "date": 2005,
+        "location": 13
+      },
+      {
+        "label": "Dur d'être optimiste",
+        "value": 1,
+        "date": 2005,
+        "location": 13
+      },
+      {
+        "label": "Le missile est lancé",
+        "value": 1,
+        "date": 2005,
+        "location": 13
+      },
+      {
+        "label": "Changer la donne",
+        "value": 1,
+        "date": 2011,
+        "location": 13
+      },
+      {
+        "label": "Dégagez !!",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      }
+    ]
+  },
+  {
+    "label": "Kenzo Farah",
+    "data": [
+      {
+        "label": "Premier Pas",
+        "value": 1,
+        "date": 2016,
+        "location": 13
+      },
+      {
+        "label": "Celle Qu'Il Te Faut",
+        "value": 1,
+        "date": 2008,
+        "location": 13
+      },
+      {
+        "label": "Ce que je suis",
+        "value": 1,
+        "date": 2008,
+        "location": 13
+      },
+      {
+        "label": "Désillusion du Ghetto",
+        "value": 1,
+        "date": 2008,
+        "location": 13
+      },
+      {
+        "label": "Let me be with you",
+        "value": 1,
+        "date": 2008,
+        "location": 13
+      },
+      {
+        "label": "Chant Libre",
+        "value": 1,
+        "date": 2008,
+        "location": 13
+      },
+      {
+        "label": "Au coeur de la rue",
+        "value": 1,
+        "date": 2008,
+        "location": 13
+      },
+      {
+        "label": "Avec le coeur",
+        "value": 1,
+        "date": 2008,
+        "location": 13
+      },
+      {
+        "label": "Commandement du Ciment",
+        "value": 1,
+        "date": 2008,
+        "location": 13
+      },
+      {
+        "label": "Ghost",
+        "value": 1,
+        "date": 2019,
+        "location": 13
+      },
+      {
+        "label": "Bandit",
+        "value": 1,
+        "date": 2018,
+        "location": 13
+      },
+      {
+        "label": "Hermana",
+        "value": 1,
+        "date": 2019,
+        "location": 13
+      },
+      {
+        "label": "A la vie à la muerte",
+        "value": 1,
+        "date": 2019,
+        "location": 13
+      },
+      {
+        "label": "Ailleurs",
+        "value": 1,
+        "date": 2019,
+        "location": 13
+      },
+      {
+        "label": "Au clair de ma plume",
+        "value": 1,
+        "date": 2019,
+        "location": 13
+      },
+      {
+        "label": "Dernier souffle",
+        "value": 1,
+        "date": 2019,
+        "location": 13
+      },
+      {
+        "label": "Baltimore",
+        "value": 1,
+        "date": 2019,
+        "location": 13
+      },
+      {
+        "label": "Dans mon Monde",
+        "value": 1,
+        "date": 2007,
+        "location": 13
+      },
+      {
+        "label": "Dans les rues de ma ville",
+        "value": 1,
+        "date": 2007,
+        "location": 13
+      },
+      {
+        "label": "Cris de Bosnie",
+        "value": 1,
+        "date": 2007,
+        "location": 13
+      },
+      {
+        "label": "Appelez moi Kenza",
+        "value": 1,
+        "date": 2007,
+        "location": 13
+      },
+      {
+        "label": "Etre Heureux",
+        "value": 1,
+        "date": 2014,
+        "location": 13
+      },
+      {
+        "label": "Entre Deux Rives",
+        "value": 1,
+        "date": 2014,
+        "location": 13
+      },
+      {
+        "label": "Briser Les Chaines",
+        "value": 1,
+        "date": 2014,
+        "location": 13
+      },
+      {
+        "label": "25.01.07",
+        "value": 1,
+        "date": 2014,
+        "location": 13
+      },
+      {
+        "label": "Chute Libre",
+        "value": 1,
+        "date": 2014,
+        "location": 13
+      },
+      {
+        "label": "4 Love",
+        "value": 1,
+        "date": 2012,
+        "location": 13
+      },
+      {
+        "label": "Accordez moi",
+        "value": 1,
+        "date": 2012,
+        "location": 13
+      },
+      {
+        "label": "Changer d'air",
+        "value": 1,
+        "date": 2012,
+        "location": 13
+      },
+      {
+        "label": "Coup de coeur",
+        "value": 1,
+        "date": 2012,
+        "location": 13
+      },
+      {
+        "label": "Avec Toi",
+        "value": 1,
+        "date": 2012,
+        "location": 13
+      },
+      {
+        "label": "Croire en nos rêves",
+        "value": 1,
+        "date": 2012,
+        "location": 13
+      },
+      {
+        "label": "Coeur prisonnier",
+        "value": 1,
+        "date": 2010,
+        "location": 13
+      },
+      {
+        "label": "Ainsi va la vie",
+        "value": 1,
+        "date": 2010,
+        "location": 13
+      },
+      {
+        "label": "Trop de mots",
+        "value": 1,
+        "date": 2010,
+        "location": 13
+      },
+      {
+        "label": "On vient de là",
+        "value": 1,
+        "date": 2010,
+        "location": 13
+      },
+      {
+        "label": "Je serai prête",
+        "value": 1,
+        "date": 2010,
+        "location": 13
+      },
+      {
+        "label": "Crack Musik",
+        "value": 1,
+        "date": 2010,
+        "location": 13
+      },
+      {
+        "label": "KarismaFuckYou",
+        "value": 1,
+        "date": 2012,
+        "location": 13
+      },
+      {
+        "label": "Courage",
+        "value": 1,
+        "date": 2012,
+        "location": 13
+      },
+      {
+        "label": "Fais le job (remix)",
+        "value": 1,
+        "date": 2016,
+        "location": 13
+      }
+    ]
+  },
+  {
+    "label": "Ladea",
+    "data": [
+      {
+        "label": "Pour gagner faut tricher",
+        "value": 1,
+        "date": 2013,
+        "location": 13
+      },
+      {
+        "label": "Fusée",
+        "value": 1,
+        "date": 2013,
+        "location": 13
+      },
+      {
+        "label": "P'tit molard",
+        "value": 1,
+        "date": 2013,
+        "location": 13
+      },
+      {
+        "label": "Poussière",
+        "value": 1,
+        "date": 2013,
+        "location": 13
+      },
+      {
+        "label": "J'irai chanter",
+        "value": 1,
+        "date": 2013,
+        "location": 13
+      },
+      {
+        "label": "Sueurs. Nerfs. Courage. Force.",
+        "value": 1,
+        "date": 2013,
+        "location": 13
+      },
+      {
+        "label": "Comme un bonhomme",
+        "value": 1,
+        "date": 2013,
+        "location": 13
+      },
+      {
+        "label": "4 minutes",
+        "value": 1,
+        "date": 2013,
+        "location": 13
+      },
+      {
+        "label": "J'ai le power",
+        "value": 1,
+        "date": 2013,
+        "location": 13
+      },
+      {
+        "label": "Cardio",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "Lolita",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "Tu ne m'auras jamais",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "Rapport de force",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "Laisse couler",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "Fleur fannée",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "Lionne",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "On ira",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "On ne pense qu'à ça",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "Ï",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "Alpha Leonis",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "Challadea",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "Bazar",
+        "value": 1,
+        "date": 2017,
+        "location": 13
+      },
+      {
+        "label": "J'voulais juste kicker",
+        "value": 1,
+        "date": 2011,
+        "location": 13
+      },
+      {
+        "label": "Boîte crânienne",
+        "value": 1,
+        "date": 2011,
+        "location": 13
+      },
+      {
+        "label": "Ladea - Marche Arrière",
+        "value": 1,
+        "date": 2013,
+        "location": 13
+      },
+      {
+        "label": "#FuckVous",
+        "value": 1,
+        "date": 2014,
+        "location": 13
+      },
+      {
+        "label": "Je ne dors plus",
+        "value": 1,
+        "date": 2015,
+        "location": 13
+      },
+      {
+        "label": "Un conscient",
+        "value": 1,
+        "date": 2016,
+        "location": 13
+      },
+      {
+        "label": "Buzz moi fort",
+        "value": 1,
+        "date": 2014,
+        "location": 13
+      }
+    ]
+  },
+  {
+    "label": "Lady Laistee",
+    "data": [
+      {
+        "label": "Fais le pas",
+        "value": 1,
+        "date": 2019,
+        "location": 95
+      },
+      {
+        "label": "Guérison",
+        "value": 1,
+        "date": 2019,
+        "location": 95
+      },
+      {
+        "label": "Laisse le passé derrière",
+        "value": 1,
+        "date": 2019,
+        "location": 95
+      },
+      {
+        "label": "Pour mes Ladies",
+        "value": 1,
+        "date": 2019,
+        "location": 95
+      },
+      {
+        "label": "A qui la faute",
+        "value": 1,
+        "date": 2019,
+        "location": 95
+      },
+      {
+        "label": "Lettre à Léa",
+        "value": 1,
+        "date": 2019,
+        "location": 95
+      },
+      {
+        "label": "Négropolitain",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Ma petite maison dans la cité",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Interlude",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Douce France",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Hip-hop therapy",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Intro (Hip-hop Therapy)",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Familia",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Karaï-B-O",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Diamant Noir",
+        "value": 1,
+        "date": 2003,
+        "location": 95
+      },
+      {
+        "label": "Cette nuit",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "O.C.C.P.",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Outro / J’reviens",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Bouger la tête",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "La Geôle",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Authentique",
+        "value": 1,
+        "date": 1999,
+        "location": 95
+      },
+      {
+        "label": "Outro",
+        "value": 1,
+        "date": 1999,
+        "location": 95
+      },
+      {
+        "label": "Ooh chico",
+        "value": 1,
+        "date": 1999,
+        "location": 95
+      },
+      {
+        "label": "Arachnophobia",
+        "value": 1,
+        "date": 1999,
+        "location": 95
+      },
+      {
+        "label": "Mon ambition",
+        "value": 1,
+        "date": 1999,
+        "location": 95
+      },
+      {
+        "label": "Pas de H...",
+        "value": 1,
+        "date": 1999,
+        "location": 95
+      },
+      {
+        "label": "Et si ?",
+        "value": 1,
+        "date": 1999,
+        "location": 95
+      },
+      {
+        "label": "Au nom de Dieu",
+        "value": 1,
+        "date": 1999,
+        "location": 95
+      },
+      {
+        "label": "Intro",
+        "value": 1,
+        "date": 1999,
+        "location": 95
+      },
+      {
+        "label": "For the Ladies",
+        "value": 1,
+        "date": 1999,
+        "location": 95
+      },
+      {
+        "label": "Les keufs me matent",
+        "value": 1,
+        "date": 1999,
+        "location": 95
+      },
+      {
+        "label": "Black Mama",
+        "value": 1,
+        "date": 1999,
+        "location": 95
+      },
+      {
+        "label": "Corda",
+        "value": 1,
+        "date": 2005,
+        "location": 95
+      },
+      {
+        "label": "Le Monde d’aujourd’hui",
+        "value": 1,
+        "date": 2005,
+        "location": 95
+      },
+      {
+        "label": "Pour Le Meilleur...",
+        "value": 1,
+        "date": 2005,
+        "location": 95
+      },
+      {
+        "label": "Faut que j’respire",
+        "value": 1,
+        "date": 2005,
+        "location": 95
+      },
+      {
+        "label": "Parle-moi",
+        "value": 1,
+        "date": 2005,
+        "location": 95
+      },
+      {
+        "label": "J’hallucine",
+        "value": 1,
+        "date": 2005,
+        "location": 95
+      },
+      {
+        "label": "Ma semaine",
+        "value": 1,
+        "date": 2005,
+        "location": 95
+      },
+      {
+        "label": "J’ai pas eu de reup",
+        "value": 1,
+        "date": 2005,
+        "location": 95
+      },
+      {
+        "label": "Indeegal",
+        "value": 1,
+        "date": 2005,
+        "location": 95
+      },
+      {
+        "label": "La vie est belle",
+        "value": 1,
+        "date": 2005,
+        "location": 95
+      },
+      {
+        "label": "Demande-toi",
+        "value": 1,
+        "date": 2001,
+        "location": 95
+      },
+      {
+        "label": "Le retour du Phoenix",
+        "value": 1,
+        "date": 2019,
+        "location": 95
+      },
+      {
+        "label": "Angel",
+        "value": 1,
+        "date": 2015,
+        "location": 95
+      }
+    ]
+  },
+  {
+    "label": "LaGo 2 Feu",
+    "data": [
+      {
+        "label": "Nicki",
+        "value": 1,
+        "date": 2017,
+        "location": 75
+      },
+      {
+        "label": "Boca",
+        "value": 1,
+        "date": 2017,
+        "location": 75
+      },
+      {
+        "label": "Basic",
+        "value": 1,
+        "date": 2017,
+        "location": 75
+      },
+      {
+        "label": "Babyboy",
+        "value": 1,
+        "date": 2017,
+        "location": 75
+      },
+      {
+        "label": "Gogo",
+        "value": 1,
+        "date": 2017,
+        "location": 75
+      },
+      {
+        "label": "Magot",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      },
+      {
+        "label": "Trop Tard (Intro)",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      },
+      {
+        "label": "Dauphin",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      },
+      {
+        "label": "Delete (Outro)",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      },
+      {
+        "label": "No Stress",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      },
+      {
+        "label": "Zedo",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      },
+      {
+        "label": "No Exit",
+        "value": 1,
+        "date": 2015,
+        "location": 75
+      },
+      {
+        "label": "Bandit",
+        "value": 1,
+        "date": 2015,
+        "location": 75
+      },
+      {
+        "label": "Le Taf",
+        "value": 1,
+        "date": 2015,
+        "location": 75
+      },
+      {
+        "label": "Bday",
+        "value": 1,
+        "date": 2015,
+        "location": 75
+      },
+      {
+        "label": "L A G O F A $ T",
+        "value": 1,
+        "date": 2013,
+        "location": 75
+      }
+    ]
+  },
+  {
+    "label": "Lala &ce",
+    "data": [
+      {
+        "label": "Amen",
+        "value": 1,
+        "date": 2019,
+        "location": 69
+      },
+      {
+        "label": "Early Bird (Intro)",
+        "value": 1,
+        "date": 2019,
+        "location": 69
+      },
+      {
+        "label": "Cell Off",
+        "value": 1,
+        "date": 2019,
+        "location": 69
+      },
+      {
+        "label": "Mémoire",
+        "value": 1,
+        "date": 2019,
+        "location": 69
+      },
+      {
+        "label": "Coulée",
+        "value": 1,
+        "date": 2019,
+        "location": 69
+      },
+      {
+        "label": "Bright",
+        "value": 1,
+        "date": 2017,
+        "location": 69
+      },
+      {
+        "label": "Drive thru",
+        "value": 1,
+        "date": 2015,
+        "location": 69
+      },
+      {
+        "label": "8 Temps",
+        "value": 1,
+        "date": 2017,
+        "location": 69
+      },
+      {
+        "label": "ATlantis",
+        "value": 1,
+        "date": 2017,
+        "location": 69
+      },
+      {
+        "label": "Danser dans le noir",
+        "value": 1,
+        "date": 2017,
+        "location": 69
+      },
+      {
+        "label": "IG Baby",
+        "value": 1,
+        "date": 2017,
+        "location": 69
+      },
+      {
+        "label": "PDL",
+        "value": 1,
+        "date": 2017,
+        "location": 69
+      },
+      {
+        "label": "Serena (Botcho)",
+        "value": 1,
+        "date": 2019,
+        "location": 69
+      },
+      {
+        "label": "BBB",
+        "value": 1,
+        "date": 2019,
+        "location": 69
+      },
+      {
+        "label": "Just ses lèvres",
+        "value": 1,
+        "date": 2016,
+        "location": 69
+      },
+      {
+        "label": "Gene K*lly",
+        "value": 1,
+        "date": 2015,
+        "location": 69
+      },
+      {
+        "label": "Parapluie",
+        "value": 1,
+        "date": 2020,
+        "location": 69
+      },
+      {
+        "label": "Cabriole 78",
+        "value": 1,
+        "date": 2017,
+        "location": 69
+      },
+      {
+        "label": "Gargamel",
+        "value": 1,
+        "date": 2020,
+        "location": 69
+      },
+      {
+        "label": "3ncore",
+        "value": 1,
+        "date": 2017,
+        "location": 69
+      },
+      {
+        "label": "Beautiful Gini",
+        "value": 1,
+        "date": 2019,
+        "location": 69
+      },
+      {
+        "label": "Jessica Jones",
+        "value": 1,
+        "date": 2015,
+        "location": 69
+      },
+      {
+        "label": "Happy end (snippet)",
+        "value": 1,
+        "date": 2016,
+        "location": 69
+      }
+    ]
+  },
+  {
+    "label": "Liza Monet",
+    "data": [
+      {
+        "label": "Purple Money",
+        "value": 1,
+        "date": 2013,
+        "location": 75
+      },
+      {
+        "label": "J.B.M",
+        "value": 1,
+        "date": 2013,
+        "location": 75
+      },
+      {
+        "label": "Yaourt aux Fruits",
+        "value": 1,
+        "date": 2013,
+        "location": 75
+      },
+      {
+        "label": "Kalage",
+        "value": 1,
+        "date": 2013,
+        "location": 75
+      },
+      {
+        "label": "Gangsta Girl",
+        "value": 1,
+        "date": 2013,
+        "location": 75
+      },
+      {
+        "label": "Bouteille",
+        "value": 1,
+        "date": 2018,
+        "location": 75
+      },
+      {
+        "label": "My Best PLan 2",
+        "value": 1,
+        "date": 2018,
+        "location": 75
+      },
+      {
+        "label": "We Them Stars",
+        "value": 1,
+        "date": 2018,
+        "location": 75
+      },
+      {
+        "label": "Alexandra",
+        "value": 1,
+        "date": 2018,
+        "location": 75
+      },
+      {
+        "label": "Goodbye",
+        "value": 1,
+        "date": 2018,
+        "location": 75
+      },
+      {
+        "label": "2 MEN",
+        "value": 1,
+        "date": 2013,
+        "location": 75
+      },
+      {
+        "label": "Plein Les Poches",
+        "value": 1,
+        "date": 2018,
+        "location": 75
+      },
+      {
+        "label": "Gangsta",
+        "value": 1,
+        "date": 2018,
+        "location": 75
+      },
+      {
+        "label": "Comme un pépin",
+        "value": 1,
+        "date": 2017,
+        "location": 75
+      },
+      {
+        "label": "No Time",
+        "value": 1,
+        "date": 2017,
+        "location": 75
+      },
+      {
+        "label": "Ave Maria",
+        "value": 1,
+        "date": 2014,
+        "location": 75
+      },
+      {
+        "label": "Douée",
+        "value": 1,
+        "date": 2017,
+        "location": 75
+      },
+      {
+        "label": "T.O.R",
+        "value": 1,
+        "date": 2015,
+        "location": 75
+      }
+    ]
+  },
+  {
+    "label": "Loréa",
+    "data": [
+      {
+        "label": "Système travail",
+        "value": 1,
+        "date": 2013,
+        "location": 95
+      },
+      {
+        "label": "Pas dupe",
+        "value": 1,
+        "date": 2013,
+        "location": 95
+      },
+      {
+        "label": "Les choses doivent changer",
+        "value": 1,
+        "date": 2013,
+        "location": 95
+      },
+      {
+        "label": "C’est nul MC",
+        "value": 1,
+        "date": 2013,
+        "location": 95
+      },
+      {
+        "label": "J’veux des hits",
+        "value": 1,
+        "date": 2009,
+        "location": 95
+      },
+      {
+        "label": "L.O.R.E.A",
+        "value": 1,
+        "date": 2013,
+        "location": 95
+      },
+      {
+        "label": "Raoul",
+        "value": 1,
+        "date": 2013,
+        "location": 95
+      }
+    ]
+  },
+  {
+    "label": "Marwa Loud",
+    "data": [
+      {
+        "label": "Calma",
+        "value": 1,
+        "date": 2018,
+        "location": 67
+      },
+      {
+        "label": "Tell Me",
+        "value": 1,
+        "date": 2019,
+        "location": 67
+      },
+      {
+        "label": "Pas là",
+        "value": 1,
+        "date": 2019,
+        "location": 67
+      },
+      {
+        "label": "Ils parlent de moi",
+        "value": 1,
+        "date": 2019,
+        "location": 67
+      },
+      {
+        "label": "Tu me connais",
+        "value": 1,
+        "date": 2019,
+        "location": 67
+      },
+      {
+        "label": "Oh la folle",
+        "value": 1,
+        "date": 2019,
+        "location": 67
+      },
+      {
+        "label": "One week",
+        "value": 1,
+        "date": 2019,
+        "location": 67
+      },
+      {
+        "label": "My life",
+        "value": 1,
+        "date": 2019,
+        "location": 67
+      },
+      {
+        "label": "Premier pas",
+        "value": 1,
+        "date": 2019,
+        "location": 67
+      },
+      {
+        "label": "Guelik",
+        "value": 1,
+        "date": 2019,
+        "location": 67
+      },
+      {
+        "label": "Amis & Billets",
+        "value": 1,
+        "date": 2019,
+        "location": 67
+      },
+      {
+        "label": "Bah ouais",
+        "value": 1,
+        "date": 2019,
+        "location": 67
+      },
+      {
+        "label": "Bandido",
+        "value": 1,
+        "date": 2019,
+        "location": 67
+      },
+      {
+        "label": "T'es où ?",
+        "value": 1,
+        "date": 2019,
+        "location": 67
+      },
+      {
+        "label": "Saturday Night",
+        "value": 1,
+        "date": 2019,
+        "location": 67
+      },
+      {
+        "label": "Un mytho dans la ville",
+        "value": 1,
+        "date": 2019,
+        "location": 67
+      },
+      {
+        "label": "Purple Money",
+        "value": 1,
+        "date": 2019,
+        "location": 67
+      },
+      {
+        "label": "Heures de colle",
+        "value": 1,
+        "date": 2019,
+        "location": 67
+      },
+      {
+        "label": "Mehdi",
+        "value": 1,
+        "date": 2017,
+        "location": 67
+      },
+      {
+        "label": "Sans vous",
+        "value": 1,
+        "date": 2018,
+        "location": 67
+      },
+      {
+        "label": "Tu peux parier",
+        "value": 1,
+        "date": 2017,
+        "location": 67
+      },
+      {
+        "label": "Je Voulais",
+        "value": 1,
+        "date": 2018,
+        "location": 67
+      },
+      {
+        "label": "Remontada",
+        "value": 1,
+        "date": 2018,
+        "location": 67
+      },
+      {
+        "label": "Fâché",
+        "value": 1,
+        "date": 2018,
+        "location": 67
+      },
+      {
+        "label": "Ça y est",
+        "value": 1,
+        "date": 2018,
+        "location": 67
+      },
+      {
+        "label": "On y va",
+        "value": 1,
+        "date": 2018,
+        "location": 67
+      },
+      {
+        "label": "Bad Boy",
+        "value": 1,
+        "date": 2018,
+        "location": 67
+      },
+      {
+        "label": "Attilio",
+        "value": 1,
+        "date": 2018,
+        "location": 67
+      },
+      {
+        "label": "Cevi",
+        "value": 1,
+        "date": 2018,
+        "location": 67
+      },
+      {
+        "label": "Billet",
+        "value": 1,
+        "date": 2018,
+        "location": 67
+      },
+      {
+        "label": "Fallait pas",
+        "value": 1,
+        "date": 2017,
+        "location": 67
+      },
+      {
+        "label": "Gâché",
+        "value": 1,
+        "date": 2018,
+        "location": 67
+      },
+      {
+        "label": "Qu'est ce que t'as",
+        "value": 1,
+        "date": 2018,
+        "location": 67
+      },
+      {
+        "label": "Temps Perdu",
+        "value": 1,
+        "date": 2017,
+        "location": 67
+      },
+      {
+        "label": "Ça va aller",
+        "value": 1,
+        "date": 2020,
+        "location": 67
+      },
+      {
+        "label": "Allez les gros",
+        "value": 1,
+        "date": 2020,
+        "location": 67
+      },
+      {
+        "label": "Mytho",
+        "value": 1,
+        "date": 2020,
+        "location": 67
+      }
+    ]
+  },
+  {
+    "label": "Melaaz",
+    "data": [
+      {
+        "label": "Rud'boy",
+        "value": 1,
+        "date": 1995,
+        "location": 94
+      },
+      {
+        "label": "Les ghettos croulent",
+        "value": 1,
+        "date": 1995,
+        "location": 94
+      },
+      {
+        "label": "Lehna",
+        "value": 1,
+        "date": 1995,
+        "location": 94
+      },
+      {
+        "label": "De père en paix",
+        "value": 1,
+        "date": 1995,
+        "location": 94
+      },
+      {
+        "label": "Roule ta boss",
+        "value": 1,
+        "date": 1995,
+        "location": 94
+      },
+      {
+        "label": "Pascal",
+        "value": 1,
+        "date": 1995,
+        "location": 94
+      },
+      {
+        "label": "Le seul remède",
+        "value": 1,
+        "date": 1995,
+        "location": 94
+      },
+      {
+        "label": "Non, non, non",
+        "value": 1,
+        "date": 1995,
+        "location": 94
+      },
+      {
+        "label": "La maladie de la mélodie",
+        "value": 1,
+        "date": 1995,
+        "location": 94
+      },
+      {
+        "label": "La scène est malsaine",
+        "value": 1,
+        "date": 1995,
+        "location": 94
+      },
+      {
+        "label": "Mon, mon, mon",
+        "value": 1,
+        "date": 1995,
+        "location": 94
+      },
+      {
+        "label": "Je marche en solitaire",
+        "value": 1,
+        "date": 1995,
+        "location": 94
+      },
+      {
+        "label": "Novice",
+        "value": 1,
+        "date": 1995,
+        "location": 94
+      }
+    ]
+  },
+  {
+    "label": "Mélissa M.",
+    "data": [
+      {
+        "label": "Jusqu'au Bout",
+        "value": 1,
+        "date": 2007,
+        "location": 13
+      },
+      {
+        "label": "Benthi",
+        "value": 1,
+        "date": 2007,
+        "location": 13
+      },
+      {
+        "label": "Elle",
+        "value": 1,
+        "date": 2007,
+        "location": 13
+      },
+      {
+        "label": "Pousse Le Volume",
+        "value": 1,
+        "date": 2007,
+        "location": 13
+      },
+      {
+        "label": "Tu M'As Laissée",
+        "value": 1,
+        "date": 2007,
+        "location": 13
+      },
+      {
+        "label": "Respectons Ces Vies",
+        "value": 1,
+        "date": 2007,
+        "location": 13
+      },
+      {
+        "label": "Avec Tout Mon Amour",
+        "value": 1,
+        "date": 2007,
+        "location": 13
+      },
+      {
+        "label": "Jour De Pluie",
+        "value": 1,
+        "date": 2007,
+        "location": 13
+      },
+      {
+        "label": "À Cœur Ouvert",
+        "value": 1,
+        "date": 2007,
+        "location": 13
+      },
+      {
+        "label": "De Trop",
+        "value": 1,
+        "date": 2007,
+        "location": 13
+      },
+      {
+        "label": "Qui Me Ressemble",
+        "value": 1,
+        "date": 2007,
+        "location": 13
+      },
+      {
+        "label": "Lettre À La Tristesse",
+        "value": 1,
+        "date": 2007,
+        "location": 13
+      },
+      {
+        "label": "Pose Pas De Questions",
+        "value": 1,
+        "date": 2007,
+        "location": 13
+      },
+      {
+        "label": "Jenny",
+        "value": 1,
+        "date": 2007,
+        "location": 13
+      }
+    ]
+  },
+  {
+    "label": "Mik'ya La Loove",
+    "data": [
+      {
+        "label": "La rose noire",
+        "value": 1,
+        "date": 2010,
+        "location": 93
+      },
+      {
+        "label": "Journal intime",
+        "value": 1,
+        "date": 2010,
+        "location": 93
+      },
+      {
+        "label": "Lettre de motivation (LM)",
+        "value": 1,
+        "date": 2010,
+        "location": 93
+      },
+      {
+        "label": "Il",
+        "value": 1,
+        "date": 2010,
+        "location": 93
+      },
+      {
+        "label": "Pardonne moi",
+        "value": 1,
+        "date": 2010,
+        "location": 93
+      },
+      {
+        "label": "Barack ô mama",
+        "value": 1,
+        "date": 2010,
+        "location": 93
+      },
+      {
+        "label": "Da Bossy",
+        "value": 1,
+        "date": 2010,
+        "location": 93
+      },
+      {
+        "label": "Où es-tu?",
+        "value": 1,
+        "date": 2007,
+        "location": 93
+      },
+      {
+        "label": "On rap tous illicites",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      }
+    ]
+  },
+  {
+    "label": "Moon’A",
+    "data": [
+      {
+        "label": "Quelle erreur",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "Amore Mio",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "Maria",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "Caraïbes",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "Mamma Mia",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "Il me dit",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "Moonlight",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "Troisième doigt",
+        "value": 1,
+        "date": 2018,
+        "location": 92
+      },
+      {
+        "label": "Hombre",
+        "value": 1,
+        "date": 2017,
+        "location": 92
+      },
+      {
+        "label": "Freestyle Moon'A",
+        "value": 1,
+        "date": 2017,
+        "location": 92
+      },
+      {
+        "label": "Criminel business",
+        "value": 1,
+        "date": 2014,
+        "location": 92
+      },
+      {
+        "label": "Zoner",
+        "value": 1,
+        "date": 2018,
+        "location": 92
+      },
+      {
+        "label": "Ferrari",
+        "value": 1,
+        "date": 2014,
+        "location": 92
+      }
+    ]
+  },
+  {
+    "label": "Nâdiya",
+    "data": [
+      {
+        "label": "On n'oublie pas d'où l'on vient",
+        "value": 1,
+        "date": 2001,
+        "location": 37
+      },
+      {
+        "label": "J'ai confiance en toi",
+        "value": 1,
+        "date": 2001,
+        "location": 37
+      },
+      {
+        "label": "Chaque fois",
+        "value": 1,
+        "date": 2001,
+        "location": 37
+      },
+      {
+        "label": "La Personne à qui tu penses",
+        "value": 1,
+        "date": 2001,
+        "location": 37
+      },
+      {
+        "label": "Changer les choses",
+        "value": 1,
+        "date": 2001,
+        "location": 37
+      },
+      {
+        "label": "Écoute Ma Prière",
+        "value": 1,
+        "date": 2001,
+        "location": 37
+      },
+      {
+        "label": "Ouvre grand ton cœur",
+        "value": 1,
+        "date": 2001,
+        "location": 37
+      },
+      {
+        "label": "Le Regard des miens",
+        "value": 1,
+        "date": 2001,
+        "location": 37
+      },
+      {
+        "label": "Nos Routes Se Séparent",
+        "value": 1,
+        "date": 2001,
+        "location": 37
+      },
+      {
+        "label": "J'te dis bye bye",
+        "value": 1,
+        "date": 2001,
+        "location": 37
+      },
+      {
+        "label": "Quand vient la nuit",
+        "value": 1,
+        "date": 2004,
+        "location": 37
+      },
+      {
+        "label": "Hey!!! Laisse tomber",
+        "value": 1,
+        "date": 2004,
+        "location": 37
+      },
+      {
+        "label": "Parle-moi",
+        "value": 1,
+        "date": 2004,
+        "location": 37
+      },
+      {
+        "label": "Les Gestes, pas les mots",
+        "value": 1,
+        "date": 2004,
+        "location": 37
+      },
+      {
+        "label": "Nâdiya vers les étoiles",
+        "value": 1,
+        "date": 2004,
+        "location": 37
+      },
+      {
+        "label": "Multinationaux",
+        "value": 1,
+        "date": 2019,
+        "location": 37
+      },
+      {
+        "label": "Credo",
+        "value": 1,
+        "date": 2019,
+        "location": 37
+      }
+    ]
+  },
+  {
+    "label": "Nayra",
+    "data": [
+      {
+        "label": "#AfroTrap",
+        "value": 1,
+        "date": 2015,
+        "location": 93
+      },
+      {
+        "label": "À chaque fois",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "Sossa",
+        "value": 1,
+        "date": 2019,
+        "location": 93
+      },
+      {
+        "label": "La rue",
+        "value": 1,
+        "date": 2020,
+        "location": 93
+      },
+      {
+        "label": "EGO (Freestyle)",
+        "value": 1,
+        "date": 2016,
+        "location": 93
+      },
+      {
+        "label": "Bang bang (remix lartiste)",
+        "value": 1,
+        "date": 2016,
+        "location": 93
+      },
+      {
+        "label": "Fais ton bail",
+        "value": 1,
+        "date": 2017,
+        "location": 93
+      },
+      {
+        "label": "Pas bdesoin d’eux",
+        "value": 1,
+        "date": 2017,
+        "location": 93
+      },
+      {
+        "label": "Je ne t'aime plus",
+        "value": 1,
+        "date": 2016,
+        "location": 93
+      },
+      {
+        "label": "20 ans",
+        "value": 1,
+        "date": 2020,
+        "location": 93
+      },
+      {
+        "label": "Michtonneur",
+        "value": 1,
+        "date": 2019,
+        "location": 93
+      },
+      {
+        "label": "Modèle",
+        "value": 1,
+        "date": 2020,
+        "location": 93
+      }
+    ]
+  },
+  {
+    "label": "Pand’Or",
+    "data": [
+      {
+        "label": "L'Impasse",
+        "value": 1,
+        "date": 2013,
+        "location": 95
+      },
+      {
+        "label": "Chaos et agonie",
+        "value": 1,
+        "date": 2013,
+        "location": 95
+      },
+      {
+        "label": "En Vers & Contre Tous",
+        "value": 1,
+        "date": 2013,
+        "location": 95
+      },
+      {
+        "label": "Me, Myself & I",
+        "value": 1,
+        "date": 2013,
+        "location": 95
+      },
+      {
+        "label": "La Misanthrope",
+        "value": 1,
+        "date": 2013,
+        "location": 95
+      },
+      {
+        "label": "BLASST #31",
+        "value": 1,
+        "date": 2016,
+        "location": 95
+      },
+      {
+        "label": "Peace & Love",
+        "value": 1,
+        "date": 2015,
+        "location": 95
+      },
+      {
+        "label": "Névralgie",
+        "value": 1,
+        "date": 2014,
+        "location": 95
+      },
+      {
+        "label": "Outsider",
+        "value": 1,
+        "date": 2014,
+        "location": 95
+      }
+    ]
+  },
+  {
+    "label": "Princess Aniès",
+    "data": [
+      {
+        "label": "Authentik style",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "L'ère du temps",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "C'était écrit",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Il était une fois...",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Pourquoi j'rap",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Celle Qui",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Le parcous d'une larme",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Le son reste fort",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Epilogue",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Boumkoeur",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Bad Girl",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "N'oublie pas",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Présent plus qu'imparfait",
+        "value": 1,
+        "date": 2002,
+        "location": 95
+      },
+      {
+        "label": "Au carrefour de ma douleur",
+        "value": 1,
+        "date": 2008,
+        "location": 95
+      },
+      {
+        "label": "Pourquoi tu m'entends pas",
+        "value": 1,
+        "date": 2008,
+        "location": 95
+      },
+      {
+        "label": "Destination finale",
+        "value": 1,
+        "date": 2001,
+        "location": 95
+      }
+    ]
+  },
+  {
+    "label": "Pumpkin",
+    "data": [
+      {
+        "label": "Briller",
+        "value": 1,
+        "date": 2013,
+        "location": 44
+      },
+      {
+        "label": "L'ascenseur",
+        "value": 1,
+        "date": 2009,
+        "location": 44
+      },
+      {
+        "label": "Mauvais genre",
+        "value": 1,
+        "date": 2017,
+        "location": 44
+      },
+      {
+        "label": "Larmes de crocodile",
+        "value": 1,
+        "date": 2018,
+        "location": 44
+      },
+      {
+        "label": "Mascarade",
+        "value": 1,
+        "date": 2018,
+        "location": 44
+      },
+      {
+        "label": "Science friction",
+        "value": 1,
+        "date": 2016,
+        "location": 44
+      },
+      {
+        "label": "Chimiq",
+        "value": 1,
+        "date": 2016,
+        "location": 44
+      },
+      {
+        "label": "Make boom-bap great again",
+        "value": 1,
+        "date": 2018,
+        "location": 44
+      },
+      {
+        "label": "Guerre du Nord",
+        "value": 1,
+        "date": 2018,
+        "location": 44
+      },
+      {
+        "label": "Can't stop won't stop",
+        "value": 1,
+        "date": 2018,
+        "location": 44
+      },
+      {
+        "label": "Himalaya",
+        "value": 1,
+        "date": 2018,
+        "location": 44
+      },
+      {
+        "label": "Astronaute",
+        "value": 1,
+        "date": 2018,
+        "location": 44
+      },
+      {
+        "label": "Mademoiselle",
+        "value": 1,
+        "date": 2006,
+        "location": 44
+      },
+      {
+        "label": "Discipline",
+        "value": 1,
+        "date": 2015,
+        "location": 44
+      },
+      {
+        "label": "Fifty fifty",
+        "value": 1,
+        "date": 2015,
+        "location": 44
+      },
+      {
+        "label": "Mauvaise langue",
+        "value": 1,
+        "date": 2015,
+        "location": 44
+      },
+      {
+        "label": "L'encre",
+        "value": 1,
+        "date": 2015,
+        "location": 44
+      },
+      {
+        "label": "Placebo",
+        "value": 1,
+        "date": 2016,
+        "location": 44
+      },
+      {
+        "label": "L’Ascenceur",
+        "value": 1,
+        "date": 2009,
+        "location": 44
+      },
+      {
+        "label": "La Récréation #1",
+        "value": 1,
+        "date": 2016,
+        "location": 44
+      },
+      {
+        "label": "La Récréation #3",
+        "value": 1,
+        "date": 2017,
+        "location": 44
+      },
+      {
+        "label": "La Récréation #2",
+        "value": 1,
+        "date": 2017,
+        "location": 44
+      },
+      {
+        "label": "La Récréation #4",
+        "value": 1,
+        "date": 2017,
+        "location": 44
+      }
+    ]
+  },
+  {
+    "label": "Ryaam",
+    "data": [
+      {
+        "label": "Kamala Khan",
+        "value": 1,
+        "date": 2019,
+        "location": 75
+      },
+      {
+        "label": "Assata Shakur",
+        "value": 1,
+        "date": 2019,
+        "location": 75
+      },
+      {
+        "label": "La cible",
+        "value": 1,
+        "date": 2017,
+        "location": 75
+      },
+      {
+        "label": "Gosses des villes",
+        "value": 1,
+        "date": 2017,
+        "location": 75
+      }
+    ]
+  },
+  {
+    "label": "Sali",
+    "data": [
+      {
+        "label": "Master",
+        "value": 1,
+        "date": 2018,
+        "location": 69
+      },
+      {
+        "label": "Sur Le Coeur",
+        "value": 1,
+        "date": 2018,
+        "location": 69
+      },
+      {
+        "label": "03:59",
+        "value": 1,
+        "date": 2016,
+        "location": 69
+      },
+      {
+        "label": "Exotique Erotique",
+        "value": 1,
+        "date": 2016,
+        "location": 69
+      },
+      {
+        "label": ".Wav",
+        "value": 1,
+        "date": 2017,
+        "location": 69
+      },
+      {
+        "label": "Rolla Pack",
+        "value": 1,
+        "date": 2017,
+        "location": 69
+      }
+    ]
+  },
+  {
+    "label": "Shay",
+    "data": [
+      {
+        "label": "Biche",
+        "value": 1,
+        "date": 2016,
+        "location": 92
+      },
+      {
+        "label": "PMW",
+        "value": 1,
+        "date": 2016,
+        "location": 92
+      },
+      {
+        "label": "Las Noches",
+        "value": 1,
+        "date": 2016,
+        "location": 92
+      },
+      {
+        "label": "Catch Up",
+        "value": 1,
+        "date": 2016,
+        "location": 92
+      },
+      {
+        "label": "Mon dealeur",
+        "value": 1,
+        "date": 2016,
+        "location": 92
+      },
+      {
+        "label": "Dernier",
+        "value": 1,
+        "date": 2016,
+        "location": 92
+      },
+      {
+        "label": "Gazon",
+        "value": 1,
+        "date": 2016,
+        "location": 92
+      },
+      {
+        "label": "Ma retraite",
+        "value": 1,
+        "date": 2016,
+        "location": 92
+      },
+      {
+        "label": "La go",
+        "value": 1,
+        "date": 2016,
+        "location": 92
+      },
+      {
+        "label": "Paumes brulées",
+        "value": 1,
+        "date": 2016,
+        "location": 92
+      },
+      {
+        "label": "Cabeza",
+        "value": 1,
+        "date": 2016,
+        "location": 92
+      },
+      {
+        "label": "Pleurer",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "Oh oui",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "Ich liebe dich",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "Cœur Wanted",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "Jolie",
+        "value": 1,
+        "date": 2018,
+        "location": 92
+      },
+      {
+        "label": "BXL",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "Prends ton time",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "Notif",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "Même pas bonne",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "Cocorico",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "Liquide",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "Désillusions",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "Amour & désastres",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "First Lady",
+        "value": 1,
+        "date": 2012,
+        "location": 92
+      },
+      {
+        "label": "Fais ta monnaie",
+        "value": 1,
+        "date": 2019,
+        "location": 92
+      },
+      {
+        "label": "Cruella",
+        "value": 1,
+        "date": 2011,
+        "location": 92
+      },
+      {
+        "label": "Par Habitude",
+        "value": 1,
+        "date": 2015,
+        "location": 92
+      },
+      {
+        "label": "1200",
+        "value": 1,
+        "date": 2016,
+        "location": 92
+      },
+      {
+        "label": "Autour du nine",
+        "value": 1,
+        "date": 2014,
+        "location": 92
+      },
+      {
+        "label": "Perpétuité",
+        "value": 1,
+        "date": 2013,
+        "location": 92
+      },
+      {
+        "label": "Aucun",
+        "value": 1,
+        "date": 2014,
+        "location": 92
+      }
+    ]
+  },
+  {
+    "label": "Shy'm",
+    "data": [
+      {
+        "label": "Doucement",
+        "value": 1,
+        "date": 2017,
+        "location": 78
+      },
+      {
+        "label": "Héros",
+        "value": 1,
+        "date": 2017,
+        "location": 78
+      },
+      {
+        "label": "Encore",
+        "value": 1,
+        "date": 2017,
+        "location": 78
+      },
+      {
+        "label": "Black Marylin",
+        "value": 1,
+        "date": 2012,
+        "location": 78
+      },
+      {
+        "label": "En plein cœur",
+        "value": 1,
+        "date": 2012,
+        "location": 78
+      },
+      {
+        "label": "Elle",
+        "value": 1,
+        "date": 2012,
+        "location": 78
+      },
+      {
+        "label": "Comme ils disent",
+        "value": 1,
+        "date": 2012,
+        "location": 78
+      },
+      {
+        "label": "Contrôle",
+        "value": 1,
+        "date": 2012,
+        "location": 78
+      },
+      {
+        "label": "Caméléon",
+        "value": 1,
+        "date": 2012,
+        "location": 78
+      },
+      {
+        "label": "Je rêve",
+        "value": 1,
+        "date": 2012,
+        "location": 78
+      },
+      {
+        "label": "Comme un oiseau",
+        "value": 1,
+        "date": 2012,
+        "location": 78
+      },
+      {
+        "label": "Et Alors !",
+        "value": 1,
+        "date": 2012,
+        "location": 78
+      },
+      {
+        "label": "Et si",
+        "value": 1,
+        "date": 2012,
+        "location": 78
+      },
+      {
+        "label": "Garçon manqué",
+        "value": 1,
+        "date": 2014,
+        "location": 78
+      },
+      {
+        "label": "Cape Town de toi",
+        "value": 1,
+        "date": 2014,
+        "location": 78
+      },
+      {
+        "label": "Comment tu vas ?",
+        "value": 1,
+        "date": 2014,
+        "location": 78
+      },
+      {
+        "label": "Inverser les rôles",
+        "value": 1,
+        "date": 2014,
+        "location": 78
+      },
+      {
+        "label": "La Malice",
+        "value": 1,
+        "date": 2014,
+        "location": 78
+      },
+      {
+        "label": "L'effet de serre",
+        "value": 1,
+        "date": 2014,
+        "location": 78
+      },
+      {
+        "label": "Les chaussures en plastique",
+        "value": 1,
+        "date": 2014,
+        "location": 78
+      },
+      {
+        "label": "J'te deteste",
+        "value": 1,
+        "date": 2014,
+        "location": 78
+      },
+      {
+        "label": "L'amour à l'envers",
+        "value": 1,
+        "date": 2019,
+        "location": 78
+      },
+      {
+        "label": "Déteste-moi",
+        "value": 1,
+        "date": 2019,
+        "location": 78
+      },
+      {
+        "label": "Je m'en vais",
+        "value": 1,
+        "date": 2019,
+        "location": 78
+      },
+      {
+        "label": "Agapé",
+        "value": 1,
+        "date": 2019,
+        "location": 78
+      },
+      {
+        "label": "La go",
+        "value": 1,
+        "date": 2018,
+        "location": 78
+      },
+      {
+        "label": "Du mal",
+        "value": 1,
+        "date": 2019,
+        "location": 78
+      },
+      {
+        "label": "Amiants",
+        "value": 1,
+        "date": 2019,
+        "location": 78
+      },
+      {
+        "label": "Absolem",
+        "value": 1,
+        "date": 2019,
+        "location": 78
+      },
+      {
+        "label": "Je Prends Sur Moi",
+        "value": 1,
+        "date": 2008,
+        "location": 78
+      },
+      {
+        "label": "La première fois",
+        "value": 1,
+        "date": 2008,
+        "location": 78
+      },
+      {
+        "label": "Faut recommencer",
+        "value": 1,
+        "date": 2008,
+        "location": 78
+      },
+      {
+        "label": "Elle danse",
+        "value": 1,
+        "date": 2010,
+        "location": 78
+      },
+      {
+        "label": "Je sais",
+        "value": 1,
+        "date": 2010,
+        "location": 78
+      },
+      {
+        "label": "J'entends encore les mots",
+        "value": 1,
+        "date": 2010,
+        "location": 78
+      },
+      {
+        "label": "Déjà vu",
+        "value": 1,
+        "date": 2010,
+        "location": 78
+      },
+      {
+        "label": "Je suis moi",
+        "value": 1,
+        "date": 2010,
+        "location": 78
+      },
+      {
+        "label": "En apesanteur",
+        "value": 1,
+        "date": 2010,
+        "location": 78
+      },
+      {
+        "label": "Et si pour une fois",
+        "value": 1,
+        "date": 2010,
+        "location": 78
+      },
+      {
+        "label": "Femme de couleur",
+        "value": 1,
+        "date": 2006,
+        "location": 78
+      },
+      {
+        "label": "Le blues de toi",
+        "value": 1,
+        "date": 2006,
+        "location": 78
+      }
+    ]
+  },
+  {
+    "label": "Sianna",
+    "data": [
+      {
+        "label": "N'essaie pas",
+        "value": 1,
+        "date": 2017,
+        "location": 60
+      },
+      {
+        "label": "Tu Reviendras",
+        "value": 1,
+        "date": 2017,
+        "location": 60
+      },
+      {
+        "label": "Reine Des Neiges",
+        "value": 1,
+        "date": 2012,
+        "location": 60
+      },
+      {
+        "label": "Ne t'en fais pas",
+        "value": 1,
+        "date": 2017,
+        "location": 60
+      },
+      {
+        "label": "J'oublie Pas *",
+        "value": 1,
+        "date": 2017,
+        "location": 60
+      },
+      {
+        "label": "Charbonner",
+        "value": 1,
+        "date": 2016,
+        "location": 60
+      },
+      {
+        "label": "Traumatiser",
+        "value": 1,
+        "date": 2017,
+        "location": 60
+      },
+      {
+        "label": "Billets mauves",
+        "value": 1,
+        "date": 2017,
+        "location": 60
+      },
+      {
+        "label": "Coeur Orphelin",
+        "value": 1,
+        "date": 2017,
+        "location": 60
+      },
+      {
+        "label": "Havre de paix",
+        "value": 1,
+        "date": 2017,
+        "location": 60
+      },
+      {
+        "label": "Ailleurs",
+        "value": 1,
+        "date": 2017,
+        "location": 60
+      },
+      {
+        "label": "Usain Bolt",
+        "value": 1,
+        "date": 2017,
+        "location": 60
+      },
+      {
+        "label": "Bouteille à la mer",
+        "value": 1,
+        "date": 2016,
+        "location": 60
+      },
+      {
+        "label": "Go Fast",
+        "value": 1,
+        "date": 2016,
+        "location": 60
+      },
+      {
+        "label": "Hunger Game",
+        "value": 1,
+        "date": 2015,
+        "location": 60
+      },
+      {
+        "label": "Appel manqué",
+        "value": 1,
+        "date": 2015,
+        "location": 60
+      },
+      {
+        "label": "Incomprise",
+        "value": 1,
+        "date": 2015,
+        "location": 60
+      },
+      {
+        "label": "Siannarabica",
+        "value": 1,
+        "date": 2014,
+        "location": 60
+      },
+      {
+        "label": "Prévenez-les",
+        "value": 1,
+        "date": 2015,
+        "location": 60
+      },
+      {
+        "label": "Quoi qu'il en soit",
+        "value": 1,
+        "date": 2015,
+        "location": 60
+      },
+      {
+        "label": "Kick Off",
+        "value": 1,
+        "date": 2013,
+        "location": 60
+      },
+      {
+        "label": "Sianna",
+        "value": 1,
+        "date": 2013,
+        "location": 60
+      },
+      {
+        "label": "J'reste quand même",
+        "value": 1,
+        "date": 2015,
+        "location": 60
+      },
+      {
+        "label": "Sur la tête de Marine Le Pen",
+        "value": 1,
+        "date": 2017,
+        "location": 60
+      },
+      {
+        "label": "Siannachnikov",
+        "value": 1,
+        "date": 2014,
+        "location": 60
+      },
+      {
+        "label": "Cosmo (Remix)",
+        "value": 1,
+        "date": 2014,
+        "location": 60
+      },
+      {
+        "label": "Djingaling",
+        "value": 1,
+        "date": 2014,
+        "location": 60
+      },
+      {
+        "label": "Négatif *",
+        "value": 1,
+        "date": 2018,
+        "location": 60
+      },
+      {
+        "label": "Siannatown (Freestyle)",
+        "value": 1,
+        "date": 2014,
+        "location": 60
+      },
+      {
+        "label": "Passe Moi La Télécommande",
+        "value": 1,
+        "date": 2013,
+        "location": 60
+      },
+      {
+        "label": "Ainsi Va La Vie",
+        "value": 1,
+        "date": 2015,
+        "location": 60
+      },
+      {
+        "label": "Siannalicante",
+        "value": 1,
+        "date": 2014,
+        "location": 60
+      },
+      {
+        "label": "SiannAllemagne",
+        "value": 1,
+        "date": 2016,
+        "location": 60
+      }
+    ]
+  },
+  {
+    "label": "Sté Strausz",
+    "data": [
+      {
+        "label": "Ma vie",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Renaissance",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Toutes ces femmes",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Sexe opposé",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Le rap est ma vie",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Ninety-nine",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Les mots qui suffisent",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "La flemme",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Futur du rap",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Tu rentres pas",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Une décennie",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Fidèle à moi-même",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "Pour l'argent",
+        "value": 1,
+        "date": 2005,
+        "location": 94
+      },
+      {
+        "label": "C'est La Même Histoire (C'est Asmeuk)",
+        "value": 1,
+        "date": 1995,
+        "location": 94
+      },
+      {
+        "label": "Ma génération",
+        "value": 1,
+        "date": 1998,
+        "location": 94
+      },
+      {
+        "label": "Tu le sais",
+        "value": 1,
+        "date": 1998,
+        "location": 94
+      },
+      {
+        "label": "Tu croyais quoi ?",
+        "value": 1,
+        "date": 1998,
+        "location": 94
+      },
+      {
+        "label": "Plus d'idéal",
+        "value": 1,
+        "date": 1996,
+        "location": 94
+      }
+    ]
+  },
+  {
+    "label": "Tal",
+    "data": [
+      {
+        "label": "Juste un rêve",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "Jambo",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "Carpe Diem",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "L'amour me donne des ailes",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "L'amour me donne des ailes (Retro version) - Bonus Track",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "Carnaval - Bonus Track",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "Madame Officiel",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "ADN",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "Comme un samedi soir",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "ADN (Acoustic Version) - Bonus Track",
+        "value": 1,
+        "date": 2018,
+        "location": 93
+      },
+      {
+        "label": "Beauté particulière",
+        "value": 1,
+        "date": 2016,
+        "location": 93
+      },
+      {
+        "label": "D.A.O.W. (Dance All Over the World)",
+        "value": 1,
+        "date": 2016,
+        "location": 93
+      },
+      {
+        "label": "Are We Awake",
+        "value": 1,
+        "date": 2016,
+        "location": 93
+      },
+      {
+        "label": "La paix",
+        "value": 1,
+        "date": 2016,
+        "location": 93
+      },
+      {
+        "label": "City of Love",
+        "value": 1,
+        "date": 2016,
+        "location": 93
+      },
+      {
+        "label": "Are We Awake (Acoustic)",
+        "value": 1,
+        "date": 2016,
+        "location": 93
+      },
+      {
+        "label": "Des fleurs et des flammes",
+        "value": 1,
+        "date": 2017,
+        "location": 93
+      },
+      {
+        "label": "Le temps qu'il faut",
+        "value": 1,
+        "date": 2016,
+        "location": 93
+      },
+      {
+        "label": "Cri du cœur",
+        "value": 1,
+        "date": 2016,
+        "location": 93
+      },
+      {
+        "label": "Le guitariste",
+        "value": 1,
+        "date": 2016,
+        "location": 93
+      },
+      {
+        "label": "Le sens de la vie (Urban Mix)",
+        "value": 1,
+        "date": 2012,
+        "location": 93
+      },
+      {
+        "label": "Je prends le large",
+        "value": 1,
+        "date": 2012,
+        "location": 93
+      },
+      {
+        "label": "Le sens de la vie",
+        "value": 1,
+        "date": 2012,
+        "location": 93
+      },
+      {
+        "label": "Allez, laisse-toi aller",
+        "value": 1,
+        "date": 2012,
+        "location": 93
+      },
+      {
+        "label": "Le droit de rêver",
+        "value": 1,
+        "date": 2012,
+        "location": 93
+      },
+      {
+        "label": "Au-delà...",
+        "value": 1,
+        "date": 2012,
+        "location": 93
+      },
+      {
+        "label": "La liberté",
+        "value": 1,
+        "date": 2012,
+        "location": 93
+      },
+      {
+        "label": "Le sens de la vie (Acoustique)",
+        "value": 1,
+        "date": 2012,
+        "location": 93
+      },
+      {
+        "label": "Je prends le large (Acoustique)",
+        "value": 1,
+        "date": 2012,
+        "location": 93
+      },
+      {
+        "label": "Je prends le large (Urban Mix)",
+        "value": 1,
+        "date": 2012,
+        "location": 93
+      },
+      {
+        "label": "Le droit de rêver (Acoustique)",
+        "value": 1,
+        "date": 2012,
+        "location": 93
+      }
+    ]
+  },
+  {
+    "label": "Vitaa",
+    "data": [
+      {
+        "label": "À fleur de toi",
+        "value": 1,
+        "date": 2007,
+        "location": 69
+      },
+      {
+        "label": "En chanson",
+        "value": 1,
+        "date": 2007,
+        "location": 69
+      },
+      {
+        "label": "Ça Va Commencer",
+        "value": 1,
+        "date": 2015,
+        "location": 69
+      },
+      {
+        "label": "En Danger",
+        "value": 1,
+        "date": 2015,
+        "location": 69
+      },
+      {
+        "label": "À Quel Prix Tu M'aimes ?",
+        "value": 1,
+        "date": 2015,
+        "location": 69
+      },
+      {
+        "label": "À La Hauteur",
+        "value": 1,
+        "date": 2015,
+        "location": 69
+      },
+      {
+        "label": "Emmène-Moi",
+        "value": 1,
+        "date": 2015,
+        "location": 69
+      },
+      {
+        "label": "J4M",
+        "value": 1,
+        "date": 2017,
+        "location": 69
+      },
+      {
+        "label": "Comme ça",
+        "value": 1,
+        "date": 2017,
+        "location": 69
+      },
+      {
+        "label": "Dis-le moi",
+        "value": 1,
+        "date": 2017,
+        "location": 69
+      },
+      {
+        "label": "Dans ma tête",
+        "value": 1,
+        "date": 2016,
+        "location": 69
+      },
+      {
+        "label": "Comme d'hab",
+        "value": 1,
+        "date": 2017,
+        "location": 69
+      },
+      {
+        "label": "Bienvenue à Paris",
+        "value": 1,
+        "date": 2016,
+        "location": 69
+      },
+      {
+        "label": "Ça les dérange",
+        "value": 1,
+        "date": 2016,
+        "location": 69
+      },
+      {
+        "label": "Ici Et Maintenant",
+        "value": 1,
+        "date": 2013,
+        "location": 69
+      },
+      {
+        "label": "J’Aimerais Te Dire",
+        "value": 1,
+        "date": 2013,
+        "location": 69
+      },
+      {
+        "label": "Avant toi",
+        "value": 1,
+        "date": 2013,
+        "location": 69
+      },
+      {
+        "label": "Comment faire",
+        "value": 1,
+        "date": 2013,
+        "location": 69
+      },
+      {
+        "label": "Game Over",
+        "value": 1,
+        "date": 2013,
+        "location": 69
+      },
+      {
+        "label": "Désaccord",
+        "value": 1,
+        "date": 2018,
+        "location": 69
+      },
+      {
+        "label": "J'aimerais Te Dire (Remix)",
+        "value": 1,
+        "date": 2014,
+        "location": 69
+      }
+    ]
+  },
+  {
+    "label": "Wallen",
+    "data": [
+      {
+        "label": "Les Filles Qui Te Veulent",
+        "value": 1,
+        "date": 2001,
+        "location": 93
+      },
+      {
+        "label": "Le Temps D'Une Chanson",
+        "value": 1,
+        "date": 2001,
+        "location": 93
+      },
+      {
+        "label": "Intro",
+        "value": 1,
+        "date": 2001,
+        "location": 93
+      },
+      {
+        "label": "Sunshine",
+        "value": 1,
+        "date": 2001,
+        "location": 93
+      },
+      {
+        "label": "Ouvre Les Yeux",
+        "value": 1,
+        "date": 2001,
+        "location": 93
+      },
+      {
+        "label": "Le Genre De ...",
+        "value": 1,
+        "date": 2001,
+        "location": 93
+      },
+      {
+        "label": "Le Triomphe De L'Amour",
+        "value": 1,
+        "date": 2001,
+        "location": 93
+      },
+      {
+        "label": "Il Ne Voit Pas Que Je L'Aime",
+        "value": 1,
+        "date": 2001,
+        "location": 93
+      },
+      {
+        "label": "Celle qui a dit non",
+        "value": 1,
+        "date": 2001,
+        "location": 93
+      },
+      {
+        "label": "La Quête du Souffre",
+        "value": 1,
+        "date": 2001,
+        "location": 93
+      },
+      {
+        "label": "A force de vivre",
+        "value": 1,
+        "date": 2001,
+        "location": 93
+      },
+      {
+        "label": "Rester moi-même",
+        "value": 1,
+        "date": 2001,
+        "location": 93
+      },
+      {
+        "label": "Dans le vent",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "Fille de berger (interlude)",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "Dis-le sans attendre",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "Business",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "Entre les blocs de ciment",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "Kilodrame",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "Apprendre à espérer",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "Dites au désespoir",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "Leur arrogance",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "Ciao pantin",
+        "value": 1,
+        "date": 2008,
+        "location": 93
+      },
+      {
+        "label": "Comme on défait",
+        "value": 1,
+        "date": 2004,
+        "location": 93
+      },
+      {
+        "label": "Donna",
+        "value": 1,
+        "date": 2004,
+        "location": 93
+      },
+      {
+        "label": "La Dot",
+        "value": 1,
+        "date": 2004,
+        "location": 93
+      },
+      {
+        "label": "Le Nouveau",
+        "value": 1,
+        "date": 2004,
+        "location": 93
+      },
+      {
+        "label": "Avoir La Vie Devant Soi",
+        "value": 1,
+        "date": 2004,
+        "location": 93
+      },
+      {
+        "label": "Bouge Cette Vie",
+        "value": 1,
+        "date": 2004,
+        "location": 93
+      },
+      {
+        "label": "Abimée",
+        "value": 1,
+        "date": 2004,
+        "location": 93
+      }
+    ]
+  },
+  {
+    "label": "Yésima",
+    "data": [
+      {
+        "label": "Avinée",
+        "value": 1,
+        "date": 2015,
+        "location": 50
+      }
+    ]
+  }
+]

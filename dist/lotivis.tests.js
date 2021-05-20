@@ -1,5 +1,5 @@
 /*!
- * lotivis.js v1.0.49
+ * lotivis.js v1.0.83
  * https://github.com/lukasdanckwerth/lotivis#readme
  * (c) 2021 lotivis.js Lukas Danckwerth
  * Released under the MIT License
@@ -1555,6 +1555,7 @@ function createPlotDataset(dataset, dateAccess) {
   let lastDate = extractLatestDateWithValue(data) || 0;
   let flatData = flatDataset(dataset);
 
+  newDataset.dataset = dataset.label;
   newDataset.label = dataset.label;
   newDataset.stack = dataset.stack;
   newDataset.firstDate = firstDate;

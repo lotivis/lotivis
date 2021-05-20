@@ -44,7 +44,7 @@ DatasetsController.prototype.getPlotDataview = function () {
   let dateAccess = this.dateAccess;
   let enabledDatasets = this.enabledDatasets();
   let dataview = {datasets: []};
-  dataview.dates = extractDatesFromDatasets(enabledDatasets);
+  dataview.dates = extractDatesFromDatasets(enabledDatasets).sort();
   dataview.labels = extractLabelsFromDatasets(enabledDatasets);
   dataview.max = this.getMax();
 
