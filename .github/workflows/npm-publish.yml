@@ -6,7 +6,14 @@ on:
       - 'v*'
 
 jobs:
+  get-npm-version:
+    name: get-npm-version
+    runs-on: ubuntu-latest
+    id: package-version
+    uses: martinbeentjes/npm-get-version-action@master
   publish:
+    needs: get-npm-version
+    name: Publish
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -21,3 +28,5 @@ jobs:
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
+      - run: echo "Printing current version:"
+      - run: echo ${{ steps.package-version.outputs.current-version}}
