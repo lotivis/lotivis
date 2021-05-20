@@ -49,16 +49,6 @@ export class PlotChartCard extends ChartCard {
   }
 
   /**
-   * Updates the button in the radio group.
-   */
-  updateRadioGroup() {
-    if (!this.datasets) return;
-    let names = this.datasets.map(dataset => dataset.label);
-    let options = names.map(name => new Option(name));
-    this.radioGroup.setOptions(options);
-  }
-
-  /**
    * Applies possible url parameters.
    */
   applyURLParameters() {
