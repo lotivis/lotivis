@@ -23,6 +23,7 @@ function createPlotDataset(dataset, dateAccess) {
   let lastDate = extractLatestDateWithValue(data) || 0;
   let flatData = flatDataset(dataset);
 
+  newDataset.dataset = dataset.label;
   newDataset.label = dataset.label;
   newDataset.stack = dataset.stack;
   newDataset.firstDate = firstDate;
