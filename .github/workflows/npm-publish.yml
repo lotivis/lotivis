@@ -7,10 +7,11 @@ on:
 
 jobs:
   publish:
-    name: publish
-    id: publish
+    name: Publish npm
     runs-on: ubuntu-latest
     steps:
+      - name: publish
+      - id: publish
       - uses: actions/checkout@v2
       - uses: martinbeentjes/npm-get-version-action@master
       - uses: actions/setup-node@v1
@@ -26,3 +27,24 @@ jobs:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
       - run: echo "Current version:"
       - run: echo ${{ steps.publish.outputs.current-version }}
+
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            Changes in this Release
+            - First Change
+            - Second Change
+          draft: false
+          prerelease: false
