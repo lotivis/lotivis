@@ -41,10 +41,14 @@ jobs:
           body: |
             {
                "path": [
-                  "/npm/lotivis@1.0.67/dist/lotivis.css",
-                  "/npm/lotivis@1.0.67/dist/lotivis.min.js",
-                  "/npm/lotivis@1.0.67/dist/lotivis.js",
-                  "/npm/lotivis@1.0.67/dist/lotivis.js.map"
+                  "/npm/lotivis@1/dist/lotivis.css",
+                  "/npm/lotivis@1/dist/lotivis.min.js",
+                  "/npm/lotivis@1/dist/lotivis.js",
+                  "/npm/lotivis@1/dist/lotivis.js.map",
+                  "/npm/lotivis@${{ steps.package-version.outputs.current-version }}/dist/lotivis.css",
+                  "/npm/lotivis@${{ steps.package-version.outputs.current-version }}/dist/lotivis.min.js",
+                  "/npm/lotivis@${{ steps.package-version.outputs.current-version }}/dist/lotivis.js",
+                  "/npm/lotivis@${{ steps.package-version.outputs.current-version }}/dist/lotivis.js.map"
                ]
             }
       - name: 'Use response'
