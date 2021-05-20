@@ -24,5 +24,5 @@ jobs:
       - run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
-      - run: echo "Printing current version:"
+      - run: echo "Current version:"
       - run: echo ${{ steps.publish.outputs.current-version }}
