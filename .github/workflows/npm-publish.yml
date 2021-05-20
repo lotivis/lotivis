@@ -39,14 +39,14 @@ jobs:
           timeout: 10000
           headers: '{ "cache-control": "no-cache", "content-type": "application/json" }'
           body: |
-            - '{'
-            - '   "path": ['
-            - '      "/npm/lotivis@1.0.67/dist/lotivis.css",'
-            - '      "/npm/lotivis@1.0.67/dist/lotivis.min.js",'
-            - '      "/npm/lotivis@1.0.67/dist/lotivis.js",'
-            - '      "/npm/lotivis@1.0.67/dist/lotivis.js.map"'
-            - '   ]'
-            - '}'
+            {
+               "path": [
+                  "/npm/lotivis@1.0.67/dist/lotivis.css",
+                  "/npm/lotivis@1.0.67/dist/lotivis.min.js",
+                  "/npm/lotivis@1.0.67/dist/lotivis.js",
+                  "/npm/lotivis@1.0.67/dist/lotivis.js.map"
+               ]
+            }
       - name: 'Use response'
         run: echo ${{ steps.api.outputs.response }}
       - name: Create Release
