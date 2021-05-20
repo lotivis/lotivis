@@ -36,6 +36,7 @@ jobs:
           url: http://purge.jsdelivr.net/
           method: 'POST'
           accept: 200
+          timeout: 10000
           headers: '{ "cache-control": "no-cache", "content-type": "application/json" }'
           body: '{ "path": ["/npm/lotivis@${{ steps.package-version.outputs.current-version }}/dist/lotivis.css","/npm/lotivis@${{ steps.package-version.outputs.current-version }}/dist/lotivis.min.js","/npm/lotivis@${{ steps.package-version.outputs.current-version }}/dist/lotivis.js","/npm/lotivis@${{ steps.package-version.outputs.current-version }}/dist/lotivis.js.map"]}'
       - name: 'Use response'
