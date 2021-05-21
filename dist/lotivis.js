@@ -1,5 +1,5 @@
 /*!
- * lotivis.js v1.0.49
+ * lotivis.js v1.0.84
  * https://github.com/lukasdanckwerth/lotivis#readme
  * (c) 2021 lotivis.js Lukas Danckwerth
  * Released under the MIT License
@@ -3899,6 +3899,7 @@ class ChartCard extends Card {
     this.radioGroup = new RadioGroup(this.headerCenterComponent);
     this.radioGroup.onChange = function (value) {
       let dataset = this.datasets.find(dataset => dataset.label === value);
+      if (!dataset) return lotivis_log(`Can't find dataset with label ${value}`);
       this.chart.datasets = [dataset];
       this.chart.update();
     }.bind(this);
@@ -3909,7 +3910,7 @@ class ChartCard extends Card {
    */
   updateRadioGroup() {
     if (!this.datasets) return;
-    let names = this.datasets.map(dataset => dataset.label);
+    let names = this.datasets.map(dataset => dataset.label || 'Unknown Label');
     let options = names.map(name => new Option(name));
     this.radioGroup.setOptions(options);
   }
@@ -5608,6 +5609,7 @@ function createPlotDataset(dataset, dateAccess) {
   let lastDate = extractLatestDateWithValue(data) || 0;
   let flatData = flatDataset(dataset);
 
+  newDataset.dataset = dataset.label;
   newDataset.label = dataset.label;
   newDataset.stack = dataset.stack;
   newDataset.firstDate = firstDate;
@@ -5628,7 +5630,7 @@ DatasetsController.prototype.getPlotDataview = function () {
   this.dateAccess;
   let enabledDatasets = this.enabledDatasets();
   let dataview = {datasets: []};
-  dataview.dates = extractDatesFromDatasets(enabledDatasets);
+  dataview.dates = extractDatesFromDatasets(enabledDatasets).sort();
   dataview.labels = extractLabelsFromDatasets(enabledDatasets);
   dataview.max = this.getMax();
 
@@ -5883,28 +5885,7 @@ class PlotChartCard extends ChartCard {
     this.body.attr('id', this.chartID);
     this.chart = new PlotChart(this.chartID, this.config);
   }
-
-  /**
-   * Injects the radio group in the top.
-   */
-  injectRadioGroup() {
-    this.radioGroup = new RadioGroup(this.headerCenterComponent);
-    this.radioGroup.onChange = function (value) {
-      let dataset = this.datasets.find(dataset => dataset.label === value);
-      this.setDataset(dataset);
-    }.bind(this);
-  }
-
-  /**
-   * Updates the button in the radio group.
-   */
-  updateRadioGroup() {
-    if (!this.datasets) return;
-    let names = this.datasets.map(dataset => dataset.label);
-    let options = names.map(name => new Option(name));
-    this.radioGroup.setOptions(options);
-  }
-
+  
   /**
    * Applies possible url parameters.
    */
@@ -6593,7 +6574,7 @@ exports.URLParameters = UrlParameters;
 
 var exports$1 = exports;
 
-console.log(`[lotivis]  lotivis library loaded.`);
+console.log(`[lotivis]  lotivis module loaded.`);
 
 exports.default = exports$1;
 

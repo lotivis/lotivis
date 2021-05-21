@@ -33,7 +33,7 @@ export class PlotLabelRenderer {
         .attr("width", (d) => xChart(d.lastDate) - xChart(d.firstDate) + xBandwidth)
         .text(function (dataset) {
           if (dataset.sum === 0) return;
-          return `${dataset.duration} years, ${dataset.sum} items`;
+          return `${dataset.duration + 1} years, ${dataset.sum} items`;
         });
     };
   }

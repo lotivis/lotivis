@@ -1,5 +1,5 @@
 /*!
- * lotivis.js v1.0.83
+ * lotivis.js v1.0.84
  * https://github.com/lukasdanckwerth/lotivis#readme
  * (c) 2021 lotivis.js Lukas Danckwerth
  * Released under the MIT License
@@ -5510,7 +5510,7 @@ class PlotLabelRenderer {
         .attr("width", (d) => xChart(d.lastDate) - xChart(d.firstDate) + xBandwidth)
         .text(function (dataset) {
           if (dataset.sum === 0) return;
-          return `${dataset.duration} years, ${dataset.sum} items`;
+          return `${dataset.duration + 1} years, ${dataset.sum} items`;
         });
     };
   }
@@ -5630,9 +5630,8 @@ DatasetsController.prototype.getPlotDataview = function () {
   this.dateAccess;
   let enabledDatasets = this.enabledDatasets();
   let dataview = {datasets: []};
-  dataview.dates = extractDatesFromDatasets(enabledDatasets);
+  dataview.dates = extractDatesFromDatasets(enabledDatasets).sort();
   dataview.labels = extractLabelsFromDatasets(enabledDatasets);
-  dataview.max = this.getMax();
 
   enabledDatasets.forEach(function (dataset) {
     let newDataset = createPlotDataset(dataset);
@@ -5643,6 +5642,11 @@ DatasetsController.prototype.getPlotDataview = function () {
   });
 
   dataview.labelsCount = dataview.datasets.length;
+  dataview.max = d3LibraryAccess.max(dataview.datasets, function (dataset) {
+    return d3LibraryAccess.max(dataset.data, function (item) {
+      return item.value;
+    });
+  });
 
   return dataview;
 };

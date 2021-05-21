@@ -1,5 +1,6 @@
 import {Color} from "../color/color";
 import {createIDFromDataset} from "../shared/selector";
+import {lotivis_log} from "../shared/debug";
 
 /**
  * Calculates and creates the gradients for the bars of a plot chart.
