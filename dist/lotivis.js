@@ -5510,7 +5510,7 @@ class PlotLabelRenderer {
         .attr("width", (d) => xChart(d.lastDate) - xChart(d.firstDate) + xBandwidth)
         .text(function (dataset) {
           if (dataset.sum === 0) return;
-          return `${dataset.duration} years, ${dataset.sum} items`;
+          return `${dataset.duration + 1} years, ${dataset.sum} items`;
         });
     };
   }
@@ -5632,7 +5632,6 @@ DatasetsController.prototype.getPlotDataview = function () {
   let dataview = {datasets: []};
   dataview.dates = extractDatesFromDatasets(enabledDatasets).sort();
   dataview.labels = extractLabelsFromDatasets(enabledDatasets);
-  dataview.max = this.getMax();
 
   enabledDatasets.forEach(function (dataset) {
     let newDataset = createPlotDataset(dataset);
@@ -5643,6 +5642,11 @@ DatasetsController.prototype.getPlotDataview = function () {
   });
 
   dataview.labelsCount = dataview.datasets.length;
+  dataview.max = d3LibraryAccess.max(dataview.datasets, function (dataset) {
+    return d3LibraryAccess.max(dataset.data, function (item) {
+      return item.value;
+    });
+  });
 
   return dataview;
 };

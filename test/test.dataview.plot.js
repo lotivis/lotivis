@@ -27,7 +27,7 @@ describe('dataview.map', function () {
     });
 
     it('has the correct max value', function () {
-      assert.strictEqual(plotDataview.max, 6);
+      assert.strictEqual(plotDataview.max, 10);
     });
 
 
