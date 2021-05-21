@@ -65,10 +65,12 @@ export class ChartCard extends Card {
   injectRadioGroup() {
     this.radioGroup = new RadioGroup(this.headerCenterComponent);
     this.radioGroup.onChange = function (value) {
-      let dataset = this.datasets.find(dataset => dataset.label === value);
+      let dataset = this.datasets.find(function (dataset) {
+        if (!dataset.label) return false;
+        return dataset.label.replaceAll(' ', '-') === value;
+      });
       if (!dataset) return lotivis_log(`Can't find dataset with label ${value}`);
-      this.chart.datasets = [dataset];
-      this.chart.update();
+      this.setDataset(dataset);
     }.bind(this);
   }
 
@@ -93,10 +95,15 @@ export class ChartCard extends Card {
     this.setDataset(firstDataset);
   }
 
+  /**
+   *
+   * @param dataset
+   */
   setDataset(dataset) {
+    lotivis_log('this.chart: ' + this.chart);
+    lotivis_log('this.chart: ', dataset);
     if (!this.chart) return;
-    this.chart.datasets = [dataset];
-    this.chart.update();
+    this.chart.setDatasets(dataset);
     if (this.onSelectedDatasetChanged) {
       this.onSelectedDatasetChanged(dataset.stack);
     }

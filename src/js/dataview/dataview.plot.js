@@ -9,7 +9,6 @@ import {
 import {combineByDate} from "../data.juggle/data.combine";
 import {sumOfValues} from "../data.juggle/data.sum";
 import {flatDataset} from "../data.juggle/data.flat";
-import {lotivis_log} from "../shared/debug";
 import {d3LibraryAccess} from "../shared/d3libaccess";
 
 /**
@@ -46,6 +45,7 @@ DatasetsController.prototype.getPlotDataview = function () {
   let dateAccess = this.dateAccess;
   let enabledDatasets = this.enabledDatasets();
   let dataview = {datasets: []};
+
   dataview.dates = extractDatesFromDatasets(enabledDatasets).sort();
   dataview.labels = extractLabelsFromDatasets(enabledDatasets);
 

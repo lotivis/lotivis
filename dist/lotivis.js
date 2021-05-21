@@ -3900,8 +3900,7 @@ class ChartCard extends Card {
     this.radioGroup.onChange = function (value) {
       let dataset = this.datasets.find(dataset => dataset.label === value);
       if (!dataset) return lotivis_log(`Can't find dataset with label ${value}`);
-      this.chart.datasets = [dataset];
-      this.chart.update();
+      this.setDataset(dataset);
     }.bind(this);
   }
 
@@ -3926,6 +3925,10 @@ class ChartCard extends Card {
     this.setDataset(firstDataset);
   }
 
+  /**
+   *
+   * @param dataset
+   */
   setDataset(dataset) {
     if (!this.chart) return;
     this.chart.datasets = [dataset];
@@ -5630,6 +5633,7 @@ DatasetsController.prototype.getPlotDataview = function () {
   this.dateAccess;
   let enabledDatasets = this.enabledDatasets();
   let dataview = {datasets: []};
+
   dataview.dates = extractDatesFromDatasets(enabledDatasets).sort();
   dataview.labels = extractLabelsFromDatasets(enabledDatasets);
 
@@ -5889,7 +5893,7 @@ class PlotChartCard extends ChartCard {
     this.body.attr('id', this.chartID);
     this.chart = new PlotChart(this.chartID, this.config);
   }
-  
+
   /**
    * Applies possible url parameters.
    */

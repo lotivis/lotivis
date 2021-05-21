@@ -42,14 +42,22 @@
   let plotChartCard = new lotivis.PlotChartCard('plot-chart-card');
   let datasetJSONCard = new lotivis.DatasetsJSONCard('datasets-json-card');
 
-  d3
-    .json('../assets/artists-active-range-female.json')
-    .then(function (json) {
+  Promise.all([
+    d3.json('../assets/artists-active-range-female.json'),
+    d3.json('../assets/artists-active-range-female.json'),
+    d3.json('../assets/artists-active-range-female.json')
+  ])
+    .then(function (collection) {
 
-      let controller = new lotivis.DatasetController(json);
+      // let controller = new lotivis.DatasetController(json);
 
-      plotChartCard.chart.setDatasetsController(controller);
-      datasetJSONCard.setDatasetsController(controller);
+      collection[0].label = 'Female 1';
+      collection[1].label = 'Female 2';
+      collection[2].label = 'Female 3';
+
+      plotChartCard.setDatasets(collection);
+      // plotChartCard.chart.setDatasetsController(controller);
+      // datasetJSONCard.setDatasetsController(controller);
 
     });
 

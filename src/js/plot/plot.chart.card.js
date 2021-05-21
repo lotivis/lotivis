@@ -1,7 +1,5 @@
 import {Card} from "../components/card";
 import {UrlParameters} from "../shared/url.parameters";
-import {RadioGroup} from "../components/radio.group";
-import {Option} from "../components/option";
 import {ChartCard} from "../components/chart.card";
 import {PlotChart} from "./plot.chart";
 import {PlotChartSettingsPopup} from "./plot.chart.settings.popup";
@@ -36,7 +34,7 @@ export class PlotChartCard extends ChartCard {
     this.body.attr('id', this.chartID);
     this.chart = new PlotChart(this.chartID, this.config);
   }
-  
+
   /**
    * Applies possible url parameters.
    */

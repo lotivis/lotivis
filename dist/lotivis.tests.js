@@ -929,7 +929,12 @@ class DatasetsController {
    * Returns a string that can be used as filename for downloads.
    */
   getFilename() {
-    return this.labels.join(',');
+    if (!this.labels) return 'Unknown';
+    let labels = this.labels.map(label => label.replaceAll(' ', '-'));
+    if (labels.length > 10) {
+      labels = labels.splice(0, 10);
+    }
+    return labels.join(',');
   }
 }
 
@@ -1576,6 +1581,7 @@ DatasetsController.prototype.getPlotDataview = function () {
   this.dateAccess;
   let enabledDatasets = this.enabledDatasets();
   let dataview = {datasets: []};
+
   dataview.dates = extractDatesFromDatasets(enabledDatasets).sort();
   dataview.labels = extractLabelsFromDatasets(enabledDatasets);
 
