@@ -6,6 +6,7 @@ import {DatasetsController} from "../datasets.controller/datasets.controller";
  * @param newController The new datasets controller.
  */
 Chart.prototype.setDatasetsController = function (newController) {
+  if (this.datasetController) this.datasetController.removeListener(this);
   this.datasetController = newController;
   this.datasetController.addListener(this);
   this.update(newController, 'registration');

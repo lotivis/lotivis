@@ -1,11 +1,10 @@
+import {LotivisConfig} from "../shared/config";
+import {toSaveID} from "../shared/selector";
+
 /**
  *
  * @class DateGhostBarsRenderer
  */
-import {LotivisConfig} from "../shared/config";
-import {toSaveID} from "../shared/selector";
-
-
 export class DateGhostBarsRenderer {
 
   /**
@@ -50,7 +49,9 @@ export class DateGhostBarsRenderer {
       dateChart.tooltipRenderer.hideTooltip(event, date);
 
       if (dateChart.config.sendsNotifications) {
+        dateChart.updateSensible = false;
         dateChart.datasetController.resetFilters();
+        dateChart.updateSensible = true;
       }
     }
 

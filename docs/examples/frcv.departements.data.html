@@ -42,7 +42,6 @@
   // print debug messages
   lotivis.debug(true);
 
-  const geoJsonURL = '/assets/departements.geojson';
   const mapChartCard = new lotivis.MapChartCard('map-chart-card');
   const chart = mapChartCard.chart;
   chart.config.excludedFeatureCodes = ['2A', '2B'];
@@ -61,13 +60,13 @@
       d3.json('/assets/words-per-departement-relative.json'),
       d3.json('/assets/types-per-departement.json'),
       d3.json('/assets/types-per-departement-relative.json'),
-      d3.json(geoJsonURL)
+      d3.json('/assets/departements.geojson')
     ])
     .then(function (datasetsAndGeoJSON) {
       let rawGeoJSON = datasetsAndGeoJSON.pop();
-      let datasets = datasetsAndGeoJSON;
+      let onlyDatasets = datasetsAndGeoJSON;
       chart.setGeoJSON(rawGeoJSON);
-      mapChartCard.setDatasets(datasets);
+      mapChartCard.setDatasets(onlyDatasets);
     });
 
 </script>

@@ -3,6 +3,7 @@ import {sumOfDataset, sumOfLabel, sumOfStack} from "../data.juggle/data.sum";
 import {d3LibraryAccess} from "../shared/d3libaccess";
 import {DefaultDateAccess} from "../data.date.assessor/date.assessor";
 import {InvalidFormatError} from "../data.juggle/data.validate.error";
+import {DataviewCache} from "../dataview/dataview.cache";
 
 /**
  * Controls a collection of datasets.
@@ -16,7 +17,9 @@ export class DatasetsController {
    * @param config
    */
   constructor(datasets, config) {
-    if (!Array.isArray(datasets)) throw new InvalidFormatError();
+    if (!Array.isArray(datasets)) {
+      throw new InvalidFormatError(`Datasets are not an array.`);
+    }
     this.initialize(config || {});
     this.setDatasets(datasets);
   }
@@ -28,6 +31,7 @@ export class DatasetsController {
     this.dateFilters = this.config.dateFilters || [];
     this.datasetFilters = this.config.datasetFilters || [];
     this.filters = {};
+    this.cache = new DataviewCache();
     if (this.config.filters) {
       this.filters.locations = this.config.filters.locations || [];
       this.filters.dates = this.config.filters.dates || [];

@@ -103,9 +103,16 @@ export class ChartCard extends Card {
     lotivis_log('this.chart: ' + this.chart);
     lotivis_log('this.chart: ', dataset);
     if (!this.chart) return;
-    this.chart.setDatasets(dataset);
+    if (Array.isArray(dataset)) {
+      this.chart.setDatasets(dataset);
+    } else {
+      this.chart.setDatasets([dataset]);
+    }
+
     if (this.onSelectedDatasetChanged) {
-      this.onSelectedDatasetChanged(dataset.stack);
+      let datasetLabel = dataset.stack || dataset.label || `Unknown`;
+      let index = (this.datasets || []).indexOf(dataset);
+      this.onSelectedDatasetChanged(dataset, index, datasetLabel);
     }
   }
 

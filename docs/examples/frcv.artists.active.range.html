@@ -39,26 +39,33 @@
 
   lotivis.debug(true);
 
-  let plotChartCard = new lotivis.PlotChartCard('plot-chart-card');
   let datasetJSONCard = new lotivis.DatasetsJSONCard('datasets-json-card');
+  let plotChartCard = new lotivis.PlotChartCard('plot-chart-card', {
+    margin: {
+      left: 140
+    }
+  });
 
   Promise.all([
-    d3.json('../assets/artists-active-range-female.json'),
-    d3.json('../assets/artists-active-range-female.json'),
-    d3.json('../assets/artists-active-range-female.json')
+    d3.json('/assets/artists-active-range.json'),
+    d3.json('/assets/artists-active-range-female.json'),
+    d3.json('/assets/artists-active-range-male.json'),
+    d3.json('/assets/artists-active-range-groups.json')
   ])
-    .then(function (collection) {
+    .then(function (datasetsCollection) {
 
-      // let controller = new lotivis.DatasetController(json);
+      datasetsCollection[0].label = 'All';
+      datasetsCollection[1].label = 'Female';
+      datasetsCollection[2].label = 'Male';
+      datasetsCollection[3].label = 'Group';
 
-      collection[0].label = 'Female 1';
-      collection[1].label = 'Female 2';
-      collection[2].label = 'Female 3';
+      plotChartCard.onSelectedDatasetChanged = function (index, dataset, label) {
+        let controller = plotChartCard.chart.datasetController;
+        datasetJSONCard.setDatasetsController(controller);
+        console.log(controller);
+      };
 
-      plotChartCard.setDatasets(collection);
-      // plotChartCard.chart.setDatasetsController(controller);
-      // datasetJSONCard.setDatasetsController(controller);
-
+      plotChartCard.setDatasets(datasetsCollection);
     });
 
 </script>

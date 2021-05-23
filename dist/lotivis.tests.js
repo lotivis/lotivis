@@ -1,5 +1,5 @@
 /*!
- * lotivis.js v1.0.84
+ * lotivis.js v1.0.87
  * https://github.com/lukasdanckwerth/lotivis#readme
  * (c) 2021 lotivis.js Lukas Danckwerth
  * Released under the MIT License
@@ -849,6 +849,39 @@ exports.GeoJSONValidateError = GeoJSONValidateError;
 exports.LotivisUnimplementedMethodError = LotivisUnimplementedMethodError;
 
 /**
+ * @class DataviewCache
+ */
+
+
+class DataviewCache {
+
+  /**
+   * Creates a new instance of DataviewCache
+   */
+  constructor() {
+    this.content = {};
+
+    this.getDataview = function (type, locationFilters, dateFilters, datasetFilters) {
+      let name = createName(type, locationFilters, dateFilters, datasetFilters);
+      return this.content[name];
+    };
+
+    this.setDataview = function (dataview, type, locationFilters, dateFilters, datasetFilters) {
+      let name = createName(type, locationFilters, dateFilters, datasetFilters);
+      this.content[name] = dataview;
+      lotivis_log(`this.content: `, this.content);
+    };
+
+    function createName(type, locationFilters, dateFilters, datasetFilters) {
+      return type +
+        locationFilters +
+        dateFilters +
+        datasetFilters;
+    }
+  }
+}
+
+/**
  * Controls a collection of datasets.
  * @class DatasetsController
  */
@@ -860,7 +893,9 @@ class DatasetsController {
    * @param config
    */
   constructor(datasets, config) {
-    if (!Array.isArray(datasets)) throw new InvalidFormatError();
+    if (!Array.isArray(datasets)) {
+      throw new InvalidFormatError(`Datasets are not an array.`);
+    }
     this.initialize(config || {});
     this.setDatasets(datasets);
   }
@@ -872,6 +907,7 @@ class DatasetsController {
     this.dateFilters = this.config.dateFilters || [];
     this.datasetFilters = this.config.datasetFilters || [];
     this.filters = {};
+    this.cache = new DataviewCache();
     if (this.config.filters) {
       this.filters.locations = this.config.filters.locations || [];
       this.filters.dates = this.config.filters.dates || [];
@@ -979,9 +1015,9 @@ DatasetsController.prototype.addListener = function (listener) {
  * @param listener The listener to removeDataset.
  */
 DatasetsController.prototype.removeListener = function (listener) {
-  if (!this.listeners) return;
+  if (!this.listeners) return lotivis_log();
   let index = this.listeners.indexOf(listener);
-  if (index === -1) return;
+  if (index === -1) return lotivis_log();
   this.listeners = this.listeners.splice(index, 1);
 };
 
@@ -996,7 +1032,9 @@ DatasetsController.prototype.notifyListeners = function (reason = DatasetsContro
     if (!listener.update) {
       continue;
     }
+    console.timeStamp('will update ' + listener);
     listener.update(this, reason);
+    console.timeStamp('did update ' + listener);
   }
 };
 
@@ -1510,10 +1548,36 @@ function combineDataByGroupsize(data, ratio) {
   return newData;
 }
 
+DatasetsController.prototype.getCached = function (type) {
+  let cached = this.cache.getDataview(
+    type,
+    this.locationFilters,
+    this.dateFilters,
+    this.datasetFilters
+  );
+  return cached;
+};
+
+DatasetsController.prototype.setCached = function (dataview, type) {
+  return this.cache.setDataview(
+    dataview,
+    type,
+    this.locationFilters,
+    this.dateFilters,
+    this.datasetFilters
+  );
+};
+
 /**
  * Returns a new generated DateDataview for the current enabled samples of dataset of this controller.
  */
 DatasetsController.prototype.getDateDataview = function (groupSize) {
+
+  let cachedDataView = this.getCached('date');
+  if (cachedDataView) {
+    return cachedDataView;
+  }
+
   this.dateAccess;
   let datasets = copy(this.datasets);
   let enabledDatasets = copy(this.enabledDatasets() || datasets);
@@ -1544,6 +1608,8 @@ DatasetsController.prototype.getDateDataview = function (groupSize) {
   dataview.dates = extractDatesFromDatasets(enabledDatasets);
   dataview.enabledStacks = this.enabledStacks();
 
+  this.setCached(dataview, 'date');
+
   return dataview;
 };
 
@@ -1554,6 +1620,7 @@ DatasetsController.prototype.getDateDataview = function (groupSize) {
  * @returns {{}}
  */
 function createPlotDataset(dataset, dateAccess) {
+
   let newDataset = {};
   let data = copy(dataset.data);
   let firstDate = extractEarliestDateWithValue(data) || 0;
@@ -1578,6 +1645,11 @@ function createPlotDataset(dataset, dateAccess) {
  */
 DatasetsController.prototype.getPlotDataview = function () {
 
+  let cachedDataView = this.getCached('plot');
+  if (cachedDataView) {
+    return cachedDataView;
+  }
+
   this.dateAccess;
   let enabledDatasets = this.enabledDatasets();
   let dataview = {datasets: []};
@@ -1599,6 +1671,8 @@ DatasetsController.prototype.getPlotDataview = function () {
       return item.value;
     });
   });
+
+  this.setCached(dataview, 'plot');
 
   return dataview;
 };
@@ -1623,6 +1697,11 @@ DatasetsController.prototype.getPlotDataview = function () {
  */
 DatasetsController.prototype.getLocationDataview = function () {
 
+  let cachedDataView = this.getCached('location');
+  if (cachedDataView) {
+    return cachedDataView;
+  }
+
   let dataview = {};
   let flatData = this.enabledFlatData();
   let combinedByStack = combineByStacks(flatData);
@@ -1634,6 +1713,8 @@ DatasetsController.prototype.getLocationDataview = function () {
   dataview.combinedData.forEach(item => {
     item.stack = item.stack || item.label || item.dataset;
   });
+
+  this.setCached(dataview, 'location');
 
   return dataview;
 };

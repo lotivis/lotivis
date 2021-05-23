@@ -1,6 +1,7 @@
 import {Component} from "./component";
 import {createID} from "../shared/selector";
 import {LotivisUnimplementedMethodError} from "../data.juggle/data.validate.error";
+import {lotivis_log} from "../shared/debug";
 
 /**
  * Superclass for lotivis charts.
@@ -51,7 +52,8 @@ export class Chart extends Component {
    * draw();
    * ```
    */
-  update() {
+  update(datasetsController, reason) {
+    lotivis_log(`reason: ${reason}`);
     if (!this.updateSensible) return;
     this.remove();
     this.precalculate();

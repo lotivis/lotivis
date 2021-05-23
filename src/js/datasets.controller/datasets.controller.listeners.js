@@ -18,9 +18,9 @@ DatasetsController.prototype.addListener = function (listener) {
  * @param listener The listener to removeDataset.
  */
 DatasetsController.prototype.removeListener = function (listener) {
-  if (!this.listeners) return;
+  if (!this.listeners) return lotivis_log('No listeners property.');
   let index = this.listeners.indexOf(listener);
-  if (index === -1) return;
+  if (index === -1) return lotivis_log(`Listener not registered: ${listener}`);
   this.listeners = this.listeners.splice(index, 1);
 };
 
@@ -36,7 +36,10 @@ DatasetsController.prototype.notifyListeners = function (reason = DatasetsContro
       lotivis_log('Listener unqualified.');
       continue;
     }
+    lotivis_log(`listener: ${listener}`);
+    console.timeStamp('will update ' + listener);
     listener.update(this, reason);
+    console.timeStamp('did update ' + listener);
   }
 };
 

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
+  <link rel="stylesheet" href="../css/lotivis.css"/>
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
+  <title>FRCV - Search</title>
+</head>
+<body>
+
+<div class="lotivis-container">
+  <div class="lotivis-row">
+    <div class="lotivis-col-2">
+      <a href="../index.html">
+        <a class="lotivis-anchor-back" href="../index.html">
+          Back
+        </a>
+      </a>
+    </div>
+    <div class="lotivis-col-8 text-center">
+      <h1>Corpus Data</h1>
+      <br>
+    </div>
+    <div class="lotivis-col-2"></div>
+    <div class="lotivis-col-12" id="loading">
+      <div class="lotivis-card">
+        <div class="frc-loading-card-body text-center">
+          <h1>
+            Loading...
+          </h1>
+        </div>
+      </div>
+    </div>
+    <div class="lotivis-col-6">
+      <div id="date-chart-card">
+        <!-- Date Chart Here -->
+      </div>
+      <div id="plot-chart-card">
+        <!-- Plot Chart Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-6">
+      <div id="map-chart-card">
+        <!-- Map Chart Here -->
+      </div>
+    </div>
+
+  </div><!-- Row -->
+</div><!-- Container -->
+
+<script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-server@3.0.1/dist/topojson-server.min.js"></script>
+<script src="../js/lotivis.js"></script>
+
+<script>
+
+  // enable debug mode
+  lotivis.debug(true);
+
+  if (!location.hash) {
+    location.hash = '#reloading';
+    location.reload(true);
+  } else {
+    location.hash = '#reloaded';
+  }
+
+  //
+  let dateChartCard = new lotivis.DateChartCard('date-chart-card');
+  let mapChartCard = new lotivis.MapChartCard('map-chart-card');
+  let plotChartCard = new lotivis.PlotChartCard('plot-chart-card');
+  let loadingCard = d3.select('#loading');
+
+  Promise.all([
+    d3.json('/assets/Departements.geojson'),
+    d3.json('/assets/frcv.corpus.datasets.json'),
+    // d3.json('/corpus'),
+  ]).then(function (results) {
+
+    // let corpus = new frc(results[2]);
+    let geoJSON = results[0];
+    let datasets = results[1];
+    let controller = new lotivis.DatasetController(datasets);
+    // let updater = {
+    //   update: function (controller, reason) {
+    //     if (reason === 'location-filter') {
+    //       let locations = controller.locationFilters;
+    //       plotChartCard.chart.datasets = corpus.getArtistsForLocations(locations);
+    //       plotChartCard.chart.update();
+    //     } else {
+    //       plotChartCard.chart.datasets = [];
+    //       plotChartCard.chart.update();
+    //     }
+    //   }
+    // };
+
+    mapChartCard.chart.excludedFeatureCodes = ['2A', '2B'];
+    mapChartCard.chart.setGeoJSON(geoJSON);
+
+    // controller.addListener(updater);
+    controller.register([
+      mapChartCard.chart,
+      dateChartCard.chart,
+      plotChartCard.chart
+    ]);
+
+    loadingCard.style('display', 'none');
+  });
+
+</script>
+
+</body>
+</html>

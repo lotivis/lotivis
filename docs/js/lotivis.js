@@ -1,5 +1,5 @@
 /*!
- * lotivis.js v1.0.84
+ * lotivis.js v1.0.87
  * https://github.com/lukasdanckwerth/lotivis#readme
  * (c) 2021 lotivis.js Lukas Danckwerth
  * Released under the MIT License
@@ -604,6 +604,51 @@ class Option {
   }
 }
 
+const LotivisConfig = {
+  // The default margin to use for charts.
+  defaultMargin: 60,
+  // The default offset for the space between an object an the toolbar.
+  tooltipOffset: 7,
+  // The default radius to use for bars drawn on a chart.
+  barRadius: 5,
+  // A Boolean value indicating whether the debug logging is enabled.
+  debugLog: false,
+  // A Boolean value indicating whether the debug logging is enabled.
+  debug: true,
+  // A string which is used as prefix for download.
+  downloadFilePrefix: 'lotivis',
+  // A string which is used as separator between components when creating a file name.
+  filenameSeparator: '_',
+  // A string which is used for unknown values.
+  unknown: 'LOTIVIS_UNKNOWN'
+};
+
+/**
+ * A collection of messages which already hast been printed.
+ * @type {*[]}
+ */
+let alreadyLogged = [];
+
+var lotivis_log_once = function (message) {
+  if (alreadyLogged.includes(message)) return;
+  alreadyLogged.push(message);
+  console.warn(`[lotivis]  Warning only once: ${message}`);
+};
+
+var lotivis_log = () => null;
+
+/**
+ * Sets whether lotivis prints debug log messages to the console.
+ * @param enabled A Boolean value indicating whether to enable debug logging.
+ * @param printConfig A Boolean value indicating whether to print the global lotivis configuration.  Default is false.
+ */
+function debug(enabled, printConfig = false) {
+  lotivis_log = enabled ? console.log : () => null;
+  lotivis_log(`[lotivis]  ${enabled ? 'En' : 'Dis'}abled debug mode.`);
+  if (!printConfig) return;
+  lotivis_log(`LotivisConfig = ${JSON.stringify(LotivisConfig, null, 2)}`);
+}
+
 /**
  * Superclass for lotivis charts.
  * @class Chart
@@ -653,7 +698,8 @@ class Chart extends Component {
    * draw();
    * ```
    */
-  update() {
+  update(datasetsController, reason) {
+    lotivis_log(`reason: ${reason}`);
     if (!this.updateSensible) return;
     this.remove();
     this.precalculate();
@@ -708,25 +754,6 @@ class Chart extends Component {
 function copy(object) {
   return JSON.parse(JSON.stringify(object));
 }
-
-const LotivisConfig = {
-  // The default margin to use for charts.
-  defaultMargin: 60,
-  // The default offset for the space between an object an the toolbar.
-  tooltipOffset: 7,
-  // The default radius to use for bars drawn on a chart.
-  barRadius: 5,
-  // A Boolean value indicating whether the debug logging is enabled.
-  debugLog: false,
-  // A Boolean value indicating whether the debug logging is enabled.
-  debug: true,
-  // A string which is used as prefix for download.
-  downloadFilePrefix: 'lotivis',
-  // A string which is used as separator between components when creating a file name.
-  filenameSeparator: '_',
-  // A string which is used for unknown values.
-  unknown: 'LOTIVIS_UNKNOWN'
-};
 
 /**
  * Returns `true` if the given value not evaluates to false and is not 0. false else.
@@ -925,32 +952,6 @@ function sumOfValues(flatData) {
 }
 
 /**
- * A collection of messages which already hast been printed.
- * @type {*[]}
- */
-let alreadyLogged = [];
-
-var lotivis_log_once = function (message) {
-  if (alreadyLogged.includes(message)) return;
-  alreadyLogged.push(message);
-  console.warn(`[lotivis]  Warning only once: ${message}`);
-};
-
-var lotivis_log = () => null;
-
-/**
- * Sets whether lotivis prints debug log messages to the console.
- * @param enabled A Boolean value indicating whether to enable debug logging.
- * @param printConfig A Boolean value indicating whether to print the global lotivis configuration.  Default is false.
- */
-function debug(enabled, printConfig = false) {
-  lotivis_log = enabled ? console.log : () => null;
-  lotivis_log(`[lotivis]  ${enabled ? 'En' : 'Dis'}abled debug mode.`);
-  if (!printConfig) return;
-  lotivis_log(`LotivisConfig = ${JSON.stringify(LotivisConfig, null, 2)}`);
-}
-
-/**
  *
  * @param date
  * @constructor
@@ -1023,6 +1024,39 @@ const DateWeekAssessor = function (weekday) {
 };
 
 /**
+ * @class DataviewCache
+ */
+
+
+class DataviewCache {
+
+  /**
+   * Creates a new instance of DataviewCache
+   */
+  constructor() {
+    this.content = {};
+
+    this.getDataview = function (type, locationFilters, dateFilters, datasetFilters) {
+      let name = createName(type, locationFilters, dateFilters, datasetFilters);
+      return this.content[name];
+    };
+
+    this.setDataview = function (dataview, type, locationFilters, dateFilters, datasetFilters) {
+      let name = createName(type, locationFilters, dateFilters, datasetFilters);
+      this.content[name] = dataview;
+      lotivis_log(`this.content: `, this.content);
+    };
+
+    function createName(type, locationFilters, dateFilters, datasetFilters) {
+      return type +
+        locationFilters +
+        dateFilters +
+        datasetFilters;
+    }
+  }
+}
+
+/**
  * Controls a collection of datasets.
  * @class DatasetsController
  */
@@ -1034,7 +1068,9 @@ class DatasetsController {
    * @param config
    */
   constructor(datasets, config) {
-    if (!Array.isArray(datasets)) throw new InvalidFormatError();
+    if (!Array.isArray(datasets)) {
+      throw new InvalidFormatError(`Datasets are not an array.`);
+    }
     this.initialize(config || {});
     this.setDatasets(datasets);
   }
@@ -1046,6 +1082,7 @@ class DatasetsController {
     this.dateFilters = this.config.dateFilters || [];
     this.datasetFilters = this.config.datasetFilters || [];
     this.filters = {};
+    this.cache = new DataviewCache();
     if (this.config.filters) {
       this.filters.locations = this.config.filters.locations || [];
       this.filters.dates = this.config.filters.dates || [];
@@ -1141,6 +1178,7 @@ DatasetsController.NotificationReason = {
  * @param newController The new datasets controller.
  */
 Chart.prototype.setDatasetsController = function (newController) {
+  if (this.datasetController) this.datasetController.removeListener(this);
   this.datasetController = newController;
   this.datasetController.addListener(this);
   this.update(newController, 'registration');
@@ -3192,8 +3230,6 @@ class DateBarsRenderer {
  *
  * @class DateGhostBarsRenderer
  */
-
-
 class DateGhostBarsRenderer {
 
   /**
@@ -3238,7 +3274,9 @@ class DateGhostBarsRenderer {
       dateChart.tooltipRenderer.hideTooltip(event, date);
 
       if (dateChart.config.sendsNotifications) {
+        dateChart.updateSensible = false;
         dateChart.datasetController.resetFilters();
+        dateChart.updateSensible = true;
       }
     }
 
@@ -3941,9 +3979,16 @@ class ChartCard extends Card {
     lotivis_log('this.chart: ' + this.chart);
     lotivis_log('this.chart: ', dataset);
     if (!this.chart) return;
-    this.chart.setDatasets(dataset);
+    if (Array.isArray(dataset)) {
+      this.chart.setDatasets(dataset);
+    } else {
+      this.chart.setDatasets([dataset]);
+    }
+
     if (this.onSelectedDatasetChanged) {
-      this.onSelectedDatasetChanged(dataset.stack);
+      let datasetLabel = dataset.stack || dataset.label || `Unknown`;
+      let index = (this.datasets || []).indexOf(dataset);
+      this.onSelectedDatasetChanged(dataset, index, datasetLabel);
     }
   }
 
@@ -5615,6 +5660,7 @@ const defaultPlotChartConfig = {
  * @returns {{}}
  */
 function createPlotDataset(dataset, dateAccess) {
+
   let newDataset = {};
   let data = copy(dataset.data);
   let firstDate = extractEarliestDateWithValue(data) || 0;
@@ -5639,6 +5685,11 @@ function createPlotDataset(dataset, dateAccess) {
  */
 DatasetsController.prototype.getPlotDataview = function () {
 
+  let cachedDataView = this.getCached('plot');
+  if (cachedDataView) {
+    return cachedDataView;
+  }
+
   this.dateAccess;
   let enabledDatasets = this.enabledDatasets();
   let dataview = {datasets: []};
@@ -5660,6 +5711,8 @@ DatasetsController.prototype.getPlotDataview = function () {
       return item.value;
     });
   });
+
+  this.setCached(dataview, 'plot');
 
   return dataview;
 };
@@ -5952,9 +6005,9 @@ DatasetsController.prototype.addListener = function (listener) {
  * @param listener The listener to removeDataset.
  */
 DatasetsController.prototype.removeListener = function (listener) {
-  if (!this.listeners) return;
+  if (!this.listeners) return lotivis_log('No listeners property.');
   let index = this.listeners.indexOf(listener);
-  if (index === -1) return;
+  if (index === -1) return lotivis_log(`Listener not registered: ${listener}`);
   this.listeners = this.listeners.splice(index, 1);
 };
 
@@ -5970,7 +6023,10 @@ DatasetsController.prototype.notifyListeners = function (reason = DatasetsContro
       lotivis_log('Listener unqualified.');
       continue;
     }
+    lotivis_log(`listener: ${listener}`);
+    console.timeStamp('will update ' + listener);
     listener.update(this, reason);
+    console.timeStamp('did update ' + listener);
   }
 };
 
@@ -6408,10 +6464,37 @@ function combineDataByGroupsize(data, ratio) {
   return newData;
 }
 
+DatasetsController.prototype.getCached = function (type) {
+  let cached = this.cache.getDataview(
+    type,
+    this.locationFilters,
+    this.dateFilters,
+    this.datasetFilters
+  );
+  lotivis_log(`using cached data view: ${type}`);
+  return cached;
+};
+
+DatasetsController.prototype.setCached = function (dataview, type) {
+  return this.cache.setDataview(
+    dataview,
+    type,
+    this.locationFilters,
+    this.dateFilters,
+    this.datasetFilters
+  );
+};
+
 /**
  * Returns a new generated DateDataview for the current enabled samples of dataset of this controller.
  */
 DatasetsController.prototype.getDateDataview = function (groupSize) {
+
+  let cachedDataView = this.getCached('date');
+  if (cachedDataView) {
+    return cachedDataView;
+  }
+
   this.dateAccess;
   let datasets = copy(this.datasets);
   let enabledDatasets = copy(this.enabledDatasets() || datasets);
@@ -6441,6 +6524,8 @@ DatasetsController.prototype.getDateDataview = function (groupSize) {
 
   dataview.dates = extractDatesFromDatasets(enabledDatasets);
   dataview.enabledStacks = this.enabledStacks();
+
+  this.setCached(dataview, 'date');
 
   return dataview;
 };
@@ -6513,6 +6598,11 @@ DatasetsController.prototype.getDateDataviewCombinedStacks = function (groupSize
  */
 DatasetsController.prototype.getLocationDataview = function () {
 
+  let cachedDataView = this.getCached('location');
+  if (cachedDataView) {
+    return cachedDataView;
+  }
+
   let dataview = {};
   let flatData = this.enabledFlatData();
   let combinedByStack = combineByStacks(flatData);
@@ -6524,6 +6614,8 @@ DatasetsController.prototype.getLocationDataview = function () {
   dataview.combinedData.forEach(item => {
     item.stack = item.stack || item.label || item.dataset;
   });
+
+  this.setCached(dataview, 'location');
 
   return dataview;
 };

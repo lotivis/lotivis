@@ -10,6 +10,7 @@ import {combineByDate} from "../data.juggle/data.combine";
 import {sumOfValues} from "../data.juggle/data.sum";
 import {flatDataset} from "../data.juggle/data.flat";
 import {d3LibraryAccess} from "../shared/d3libaccess";
+import {lotivis_log} from "../shared/debug";
 
 /**
  *
@@ -18,6 +19,7 @@ import {d3LibraryAccess} from "../shared/d3libaccess";
  * @returns {{}}
  */
 function createPlotDataset(dataset, dateAccess) {
+
   let newDataset = {};
   let data = copy(dataset.data);
   let firstDate = extractEarliestDateWithValue(data) || 0;
@@ -42,6 +44,11 @@ function createPlotDataset(dataset, dateAccess) {
  */
 DatasetsController.prototype.getPlotDataview = function () {
 
+  let cachedDataView = this.getCached('plot');
+  if (cachedDataView) {
+    return cachedDataView;
+  }
+
   let dateAccess = this.dateAccess;
   let enabledDatasets = this.enabledDatasets();
   let dataview = {datasets: []};
@@ -63,6 +70,8 @@ DatasetsController.prototype.getPlotDataview = function () {
       return item.value;
     });
   });
+
+  this.setCached(dataview, 'plot');
 
   return dataview;
 };

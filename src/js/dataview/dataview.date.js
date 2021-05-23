@@ -4,11 +4,39 @@ import {createStackModel} from "../data.juggle/data.stacks";
 import {copy} from "../shared/copy";
 import {combineDatasetsByRatio} from "../data.juggle/data.combine.ratio";
 import {extractDatesFromDatasets} from "../data.juggle/data.extract";
+import {lotivis_log} from "../shared/debug";
+
+DatasetsController.prototype.getCached = function (type) {
+  let cached = this.cache.getDataview(
+    type,
+    this.locationFilters,
+    this.dateFilters,
+    this.datasetFilters
+  );
+  lotivis_log(`using cached data view: ${type}`);
+  return cached;
+}
+
+DatasetsController.prototype.setCached = function (dataview, type) {
+  return this.cache.setDataview(
+    dataview,
+    type,
+    this.locationFilters,
+    this.dateFilters,
+    this.datasetFilters
+  );
+}
 
 /**
  * Returns a new generated DateDataview for the current enabled samples of dataset of this controller.
  */
 DatasetsController.prototype.getDateDataview = function (groupSize) {
+
+  let cachedDataView = this.getCached('date');
+  if (cachedDataView) {
+    return cachedDataView;
+  }
+
   let dateAccess = this.dateAccess;
   let datasets = copy(this.datasets);
   let enabledDatasets = copy(this.enabledDatasets() || datasets);
@@ -38,6 +66,8 @@ DatasetsController.prototype.getDateDataview = function (groupSize) {
 
   dataview.dates = extractDatesFromDatasets(enabledDatasets);
   dataview.enabledStacks = this.enabledStacks();
+
+  this.setCached(dataview, 'date');
 
   return dataview;
 };
