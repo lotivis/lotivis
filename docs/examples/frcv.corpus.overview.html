@@ -84,27 +84,27 @@
     let geoJSON = results[0];
     let datasets = results[1];
     let controller = new lotivis.DatasetController(datasets);
-    // let updater = {
-    //   update: function (controller, reason) {
-    //     if (reason === 'location-filter') {
-    //       let locations = controller.locationFilters;
-    //       plotChartCard.chart.datasets = corpus.getArtistsForLocations(locations);
-    //       plotChartCard.chart.update();
-    //     } else {
-    //       plotChartCard.chart.datasets = [];
-    //       plotChartCard.chart.update();
-    //     }
-    //   }
-    // };
+    let updater = {
+      update: function (controller, reason) {
+        if (reason === 'location-filter') {
+          let locations = controller.locationFilters;
+          plotChartCard.chart.datasets = corpus.getArtistsForLocations(locations);
+          plotChartCard.chart.update();
+        } else {
+          plotChartCard.chart.datasets = [];
+          plotChartCard.chart.update();
+        }
+      }
+    };
 
     mapChartCard.chart.excludedFeatureCodes = ['2A', '2B'];
     mapChartCard.chart.setGeoJSON(geoJSON);
 
-    // controller.addListener(updater);
+    controller.addListener(updater);
     controller.register([
       mapChartCard.chart,
       dateChartCard.chart,
-      plotChartCard.chart
+      // plotChartCard.chart
     ]);
 
     loadingCard.style('display', 'none');
