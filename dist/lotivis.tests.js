@@ -859,16 +859,16 @@ class DataviewCache {
    * Creates a new instance of DataviewCache
    */
   constructor() {
-    this.content = {};
+    let content = {};
 
     this.getDataview = function (type, locationFilters, dateFilters, datasetFilters) {
       let name = createName(type, locationFilters, dateFilters, datasetFilters);
-      return this.content[name];
+      return content[name];
     };
 
     this.setDataview = function (dataview, type, locationFilters, dateFilters, datasetFilters) {
       let name = createName(type, locationFilters, dateFilters, datasetFilters);
-      this.content[name] = dataview;
+      content[name] = dataview;
       lotivis_log(`this.content: `, this.content);
     };
 
@@ -878,6 +878,10 @@ class DataviewCache {
         dateFilters +
         datasetFilters;
     }
+
+    this.invalidate = function () {
+      content = {};
+    };
   }
 }
 
@@ -1326,6 +1330,7 @@ CRUD:
  * @param dataset The new dataset.
  */
 DatasetsController.prototype.setDataset = function (dataset) {
+  this.cache.invalidate();
   this.setDatasets([dataset]);
 };
 
@@ -1334,6 +1339,7 @@ DatasetsController.prototype.setDataset = function (dataset) {
  * @param datasets The new datasets.
  */
 DatasetsController.prototype.setDatasets = function (datasets) {
+  this.cache.invalidate();
   this.originalDatasets = datasets;
   this.datasets = copy(datasets);
   validateDatasets(datasets);
@@ -1345,6 +1351,7 @@ DatasetsController.prototype.setDatasets = function (datasets) {
  * @param dataset The dataset to append.
  */
 DatasetsController.prototype.addDataset = function (dataset) {
+  this.cache.invalidate();
   this.addDatasets([dataset]);
 };
 
@@ -1358,6 +1365,7 @@ DatasetsController.prototype.addDatasets = function (datasets) {
   if (this.datasets.find(dataset => dataset.label === datasets.label)) {
     throw new Error(`DatasetsController already contains a dataset with the same label (${datasets.label}).`);
   }
+  this.cache.invalidate();
   datasets.forEach(dataset => this.datasets.push(dataset));
   this.datasetsDidChange();
   this.notifyListeners(DatasetsController.NotificationReason.datasetsUpdate);
@@ -1369,6 +1377,7 @@ DatasetsController.prototype.addDatasets = function (datasets) {
  * @param label The label of the dataset to removeDataset.
  */
 DatasetsController.prototype.removeDataset = function (label) {
+  this.cache.invalidate();
   this.removeDatasets([label]);
 };
 
@@ -1379,6 +1388,7 @@ DatasetsController.prototype.removeDataset = function (label) {
 DatasetsController.prototype.removeDatasets = function (labels) {
   if (!this.datasets || !Array.isArray(this.datasets)) return;
   if (!labels || !Array.isArray(labels)) return;
+  this.cache.invalidate();
   labels.forEach(function (label) {
     let candidate = this.datasets.find(dataset => dataset.label === label);
     if (!candidate) return;

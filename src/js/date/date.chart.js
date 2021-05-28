@@ -8,6 +8,7 @@ import {DateTooltipRenderer} from "./date.tooltip.renderer";
 import {Chart} from "../components/chart";
 import {DateGridRenderer} from "./date.grid.renderer";
 import {LotivisConfig} from "../shared/config";
+import {lotivis_log} from "../shared/debug";
 
 const defaultConfig = {
   width: 1000,
@@ -112,9 +113,11 @@ export class DateChart extends Chart {
     let margin = config.margin;
     if (!this.dataview) return;
 
+    let dates = config.dateLabels || this.dataview.dates;
+
     this.xChart = d3
       .scaleBand()
-      .domain(this.dataview.dates)
+      .domain(dates)
       .rangeRound([margin.left, config.width - margin.right])
       .paddingInner(0.1);
 

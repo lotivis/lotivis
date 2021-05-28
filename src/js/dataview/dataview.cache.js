@@ -10,18 +10,18 @@ export class DataviewCache {
    * Creates a new instance of DataviewCache
    */
   constructor() {
-    this.content = {};
+    let content = {};
 
     this.getDataview = function (type, locationFilters, dateFilters, datasetFilters) {
       let name = createName(type, locationFilters, dateFilters, datasetFilters);
-      return this.content[name];
-    }
+      return content[name];
+    };
 
     this.setDataview = function (dataview, type, locationFilters, dateFilters, datasetFilters) {
       let name = createName(type, locationFilters, dateFilters, datasetFilters);
-      this.content[name] = dataview;
+      content[name] = dataview;
       lotivis_log(`this.content: `, this.content);
-    }
+    };
 
     function createName(type, locationFilters, dateFilters, datasetFilters) {
       return type +
@@ -29,5 +29,9 @@ export class DataviewCache {
         dateFilters +
         datasetFilters;
     }
+
+    this.invalidate = function () {
+      content = {};
+    };
   }
 }

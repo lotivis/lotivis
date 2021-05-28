@@ -57,7 +57,8 @@ export class DateGhostBarsRenderer {
 
     this.renderGhostBars = function () {
       let margin = dateChart.config.margin;
-      let dates = dateChart.datasetController.dates;
+      let dates = dateChart.config.dateLabels || dateChart.dataview.dates;
+
       dateChart
         .svg
         .append("g")
