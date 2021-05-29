@@ -64,6 +64,9 @@ import {
   DateWeekAssessor
 } from "./js/data.date.assessor/date.assessor";
 import {UrlParameters} from "./js/shared/url.parameters";
+import {createID} from "./js/shared/selector";
+
+exports.createID = createID;
 
 // colors
 exports.Color = Color;

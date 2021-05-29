@@ -1,5 +1,5 @@
 /*!
- * lotivis.js v1.0.88
+ * lotivis.js v1.0.89
  * https://github.com/lukasdanckwerth/lotivis#readme
  * (c) 2021 lotivis.js Lukas Danckwerth
  * Released under the MIT License
@@ -1036,6 +1036,7 @@ DatasetsController.prototype.notifyListeners = function (reason = DatasetsContro
     if (!listener.update) {
       continue;
     }
+    // lotivis_log(`listener: ${listener}`);
     console.timeStamp('will update ' + listener);
     listener.update(this, reason);
     console.timeStamp('did update ' + listener);
@@ -1559,13 +1560,12 @@ function combineDataByGroupsize(data, ratio) {
 }
 
 DatasetsController.prototype.getCached = function (type) {
-  let cached = this.cache.getDataview(
+  return this.cache.getDataview(
     type,
     this.locationFilters,
     this.dateFilters,
     this.datasetFilters
   );
-  return cached;
 };
 
 DatasetsController.prototype.setCached = function (dataview, type) {

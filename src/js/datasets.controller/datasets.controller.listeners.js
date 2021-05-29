@@ -36,7 +36,7 @@ DatasetsController.prototype.notifyListeners = function (reason = DatasetsContro
       lotivis_log('Listener unqualified.');
       continue;
     }
-    lotivis_log(`listener: ${listener}`);
+    // lotivis_log(`listener: ${listener}`);
     console.timeStamp('will update ' + listener);
     listener.update(this, reason);
     console.timeStamp('did update ' + listener);

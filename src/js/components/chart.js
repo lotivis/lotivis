@@ -53,7 +53,6 @@ export class Chart extends Component {
    * ```
    */
   update(datasetsController, reason) {
-    lotivis_log(`reason: ${reason}`);
     if (!this.updateSensible) return;
     this.remove();
     this.precalculate();

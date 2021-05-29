@@ -1,5 +1,5 @@
 /*!
- * lotivis.js v1.0.88
+ * lotivis.js v1.0.89
  * https://github.com/lukasdanckwerth/lotivis#readme
  * (c) 2021 lotivis.js Lukas Danckwerth
  * Released under the MIT License
@@ -699,7 +699,6 @@ class Chart extends Component {
    * ```
    */
   update(datasetsController, reason) {
-    lotivis_log(`reason: ${reason}`);
     if (!this.updateSensible) return;
     this.remove();
     this.precalculate();
@@ -6030,7 +6029,7 @@ DatasetsController.prototype.notifyListeners = function (reason = DatasetsContro
       lotivis_log('Listener unqualified.');
       continue;
     }
-    lotivis_log(`listener: ${listener}`);
+    // lotivis_log(`listener: ${listener}`);
     console.timeStamp('will update ' + listener);
     listener.update(this, reason);
     console.timeStamp('did update ' + listener);
@@ -6478,14 +6477,12 @@ function combineDataByGroupsize(data, ratio) {
 }
 
 DatasetsController.prototype.getCached = function (type) {
-  let cached = this.cache.getDataview(
+  return this.cache.getDataview(
     type,
     this.locationFilters,
     this.dateFilters,
     this.datasetFilters
   );
-  lotivis_log(`using cached data view: ${type}`);
-  return cached;
 };
 
 DatasetsController.prototype.setCached = function (dataview, type) {
@@ -6632,6 +6629,8 @@ DatasetsController.prototype.getLocationDataview = function () {
 
   return dataview;
 };
+
+exports.createID = createID;
 
 // colors
 exports.Color = Color$1;

@@ -4,17 +4,14 @@ import {createStackModel} from "../data.juggle/data.stacks";
 import {copy} from "../shared/copy";
 import {combineDatasetsByRatio} from "../data.juggle/data.combine.ratio";
 import {extractDatesFromDatasets} from "../data.juggle/data.extract";
-import {lotivis_log} from "../shared/debug";
 
 DatasetsController.prototype.getCached = function (type) {
-  let cached = this.cache.getDataview(
+  return this.cache.getDataview(
     type,
     this.locationFilters,
     this.dateFilters,
     this.datasetFilters
   );
-  lotivis_log(`using cached data view: ${type}`);
-  return cached;
 }
 
 DatasetsController.prototype.setCached = function (dataview, type) {
