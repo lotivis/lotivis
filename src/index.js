@@ -31,8 +31,8 @@ import {
   DataViewPlotCard
 } from "./js/dataview.card/dataview.card";
 
-import {DateChart} from "./js/date/date.chart";
-import {DateChartCard} from "./js/date/date.chart.card";
+import {DateChart} from "./js/time/date.chart";
+import {DateChartCard} from "./js/time/date.chart.card";
 import {MapChart} from "./js/map/map.chart";
 import {MapChartCard} from "./js/map/map.chart.card";
 import {PlotChart} from "./js/plot/plot.chart";
@@ -97,7 +97,7 @@ exports.DataviewDatasetsControllerSelectionCard = DataviewDatasetsControllerSele
 exports.UpdatableDataviewCard = UpdatableDataviewCard;
 exports.EditableDataviewCard = EditableDataviewCard;
 
-// date
+// time
 exports.DateChart = DateChart;
 exports.DateChartCard = DateChartCard;
 
@@ -120,7 +120,7 @@ exports.parseCSVDate = parseCSVDate;
 exports.config = LotivisConfig;
 exports.debug = debug;
 
-// date assessors
+// time assessors
 exports.DefaultDateAccess = DefaultDateAccess;
 exports.FormattedDateAccess = FormattedDateAccess;
 exports.GermanDateAccess = DateGermanAssessor;

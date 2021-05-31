@@ -577,11 +577,11 @@ function toSet(array) {
 }
 
 /**
- * Returns the earliest date occurring in the flat array of items.
+ * Returns the earliest time occurring in the flat array of items.
  *
  * @param flatData The flat samples array.
  * @param dateAccess
- * @returns {*} The earliest date.
+ * @returns {*} The earliest time.
  */
 function extractEarliestDate(flatData, dateAccess = (date) => date) {
   return extractDatesFromFlatData(flatData)
@@ -589,22 +589,22 @@ function extractEarliestDate(flatData, dateAccess = (date) => date) {
 }
 
 /**
- * Returns the earliest date occurring in the flat array of items.
+ * Returns the earliest time occurring in the flat array of items.
  *
  * @param flatData The flat samples array.
  * @param dateAccess
- * @returns {*} The earliest date.
+ * @returns {*} The earliest time.
  */
 function extractEarliestDateWithValue(flatData, dateAccess = (date) => date) {
   return extractEarliestDate(filterWithValue(flatData), dateAccess);
 }
 
 /**
- * Returns the latest date occurring in the flat array of items.
+ * Returns the latest time occurring in the flat array of items.
  *
  * @param flatData The flat samples array.
  * @param dateAccess
- * @returns {*} The latest date.
+ * @returns {*} The latest time.
  */
 function extractLatestDate(flatData, dateAccess = (date) => date) {
   return extractDatesFromFlatData(flatData)
@@ -612,11 +612,11 @@ function extractLatestDate(flatData, dateAccess = (date) => date) {
 }
 
 /**
- * Returns the latest date occurring in the flat array of items.
+ * Returns the latest time occurring in the flat array of items.
  *
  * @param flatData The flat samples array.
  * @param dateAccess
- * @returns {*} The latest date.
+ * @returns {*} The latest time.
  */
 function extractLatestDateWithValue(flatData, dateAccess = (date) => date) {
   return extractLatestDate(filterWithValue(flatData), dateAccess);
@@ -679,7 +679,7 @@ function sumOfValues(flatData) {
  *
  * @param datasets
  * @param dateAccess
- * @returns {{date: *}[]}
+ * @returns {{time: *}[]}
  */
 function dateToItemsRelation(datasets, dateAccess) {
 
@@ -849,36 +849,57 @@ exports.GeoJSONValidateError = GeoJSONValidateError;
 exports.LotivisUnimplementedMethodError = LotivisUnimplementedMethodError;
 
 /**
- * @class DataviewCache
+ * @class DataViewCache
  */
-
-
-class DataviewCache {
+class DataViewCache {
 
   /**
-   * Creates a new instance of DataviewCache
+   * Creates a new instance of DataViewCache.
    */
   constructor() {
     let content = {};
 
-    this.getDataview = function (type, locationFilters, dateFilters, datasetFilters) {
+    /**
+     * Creates an identifier for a cached data view with the given parameters.
+     * @param type The type of the graph.
+     * @param locationFilters The collection of filtered locations.
+     * @param dateFilters The collection of filtered dates.
+     * @param datasetFilters The collection of filtered datasets.
+     * @returns {*}
+     */
+    function createName(type, locationFilters, dateFilters, datasetFilters) {
+      return type + locationFilters + dateFilters + datasetFilters;
+    }
+
+    /**
+     * Returns the cached data view for the given parameters.
+     * @param type The type of the graph.
+     * @param locationFilters The collection of filtered locations.
+     * @param dateFilters The collection of filtered dates.
+     * @param datasetFilters The collection of filtered datasets.
+     * @returns {*}
+     */
+    this.getDataView = function (type, locationFilters, dateFilters, datasetFilters) {
       let name = createName(type, locationFilters, dateFilters, datasetFilters);
       return content[name];
     };
 
-    this.setDataview = function (dataview, type, locationFilters, dateFilters, datasetFilters) {
+    /**
+     * Inserts the given data view into the cache for the given parameters.
+     * @param dataView The data view to cache.
+     * @param type The type of the graph.
+     * @param locationFilters The collection of filtered locations.
+     * @param dateFilters The collection of filtered dates.
+     * @param datasetFilters The collection of filtered datasets.
+     */
+    this.setDataView = function (dataView, type, locationFilters, dateFilters, datasetFilters) {
       let name = createName(type, locationFilters, dateFilters, datasetFilters);
-      content[name] = dataview;
-      lotivis_log(`this.content: `, this.content);
+      content[name] = dataView;
     };
 
-    function createName(type, locationFilters, dateFilters, datasetFilters) {
-      return type +
-        locationFilters +
-        dateFilters +
-        datasetFilters;
-    }
-
+    /**
+     * Invalidates the cache.
+     */
     this.invalidate = function () {
       content = {};
     };
@@ -911,7 +932,7 @@ class DatasetsController {
     this.dateFilters = this.config.dateFilters || [];
     this.datasetFilters = this.config.datasetFilters || [];
     this.filters = {};
-    this.cache = new DataviewCache();
+    this.cache = new DataViewCache();
     if (this.config.filters) {
       this.filters.locations = this.config.filters.locations || [];
       this.filters.dates = this.config.filters.dates || [];
@@ -1306,7 +1327,7 @@ function validateDataset(dataset) {
 }
 
 /**
- * Validates the given datasets.controller item by ensuring it has a valid `date`, `location` and `value` property value.
+ * Validates the given datasets.controller item by ensuring it has a valid `time`, `location` and `value` property value.
  * @param item The datasets.controller item to validate.
  * @throws MissingPropertyError
  */
@@ -1560,7 +1581,7 @@ function combineDataByGroupsize(data, ratio) {
 }
 
 DatasetsController.prototype.getCached = function (type) {
-  return this.cache.getDataview(
+  return this.cache.getDataView(
     type,
     this.locationFilters,
     this.dateFilters,
@@ -1569,7 +1590,7 @@ DatasetsController.prototype.getCached = function (type) {
 };
 
 DatasetsController.prototype.setCached = function (dataview, type) {
-  return this.cache.setDataview(
+  return this.cache.setDataView(
     dataview,
     type,
     this.locationFilters,
@@ -1896,9 +1917,6 @@ function createDatasets(flatData) {
 
   for (let itemIndex = 0; itemIndex < flatData.length; itemIndex++) {
     let item = flatData[itemIndex];
-
-    if (!validateDataItem(item)) ;
-
     let label = item.dataset || item.label;
     let dataset = datasetsByLabel[label];
 

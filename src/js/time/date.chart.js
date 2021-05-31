@@ -166,7 +166,7 @@ export class DateChart extends Chart {
   renderSVG() {
     this.svg = this.element
       .append('svg')
-      .attr('class', 'lotivis-chart-svg lotivis-date-chart')
+      .attr('class', 'lotivis-chart-svg lotivis-time-chart')
       .attr('preserveAspectRatio', 'xMidYMid meet')
       .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`)
       .attr('id', this.svgSelector);

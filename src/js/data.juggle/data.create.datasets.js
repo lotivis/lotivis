@@ -1,5 +1,3 @@
-import {validateDataItem} from "./data.validate";
-
 /**
  * Returns a dataset collection created from the given flat samples collection.
  * @param flatData The flat samples collection.
@@ -10,12 +8,6 @@ export function createDatasets(flatData) {
 
   for (let itemIndex = 0; itemIndex < flatData.length; itemIndex++) {
     let item = flatData[itemIndex];
-
-    if (!validateDataItem(item)) {
-      // console.log('item');
-      // console.log(item);
-    }
-
     let label = item.dataset || item.label;
     let dataset = datasetsByLabel[label];
 

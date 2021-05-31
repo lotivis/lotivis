@@ -2,7 +2,7 @@ import {combineByDate} from "../data.juggle/data.combine";
 import {LotivisConfig} from "../shared/config";
 
 /**
- * Injects and presents a tooltip on a date chart.
+ * Injects and presents a tooltip on a time chart.
  *
  * @class DateTooltipRenderer
  */
@@ -53,7 +53,7 @@ export class DateTooltipRenderer {
      * Calculates the x offset to position the tooltip on the left side
      * of a bar.
      *
-     * @param date The presented date of selected bar.
+     * @param date The presented time of selected bar.
      * @param factor The size factor of the chart.
      * @param offset The offset of the chart.
      * @param tooltipSize The size of the tooltip.
@@ -68,7 +68,7 @@ export class DateTooltipRenderer {
      * Calculates the x offset to position the tooltip on the right side
      * of a bar.
      *
-     * @param date The presented date of selected bar.
+     * @param date The presented time of selected bar.
      * @param factor The size factor of the chart.
      * @param offset The offset of the chart.
      * @returns {number} The x offset for the tooltip.
@@ -81,9 +81,9 @@ export class DateTooltipRenderer {
     }
 
     /**
-     * Returns the HTML content for the given date.
+     * Returns the HTML content for the given time.
      *
-     * @param date The date to get the HTML content for.
+     * @param date The time to get the HTML content for.
      * @returns {string} Return the rendered HTML content.
      */
     function getHTMLForDate(date) {
@@ -104,7 +104,8 @@ export class DateTooltipRenderer {
         .map(function (item) {
           let color = dateChart.datasetController.getColorForDataset(item.dataset);
           let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
-          return `${divHTML} ${item.dataset}: <b>${item.value}</b>`;
+          let valueFormatted = dateChart.config.numberFormat.format(item.value);
+          return `${divHTML} ${item.dataset}: <b>${valueFormatted}</b>`;
         })
         .join('<br>');
 
@@ -112,10 +113,10 @@ export class DateTooltipRenderer {
     }
 
     /**
-     * Presents the tooltip next to bar presenting the given date.
+     * Presents the tooltip next to bar presenting the given time.
      *
      * @param event The mouse event.
-     * @param date The date which is presented.
+     * @param date The time which is presented.
      */
     this.showTooltip = function (event, date) {
 

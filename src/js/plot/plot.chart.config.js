@@ -17,5 +17,8 @@ export const defaultPlotChartConfig = {
   showTooltip: true,
   lowColor: 'rgb(184, 233, 148)',
   highColor: 'rgb(0, 122, 255)',
-  sort: PlotChartSort.duration
+  sort: PlotChartSort.duration,
+  numberFormat: Intl.NumberFormat('de-DE', {
+    maximumFractionDigits: 3
+  }),
 };

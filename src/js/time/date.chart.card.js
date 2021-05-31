@@ -8,7 +8,7 @@ import {downloadImage} from "../shared/download";
 import {createDownloadFilename} from "../shared/filname";
 
 /**
- * A lotivis date chart card.
+ * A lotivis time chart card.
  * @class DateChartCard
  * @extends Card
  */
@@ -86,7 +86,7 @@ export class DateChartCard extends ChartCard {
    * @override
    */
   screenshotButtonAction() {
-    let filename = this.chart.datasetController.getFilename() || 'date-chart';
+    let filename = this.chart.datasetController.getFilename() || 'time-chart';
     let downloadFilename = createDownloadFilename(filename, `date-chart`);
     downloadImage(this.chart.svgSelector, downloadFilename);
   }

@@ -6,7 +6,7 @@ import {combineDatasetsByRatio} from "../data.juggle/data.combine.ratio";
 import {extractDatesFromDatasets} from "../data.juggle/data.extract";
 
 DatasetsController.prototype.getCached = function (type) {
-  return this.cache.getDataview(
+  return this.cache.getDataView(
     type,
     this.locationFilters,
     this.dateFilters,
@@ -15,7 +15,7 @@ DatasetsController.prototype.getCached = function (type) {
 }
 
 DatasetsController.prototype.setCached = function (dataview, type) {
-  return this.cache.setDataview(
+  return this.cache.setDataView(
     dataview,
     type,
     this.locationFilters,

@@ -1,14 +1,14 @@
 import {LotivisConfig} from "../shared/config";
 
 /**
- * Appends the bars to a date chart.
+ * Appends the bars to a time chart.
  * @class DateBarsRenderer
  */
 export class DateBarsRenderer {
 
   /**
    * Creates a new instance of DateBarsRenderer.
-   * @param dateChart The parental date chart.
+   * @param dateChart The parental time chart.
    */
   constructor(dateChart) {
 
@@ -35,7 +35,7 @@ export class DateBarsRenderer {
         .data((data) => data)
         .enter()
         .append("rect")
-        .attr('class', 'lotivis-date-chart-bar')
+        .attr('class', 'lotivis-time-chart-bar')
         .attr("rx", isCombineStacks ? 0 : barRadius)
         .attr("ry", isCombineStacks ? 0 : barRadius)
         .attr("x", (d) => dateChart.xChart(d.data.date) + dateChart.xStack(stack.label))

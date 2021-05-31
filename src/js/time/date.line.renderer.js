@@ -14,7 +14,7 @@ export class DateLineRenderer {
         .attr("stroke", dataset.color.rgbString())
         .attr("stroke-width", 3.5)
         .attr("d", d3.line()
-          // .x((item) => this.x0(item.date))
+          // .x((item) => this.x0(item.time))
           // .y((item) => this.y0(item.value))
           .curve(d3.curveMonotoneX));
 
@@ -24,7 +24,7 @@ export class DateLineRenderer {
         .enter()
         .append("circle")
         .attr("r", 6)
-        // .attr("cx", (item) => this.x0(item.date))
+        // .attr("cx", (item) => this.x0(item.time))
         // .attr("cy", (item) => this.y0(item.value))
         .attr("fill", dataset.color.rgbString());
 

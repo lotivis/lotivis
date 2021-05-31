@@ -12,6 +12,7 @@ export class DateLegendRenderer {
     this.renderNormalLegend = function () {
       let config = dateChart.config;
       let controller = dateChart.datasetController;
+      let numberFormat = dateChart.numberFormat;
       let datasets = controller.datasets;
       let datasetNames = controller.labels;
       let circleRadius = 6;
@@ -28,7 +29,7 @@ export class DateLegendRenderer {
 
       legends
         .append('text')
-        .attr('class', 'lotivis-date-chart-legend-label')
+        .attr('class', 'lotivis-time-chart-legend-label')
         .attr("font-size", 13)
         .attr("x", (item) => xLegend(item.label) - 30)
         .attr("y", dateChart.graphHeight + labelMargin)
@@ -36,7 +37,11 @@ export class DateLegendRenderer {
         .style("fill", function (item) {
           return controller.getColorForDataset(item.label);
         })
-        .text((item) => `${item.label} (${controller.getSumOfDataset(item.label)})`)
+        .text(function (item) {
+          let value = controller.getSumOfDataset(item.label);
+          let formatted = numberFormat.format(value);
+          return `${item.label} (${formatted})`;
+        })
         .on('click', function (event) {
           if (!event || !event.target) return;
           if (!event.target.innerHTML) return;
@@ -48,7 +53,7 @@ export class DateLegendRenderer {
 
       legends
         .append("circle")
-        .attr('class', 'lotivis-date-chart-legend-circle')
+        .attr('class', 'lotivis-time-chart-legend-circle')
         .attr("r", circleRadius)
         .attr("cx", (item) => xLegend(item.label) - (circleRadius * 2) - 30)
         .attr("cy", dateChart.graphHeight + labelMargin - circleRadius + 2)
@@ -60,6 +65,7 @@ export class DateLegendRenderer {
 
     this.renderCombinedStacksLegend = function () {
       let stackNames = dateChart.datasetController.stacks;
+      let numberFormat = dateChart.numberFormat;
       let circleRadius = 6;
       let labelMargin = 50;
 
@@ -70,13 +76,13 @@ export class DateLegendRenderer {
 
       let legends = dateChart
         .graph
-        .selectAll('.lotivis-date-chart-legend-label')
+        .selectAll('.lotivis-time-chart-legend-label')
         .data(stackNames)
         .enter();
 
       legends
         .append('text')
-        .attr('class', 'lotivis-date-chart-legend-label')
+        .attr('class', 'lotivis-time-chart-legend-label')
         .attr("font-size", 23)
         .attr("x", (item) => xLegend(item) - 30)
         .attr("y", function () {
@@ -87,7 +93,9 @@ export class DateLegendRenderer {
           return Color.colorsForStack(index)[0].rgbString();
         }.bind(this))
         .text(function (item) {
-          return `${item} (${sumOfStack(dateChart.datasetController.flatData, item)})`;
+          let value = sumOfStack(dateChart.datasetController.flatData, item);
+          let formatted = numberFormat.format(value);
+          return `${item} (${formatted})`;
         }.bind(this));
 
       legends
