@@ -1,5 +1,6 @@
 import {PlotGradientCreator} from "./plot.gradient.creator";
 import {createIDFromDataset} from "../shared/selector";
+import {lotivis_log} from "../shared/debug";
 
 /**
  * Draws the bar on the plot chart.
@@ -43,7 +44,8 @@ export class PlotBarsRenderer {
      * Draws the bars.
      */
     this.renderBars = function () {
-      let datasets = plotChart.dataView.datasets;
+      lotivis_log('plotChart.dataView', plotChart.dataView);
+      let datasets = plotChart.dataView.datasetsSorted || plotChart.dataView.datasets;
       plotChart.definitions = plotChart.svg.append("defs");
 
       for (let index = 0; index < datasets.length; index++) {

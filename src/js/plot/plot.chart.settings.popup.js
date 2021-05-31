@@ -23,7 +23,7 @@ export class PlotChartSettingsPopup extends SettingsPopup {
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText('Labels');
     this.showLabelsCheckbox.onClick = function (checked) {
-      this.chart.config.isShowLabels = checked;
+      this.chart.config.showLabels = checked;
       this.chart.update();
       UrlParameters.getInstance().set(UrlParameters.chartShowLabels, checked);
     }.bind(this);
@@ -38,7 +38,7 @@ export class PlotChartSettingsPopup extends SettingsPopup {
       new Option(PlotChartSort.firstDate)
     ]);
     this.sortDropdown.setOnChange(function (value) {
-      this.chart.sort = value;
+      this.chart.config.sort = value;
       this.chart.update();
     }.bind(this));
   }
@@ -47,7 +47,7 @@ export class PlotChartSettingsPopup extends SettingsPopup {
    * Tells this popup that it is about to be displayed.
    */
   willShow() {
-    this.showLabelsCheckbox.setChecked(this.chart.config.isShowLabels);
-    this.sortDropdown.setSelectedOption(this.chart.sort);
+    this.showLabelsCheckbox.setChecked(this.chart.config.showLabels);
+    this.sortDropdown.setSelectedOption(this.chart.config.sort);
   }
 }

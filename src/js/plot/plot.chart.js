@@ -8,6 +8,7 @@ import {PlotBackgroundRenderer} from "./plot.background.renderer";
 import {defaultPlotChartConfig} from "./plot.chart.config";
 import {PlotChartSort} from "./plot.chart.sort";
 import "../dataview/dataview.plot";
+import {lotivis_log} from "../shared/debug";
 
 /**
  * A lotivis plot chart.
@@ -63,11 +64,14 @@ export class PlotChart extends Chart {
    *
    */
   precalculate() {
+
     if (this.datasetController) {
       this.dataView = this.datasetController.getPlotDataview();
     } else {
       this.dataView = {datasets: [], barsCount: 0};
     }
+
+    this.sortDatasets();
 
     let margin = this.config.margin;
     let barsCount = this.dataView.labelsCount || 0;
@@ -80,7 +84,6 @@ export class PlotChart extends Chart {
     this.svg
       .attr("viewBox", `0 0 ${this.config.width} ${this.preferredHeight}`);
 
-    this.sortDatasets();
     this.createScales();
   }
 
@@ -150,26 +153,35 @@ export class PlotChart extends Chart {
   }
 
   sortDatasets() {
-    this.dataView.datasets = this.dataView.datasets.reverse();
-    switch (this.sort) {
+    // this.dataView.datasets = this.dataView.datasets.reverse();
+    let datasets = this.dataView.datasets;
+    lotivis_log('sortDatasets', this.config.sort);
+    lotivis_log('sortedDatasets', datasets.length);
+    let sortedDatasets = [];
+    switch (this.config.sort) {
       case PlotChartSort.alphabetically:
-        this.dataView.datasets = this.dataView.datasets
+        sortedDatasets = datasets
           .sort((set1, set2) => set1.label > set2.label);
         break;
       case PlotChartSort.duration:
-        this.dataView.datasets = this.dataView.datasets
+        sortedDatasets = datasets
           .sort((set1, set2) => set1.duration < set2.duration);
         break;
       case PlotChartSort.intensity:
-        this.dataView.datasets = this.dataView.datasets
+        sortedDatasets = datasets
           .sort((set1, set2) => set1.sum < set2.sum);
         break;
       case PlotChartSort.firstDate:
-        this.dataView.datasets = this.dataView.datasets
-          .sort((set1, set2) => set1.earliestDate > set2.earliestDate);
+        sortedDatasets = datasets
+          .sort((set1, set2) => set1.firstDate > set2.firstDate);
         break;
       default:
+        sortedDatasets = datasets;
         break;
     }
+
+    this.dataView.labels = sortedDatasets.map(dataset => String(dataset.label)).reverse();
+    lotivis_log('sortedDatasets', sortedDatasets.length);
+    lotivis_log('this.dataView.labels', this.dataView.labels);
   }
 }

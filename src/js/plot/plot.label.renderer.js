@@ -18,7 +18,7 @@ export class PlotLabelRenderer {
      * Draws the labels on the bars on the plot chart.
      */
     this.renderLabels = function () {
-      if (!plotChart.config.isShowLabels) return;
+      if (!plotChart.config.showLabels) return;
       let xBandwidth = plotChart.yChart.bandwidth();
       let xChart = plotChart.xChart;
       plotChart.labels = plotChart

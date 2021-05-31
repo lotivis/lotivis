@@ -12,12 +12,12 @@ export const defaultPlotChartConfig = {
   },
   lineHeight: 28,
   radius: 23,
-  isShowLabels: true,
+  showLabels: true,
   drawGrid: true,
   showTooltip: true,
   lowColor: 'rgb(184, 233, 148)',
   highColor: 'rgb(0, 122, 255)',
-  sort: PlotChartSort.duration,
+  sort: PlotChartSort.none,
   numberFormat: Intl.NumberFormat('de-DE', {
     maximumFractionDigits: 3
   }),

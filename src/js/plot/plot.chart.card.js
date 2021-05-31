@@ -23,7 +23,7 @@ export class PlotChartCard extends ChartCard {
     super(theSelector, config);
     this.injectRadioGroup();
     this.applyURLParameters();
-    this.setTitle('Plot');
+    // this.setTitle('Plot');
   }
 
   /**

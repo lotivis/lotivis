@@ -5422,7 +5422,8 @@ class PlotBarsRenderer {
      * Draws the bars.
      */
     this.renderBars = function () {
-      let datasets = plotChart.dataView.datasets;
+      lotivis_log('plotChart.dataView', plotChart.dataView);
+      let datasets = plotChart.dataView.datasetsSorted || plotChart.dataView.datasets;
       plotChart.definitions = plotChart.svg.append("defs");
 
       for (let index = 0; index < datasets.length; index++) {
@@ -5585,7 +5586,7 @@ class PlotLabelRenderer {
      * Draws the labels on the bars on the plot chart.
      */
     this.renderLabels = function () {
-      if (!plotChart.config.isShowLabels) return;
+      if (!plotChart.config.showLabels) return;
       let xBandwidth = plotChart.yChart.bandwidth();
       let xChart = plotChart.xChart;
       plotChart.labels = plotChart
@@ -5661,6 +5662,7 @@ class PlotBackgroundRenderer {
  * Enumeration of sorts available in the plot chart.
  */
 const PlotChartSort = {
+  none: 'none',
   alphabetically: 'alphabetically',
   duration: 'duration',
   intensity: 'intensity',
@@ -5678,12 +5680,12 @@ const defaultPlotChartConfig = {
   },
   lineHeight: 28,
   radius: 23,
-  isShowLabels: true,
+  showLabels: true,
   drawGrid: true,
   showTooltip: true,
   lowColor: 'rgb(184, 233, 148)',
   highColor: 'rgb(0, 122, 255)',
-  sort: PlotChartSort.duration,
+  sort: PlotChartSort.none,
   numberFormat: Intl.NumberFormat('de-DE', {
     maximumFractionDigits: 3
   }),
@@ -5807,11 +5809,14 @@ class PlotChart extends Chart {
    *
    */
   precalculate() {
+
     if (this.datasetController) {
       this.dataView = this.datasetController.getPlotDataview();
     } else {
       this.dataView = {datasets: [], barsCount: 0};
     }
+
+    this.sortDatasets();
 
     let margin = this.config.margin;
     let barsCount = this.dataView.labelsCount || 0;
@@ -5824,7 +5829,6 @@ class PlotChart extends Chart {
     this.svg
       .attr("viewBox", `0 0 ${this.config.width} ${this.preferredHeight}`);
 
-    this.sortDatasets();
     this.createScales();
   }
 
@@ -5894,25 +5898,36 @@ class PlotChart extends Chart {
   }
 
   sortDatasets() {
-    this.dataView.datasets = this.dataView.datasets.reverse();
-    switch (this.sort) {
+    // this.dataView.datasets = this.dataView.datasets.reverse();
+    let datasets = this.dataView.datasets;
+    lotivis_log('sortDatasets', this.config.sort);
+    lotivis_log('sortedDatasets', datasets.length);
+    let sortedDatasets = [];
+    switch (this.config.sort) {
       case PlotChartSort.alphabetically:
-        this.dataView.datasets = this.dataView.datasets
+        sortedDatasets = datasets
           .sort((set1, set2) => set1.label > set2.label);
         break;
       case PlotChartSort.duration:
-        this.dataView.datasets = this.dataView.datasets
+        sortedDatasets = datasets
           .sort((set1, set2) => set1.duration < set2.duration);
         break;
       case PlotChartSort.intensity:
-        this.dataView.datasets = this.dataView.datasets
+        sortedDatasets = datasets
           .sort((set1, set2) => set1.sum < set2.sum);
         break;
       case PlotChartSort.firstDate:
-        this.dataView.datasets = this.dataView.datasets
-          .sort((set1, set2) => set1.earliestDate > set2.earliestDate);
+        sortedDatasets = datasets
+          .sort((set1, set2) => set1.firstDate > set2.firstDate);
+        break;
+      default:
+        sortedDatasets = datasets;
         break;
     }
+
+    this.dataView.labels = sortedDatasets.map(dataset => String(dataset.label)).reverse();
+    lotivis_log('sortedDatasets', sortedDatasets.length);
+    lotivis_log('this.dataView.labels', this.dataView.labels);
   }
 }
 
@@ -5934,7 +5949,7 @@ class PlotChartSettingsPopup extends SettingsPopup {
     this.showLabelsCheckbox = new Checkbox(container);
     this.showLabelsCheckbox.setText('Labels');
     this.showLabelsCheckbox.onClick = function (checked) {
-      this.chart.config.isShowLabels = checked;
+      this.chart.config.showLabels = checked;
       this.chart.update();
       UrlParameters.getInstance().set(UrlParameters.chartShowLabels, checked);
     }.bind(this);
@@ -5949,7 +5964,7 @@ class PlotChartSettingsPopup extends SettingsPopup {
       new Option(PlotChartSort.firstDate)
     ]);
     this.sortDropdown.setOnChange(function (value) {
-      this.chart.sort = value;
+      this.chart.config.sort = value;
       this.chart.update();
     }.bind(this));
   }
@@ -5958,8 +5973,8 @@ class PlotChartSettingsPopup extends SettingsPopup {
    * Tells this popup that it is about to be displayed.
    */
   willShow() {
-    this.showLabelsCheckbox.setChecked(this.chart.config.isShowLabels);
-    this.sortDropdown.setSelectedOption(this.chart.sort);
+    this.showLabelsCheckbox.setChecked(this.chart.config.showLabels);
+    this.sortDropdown.setSelectedOption(this.chart.config.sort);
   }
 }
 
@@ -5980,7 +5995,7 @@ class PlotChartCard extends ChartCard {
     super(theSelector, config);
     this.injectRadioGroup();
     this.applyURLParameters();
-    this.setTitle('Plot');
+    // this.setTitle('Plot');
   }
 
   /**
