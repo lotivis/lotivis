@@ -153,10 +153,7 @@ export class PlotChart extends Chart {
   }
 
   sortDatasets() {
-    // this.dataView.datasets = this.dataView.datasets.reverse();
     let datasets = this.dataView.datasets;
-    lotivis_log('sortDatasets', this.config.sort);
-    lotivis_log('sortedDatasets', datasets.length);
     let sortedDatasets = [];
     switch (this.config.sort) {
       case PlotChartSort.alphabetically:
@@ -181,7 +178,5 @@ export class PlotChart extends Chart {
     }
 
     this.dataView.labels = sortedDatasets.map(dataset => String(dataset.label)).reverse();
-    lotivis_log('sortedDatasets', sortedDatasets.length);
-    lotivis_log('this.dataView.labels', this.dataView.labels);
   }
 }

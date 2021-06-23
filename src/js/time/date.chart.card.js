@@ -6,6 +6,7 @@ import {Option} from "../components/option";
 import {ChartCard} from "../components/chart.card";
 import {downloadImage} from "../shared/download";
 import {createDownloadFilename} from "../shared/filname";
+import {UrlParameters} from "../shared/url.parameters";
 
 /**
  * A lotivis time chart card.
@@ -35,6 +36,7 @@ export class DateChartCard extends ChartCard {
     this.chartID = this.selector + '-chart';
     this.body.attr('id', this.chartID);
     this.chart = new DateChart(this.chartID, this.config);
+    this.applyURLParameters();
   }
 
   /**
@@ -58,17 +60,16 @@ export class DateChartCard extends ChartCard {
     this.radioGroup.setOptions(options);
   }
 
-  // /**
-  //  *
-  //  */
-  // applyURLParameters() {
-  //   this.chart.type = UrlParameters.getInstance()
-  //     .getString(UrlParameters.chartType + this.chartID, 'bar');
-  //   this.chart.config.showLabels = UrlParameters.getInstance()
-  //     .getBoolean(UrlParameters.chartShowLabels + this.chartID, this.chart.config.showLabels);
-  //   this.chart.config.combineStacks = UrlParameters.getInstance()
-  //     .getBoolean(UrlParameters.chartCombineStacks + this.chartID, this.chart.config.combineStacks);
-  // }
+  /**
+   *
+   */
+  applyURLParameters() {
+    let parameters = UrlParameters.getInstance();
+    this.chart.config.showLabels = parameters
+      .getBoolean(`showLabels-${this.chartID}`, this.chart.config.showLabels);
+    this.chart.config.combineStacks = parameters
+      .getBoolean(`combineStacks-${this.chartID}`, this.chart.config.combineStacks);
+  }
 
   /**
    * Tells this chart card to present the setting popup card.

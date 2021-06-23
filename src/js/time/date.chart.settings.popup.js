@@ -1,7 +1,5 @@
 import {Checkbox} from "../components/checkbox";
-import {RadioGroup} from "../components/radio.group";
 import {UrlParameters} from "../shared/url.parameters";
-import {Option} from "../components/option";
 import {SettingsPopup} from "../components/settings.popup";
 
 /**
@@ -15,7 +13,6 @@ export class DateChartSettingsPopup extends SettingsPopup {
     super.inject();
     this.injectShowLabelsCheckbox();
     this.injectCombineStacksCheckbox();
-    this.injectRadios();
   }
 
   injectShowLabelsCheckbox() {
@@ -25,7 +22,7 @@ export class DateChartSettingsPopup extends SettingsPopup {
     this.showLabelsCheckbox.onClick = function (checked) {
       this.chart.config.showLabels = checked;
       this.chart.update();
-      UrlParameters.getInstance().set(UrlParameters.chartShowLabels + this.selector, checked);
+      UrlParameters.getInstance().set(`showLabels-${this.chart.selector}`, checked);
     }.bind(this);
   }
 
@@ -36,30 +33,12 @@ export class DateChartSettingsPopup extends SettingsPopup {
     this.combineStacksCheckbox.onClick = function (checked) {
       this.chart.config.combineStacks = checked;
       this.chart.update();
-      UrlParameters.getInstance().set(UrlParameters.chartCombineStacks + this.selector, checked);
-    }.bind(this);
-  }
-
-  injectRadios() {
-    let container = this.row.append('div');
-    this.typeRadioGroup = new RadioGroup(container);
-    this.typeRadioGroup.setOptions([
-      new Option('bar', 'Bar'),
-      new Option('line', 'Line')
-    ]);
-
-    this.typeRadioGroup.onChange = function (value) {
-      this.chart.type = value;
-      this.chart.update();
-      UrlParameters.getInstance().set(UrlParameters.chartType + this.selector, value);
+      UrlParameters.getInstance().set(`combineStacks-${this.chart.selector}`, checked);
     }.bind(this);
   }
 
   willShow() {
     this.showLabelsCheckbox.setChecked(this.chart.config.showLabels);
-    // console.log('this.diachronicChart.showLabels: ' + this.diachronicChart.isShowLabels);
     this.combineStacksCheckbox.setChecked(this.chart.config.combineStacks);
-    // console.log('this.diachronicChart.combineGroups: ' + this.diachronicChart.isCombineStacks);
-    this.typeRadioGroup.setSelectedOption(this.chart.type);
   }
 }

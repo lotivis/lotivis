@@ -85,6 +85,8 @@ export class MapLegendRenderer {
           .attr('x', offset + 35)
           .attr('y', (d, i) => (i * 20) + 44)
           .text((d, i) => formatNumber((i / steps) * max));
+
+        return;
       }
     };
   }

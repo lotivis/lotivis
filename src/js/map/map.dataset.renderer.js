@@ -91,6 +91,8 @@ export class MapDatasetRenderer {
             .style('fill', generator(opacity));
 
         }
+
+        return;
       }
     };
   }

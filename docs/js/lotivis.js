@@ -3802,6 +3802,10 @@ class UrlParameters {
   updateCurrentPageFooter() {
     // console.log('window.lotivisApplication: ' + window.lotivisApplication);
     // window.lotivisApplication.currentPage.updateFooter();
+    const url = this.getURL();
+    d3
+      .select('#lotivis-url-container')
+      .text(url);
   }
 }
 
@@ -3811,7 +3815,7 @@ UrlParameters.query = 'query';
 UrlParameters.searchViewMode = 'search-view-mode';
 UrlParameters.chartType = 'chart-type';
 UrlParameters.chartShowLabels = 'chart-show-labels';
-UrlParameters.chartCombineStacks = 'chart-datasetCombine-stacks';
+UrlParameters.chartCombineStacks = 'combine-stacks';
 UrlParameters.contentType = 'content-type';
 UrlParameters.valueType = 'value-type';
 UrlParameters.searchSensitivity = 'search-sensitivity';
@@ -3865,7 +3869,6 @@ class DateChartSettingsPopup extends SettingsPopup {
     super.inject();
     this.injectShowLabelsCheckbox();
     this.injectCombineStacksCheckbox();
-    this.injectRadios();
   }
 
   injectShowLabelsCheckbox() {
@@ -3875,7 +3878,7 @@ class DateChartSettingsPopup extends SettingsPopup {
     this.showLabelsCheckbox.onClick = function (checked) {
       this.chart.config.showLabels = checked;
       this.chart.update();
-      UrlParameters.getInstance().set(UrlParameters.chartShowLabels + this.selector, checked);
+      UrlParameters.getInstance().set(`showLabels-${this.chart.selector}`, checked);
     }.bind(this);
   }
 
@@ -3886,31 +3889,13 @@ class DateChartSettingsPopup extends SettingsPopup {
     this.combineStacksCheckbox.onClick = function (checked) {
       this.chart.config.combineStacks = checked;
       this.chart.update();
-      UrlParameters.getInstance().set(UrlParameters.chartCombineStacks + this.selector, checked);
-    }.bind(this);
-  }
-
-  injectRadios() {
-    let container = this.row.append('div');
-    this.typeRadioGroup = new RadioGroup(container);
-    this.typeRadioGroup.setOptions([
-      new Option('bar', 'Bar'),
-      new Option('line', 'Line')
-    ]);
-
-    this.typeRadioGroup.onChange = function (value) {
-      this.chart.type = value;
-      this.chart.update();
-      UrlParameters.getInstance().set(UrlParameters.chartType + this.selector, value);
+      UrlParameters.getInstance().set(`combineStacks-${this.chart.selector}`, checked);
     }.bind(this);
   }
 
   willShow() {
     this.showLabelsCheckbox.setChecked(this.chart.config.showLabels);
-    // console.log('this.diachronicChart.showLabels: ' + this.diachronicChart.isShowLabels);
     this.combineStacksCheckbox.setChecked(this.chart.config.combineStacks);
-    // console.log('this.diachronicChart.combineGroups: ' + this.diachronicChart.isCombineStacks);
-    this.typeRadioGroup.setSelectedOption(this.chart.type);
   }
 }
 
@@ -4081,6 +4066,7 @@ class DateChartCard extends ChartCard {
     this.chartID = this.selector + '-chart';
     this.body.attr('id', this.chartID);
     this.chart = new DateChart(this.chartID, this.config);
+    this.applyURLParameters();
   }
 
   /**
@@ -4104,17 +4090,16 @@ class DateChartCard extends ChartCard {
     this.radioGroup.setOptions(options);
   }
 
-  // /**
-  //  *
-  //  */
-  // applyURLParameters() {
-  //   this.chart.type = UrlParameters.getInstance()
-  //     .getString(UrlParameters.chartType + this.chartID, 'bar');
-  //   this.chart.config.showLabels = UrlParameters.getInstance()
-  //     .getBoolean(UrlParameters.chartShowLabels + this.chartID, this.chart.config.showLabels);
-  //   this.chart.config.combineStacks = UrlParameters.getInstance()
-  //     .getBoolean(UrlParameters.chartCombineStacks + this.chartID, this.chart.config.combineStacks);
-  // }
+  /**
+   *
+   */
+  applyURLParameters() {
+    let parameters = UrlParameters.getInstance();
+    this.chart.config.showLabels = parameters
+      .getBoolean(`showLabels-${this.chartID}`, this.chart.config.showLabels);
+    this.chart.config.combineStacks = parameters
+      .getBoolean(`combineStacks-${this.chartID}`, this.chart.config.combineStacks);
+  }
 
   /**
    * Tells this chart card to present the setting popup card.
@@ -4434,6 +4419,8 @@ class MapLegendRenderer {
           .attr('x', offset + 35)
           .attr('y', (d, i) => (i * 20) + 44)
           .text((d, i) => formatNumber((i / steps) * max));
+
+        return;
       }
     };
   }
@@ -4566,6 +4553,8 @@ class MapDatasetRenderer {
             .style('fill', generator(opacity));
 
         }
+
+        return;
       }
     };
   }
@@ -5422,7 +5411,6 @@ class PlotBarsRenderer {
      * Draws the bars.
      */
     this.renderBars = function () {
-      lotivis_log('plotChart.dataView', plotChart.dataView);
       let datasets = plotChart.dataView.datasetsSorted || plotChart.dataView.datasets;
       plotChart.definitions = plotChart.svg.append("defs");
 
@@ -5487,18 +5475,22 @@ class PlotTooltipRenderer {
     function getHTMLContentForDataset(dataset) {
       let components = [];
 
+      let sum = dataset.data.map(item => item.value).reduce((acc, next) => +acc + +next, 0);
+      let formatted = plotChart.config.numberFormat.format(sum);
+
       components.push('Label: ' + dataset.label);
       components.push('');
       components.push('Start: ' + dataset.firstDate);
       components.push('End: ' + dataset.lastDate);
       components.push('');
-      components.push('Items: ' + dataset.data.map(item => item.value).reduce((acc, next) => +acc + +next, 0));
+      components.push('Items: ' + formatted);
       components.push('');
 
       let filtered = dataset.data.filter(item => item.value !== 0);
       for (let index = 0; index < filtered.length; index++) {
         let entry = filtered[index];
-        components.push(`${entry.date}: ${entry.value}`);
+        let formatted = plotChart.config.numberFormat.format(entry.value);
+        components.push(`${entry.date}: ${formatted}`);
       }
 
       return components.join('<br/>');
@@ -5601,7 +5593,8 @@ class PlotLabelRenderer {
         .attr("width", (d) => xChart(d.lastDate) - xChart(d.firstDate) + xBandwidth)
         .text(function (dataset) {
           if (dataset.sum === 0) return;
-          return `${dataset.duration + 1} years, ${dataset.sum} items`;
+          let formatted = plotChart.config.numberFormat.format(dataset.sum);
+          return `${dataset.duration + 1} years, ${formatted} items`;
         });
     };
   }
@@ -5898,10 +5891,7 @@ class PlotChart extends Chart {
   }
 
   sortDatasets() {
-    // this.dataView.datasets = this.dataView.datasets.reverse();
     let datasets = this.dataView.datasets;
-    lotivis_log('sortDatasets', this.config.sort);
-    lotivis_log('sortedDatasets', datasets.length);
     let sortedDatasets = [];
     switch (this.config.sort) {
       case PlotChartSort.alphabetically:
@@ -5926,8 +5916,6 @@ class PlotChart extends Chart {
     }
 
     this.dataView.labels = sortedDatasets.map(dataset => String(dataset.label)).reverse();
-    lotivis_log('sortedDatasets', sortedDatasets.length);
-    lotivis_log('this.dataView.labels', this.dataView.labels);
   }
 }
 
@@ -6741,6 +6729,7 @@ exports.URLParameters = UrlParameters;
 var exports$1 = exports;
 
 console.log(`[lotivis]  lotivis module loaded.`);
+UrlParameters.getInstance().updateCurrentPageFooter();
 
 exports.default = exports$1;
 

@@ -30,18 +30,22 @@ export class PlotTooltipRenderer {
     function getHTMLContentForDataset(dataset) {
       let components = [];
 
+      let sum = dataset.data.map(item => item.value).reduce((acc, next) => +acc + +next, 0);
+      let formatted = plotChart.config.numberFormat.format(sum);
+
       components.push('Label: ' + dataset.label);
       components.push('');
       components.push('Start: ' + dataset.firstDate);
       components.push('End: ' + dataset.lastDate);
       components.push('');
-      components.push('Items: ' + dataset.data.map(item => item.value).reduce((acc, next) => +acc + +next, 0));
+      components.push('Items: ' + formatted);
       components.push('');
 
       let filtered = dataset.data.filter(item => item.value !== 0);
       for (let index = 0; index < filtered.length; index++) {
         let entry = filtered[index];
-        components.push(`${entry.date}: ${entry.value}`);
+        let formatted = plotChart.config.numberFormat.format(entry.value);
+        components.push(`${entry.date}: ${formatted}`);
       }
 
       return components.join('<br/>');

@@ -22,10 +22,10 @@
     "build": "npm run build:js && npm run build:css:sass",
     "build:js": "rollup -c",
     "build:css:sass": "sass src/index.scss > dist/lotivis.css",
-    "test": "npm run copy-to-dist && mocha",
+    "test": "npm run copy:to:dist && mocha",
     "serve:example": "node server.js",
     "copy:to:dist": "cp docs/js/lotivis.* dist/ && cp docs/css/lotivis.* dist/",
-    "copy:to:frcv": "cp docs/js/lotivis.* ../frc-visualization/public/js && cp docs/css/lotivis.* ../frc-visualization/public/css"
+    "copy:to:frcv": "cp docs/js/lotivis.* ../frc-visualization/public/js/lib && cp docs/css/lotivis.* ../frc-visualization/public/css"
   },
   "repository": {
     "type": "git",

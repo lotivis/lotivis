@@ -64,6 +64,10 @@ export class UrlParameters {
   updateCurrentPageFooter() {
     // console.log('window.lotivisApplication: ' + window.lotivisApplication);
     // window.lotivisApplication.currentPage.updateFooter();
+    const url = this.getURL();
+    d3
+      .select('#lotivis-url-container')
+      .text(url);
   }
 }
 
@@ -73,7 +77,7 @@ UrlParameters.query = 'query';
 UrlParameters.searchViewMode = 'search-view-mode';
 UrlParameters.chartType = 'chart-type';
 UrlParameters.chartShowLabels = 'chart-show-labels';
-UrlParameters.chartCombineStacks = 'chart-datasetCombine-stacks';
+UrlParameters.chartCombineStacks = 'combine-stacks';
 UrlParameters.contentType = 'content-type';
 UrlParameters.valueType = 'value-type';
 UrlParameters.searchSensitivity = 'search-sensitivity';

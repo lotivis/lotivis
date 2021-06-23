@@ -44,7 +44,6 @@ export class PlotBarsRenderer {
      * Draws the bars.
      */
     this.renderBars = function () {
-      lotivis_log('plotChart.dataView', plotChart.dataView);
       let datasets = plotChart.dataView.datasetsSorted || plotChart.dataView.datasets;
       plotChart.definitions = plotChart.svg.append("defs");
 

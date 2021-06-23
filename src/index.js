@@ -132,3 +132,4 @@ exports.URLParameters = UrlParameters;
 export default exports;
 
 console.log(`[lotivis]  lotivis module loaded.`);
+UrlParameters.getInstance().updateCurrentPageFooter();
