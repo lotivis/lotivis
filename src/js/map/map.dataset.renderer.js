@@ -88,7 +88,13 @@ export class MapDatasetRenderer {
           mapChart.svg
             .selectAll('.lotivis-map-area')
             .filter((item) => equals(mapChart.config.featureIDAccessor(item), locationID))
-            .style('fill', generator(opacity));
+            .style('fill', function () {
+              if (opacity === 0) {
+                return 'WhiteSmoke';
+              } else {
+                return generator(opacity);
+              }
+            });
 
         }
 

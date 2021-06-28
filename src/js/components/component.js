@@ -41,7 +41,8 @@ export class Component {
       let selector = camel2title(this.constructor.name)
         .toLowerCase()
         .trim()
-        .replaceAll(' ', '-');
+        .split(` `).join(`-`);
+
       this.initializeFromSelector(selector);
     }
   }

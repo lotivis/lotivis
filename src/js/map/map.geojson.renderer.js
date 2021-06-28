@@ -52,7 +52,7 @@ export class MapGeoJSONRenderer {
         .attr('id', feature => `lotivis-map-area-${idAccessor(feature)}`)
         .classed('lotivis-map-area', true)
         .style('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4')
-        .style('fill', 'whitesmoke')
+        .style('fill', 'white')
         .style('fill-opacity', 1)
         .on('click', mapChart.onSelectFeature.bind(mapChart))
         .on('mouseenter', mouseEnter)

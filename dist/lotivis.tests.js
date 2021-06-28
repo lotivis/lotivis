@@ -991,7 +991,7 @@ class DatasetsController {
    */
   getFilename() {
     if (!this.labels) return 'Unknown';
-    let labels = this.labels.map(label => label.replaceAll(' ', '-'));
+    let labels = this.labels.map(label => label.split(` `).join(`-`));
     if (labels.length > 10) {
       labels = labels.splice(0, 10);
     }

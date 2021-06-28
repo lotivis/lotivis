@@ -62,6 +62,59 @@ export class MapLegendRenderer {
 
         legend
           .append("g")
+          .selectAll("text")
+          .data(['Keine Daten'])
+          .enter()
+          .append("text")
+          .attr('class', 'lotivis-map-legend-text')
+          .attr('x', offset + 35)
+          .attr('y', 44)
+          .text(d => d);
+
+        legend
+          .append('g')
+          .selectAll("rect")
+          .data([0])
+          .enter()
+          .append("rect")
+          .attr('class', 'lotivis-map-legend-rect')
+          .style('fill', 'white')
+          .attr('x', offset + 10)
+          .attr('y', 30)
+          .attr('width', 18)
+          .attr('height', 18)
+          .style('stroke-dasharray', '1,3')
+          .style('stroke', 'black')
+          .style('stroke-width', 1);
+
+        legend
+          .append("g")
+          .selectAll("text")
+          .data([0])
+          .enter()
+          .append("text")
+          .attr('class', 'lotivis-map-legend-text')
+          .attr('x', offset + 35)
+          .attr('y', 64)
+          .text(d => d);
+
+        legend
+          .append('g')
+          .selectAll("rect")
+          .data([0])
+          .enter()
+          .append("rect")
+          .attr('class', 'lotivis-map-legend-rect')
+          .style('fill', 'WhiteSmoke')
+          .attr('x', offset + 10)
+          .attr('y', 50)
+          .attr('width', 18)
+          .attr('height', 18)
+          .style('stroke', 'black')
+          .style('stroke-width', 1);
+
+        legend
+          .append("g")
           .selectAll("rect")
           .data(data)
           .enter()
@@ -69,7 +122,7 @@ export class MapLegendRenderer {
           .attr('class', 'lotivis-map-legend-rect')
           .style('fill', generator)
           .attr('x', offset + 10)
-          .attr('y', (d, i) => (i * 20) + 30)
+          .attr('y', (d, i) => (i * 20) + 70)
           .attr('width', 18)
           .attr('height', 18)
           .style('stroke', 'black')
@@ -83,8 +136,14 @@ export class MapLegendRenderer {
           .append("text")
           .attr('class', 'lotivis-map-legend-text')
           .attr('x', offset + 35)
-          .attr('y', (d, i) => (i * 20) + 44)
-          .text((d, i) => formatNumber((i / steps) * max));
+          .attr('y', (d, i) => (i * 20) + 84)
+          .text(function (d, i) {
+            if (d === 0) {
+              return '> 0'
+            } else {
+              return formatNumber(((i / steps) * max));
+            }
+          });
 
         return;
       }

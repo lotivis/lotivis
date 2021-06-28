@@ -18,9 +18,9 @@ export var createID;
  */
 export function toSaveID(theID) {
   return theID
-    .replaceAll(' ', '-')
-    .replaceAll('/', '-')
-    .replaceAll('.', '-');
+    .split(` `).join(`-`)
+    .split(`/`).join(`-`)
+    .split(`.`).join(`-`);
 }
 
 /**

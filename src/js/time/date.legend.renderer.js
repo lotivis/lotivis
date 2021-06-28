@@ -95,7 +95,18 @@ export class DateLegendRenderer {
         .text(function (item) {
           let value = sumOfStack(dateChart.datasetController.flatData, item);
           let formatted = numberFormat.format(value);
-          return `${item} (${formatted})`;
+          let labels = item.split(',');
+          let text;
+
+          if (labels.length > 3) {
+            labels = labels.splice(0, 3);
+            text = labels.join(', ') + ',...';
+          } else {
+            text = item;
+          }
+
+          return `${text} (${formatted})`;
+
         }.bind(this));
 
       legends
