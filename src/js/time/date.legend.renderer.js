@@ -48,6 +48,7 @@ export class DateLegendRenderer {
           let components = event.target.innerHTML.split(' (');
           components.pop();
           let label = components.join(" (");
+          console.log('label', label);
           dateChart.toggleDataset(label);
         }.bind(this));
 

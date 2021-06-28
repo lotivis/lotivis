@@ -1,5 +1,5 @@
 /*!
- * lotivis.js v1.0.89
+ * lotivis.js v1.0.90
  * https://github.com/lukasdanckwerth/lotivis#readme
  * (c) 2021 lotivis.js Lukas Danckwerth
  * Released under the MIT License
@@ -1160,6 +1160,14 @@ DatasetsController.prototype.toggleDataset = function (label, notifyListeners = 
     if (dataset.label !== label) return;
     dataset.isEnabled = !dataset.isEnabled;
   });
+
+  // let index = this.datasetFilters.indexOf(label);
+  // if (index !== -1) {
+  //   this.datasetFilters.splice(index, 1);
+  // } else {
+  //   this.datasetFilters.push(String(label));
+  // }
+
   if (!notifyListeners) return;
   this.notifyListeners('dataset-toggle');
 };
@@ -1215,7 +1223,10 @@ DatasetsController.prototype.enabledDatasets = function () {
     .filter(dataset => dataset.isEnabled === true);
 
   if (this.datasetFilters && this.datasetFilters.length > 0) {
-    enabled = enabled.filter(dataset => this.datasetFilters.includes(dataset.label));
+    let datasetFilters = this.datasetFilters;
+    enabled = enabled.filter(function (dataset) {
+      return datasetFilters.includes(String(dataset.label));
+    });
   }
 
   if (this.locationFilters && this.locationFilters.length > 0) {

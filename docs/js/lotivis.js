@@ -1,5 +1,5 @@
 /*!
- * lotivis.js v1.0.89
+ * lotivis.js v1.0.90
  * https://github.com/lukasdanckwerth/lotivis#readme
  * (c) 2021 lotivis.js Lukas Danckwerth
  * Released under the MIT License
@@ -3142,6 +3142,7 @@ class DateLegendRenderer {
           let components = event.target.innerHTML.split(' (');
           components.pop();
           let label = components.join(" (");
+          console.log('label', label);
           dateChart.toggleDataset(label);
         }.bind(this));
 
@@ -3257,6 +3258,7 @@ class DateBarsRenderer {
         .enter()
         .append("rect")
         .attr('class', 'lotivis-time-chart-bar')
+        .attr('class', 'lotivis-date-chart-bar')
         .attr("rx", isCombineStacks ? 0 : barRadius)
         .attr("ry", isCombineStacks ? 0 : barRadius)
         .attr("x", (d) => dateChart.xChart(d.data.date) + dateChart.xStack(stack.label))
@@ -6219,6 +6221,14 @@ DatasetsController.prototype.toggleDataset = function (label, notifyListeners = 
     if (dataset.label !== label) return;
     dataset.isEnabled = !dataset.isEnabled;
   });
+
+  // let index = this.datasetFilters.indexOf(label);
+  // if (index !== -1) {
+  //   this.datasetFilters.splice(index, 1);
+  // } else {
+  //   this.datasetFilters.push(String(label));
+  // }
+
   if (!notifyListeners) return;
   this.notifyListeners('dataset-toggle');
 };
@@ -6274,7 +6284,10 @@ DatasetsController.prototype.enabledDatasets = function () {
     .filter(dataset => dataset.isEnabled === true);
 
   if (this.datasetFilters && this.datasetFilters.length > 0) {
-    enabled = enabled.filter(dataset => this.datasetFilters.includes(dataset.label));
+    let datasetFilters = this.datasetFilters;
+    enabled = enabled.filter(function (dataset) {
+      return datasetFilters.includes(String(dataset.label));
+    });
   }
 
   if (this.locationFilters && this.locationFilters.length > 0) {

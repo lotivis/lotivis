@@ -36,6 +36,7 @@ export class DateBarsRenderer {
         .enter()
         .append("rect")
         .attr('class', 'lotivis-time-chart-bar')
+        .attr('class', 'lotivis-date-chart-bar')
         .attr("rx", isCombineStacks ? 0 : barRadius)
         .attr("ry", isCombineStacks ? 0 : barRadius)
         .attr("x", (d) => dateChart.xChart(d.data.date) + dateChart.xStack(stack.label))
