@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
-  <link rel="stylesheet" href="../css/lotivis.css"/>
+  <link rel="stylesheet" href="../dist/lotivis.css"/>
   <title>Lotivis - Map Data</title>
 </head>
 <body>
@@ -12,7 +12,7 @@
 <div class="lotivis-container">
   <div class="lotivis-row">
     <div class="lotivis-col-2">
-      <a class="lotivis-anchor-back" href="../docs/index.html">
+      <a class="lotivis-anchor-back" href="../index.html">
         Back
       </a>
     </div>
@@ -30,7 +30,7 @@
 <script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/topojson-server@3.0.1/dist/topojson-server.min.js"></script>
-<script src="../js/lotivis.js"></script>
+<script src="../dist/lotivis.js"></script>
 
 <script>
 
@@ -39,7 +39,7 @@
   mapChartCard.chart.config.excludedFeatureCodes = ['2A', '2B'];
   mapChartCard.chart.minimapFeatureCodes = ['75', '92', '93', '94'];
 
-  d3.json('../assets/departements.geojson')
+  d3.json('assets/departements.geojson')
     .then(function (rawGeoJSON) {
       mapChartCard.chart.setGeoJSON(rawGeoJSON);
     });

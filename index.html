@@ -15,6 +15,7 @@
       <h1>
         lotivis.js Examples
       </h1>
+      Version: <span id="label-version"></span>
     </div>
     <div class="lotivis-col-4 menu">
       <h2>Chart</h2>
@@ -66,6 +67,20 @@
     </div>
   </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
+<script src="dist/lotivis.js"></script>
+
+<script>
+
+  lotivis.debug(true);
+
+  let versionLabel = document.getElementById('label-version');
+  versionLabel.innerText = lotivis.version;
+
+  console.log(lotivis)
+
+</script>
 
 </body>
 

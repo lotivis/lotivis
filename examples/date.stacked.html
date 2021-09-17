@@ -37,21 +37,187 @@
 
 <script>
 
+  let data = [
+    {
+      "label": "dataset_1",
+      "stack": "dataset_1",
+      "data": [
+        {
+          "location": 1,
+          "date": 2000,
+          "value": 0
+        },
+        {
+          "location": 1,
+          "date": 2001,
+          "value": 1
+        },
+        {
+          "location": 1,
+          "date": 2002,
+          "value": 2
+        },
+        {
+          "location": 1,
+          "date": 2003,
+          "value": 3
+        },
+        {
+          "location": 1,
+          "date": 2004,
+          "value": 4
+        },
+        {
+          "location": 2,
+          "date": 2000,
+          "value": 2
+        },
+        {
+          "location": 2,
+          "date": 2001,
+          "value": 3
+        },
+        {
+          "location": 2,
+          "date": 2002,
+          "value": 4
+        },
+        {
+          "location": 2,
+          "date": 2003,
+          "value": 5
+        },
+        {
+          "location": 2,
+          "date": 2004,
+          "value": 6
+        }
+      ]
+    },
+    {
+      "label": "dataset_2",
+      "stack": "dataset_2, dataset_3",
+      "data": [
+        {
+          "location": 1,
+          "date": 2000,
+          "value": 5
+        },
+        {
+          "location": 1,
+          "date": 2001,
+          "value": 5
+        },
+        {
+          "location": 1,
+          "date": 2002,
+          "value": 5
+        },
+        {
+          "location": 1,
+          "date": 2003,
+          "value": 5
+        },
+        {
+          "location": 1,
+          "date": 2004,
+          "value": 5
+        },
+        {
+          "location": 2,
+          "date": 2000,
+          "value": 8
+        },
+        {
+          "location": 2,
+          "date": 2001,
+          "value": 7
+        },
+        {
+          "location": 2,
+          "date": 2002,
+          "value": 6
+        },
+        {
+          "location": 2,
+          "date": 2003,
+          "value": 5
+        },
+        {
+          "location": 2,
+          "date": 2004,
+          "value": 4
+        }
+      ]
+    },
+    {
+      "label": "dataset_3",
+      "stack": "dataset_2, dataset_3",
+      "data": [
+        {
+          "location": 1,
+          "date": 2000,
+          "value": 5
+        },
+        {
+          "location": 1,
+          "date": 2001,
+          "value": 4
+        },
+        {
+          "location": 1,
+          "date": 2002,
+          "value": 3
+        },
+        {
+          "location": 1,
+          "date": 2003,
+          "value": 2
+        },
+        {
+          "location": 1,
+          "date": 2004,
+          "value": 1
+        },
+        {
+          "location": 2,
+          "date": 2000,
+          "value": 5
+        },
+        {
+          "location": 2,
+          "date": 2001,
+          "value": 6
+        },
+        {
+          "location": 2,
+          "date": 2002,
+          "value": 7
+        },
+        {
+          "location": 2,
+          "date": 2003,
+          "value": 8
+        },
+        {
+          "location": 2,
+          "date": 2004,
+          "value": 9
+        }
+      ]
+    }
+  ]
+
+
   lotivis.debug(true);
 
   let datasetsCard = new lotivis.DatasetsJSONCard();
   let dateChartCard = new lotivis.DateChartCard();
 
-  fetch('./assets/example-datasets-location-time-stacked.json')
-    .then(response => response.text())
-    .then(text => JSON.parse(text))
-    .then(function (json) {
+  let datasetsController = new lotivis.DatasetController(data);
 
-      let datasetsController = new lotivis.DatasetController(json);
-      dateChartCard.chart.setDatasetsController(datasetsController);
-      datasetsCard.setDatasetsController(datasetsController);
-
-    });
+  dateChartCard.chart.setDatasetsController(datasetsController);
+  datasetsCard.setDatasetsController(datasetsController);
 
 </script>
 

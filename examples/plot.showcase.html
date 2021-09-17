@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
-  <link rel="stylesheet" href="../css/lotivis.css"/>
+  <link rel="stylesheet" href="../dist/lotivis.css"/>
   <title>Lotivis - Plot Data Example</title>
 </head>
 <body>
@@ -12,7 +12,7 @@
 <div class="lotivis-container-full">
   <div class="lotivis-row">
     <div class="lotivis-col-2">
-      <a class="lotivis-anchor-back" href="../docs/index.html">
+      <a class="lotivis-anchor-back" href="../index.html">
         Back
       </a>
     </div>
@@ -51,9 +51,126 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
-<script src="../js/lotivis.js"></script>
+<script src="../dist/lotivis.js"></script>
 
 <script>
+
+  let data = [
+    {
+      "label": "dataset_1",
+      "data": [
+        {
+          "location": 1,
+          "date": 2000,
+          "value": 0
+        },
+        {
+          "location": 1,
+          "date": 2001,
+          "value": 1
+        },
+        {
+          "location": 1,
+          "date": 2002,
+          "value": 2
+        },
+        {
+          "location": 1,
+          "date": 2003,
+          "value": 3
+        },
+        {
+          "location": 1,
+          "date": 2004,
+          "value": 4
+        }
+      ]
+    },
+    {
+      "label": "dataset_2",
+      "data": [
+        {
+          "location": 1,
+          "date": 2000,
+          "value": 0
+        },
+        {
+          "location": 1,
+          "date": 2001,
+          "value": 2
+        },
+        {
+          "location": 1,
+          "date": 2002,
+          "value": 4
+        },
+        {
+          "location": 1,
+          "date": 2003,
+          "value": 2
+        },
+        {
+          "location": 1,
+          "date": 2004,
+          "value": 0
+        }
+      ]
+    },
+    {
+      "label": "dataset_3",
+      "data": [
+        {
+          "location": 1,
+          "date": 2000,
+          "value": 5
+        },
+        {
+          "location": 1,
+          "date": 2001,
+          "value": 4
+        },
+        {
+          "location": 1,
+          "date": 2002,
+          "value": 3
+        },
+        {
+          "location": 1,
+          "date": 2003,
+          "value": 2
+        },
+        {
+          "location": 1,
+          "date": 2004,
+          "value": 0
+        }
+      ]
+    },
+    {
+      "label": "dataset_4",
+      "data": [
+        {
+          "location": 1,
+          "date": 2000,
+          "value": 3
+        }
+      ]
+    },
+    {
+      "label": "dataset_5",
+      "data": [
+        {
+          "location": 1,
+          "date": 2003,
+          "value": 5
+        }
+      ]
+    },
+    {
+      "label": "dataset_6",
+      "data": []
+    }
+  ]
 
   lotivis.debug(true);
 
@@ -65,21 +182,16 @@
   let plotChartCard6 = new lotivis.PlotChartCard('card-6', {title: 'Sort firstDate', sort: 'firstDate'});
   let datasetJSONCard = new lotivis.DatasetsJSONCard('datasets-json-card');
 
-  d3
-    .json('../assets/example-datasets-plot.json')
-    .then(function (json) {
-
-      let controller = new lotivis.DatasetController(json);
-      controller.register([
-        plotChartCard1.chart,
-        plotChartCard2.chart,
-        plotChartCard3.chart,
-        plotChartCard4.chart,
-        plotChartCard5.chart,
-        plotChartCard6.chart,
-        datasetJSONCard
-      ]);
-    });
+  let controller = new lotivis.DatasetController(data);
+  controller.register([
+    plotChartCard1.chart,
+    plotChartCard2.chart,
+    plotChartCard3.chart,
+    plotChartCard4.chart,
+    plotChartCard5.chart,
+    plotChartCard6.chart,
+    datasetJSONCard
+  ]);
 
 </script>
 

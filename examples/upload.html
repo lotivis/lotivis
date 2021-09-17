@@ -4,7 +4,7 @@
   <meta charset="utf-8"/>
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
-  <link rel="stylesheet" href="../css/lotivis.css"/>
+  <link rel="stylesheet" href="../dist/lotivis.css"/>
   <title>Lotivis - Upload</title>
 </head>
 <body>
@@ -12,7 +12,7 @@
 <div class="lotivis-container">
   <div class="lotivis-row">
     <div class="lotivis-col-2">
-      <a class="lotivis-anchor-back" href="../docs/index.html">
+      <a class="lotivis-anchor-back" href="../index.html">
         Back
       </a>
     </div>
@@ -66,7 +66,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
-<script src="../js/lotivis.js"></script>
+<script src="../dist/lotivis.js"></script>
 
 <script>
 
@@ -82,7 +82,7 @@
   d3.json(geoJSON)
     .then(function (json) {
       mapChartCard.chart.setGeoJSON(json);
-      return d3.json('../assets/miff.json');
+      return d3.json('assets/miff.json');
     })
     .then(function (json) {
 

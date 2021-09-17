@@ -128,8 +128,9 @@ exports.DateWeekAssessor = DateWeekAssessor;
 
 // url parameters
 exports.URLParameters = UrlParameters;
+exports.version = '1.0.90';
+exports.versionShort = '1';
 
 export default exports;
 
 console.log(`[lotivis]  lotivis module loaded.`);
-UrlParameters.getInstance().updateCurrentPageFooter();
