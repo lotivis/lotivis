@@ -42,24 +42,15 @@ dist/
 
 ## Development
 
-You can run these examples as:
+To start development run:
 ```shell
-// build lotivis library
-$ npm run build
+// stars rollup with -c -w arguments
+$ npm run develop
 
-// run server
-$ npm run serve:example
-```
+// starts a http-server serving the examples
+$ npm run develop:example
 
-## Run Examples
-
-You can try the examples of **lotivis.js** by running the following commands.
-```shell
-// build lotivis library
-$ npm run build
-
-// run server
-$ npm run serve:example
+// start developing...
 ```
 
 ## Dependency
