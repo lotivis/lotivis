@@ -4,7 +4,7 @@
 
 > lotivis.js is a D3-based chart library to visualize location and time specific data.
 
-*lotivis* (or **lotivis.js**) is a JavaScript library for
+**lotivis** (or **lotivis.js**) is a JavaScript library for
 visualizing location and time specific data using [D3](https://github.com/mbostock/d3).
 
 ## Resources
