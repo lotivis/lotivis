@@ -4,7 +4,7 @@ import {ChartCard} from "../components/chart.card";
 import {PlotChart} from "./plot.chart";
 import {PlotChartSettingsPopup} from "./plot.chart.settings.popup";
 import {downloadImage} from "../shared/download";
-import {createDownloadFilename} from "../shared/filname";
+import {createDownloadFilename} from "../shared/filename";
 
 /**
  * A card containing a plot chart.

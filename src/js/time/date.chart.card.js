@@ -5,7 +5,7 @@ import {RadioGroup} from "../components/radio.group";
 import {Option} from "../components/option";
 import {ChartCard} from "../components/chart.card";
 import {downloadImage} from "../shared/download";
-import {createDownloadFilename} from "../shared/filname";
+import {createDownloadFilename} from "../shared/filename";
 import {UrlParameters} from "../shared/url.parameters";
 
 /**

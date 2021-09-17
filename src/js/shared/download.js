@@ -1,4 +1,4 @@
-import {appendExtensionIfNeeded} from "./filname";
+import {appendExtensionIfNeeded} from "./filename";
 import {getOriginalSizeOfSVG, getSVGString, svgString2Image} from "./screenshot";
 
 /**

@@ -157,7 +157,9 @@ var createID;
 
 /**
  * Returns a 'save-to-use' id for a HTML element by replacing whitespace with dashes.
+ *
  * @param theID The id for a HTML element.
+ *
  * @returns {string} The save version of the given id.
  */
 function toSaveID(theID) {
@@ -170,14 +172,15 @@ function toSaveID(theID) {
 /**
  * Creates and returns a unique (save to use for elements) id.  The id is created by calculating the hash of the
  * dataset's label.
+ *
  * @param dataset The dataset.
+ *
  * @returns {number} The created id.
  */
 function createIDFromDataset(dataset) {
   if (!dataset || !dataset.label) return 0;
   return hashCode(dataset.label);
 }
-
 
 function camel2title(camelCase) {
   // no side-effects
@@ -975,7 +978,9 @@ const FormattedDateAccess = function (dateString) {
 /**
  *
  * @param dateString
+ *
  * @returns {number}
+ *
  * @constructor
  */
 const DateGermanAssessor = function (dateString) {
@@ -2138,8 +2143,10 @@ class EditableDataviewCard extends UpdatableDataviewCard {
 
 /**
  * Appends the given string in extension to the given string filename if filename not already ends with this extension.
+ *
  * @param filename A string with or without an extension.
  * @param extension The extension the filename will end with.
+ *
  * @returns {*|string} The filename with the given extension.
  */
 function appendExtensionIfNeeded(filename, extension) {

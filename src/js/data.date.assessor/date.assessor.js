@@ -24,7 +24,9 @@ export const FormattedDateAccess = function (dateString) {
 /**
  *
  * @param dateString
+ *
  * @returns {number}
+ *
  * @constructor
  */
 export const DateGermanAssessor = function (dateString) {

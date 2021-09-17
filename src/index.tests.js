@@ -64,7 +64,7 @@ import {equals, objectsEqual} from "./js/shared/equal";
 import {renderCSVDate} from "./js/data.render/render.csv.date";
 import {createDatasets} from "./js/data.juggle/data.create.datasets";
 import {copy} from "./js/shared/copy";
-import {appendExtensionIfNeeded} from "./js/shared/filname";
+import {appendExtensionIfNeeded} from "./js/shared/filename";
 import {
   FormattedDateAccess,
   DateGermanAssessor,

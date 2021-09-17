@@ -1,6 +1,6 @@
 import {EditableDataviewCard} from "./editable.dataview.card";
 import {downloadJSON} from "../shared/download";
-import {createDownloadFilename} from "../shared/filname";
+import {createDownloadFilename} from "../shared/filename";
 
 /**
  * A card containing a textarea which contains the JSON text of a dataset collection.

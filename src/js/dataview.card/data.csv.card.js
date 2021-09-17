@@ -3,7 +3,7 @@ import {EditableDataviewCard} from "./editable.dataview.card";
 import {parseCSV} from "../data.parse/parse.csv";
 import {renderCSV} from "../data.render/render.csv";
 import {downloadCSV} from "../shared/download";
-import {createDownloadFilename} from "../shared/filname";
+import {createDownloadFilename} from "../shared/filename";
 
 /**
  * Presents the CSV version of datasets.  The presented CSV can be edited.
