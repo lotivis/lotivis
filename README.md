@@ -43,7 +43,7 @@ dist/
 ## Development
 
 To start development run:
-```shell
+```bash
 // stars rollup with -c -w arguments
 $ npm run develop
 
@@ -51,6 +51,10 @@ $ npm run develop
 $ npm run develop:example
 
 // start developing...
+
+
+// tests can be run with
+$ npm run test
 ```
 
 ## Dependency
