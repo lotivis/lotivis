@@ -5,19 +5,19 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../css/lotivis.css"/>
-  <title>Lotivis Examples - Dataviews</title>
+  <title>Lotivis Examples - App</title>
 </head>
 <body>
 
 <div class="lotivis-container-full">
   <div class="lotivis-row">
     <div class="lotivis-col-2">
-      <a class="lotivis-anchor-back" href="../index.html">
+      <a class="lotivis-anchor-back" href="../docs/index.html">
         Back
       </a>
     </div>
     <div class="lotivis-col-8 lotivis-headline">
-      <h1>Dataviews</h1>
+      <h1>App</h1>
     </div>
     <div class="lotivis-col-2">
       <!-- Empty-->
@@ -25,6 +25,24 @@
     <div class="lotivis-col-3">
       <div id="datasets-json-card">
         <!-- Datasets JSON Card Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-5">
+      <div id="date-chart-card">
+        <!-- Date Chart Card Here -->
+      </div>
+      <div id="plot-chart-card">
+        <!-- Plot Chart Card Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-4">
+      <div id="map-chart-card">
+        <!-- Map Chart Card Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-3">
+      <div id="dataview-datasets-controller-card">
+        <!-- Dataview Datasets Controller Card Here -->
       </div>
     </div>
     <div class="lotivis-col-3">
@@ -47,11 +65,6 @@
         <!-- Dataview Flat Card Here -->
       </div>
     </div>
-    <div class="lotivis-col-3">
-      <div id="dataview-datasets-controller-card">
-        <!-- Dataview Datasets Controller Card Here -->
-      </div>
-    </div>
   </div>
 </div>
 
@@ -64,15 +77,30 @@
     {
       label: 'dataset_1',
       data: [
-        {location: 0, date: '2002/02/02', value: 2},
-        {location: 0, date: '2002/01/01', value: 1},
-        {location: 0, date: '2002/04/04', value: 4},
-        {location: 0, date: '2002/03/03', value: 3},
+        {location: 5, date: '2002/02/02', value: 2},
+        {location: 5, date: '2002/01/01', value: 1},
+        {location: 8, date: '2002/04/04', value: 4},
+        {location: 8, date: '2002/03/03', value: 3},
       ]
     }
   ];
 
   lotivis.debug(true);
+
+  let dateChartCard = new lotivis.DateChartCard('date-chart-card', {
+    width: 1000,
+    height: 300
+  });
+
+  let plotChartCard = new lotivis.PlotChartCard('plot-chart-card', {
+    width: 1000,
+    height: 500
+  });
+
+  let mapChartCard = new lotivis.MapChartCard('map-chart-card', {
+    width: 1000,
+    height: 690
+  });
 
   let datasetsJSONCard = new lotivis.DatasetsJSONCard('datasets-json-card');
   let dataViewDateCard = new lotivis.DataviewDateCard('dataview-date-card');
@@ -86,6 +114,9 @@
   });
 
   controller.register([
+    dateChartCard.chart,
+    plotChartCard.chart,
+    mapChartCard.chart,
     datasetsJSONCard,
     dataViewDateCard,
     dataViewPlotCard,

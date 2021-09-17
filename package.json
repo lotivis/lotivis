@@ -1,9 +1,21 @@
 {
   "name": "lotivis",
-  "homepage": "https://github.com/lukasdanckwerth/lotivis#readme",
-  "description": "Location and time data visualization",
-  "license": "MIT",
   "version": "1.0.90",
+  "description": "Location and time data visualization",
+  "homepage": "https://github.com/lukasdanckwerth/lotivis#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lukasdanckwerth/lotivis.git"
+  },
+  "keywords": [
+    "location",
+    "time",
+    "data",
+    "visualization"
+  ],
+  "license": "MIT",
+  "author": "Lukas Danckwerth",
+
   "jsdelivr": [
     "dist/lotivis.css",
     "dist/lotivis.js",
@@ -19,31 +31,23 @@
   ],
   "scripts": {
     "develop": "rollup -c -w",
-    "build": "npm run build:js && npm run build:css:sass",
-    "build:js": "rollup -c",
-    "build:css:sass": "sass src/index.scss > dist/lotivis.css",
-    "test": "npm run copy:to:dist && mocha",
-    "serve:example": "node server.js",
-    "copy:to:dist": "cp docs/js/lotivis.* dist/ && cp docs/css/lotivis.* dist/",
+    "develop:examples": "http-server",
+    "build": "rollup -c && sass src/index.scss > dist/lotivis.css",
+    "test": "npm run build && mocha",
     "copy:to:frcv": "cp docs/js/lotivis.* ../frc-visualization/public/js/lib && cp docs/css/lotivis.* ../frc-visualization/public/css"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lukasdanckwerth/lotivis.git"
-  },
-  "keywords": [
-    "location",
-    "time",
-    "data",
-    "visualization"
-  ],
-  "author": "Lukas Danckwerth",
   "bugs": {
     "url": "https://github.com/lukasdanckwerth/lotivis/issues"
   },
   "devDependencies": {
     "@rollup/plugin-json": "^4.1.0",
     "@rollup/plugin-node-resolve": "^11.1.1",
+    "rollup": "^2.39.0",
+    "rollup-plugin-cleanup": "^3.2.1",
+    "rollup-plugin-postcss": "^4.0.0",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.27.1",
+    "rollup-stream": "^1.24.1",
     "cross-env": "^7.0.3",
     "d3": "^6.5.0",
     "eslint": "^7.19.0",
@@ -51,12 +55,6 @@
     "mocha": "^8.3.0",
     "postcss": "^8.2.8",
     "rewire": "^5.0.0",
-    "rollup": "^2.39.0",
-    "rollup-plugin-cleanup": "^3.2.1",
-    "rollup-plugin-postcss": "^4.0.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-typescript2": "^0.27.1",
-    "rollup-stream": "^1.24.1",
     "sass": "^1.32.8",
     "topojson-client": "^3.1.0"
   },
