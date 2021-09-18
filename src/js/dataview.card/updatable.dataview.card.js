@@ -1,4 +1,4 @@
-import {TextareaCard} from "../components/textarea.card";
+import {TextareaCard} from "../shared.components/textarea.card";
 import {lotivis_log} from "../shared/debug";
 import {LotivisUnimplementedMethodError} from "../data.juggle/data.validate.error";
 

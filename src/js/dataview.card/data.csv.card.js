@@ -1,4 +1,4 @@
-import {Card} from "../components/card";
+import {Card} from "../shared.components/card";
 import {EditableDataviewCard} from "./editable.dataview.card";
 import {parseCSV} from "../data.parse/parse.csv";
 import {renderCSV} from "../data.render/render.csv";

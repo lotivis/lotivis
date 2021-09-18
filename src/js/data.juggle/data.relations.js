@@ -9,7 +9,7 @@ import {combineByDate} from "./data.combine";
  *
  * @param datasets
  * @param dateAccess
- * @returns {{time: *}[]}
+ * @returns {{time.chart: *}[]}
  */
 export function dateToItemsRelation(datasets, dateAccess) {
 

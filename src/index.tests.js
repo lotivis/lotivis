@@ -1,9 +1,9 @@
-import {Color} from "./js/color/color";
-import './js/color/color.defaults';
-import './js/color/color.map';
-import './js/color/color.plot';
-import './js/color/color.random';
-import './js/color/color.stacks';
+import {Color} from "./js/shared.color/color";
+import './js/shared.color/color.defaults';
+import './js/shared.color/color.map';
+import './js/shared.color/color.plot';
+import './js/shared.color/color.random';
+import './js/shared.color/color.stacks';
 import {GeoJson} from "./js/geojson/geojson";
 import {Feature} from "./js/geojson/feature";
 import {
@@ -54,10 +54,10 @@ import {
   combineDatasetsByRatio,
   combineDataByGroupsize
 } from "./js/data.juggle/data.combine.ratio";
-import './js/color/color.defaults';
-import './js/color/color.map';
-import './js/color/color.plot';
-import './js/color/color.random';
+import './js/shared.color/color.defaults';
+import './js/shared.color/color.map';
+import './js/shared.color/color.plot';
+import './js/shared.color/color.random';
 import {parseCSV} from "./js/data.parse/parse.csv";
 import {parseCSVDate} from "./js/data.parse/parse.csv.date";
 import {equals, objectsEqual} from "./js/shared/equal";

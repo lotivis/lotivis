@@ -1,4 +1,4 @@
-import {Toast} from "../components/toast";
+import {Toast} from "../shared.components/toast";
 import {validateDatasets} from "../data.juggle/data.validate";
 import {lotivis_log} from "../shared/debug";
 import {objectsEqual} from "../shared/equal";

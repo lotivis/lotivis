@@ -45,7 +45,7 @@ export function validateDataset(dataset) {
 }
 
 /**
- * Validates the given datasets.controller item by ensuring it has a valid `time`, `location` and `value` property value.
+ * Validates the given datasets.controller item by ensuring it has a valid `time.chart`, `location` and `value` property value.
  * @param item The datasets.controller item to validate.
  * @throws MissingPropertyError
  */

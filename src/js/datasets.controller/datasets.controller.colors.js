@@ -1,5 +1,5 @@
-import {Color} from "../color/color";
-import "../color/color.stacks";
+import {Color} from "../shared.color/color";
+import "../shared.color/color.stacks";
 
 /**
  *

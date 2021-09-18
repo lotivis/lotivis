@@ -22,8 +22,8 @@ function createPlotDataset(dataset, dateAccess) {
 
   let newDataset = {};
   let data = copy(dataset.data);
-  let firstDate = extractEarliestDateWithValue(data) || 0;
-  let lastDate = extractLatestDateWithValue(data) || 0;
+  let firstDate = extractEarliestDateWithValue(data, dateAccess) || 0;
+  let lastDate = extractLatestDateWithValue(data, dateAccess) || 0;
   let flatData = flatDataset(dataset);
 
   newDataset.dataset = dataset.label;
@@ -40,11 +40,11 @@ function createPlotDataset(dataset, dateAccess) {
 }
 
 /**
- * Returns a new generated plot samples view for the current enabled samples of dataset of this controller.
+ * Returns a new generated time.chart.plot.chart samples view for the current enabled samples of dataset of this controller.
  */
 DatasetsController.prototype.getPlotDataview = function () {
 
-  let cachedDataView = this.getCached('plot');
+  let cachedDataView = this.getCached('time.chart.plot.chart');
   if (cachedDataView) {
     return cachedDataView;
   }
@@ -56,12 +56,17 @@ DatasetsController.prototype.getPlotDataview = function () {
   dataview.dates = extractDatesFromDatasets(enabledDatasets).sort();
   dataview.labels = extractLabelsFromDatasets(enabledDatasets);
 
+  dataview.firstDate = dataview.dates.first();
+  dataview.lastDate = dataview.dates.last();
+
   enabledDatasets.forEach(function (dataset) {
     let newDataset = createPlotDataset(dataset, dateAccess);
     let firstIndex = dataview.dates.indexOf(newDataset.firstDate);
     let lastIndex = dataview.dates.indexOf(newDataset.lastDate);
     newDataset.duration = lastIndex - firstIndex;
     dataview.datasets.push(newDataset);
+
+
   });
 
   dataview.labelsCount = dataview.datasets.length;
@@ -71,7 +76,7 @@ DatasetsController.prototype.getPlotDataview = function () {
     });
   });
 
-  this.setCached(dataview, 'plot');
+  this.setCached(dataview, 'time.chart.plot.chart');
 
   return dataview;
 };

@@ -1,20 +1,20 @@
-import {Color} from "./js/color/color";
-import './js/color/color.defaults';
-import './js/color/color.map';
-import './js/color/color.plot';
-import './js/color/color.random';
-import './js/color/color.stacks';
-import {Button} from "./js/components/button";
-import {Component} from "./js/components/component";
-import {RadioGroup} from "./js/components/radio.group";
-import {Toast} from "./js/components/toast";
-import {Option} from "./js/components/option";
-import "./js/components/chart.datasets";
-import {Card} from "./js/components/card";
-import {Checkbox} from "./js/components/checkbox";
-import {ModalPopup} from "./js/components/modal.popup";
-import {Dropdown} from "./js/components/dropdown";
-import {Popup} from "./js/components/popup";
+import {Color} from "./js/shared.color/color";
+import './js/shared.color/color.defaults';
+import './js/shared.color/color.map';
+import './js/shared.color/color.plot';
+import './js/shared.color/color.random';
+import './js/shared.color/color.stacks';
+import {Button} from "./js/shared.components/button";
+import {Component} from "./js/shared.components/component";
+import {RadioGroup} from "./js/shared.components/radio.group";
+import {Toast} from "./js/shared.components/toast";
+import {Option} from "./js/shared.components/option";
+import "./js/chart/chart.datasets";
+import {Card} from "./js/shared.components/card";
+import {Checkbox} from "./js/shared.components/checkbox";
+import {ModalPopup} from "./js/shared.components/modal.popup";
+import {Dropdown} from "./js/shared.components/dropdown";
+import {Popup} from "./js/shared.components/popup";
 
 import {UpdatableDataviewCard} from "./js/dataview.card/updatable.dataview.card";
 import {EditableDataviewCard} from "./js/dataview.card/editable.dataview.card";
@@ -31,12 +31,12 @@ import {
   DataViewPlotCard
 } from "./js/dataview.card/dataview.card";
 
-import {DateChart} from "./js/time/date.chart";
-import {DateChartCard} from "./js/time/date.chart.card";
-import {MapChart} from "./js/map/map.chart";
-import {MapChartCard} from "./js/map/map.chart.card";
-import {PlotChart} from "./js/plot/plot.chart";
-import {PlotChartCard} from "./js/plot/plot.chart.card";
+import {TimeChart} from "./js/time.chart/time.chart";
+import {DateChartCard} from "./js/time.chart.card/date.chart.card";
+import {MapChart} from "./js/location.chart/map.chart";
+import {MapChartCard} from "./js/location.chart/map.chart.card";
+import {TimePlotChart} from "./js/time.plot.chart/time.plot.chart";
+import {TimePlotChartCard} from "./js/time.plot.chart.card/time.plot.chart.card";
 
 import {DatasetsController} from "./js/datasets.controller/datasets.controller";
 import "./js/datasets.controller/datasets.controller.listeners";
@@ -71,7 +71,7 @@ exports.createID = createID;
 // colors
 exports.Color = Color;
 
-// components
+// shared.components
 exports.Button = Button;
 exports.Card = Card;
 exports.Checkbox = Checkbox;
@@ -97,17 +97,17 @@ exports.DataviewDatasetsControllerSelectionCard = DataviewDatasetsControllerSele
 exports.UpdatableDataviewCard = UpdatableDataviewCard;
 exports.EditableDataviewCard = EditableDataviewCard;
 
-// time
-exports.DateChart = DateChart;
+// time.chart
+exports.DateChart = TimeChart;
 exports.DateChartCard = DateChartCard;
 
-// map
+// location.chart
 exports.MapChart = MapChart;
 exports.MapChartCard = MapChartCard;
 
-// plot
-exports.PlotChart = PlotChart;
-exports.PlotChartCard = PlotChartCard;
+// time.chart.plot.chart
+exports.PlotChart = TimePlotChart;
+exports.PlotChartCard = TimePlotChartCard;
 
 // datasets
 exports.DatasetController = DatasetsController;
@@ -120,7 +120,7 @@ exports.parseCSVDate = parseCSVDate;
 exports.config = LotivisConfig;
 exports.debug = debug;
 
-// time assessors
+// time.chart assessors
 exports.DefaultDateAccess = DefaultDateAccess;
 exports.FormattedDateAccess = FormattedDateAccess;
 exports.GermanDateAccess = DateGermanAssessor;
