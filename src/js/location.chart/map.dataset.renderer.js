@@ -1,6 +1,6 @@
 import {equals} from "../shared/equal";
 import {Color} from "../shared.color/color";
-import '../shared.color/color.map';
+import '../shared.color/color.location.chart';
 import {lotivis_log} from "../shared/debug";
 
 /**

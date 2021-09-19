@@ -1,6 +1,6 @@
 import {Color} from "./js/shared.color/color";
 import './js/shared.color/color.defaults';
-import './js/shared.color/color.map';
+import './js/shared.color/color.location.chart';
 import './js/shared.color/color.plot';
 import './js/shared.color/color.random';
 import './js/shared.color/color.stacks';
@@ -34,7 +34,7 @@ import {
 import {TimeChart} from "./js/time.chart/time.chart";
 import {DateChartCard} from "./js/time.chart.card/date.chart.card";
 import {MapChart} from "./js/location.chart/map.chart";
-import {MapChartCard} from "./js/location.chart/map.chart.card";
+import {MapChartCard} from "./js/location.chart.card/map.chart.card";
 import {TimePlotChart} from "./js/time.plot.chart/time.plot.chart";
 import {TimePlotChartCard} from "./js/time.plot.chart.card/time.plot.chart.card";
 

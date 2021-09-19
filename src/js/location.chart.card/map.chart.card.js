@@ -1,4 +1,4 @@
-import {MapChart} from "./map.chart";
+import {MapChart} from "../location.chart/map.chart";
 import {MapChartSettingsPopup} from "./map.chart.settings.popup";
 import {ChartCard} from "../shared.components/chart.card";
 import {downloadImage} from "../shared/download";

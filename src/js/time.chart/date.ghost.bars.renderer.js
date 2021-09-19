@@ -29,16 +29,15 @@ export class DateGhostBarsRenderer {
       let controller = dateChart.datasetController;
       let id = createID(date);
 
-      if (dateChart.config.sendsNotifications) {
-        dateChart.updateSensible = false;
-        controller.setDatesFilter([date]);
-        dateChart.updateSensible = true;
-      }
+      // if (dateChart.config.sendsNotifications) {
+      //   dateChart.updateSensible = false;
+      //   controller.setDatesFilter([date]);
+      //   dateChart.updateSensible = true;
+      // }
 
       dateChart
         .svg
         .select(`#${id}`)
-        // .transition()
         .attr("opacity", 0.3);
 
       dateChart.tooltipRenderer.showTooltip(event, date);

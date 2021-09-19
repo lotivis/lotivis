@@ -17,7 +17,7 @@ export class TimePlotBackgroundBarsRenderer {
   constructor(plotChart) {
 
     function createID(dataset) {
-      return `ghost-rect-${toSaveID(String(dataset))}`;
+      return `ghost-rect-${createIDFromDataset(dataset)}`;
     }
 
     function hideAll() {
@@ -34,16 +34,14 @@ export class TimePlotBackgroundBarsRenderer {
     function mouseEnter(event, dataset) {
       hideAll();
 
-      console.log(dataset.dataset);
-      let id = createID(dataset.dataset);
-      console.log('id', id);
+      let id = createID(dataset);
       plotChart
         .svg
         .select(`#${id}`)
         .attr("opacity", 0.3);
 
       plotChart.tooltipRenderer.showTooltip.bind(plotChart)(event, dataset);
-      plotChart.onSelectDataset(event, dataset);
+      // plotChart.onSelectDataset(event, dataset);
     }
 
     /**
@@ -73,10 +71,10 @@ export class TimePlotBackgroundBarsRenderer {
 
       plotChart.backgrounBars = plotChart.backgrounBarsData
         .append("rect")
-        .attr("id", (d) => createID(d.dataset))
+        .attr("id", (d) => createID(d))
         .attr('class', 'lotivis-time-plot-chart-selection-rect')
         .attr(`opacity`, 0)
-        .attr("x", plotChart.xChart(firstDate))
+        .attr("x", plotChart.config.margin.left)
         .attr("y", (d) => plotChart.yChart(d.label))
         .attr("height", plotChart.yChart.bandwidth())
         .attr("width", graphWidth)

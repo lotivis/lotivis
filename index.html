@@ -76,9 +76,10 @@
   lotivis.debug(true);
 
   let versionLabel = document.getElementById('label-version');
-  versionLabel.innerText = lotivis.version;
 
-  console.log(lotivis)
+  fetch('./package.json')
+    .then(response => response.json())
+    .then(data => versionLabel.innerText = data.version);
 
 </script>
 

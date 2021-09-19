@@ -1,6 +1,6 @@
 import {Color} from "./js/shared.color/color";
 import './js/shared.color/color.defaults';
-import './js/shared.color/color.map';
+import './js/shared.color/color.location.chart';
 import './js/shared.color/color.plot';
 import './js/shared.color/color.random';
 import './js/shared.color/color.stacks';
@@ -55,7 +55,7 @@ import {
   combineDataByGroupsize
 } from "./js/data.juggle/data.combine.ratio";
 import './js/shared.color/color.defaults';
-import './js/shared.color/color.map';
+import './js/shared.color/color.location.chart';
 import './js/shared.color/color.plot';
 import './js/shared.color/color.random';
 import {parseCSV} from "./js/data.parse/parse.csv";
