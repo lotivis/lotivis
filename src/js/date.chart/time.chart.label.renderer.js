@@ -1,12 +1,12 @@
 /**
- * Appends labels on top of the bars of a time.chart chart.
+ * Appends labels on top of the bars of a date.chart chart.
  * @class TimeChartLabelRenderer
  */
 export class TimeChartLabelRenderer {
 
   /**
    * Creates a new instance of TimeChartLabelRenderer.
-   * @param dateChart The parental time.chart chart.
+   * @param dateChart The parental date.chart chart.
    */
   constructor(dateChart) {
 
@@ -37,7 +37,7 @@ export class TimeChartLabelRenderer {
         .data(dataset => dataset)
         .enter()
         .append('text')
-        .attr('class', 'lotivis-time.chart-chart-label')
+        .attr('class', 'lotivis-date.chart-chart-label')
         .attr("transform", function (item) {
           let x = xChartRef(item.data.date) + xStackRef(stack.label) + bandwidth;
           let y = yChartRef(item[1]) - 5;

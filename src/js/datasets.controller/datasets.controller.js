@@ -27,15 +27,16 @@ export class DatasetsController {
   initialize(config) {
     this.config = config;
     this.dateAccess = this.config.dateAccess || DefaultDateAccess;
-    this.locationFilters = this.config.locationFilters || [];
-    this.dateFilters = this.config.dateFilters || [];
-    this.datasetFilters = this.config.datasetFilters || [];
     this.filters = {};
     this.cache = new DataViewCache();
     if (this.config.filters) {
       this.filters.locations = this.config.filters.locations || [];
       this.filters.dates = this.config.filters.dates || [];
-      this.filters.datasets = this.config.filters.datasets || [];
+      this.filters.labels = this.config.filters.labels || [];
+    } else {
+      this.filters.locations = [];
+      this.filters.dates = [];
+      this.filters.labels = [];
     }
   }
 
@@ -97,27 +98,3 @@ export class DatasetsController {
     return labels.join(',');
   }
 }
-
-/**
- *
- * @type {{
- * datasetsUpdate: string,
- * filterDates: string,
- * filterDataset: string,
- * filterLocations: string
- * resetFilters: string,
- * registration: string,
- * none: string,
- * datasetsSet: string
- * }}
- */
-DatasetsController.NotificationReason = {
-  none: 'none',
-  registration: 'registration',
-  datasetsSet: 'datasets-set',
-  datasetsUpdate: 'datasets-update',
-  filterDataset: 'dataset-filter',
-  filterDates: 'dates-filter',
-  filterLocations: 'location-filter',
-  resetFilters: 'reset-filters'
-};

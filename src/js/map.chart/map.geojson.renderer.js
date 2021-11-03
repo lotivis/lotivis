@@ -7,12 +7,12 @@ export class MapGeoJSONRenderer {
 
   /**
    * Creates a new instance of MapGeoJSONRenderer.
-   * @param mapChart The parental location.chart chart.
+   * @param mapChart The parental map.chart chart.
    */
   constructor(mapChart) {
 
     /**
-     * To be called when the mouse enters an area drawn on the location.chart.
+     * To be called when the mouse enters an area drawn on the map.chart.
      *
      * @param event The mouse event.
      * @param feature The drawn feature (area).
@@ -24,7 +24,7 @@ export class MapGeoJSONRenderer {
     }
 
     /**
-     * To be called when the mouse leaves an area drawn on the location.chart.
+     * To be called when the mouse leaves an area drawn on the map.chart.
      *
      * @param event The mouse event.
      * @param feature The drawn feature (area).

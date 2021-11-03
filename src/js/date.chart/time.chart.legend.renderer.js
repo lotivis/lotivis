@@ -29,7 +29,7 @@ export class TimeChartLegendRenderer {
 
       legends
         .append('text')
-        .attr('class', 'lotivis-time.chart-chart-legend-label')
+        .attr('class', 'lotivis-date.chart-chart-legend-label')
         .attr("font-size", 13)
         .attr("x", (item) => xLegend(item.label) - 30)
         .attr("y", dateChart.graphHeight + labelMargin)
@@ -54,7 +54,7 @@ export class TimeChartLegendRenderer {
 
       legends
         .append("circle")
-        .attr('class', 'lotivis-time.chart-chart-legend-circle')
+        .attr('class', 'lotivis-date.chart-chart-legend-circle')
         .attr("r", circleRadius)
         .attr("cx", (item) => xLegend(item.label) - (circleRadius * 2) - 30)
         .attr("cy", dateChart.graphHeight + labelMargin - circleRadius + 2)
@@ -77,13 +77,13 @@ export class TimeChartLegendRenderer {
 
       let legends = dateChart
         .graph
-        .selectAll('.lotivis-time.chart-chart-legend-label')
+        .selectAll('.lotivis-date.chart-chart-legend-label')
         .data(stackNames)
         .enter();
 
       legends
         .append('text')
-        .attr('class', 'lotivis-time.chart-chart-legend-label')
+        .attr('class', 'lotivis-date.chart-chart-legend-label')
         .attr("font-size", 23)
         .attr("x", (item) => xLegend(item) - 30)
         .attr("y", function () {

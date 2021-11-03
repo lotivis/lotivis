@@ -1,5 +1,5 @@
 import {Card} from "../shared.components/card";
-import {TimeChart} from "../time.chart/time.chart";
+import {TimeChart} from "../date.chart/time.chart";
 import {DateChartCardSettingsPopup} from "./date.chart.card.settings.popup";
 import {RadioGroup} from "../shared.components/radio.group";
 import {Option} from "../shared.components/option";
@@ -9,7 +9,7 @@ import {createDownloadFilename} from "../shared/filename";
 import {UrlParameters} from "../shared/url.parameters";
 
 /**
- * A lotivis time.chart chart card.
+ * A lotivis date.chart chart card.
  * @class DateChartCard
  * @extends Card
  */
@@ -87,7 +87,7 @@ export class DateChartCard extends ChartCard {
    * @override
    */
   screenshotButtonAction() {
-    let filename = this.chart.datasetController.getFilename() || 'time.chart-chart';
+    let filename = this.chart.datasetController.getFilename() || 'date.chart-chart';
     let downloadFilename = createDownloadFilename(filename, `date-chart`);
     downloadImage(this.chart.svgSelector, downloadFilename);
   }

@@ -10,7 +10,7 @@ export class MapLegendRenderer {
   /**
    * Creates a new instance of MapLegendRenderer.
    *
-   * @param mapChart The parental location.chart chart.
+   * @param mapChart The parental map.chart chart.
    */
   constructor(mapChart) {
     let legend;

@@ -2,7 +2,7 @@ import {Checkbox} from "../shared.components/checkbox";
 import {UrlParameters} from "../shared/url.parameters";
 import {Dropdown} from "../shared.components/dropdown";
 import {Option} from "../shared.components/option";
-import {TimePlotChartSort} from "../time.plot.chart/time.plot.chart.sort";
+import {TimePlotChartSort} from "../date.plot.chart/time.plot.chart.sort";
 import {SettingsPopup} from "../shared.components/settings.popup";
 
 /**

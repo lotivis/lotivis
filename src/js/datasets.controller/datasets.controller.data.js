@@ -1,6 +1,7 @@
 import {DatasetsController} from "./datasets.controller";
 import {copy} from "../shared/copy";
 import {validateDatasets} from "../data.juggle/data.validate";
+import "./datasets.controller.snapshot";
 
 /*
 CRUD:
@@ -53,13 +54,14 @@ DatasetsController.prototype.addDatasets = function (datasets) {
   this.cache.invalidate();
   datasets.forEach(dataset => this.datasets.push(dataset));
   this.datasetsDidChange();
-  this.notifyListeners(DatasetsController.NotificationReason.datasetsUpdate);
+  this.notifyListeners('datasets-update');
 };
 
 /**
  * Removes the dataset with the given label from this controller.  Will do nothing if no dataset
  * with the given label exists.
- * @param label The label of the dataset to removeDataset.
+ *
+ * @param label The label of the dataset to remove.
  */
 DatasetsController.prototype.removeDataset = function (label) {
   this.cache.invalidate();

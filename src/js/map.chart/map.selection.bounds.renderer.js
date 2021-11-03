@@ -6,7 +6,7 @@ export class MapSelectionBoundsRenderer {
 
   /**
    * Creates a new instance of MapSelectionBoundsRenderer.
-   * @param mapChart The parental location.chart chart.
+   * @param mapChart The parental map.chart chart.
    */
   constructor(mapChart) {
 

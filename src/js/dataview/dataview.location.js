@@ -1,9 +1,9 @@
 import {DatasetsController} from "../datasets.controller/datasets.controller";
 import {combineByLocation, combineByStacks} from "../data.juggle/data.combine";
-import {lotivis_log} from "../shared/debug";
+import "../datasets.controller/datasets.controller.cache";
 
 /**
- * Returns a new generated location dataview for the current selected datasets.controller of datasets of this controller.
+ * Returns a new generated location data view for the current selected datasets.controller of datasets of this controller.
  *
  * A location dataview has the following form:
  * ```
@@ -23,23 +23,22 @@ import {lotivis_log} from "../shared/debug";
 DatasetsController.prototype.getLocationDataview = function () {
 
   let cachedDataView = this.getCached('location');
-  if (cachedDataView) {
-    return cachedDataView;
-  }
+  if (cachedDataView) { return cachedDataView; }
 
-  let dataview = {};
-  let flatData = this.enabledFlatData();
+  let dataView = {};
+
+  let flatData = this.snapshot.flatData;
   let combinedByStack = combineByStacks(flatData);
   let combinedByLocation = combineByLocation(combinedByStack);
 
-  dataview.stacks = this.stacks;
-  dataview.combinedData = combinedByLocation;
+  dataView.stacks = this.stacks;
+  dataView.combinedData = combinedByLocation;
 
-  dataview.combinedData.forEach(item => {
+  dataView.combinedData.forEach(item => {
     item.stack = item.stack || item.label || item.dataset;
   });
 
-  this.setCached(dataview, 'location');
+  this.setCached(dataView, 'location');
 
-  return dataview;
+  return dataView;
 };

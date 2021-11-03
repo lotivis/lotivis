@@ -17,7 +17,7 @@ export class MapChartCard extends ChartCard {
    * @param config The config of the map.chart chart.
    */
   constructor(parent, config) {
-    super(parent || 'map.chart-chart-card', config);
+    super(parent || 'map-chart-card', config);
   }
 
   /**

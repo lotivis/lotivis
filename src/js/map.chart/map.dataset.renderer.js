@@ -12,7 +12,7 @@ export class MapDatasetRenderer {
 
   /**
    * Creates a new instance of MapDatasetRenderer.
-   * @param mapChart The parental location.chart chart.
+   * @param mapChart The parental map.chart chart.
    */
   constructor(mapChart) {
 
@@ -22,7 +22,7 @@ export class MapDatasetRenderer {
      * Resets the `fill` and `fill-opacity` property of each area.
      */
     function resetAreas() {
-      let style = styleForCSSClass('.lotivis-location.chart-area');
+      let style = styleForCSSClass('.lotivis-map.chart-area');
       mapChart.svg
         .selectAll('.lotivis-location-chart-area')
         .style('stroke', style.stroke || 'black')
@@ -35,7 +35,7 @@ export class MapDatasetRenderer {
     }
 
     /**
-     * Called by location.chart GeoJSON renderer when mouse enters an area drawn
+     * Called by map.chart GeoJSON renderer when mouse enters an area drawn
      * on the location chart.
      *
      * @param event The mouse event.
@@ -46,11 +46,11 @@ export class MapDatasetRenderer {
 
       let color = Color.defaultTint.rgbString();
       let mapID = featureMapID(feature);
-      console.log(mapID);
+
       mapChart
         .svg
         .selectAll(`#${mapID}`)
-        .raise() // bring element to top
+        .raise()
         .style('stroke', () => color)
         .style('stroke-width', '2')
         .style('stroke-dasharray', '0');
@@ -73,7 +73,7 @@ export class MapDatasetRenderer {
      */
     this.render = function () {
       if (!mapChart.geoJSON) return lotivis_log('[lotivis]  No GeoJSON to render.');
-      if (!mapChart.dataview) return lotivis_log('[lotivis]  No dataview property.');
+      if (!mapChart.dataview) return lotivis_log('[lotivis]  No data view property.');
 
       let stackNames = mapChart.dataview.stacks;
       let combinedData = mapChart.dataview.combinedData;

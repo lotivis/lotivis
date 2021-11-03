@@ -3,7 +3,7 @@ import {createIDFromDataset} from "../shared/selector";
 import {lotivis_log} from "../shared/debug";
 
 /**
- * Draws the bar on the time.chart.plot.chart chart.
+ * Draws the bar on the date.chart.plot.chart chart.
  * @class TimePlotBarsRenderer
  */
 export class TimePlotBarsRenderer {
@@ -11,7 +11,7 @@ export class TimePlotBarsRenderer {
   /**
    * Creates a new instance of PlotAxisRenderer.
    * @constructor
-   * @param plotChart The parental time.chart.plot.chart chart.
+   * @param plotChart The parental date.chart.plot.chart chart.
    */
   constructor(plotChart) {
 
@@ -42,7 +42,7 @@ export class TimePlotBarsRenderer {
       plotChart.bars = plotChart.barsData
         .append("rect")
         .attr("fill", (d) => `url(#lotivis-plot-gradient-${createIDFromDataset(d)})`)
-        .attr('class', 'lotivis-time.chart.plot.chart-bar')
+        .attr('class', 'lotivis-date.chart.plot.chart-bar')
         .attr("rx", radius)
         .attr("ry", radius)
         .attr("x", (d) => plotChart.xChart((d.duration < 0) ? d.lastDate : d.firstDate || 0))

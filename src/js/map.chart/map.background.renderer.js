@@ -6,7 +6,8 @@ export class MapBackgroundRenderer {
 
   /**
    * Creates a new instance of MapBackgroundRenderer.
-   * @param mapChart The parental location.chart chart.
+   *
+   * @param mapChart The parental map.chart chart.
    */
   constructor(mapChart) {
 
@@ -14,12 +15,13 @@ export class MapBackgroundRenderer {
       let controller = mapChart.datasetController;
       if (!controller) return;
 
-      let filters = controller.locationFilters;
+      let filters = controller.filters.locations;
       if (!filters || filters.length === 0) return;
       mapChart.updateSensible = false;
-      // controller.setLocationsFilter([]);
-      controller.resetFilters();
+      controller.resetLocationFilters();
       mapChart.updateSensible = true;
+
+      mapChart.selectionRenderer.render();
     }
 
     /**
@@ -30,6 +32,7 @@ export class MapBackgroundRenderer {
       // in order to reset the location samples filter.
       mapChart.svg
         .append('rect')
+        .attr('class', 'lotivis-map-chart-background')
         .attr('width', mapChart.config.width)
         .attr('height', mapChart.config.height)
         .attr('fill', 'white')

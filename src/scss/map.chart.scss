@@ -15,11 +15,12 @@
   cursor: pointer;
 }
 
-.lotivis-location-chart-exterior-borders {
+.lotivis-map-chart-exterior-borders {
   fill: white;
-  fill-opacity: 0;
-  stroke: green;
+  fill-opacity: 1;
+  stroke: gray;
   stroke-width: 3;
+  stroke-opacity: 0.4;
   pointer-events: none;
 }
 
@@ -30,13 +31,12 @@
   pointer-events: none;
 }
 
-.lotivis-location-chart-selection-rect {
+.lotivis-map-chart-selection-rect {
   pointer-events: none;
-  position: absolute;
   fill: white;
-  fill-opacity: 0;
+  fill-opacity: 1;
   stroke: red;
-  stroke-width: 1px;
+  stroke-width: 5px;
   stroke-dasharray: 1, 3;
 }
 

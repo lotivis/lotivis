@@ -9,7 +9,7 @@ export class MapExteriorBorderRenderer {
 
   /**
    * Creates a new instance of MapExteriorBorderRenderer.
-   * @property mapChart The parental location.chart chart.
+   * @property mapChart The parental map.chart chart.
    */
   constructor(mapChart) {
 
@@ -23,12 +23,13 @@ export class MapExteriorBorderRenderer {
         lotivis_log('[lotivis]  Can\'t find topojson library.');
         return;
       }
-      let geoJSON = mapChart.presentedGeoJSON;
+      let geoJSON = mapChart.geoJSON;
       if (!geoJSON) {
         lotivis_log('[lotivis]  No GeoJSON to render.');
         return;
       }
-      let borders = joinFeatures(geoJSON);
+
+      let borders = joinFeatures(geoJSON.features);
       if (!borders) {
         return lotivis_log('[lotivis]  No borders to render.');
       }
@@ -36,9 +37,12 @@ export class MapExteriorBorderRenderer {
       mapChart.svg
         .selectAll('path')
         .append('path')
-        .datum(borders)
+        .data(borders.features)
+        .enter()
+        .append('path')
         .attr('d', mapChart.path)
-        .attr('class', 'lotivis-location-chart-exterior-borders');
+        .attr('class', 'lotivis-map-chart-exterior-borders')
+        .raise();
     };
   }
 }

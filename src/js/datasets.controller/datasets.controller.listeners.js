@@ -3,6 +3,7 @@ import {lotivis_log} from "../shared/debug";
 
 /**
  * Appends the given listener to the collection of listeners.
+ *
  * @param listener The listener to addDataset.
  */
 DatasetsController.prototype.addListener = function (listener) {
@@ -10,11 +11,12 @@ DatasetsController.prototype.addListener = function (listener) {
   if (!listener.update) return lotivis_log('Listener unqualified.');
   if (this.listeners.includes(listener)) return lotivis_log(`[lotivis]  Attempt to add listener twice (${listener}).`);
   this.listeners.push(listener);
-  listener.update(this, DatasetsController.NotificationReason.registration);
+  listener.update(this, 'registration');
 };
 
 /**
  * Removes the given listener from the collection of listeners.
+ *
  * @param listener The listener to removeDataset.
  */
 DatasetsController.prototype.removeListener = function (listener) {
@@ -28,7 +30,7 @@ DatasetsController.prototype.removeListener = function (listener) {
  * Notifies all listeners.
  * @param reason The reason to send to the listener.  Default is 'none'.
  */
-DatasetsController.prototype.notifyListeners = function (reason = DatasetsController.NotificationReason.none) {
+DatasetsController.prototype.notifyListeners = function (reason = 'none') {
   if (!this.listeners) return;
   for (let index = 0; index < this.listeners.length; index++) {
     let listener = this.listeners[index];
@@ -36,7 +38,7 @@ DatasetsController.prototype.notifyListeners = function (reason = DatasetsContro
       lotivis_log('Listener unqualified.');
       continue;
     }
-    // lotivis_log(`listener: ${listener}`);
+    lotivis_log(`listener: ${listener}`);
     console.timeStamp('will update ' + listener);
     listener.update(this, reason);
     console.timeStamp('did update ' + listener);

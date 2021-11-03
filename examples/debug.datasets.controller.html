@@ -22,39 +22,14 @@
     <div class="lotivis-col-2">
       <!-- Empty-->
     </div>
-    <div class="lotivis-col-4">
-      <div id="locations-filter-card">
-        <!-- Locations Filter Card Here -->
-      </div>
-    </div>
-    <div class="lotivis-col-4">
-      <div id="dates-filter-card">
-        <!-- Dates Filter Card Here -->
-      </div>
-    </div>
-    <div class="lotivis-col-4">
-      <div id="datasets-filter-card">
-        <!-- Datasets Filter Card Here -->
-      </div>
-    </div>
-    <div class="lotivis-col-4">
+    <div class="lotivis-col-6">
       <div id="datasets-json-card">
         <!-- Datasets JSON Card Here -->
       </div>
     </div>
-    <div class="lotivis-col-3">
-      <div id="dataview-datasets-controller-card">
-        <!-- Dataview Datasets Controller Card Here -->
-      </div>
-    </div>
-    <div class="lotivis-col-3">
-      <div id="dataview-datasets-controller-selection-card">
-        <!-- Dataview Datasets Controller Selection Card Here -->
-      </div>
-    </div>
-    <div class="lotivis-col-2">
-      <div id="dataview-flat-card">
-        <!-- Dataview Datasets Controller Selection Card Here -->
+    <div class="lotivis-col-6">
+      <div id="datasets-controller-card">
+        <!-- Datasets Controller Card Here -->
       </div>
     </div>
   </div>
@@ -67,67 +42,15 @@
 
   lotivis.debug(true);
 
-  class LocationsFilterCard extends lotivis.EditableDataviewCard {
+  let datasetsJSONCard = new lotivis.DatasetsJSONCard({lines: 50, updateSensible: false});
+  let datasetsControllerCard = new lotivis.DatasetsControllerCard({lines: 50});
 
-    datasetsToText(datasets) {
-      if (!this.datasetsController) return '';
-      return this.datasetsController.locationFilters.join(',');
-    }
-
-    textToDatasets(text) {
-      if (!this.datasetsController) return '';
-      this.datasetsController.setLocationsFilter(text.split(',').map(item => item.trim()));
-    }
-  }
-
-  class DatesFilterCard extends lotivis.EditableDataviewCard {
-
-    datasetsToText() {
-      if (!this.datasetsController) return '';
-      return this.datasetsController.dateFilters.join(',');
-    }
-
-    textToDatasets(text) {
-      if (!this.datasetsController) return '';
-      this.datasetsController.setDatesFilter(text.split(',').map(item => item.trim()));
-    }
-  }
-
-  class DatasetsFilterCard extends lotivis.EditableDataviewCard {
-
-    datasetsToText(datasets) {
-      if (!this.datasetsController) return '';
-      return this.datasetsController.datasetFilters.join(',');
-    }
-
-    textToDatasets(text) {
-      if (!this.datasetsController) return '';
-      this.datasetsController.setDatasetsFilter(text.split(',').map(item => item.trim()));
-    }
-  }
-
-  let datasetsJSONCard = new lotivis.DatasetsJSONCard({lines: 400, updateSensible: false});
-  let dataviewDatasetsControllerCard = new lotivis.DataviewDatasetsControllerCard({lines: 400});
-  let dataviewDatasetsControllerSelectionCard = new lotivis.DataviewDatasetsControllerSelectionCard({lines: 400});
-  let dataviewFlatCard = new lotivis.DataviewFlatCard({lines: 400});
-  let locationsFilterCard = new LocationsFilterCard({title: 'Location Filters', lines: 1});
-  let datesFilterCard = new DatesFilterCard({title: 'Date Filters', lines: 1});
-  let datasetsFilterCard = new DatasetsFilterCard({title: 'Label Filters', lines: 1});
   let controller = new lotivis.DatasetController([], {dateAccess: lotivis.FormattedDateAccess});
 
   controller.register([
     datasetsJSONCard,
-    dataviewDatasetsControllerCard,
-    dataviewDatasetsControllerSelectionCard,
-    locationsFilterCard,
-    datesFilterCard,
-    datasetsFilterCard,
-    dataviewFlatCard
+    datasetsControllerCard
   ]);
-
-  controller.setLocationsFilter([1, 2]);
-  controller.setDatesFilter(['2002/02/02']);
-  controller.setDatasetsFilter(['dataset_1', 'dataset_2']);
 
   datasetsJSONCard.setTextareaContent(`[
   {
@@ -160,10 +83,6 @@
 ]
 `);
   datasetsJSONCard.updateDatasetsOfController(true);
-
-  locationsFilterCard.config.updateSensible = false;
-  datesFilterCard.config.updateSensible = false;
-  datasetsFilterCard.config.updateSensible = false;
 
 </script>
 

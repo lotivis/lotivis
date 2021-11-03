@@ -1,5 +1,5 @@
 /**
- * Enumeration of sorts available in the time.chart.plot.chart chart.
+ * Enumeration of sorts available in the date.chart.plot.chart chart.
  */
 export const TimePlotChartSort = {
   none: 'none',

@@ -1,5 +1,5 @@
 import {Color} from "../shared.color/color";
-import {TimeChartAxisRenderer} from "./time.chart.axis.renderer";
+import {DateChartAxisRenderer} from "./date.chart.axis.renderer";
 import {TimeChartLabelRenderer} from "./time.chart.label.renderer";
 import {TimeChartLegendRenderer} from "./time.chart.legend.renderer";
 import {TimeChartBarsRenderer} from "./time.chart.bars.renderer";
@@ -71,7 +71,7 @@ export class TimeChart extends Chart {
   }
 
   initializeRenderers() {
-    this.axisRenderer = new TimeChartAxisRenderer(this);
+    this.axisRenderer = new DateChartAxisRenderer(this);
     this.gridRenderer = new TimeChartGridRenderer(this);
     this.labelRenderer = new TimeChartLabelRenderer(this);
     this.legendRenderer = new TimeChartLegendRenderer(this);
@@ -115,7 +115,11 @@ export class TimeChart extends Chart {
     let margin = config.margin;
     if (!this.dataview) return;
 
+    /*
+     * Prefer dates specified by configuration. Fallback to dates of datasets.
+     */
     let dates = config.dateLabels || this.dataview.dates;
+    lotivis_log('dates of date-chart:', dates);
 
     this.xChart = d3
       .scaleBand()
@@ -168,7 +172,7 @@ export class TimeChart extends Chart {
   renderSVG() {
     this.svg = this.element
       .append('svg')
-      .attr('class', 'lotivis-chart-svg lotivis-time.chart-chart')
+      .attr('class', 'lotivis-chart-svg lotivis-date.chart-chart')
       .attr('preserveAspectRatio', 'xMidYMid meet')
       .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`)
       .attr('id', this.svgSelector);

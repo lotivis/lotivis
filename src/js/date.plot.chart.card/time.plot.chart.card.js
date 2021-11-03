@@ -1,13 +1,13 @@
 import {Card} from "../shared.components/card";
 import {UrlParameters} from "../shared/url.parameters";
 import {ChartCard} from "../shared.components/chart.card";
-import {TimePlotChart} from "../time.plot.chart/time.plot.chart";
+import {TimePlotChart} from "../date.plot.chart/time.plot.chart";
 import {TimePlotChartCardSettingsPopup} from "./time.plot.chart.card.settings.popup";
 import {downloadImage} from "../shared/download";
 import {createDownloadFilename} from "../shared/filename";
 
 /**
- * A card containing a time.chart.plot.chart chart.
+ * A card containing a date.chart.plot.chart chart.
  * @class TimePlotChartCard
  * @extends Card
  */

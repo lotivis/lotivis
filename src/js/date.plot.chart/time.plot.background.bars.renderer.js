@@ -12,7 +12,7 @@ export class TimePlotBackgroundBarsRenderer {
   /**
    * Creates a new instance of PlotAxisRenderer.
    * @constructor
-   * @param plotChart The parental time.chart.plot.chart chart.
+   * @param plotChart The parental date.chart.plot.chart chart.
    */
   constructor(plotChart) {
 
@@ -27,7 +27,7 @@ export class TimePlotBackgroundBarsRenderer {
     };
 
     /**
-     * To be called when the mouse enters a bar on the time.chart.plot.chart chart.
+     * To be called when the mouse enters a bar on the date.chart.plot.chart chart.
      * @param event The mouse event.
      * @param dataset The represented dataset.
      */
@@ -45,7 +45,7 @@ export class TimePlotBackgroundBarsRenderer {
     }
 
     /**
-     * To be called when the mouse leaves a bar on the time.chart.plot.chart chart.
+     * To be called when the mouse leaves a bar on the date.chart.plot.chart chart.
      * @param event The mouse event.
      * @param dataset The represented dataset.
      */

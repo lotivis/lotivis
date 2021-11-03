@@ -5,7 +5,7 @@ import {UpdatableDataviewCard} from "./updatable.dataview.card";
  * @class DataviewCard
  * @extends UpdatableDataviewCard
  */
-export class DataviewCard extends UpdatableDataviewCard {
+export class DataViewCard extends UpdatableDataviewCard {
 
   /**
    * Creates a new instance of DataviewCard.
@@ -20,8 +20,8 @@ export class DataviewCard extends UpdatableDataviewCard {
 
   datasetsToText(datasets) {
     if (!this.datasetsController) return "No datasets controller.";
-    let dataview = this.getDataview();
-    return JSON.stringify(dataview, null, 2);
+    let dataView = this.getDataview();
+    return JSON.stringify(dataView, null, 2);
   }
 
   getDataview() {
@@ -29,7 +29,7 @@ export class DataviewCard extends UpdatableDataviewCard {
   }
 }
 
-export class DataviewDateCard extends DataviewCard {
+export class DataViewDateChartCard extends DataViewCard {
   getTitle() {
     return 'Dataview Date';
   }
@@ -39,7 +39,7 @@ export class DataviewDateCard extends DataviewCard {
   }
 }
 
-export class DataViewPlotCard extends DataviewCard {
+export class DataViewDatePlotChartCard extends DataViewCard {
   getTitle() {
     return 'Dataview Plot';
   }
@@ -49,7 +49,7 @@ export class DataViewPlotCard extends DataviewCard {
   }
 }
 
-export class DataViewMapCard extends DataviewCard {
+export class DataViewLocationChartCard extends DataViewCard {
   getTitle() {
     return 'Dataview Map';
   }
@@ -59,7 +59,7 @@ export class DataViewMapCard extends DataviewCard {
   }
 }
 
-export class DataviewFlatCard extends DataviewCard {
+export class DataViewFlatCard extends DataViewCard {
   getTitle() {
     return 'Flat Data';
   }

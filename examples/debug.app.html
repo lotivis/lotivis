@@ -46,22 +46,22 @@
       </div>
     </div>
     <div class="lotivis-col-3">
-      <div id="dataview-date-card">
-        <!-- Dataview Date Card Here -->
+      <div id="data-view-date-card">
+        <!-- Data View Date Card Here -->
       </div>
     </div>
     <div class="lotivis-col-3">
-      <div id="dataview-plot-card">
+      <div id="data-view-date-plot-chart-card">
         <!-- Dataview Plot Card Here -->
       </div>
     </div>
     <div class="lotivis-col-3">
-      <div id="dataview-map-card">
+      <div id="data-view-location-chart-card">
         <!-- Dataview Map Card Here -->
       </div>
     </div>
     <div class="lotivis-col-3">
-      <div id="dataview-flat-card">
+      <div id="data-view-flat-card">
         <!-- Dataview Flat Card Here -->
       </div>
     </div>
@@ -103,11 +103,11 @@
   });
 
   let datasetsJSONCard = new lotivis.DatasetsJSONCard('datasets-json-card');
-  let dataViewDateCard = new lotivis.DataviewDateCard('dataview-date-card');
-  let dataViewPlotCard = new lotivis.DataviewPlotCard('dataview-plot-card');
-  let dataViewMapCard = new lotivis.DataviewMapCard('dataview-map-card');
-  let dataViewFlatCard = new lotivis.DataviewFlatCard('dataview-flat-card');
-  let dataViewDatasetsControllerCard = new lotivis.DataviewDatasetsControllerCard('dataview-datasets-controller-card');
+  let dataViewDateCard = new lotivis.DataViewDateChartCard('data-view-date-card');
+  let dataViewPlotCard = new lotivis.DataViewDatePlotChartCard();
+  let dataViewMapCard = new lotivis.DataViewMapChartCard();
+  let dataViewFlatCard = new lotivis.DataviewFlatCard('data-view-flat-card');
+  let dataViewDatasetsControllerCard = new lotivis.DatasetsControllerCard('dataview-datasets-controller-card');
 
   let controller = new lotivis.DatasetController(datasets, {
     dateAccess: lotivis.FormattedDateAccess

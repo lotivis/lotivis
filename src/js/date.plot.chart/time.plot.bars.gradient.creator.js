@@ -3,7 +3,7 @@ import {createIDFromDataset} from "../shared/selector";
 import {lotivis_log} from "../shared/debug";
 
 /**
- * Calculates and creates the gradients for the bars of a time.chart.plot.chart chart.
+ * Calculates and creates the gradients for the bars of a date.chart.plot.chart chart.
  *
  * @class TimePlotBarsGradientCreator
  */
@@ -13,7 +13,7 @@ export class TimePlotBarsGradientCreator {
    * Creates a new instance of TimePlotBarsGradientCreator.
    *
    * @constructor
-   * @param plotChart The parental time.chart.plot.chart chart.
+   * @param plotChart The parental date.chart.plot.chart chart.
    */
   constructor(plotChart) {
     this.plotChart = plotChart;
@@ -29,7 +29,7 @@ export class TimePlotBarsGradientCreator {
     let max = this.plotChart.dataView.max;
     let gradient = this.plotChart.definitions
       .append("linearGradient")
-      .attr("id", 'lotivis-time.chart.plot.chart-gradient-' + createIDFromDataset(dataset))
+      .attr("id", 'lotivis-date.chart.plot.chart-gradient-' + createIDFromDataset(dataset))
       .attr("x1", "0%")
       .attr("x2", "100%")
       .attr("y1", "0%")

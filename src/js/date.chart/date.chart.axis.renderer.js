@@ -1,16 +1,16 @@
 /**
- * @class TimeChartAxisRenderer
+ * @class DateChartAxisRenderer
  */
-export class TimeChartAxisRenderer {
+export class DateChartAxisRenderer {
 
   /**
-   * Creates a new instance of TimeChartAxisRenderer.
-   * @param dateChart The parental time.chart chart.
+   * Creates a new instance of DateChartAxisRenderer.
+   * @param dateChart The parental date.chart chart.
    */
   constructor(dateChart) {
 
     /**
-     * Appends the `left` and `bottom` axis to the time.chart chart.
+     * Appends the `left` and `bottom` axis to the date.chart chart.
      */
     this.render = function () {
       let height = dateChart.config.height;

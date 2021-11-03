@@ -4,25 +4,8 @@ import {createStackModel} from "../data.juggle/data.stacks";
 import {copy} from "../shared/copy";
 import {combineDatasetsByRatio} from "../data.juggle/data.combine.ratio";
 import {extractDatesFromDatasets} from "../data.juggle/data.extract";
-
-DatasetsController.prototype.getCached = function (type) {
-  return this.cache.getDataView(
-    type,
-    this.locationFilters,
-    this.dateFilters,
-    this.datasetFilters
-  );
-}
-
-DatasetsController.prototype.setCached = function (dataview, type) {
-  return this.cache.setDataView(
-    dataview,
-    type,
-    this.locationFilters,
-    this.dateFilters,
-    this.datasetFilters
-  );
-}
+import "../datasets.controller/datasets.controller.cache";
+import {lotivis_log} from "../shared/debug";
 
 /**
  * Returns a new generated DateDataview for the current enabled samples of dataset of this controller.
@@ -31,40 +14,41 @@ DatasetsController.prototype.getDateDataview = function (groupSize) {
 
   let cachedDataView = this.getCached('date');
   if (cachedDataView) {
+    lotivis_log('using cached');
     return cachedDataView;
   }
 
   let dateAccess = this.dateAccess;
   let datasets = copy(this.datasets);
-  let enabledDatasets = copy(this.enabledDatasets() || datasets);
-  let dataview = {};
+  let enabledDatasets = copy(this.filteredDatasets() || datasets);
+  let dataView = {};
   let saveGroupSize = groupSize || 1;
 
-  dataview.groupSize = saveGroupSize;
+  dataView.groupSize = saveGroupSize;
   if (saveGroupSize <= 1) {
-    dataview.datasets = datasets;
-    dataview.enabledDatasets = enabledDatasets;
+    dataView.datasets = datasets;
+    dataView.enabledDatasets = enabledDatasets;
   } else {
     datasets = combineDatasetsByRatio(datasets, saveGroupSize);
     enabledDatasets = combineDatasetsByRatio(enabledDatasets, saveGroupSize);
-    dataview.datasets = datasets;
+    dataView.datasets = datasets;
   }
 
-  dataview.dateToItemsRelation = dateToItemsRelation(datasets, dateAccess);
-  dataview.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets, dateAccess);
-  dataview.datasetStacks = createStackModel(this, datasets, dataview.dateToItemsRelation);
-  dataview.datasetStacksPresented = createStackModel(this, enabledDatasets, dataview.dateToItemsRelationPresented);
+  dataView.dateToItemsRelation = dateToItemsRelation(datasets, dateAccess);
+  dataView.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets, dateAccess);
+  dataView.datasetStacks = createStackModel(this, datasets, dataView.dateToItemsRelation);
+  dataView.datasetStacksPresented = createStackModel(this, enabledDatasets, dataView.dateToItemsRelationPresented);
 
-  dataview.max = d3.max(dataview.datasetStacksPresented, function (stack) {
+  dataView.max = d3.max(dataView.datasetStacksPresented, function (stack) {
     return d3.max(stack, function (series) {
       return d3.max(series.map(item => item['1']));
     });
   });
 
-  dataview.dates = extractDatesFromDatasets(enabledDatasets);
-  dataview.enabledStacks = this.enabledStacks();
+  dataView.dates = extractDatesFromDatasets(enabledDatasets);
+  dataView.enabledStacks = this.snapshot.stacks;
 
-  this.setCached(dataview, 'date');
+  this.setCached(dataView, 'date');
 
-  return dataview;
+  return dataView;
 };

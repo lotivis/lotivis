@@ -2,7 +2,7 @@ import {combineByDate} from "../data.juggle/data.combine";
 import {LotivisConfig} from "../shared/config";
 
 /**
- * Injects and presents a tooltip on a time.chart chart.
+ * Injects and presents a tooltip on a date.chart chart.
  *
  * @class TimeChartTooltipRenderer
  */
@@ -53,7 +53,7 @@ export class TimeChartTooltipRenderer {
      * Calculates the x offset to position the tooltip on the left side
      * of a bar.
      *
-     * @param date The presented time.chart of selected bar.
+     * @param date The presented date.chart of selected bar.
      * @param factor The size factor of the chart.
      * @param offset The offset of the chart.
      * @param tooltipSize The size of the tooltip.
@@ -68,7 +68,7 @@ export class TimeChartTooltipRenderer {
      * Calculates the x offset to position the tooltip on the right side
      * of a bar.
      *
-     * @param date The presented time.chart of selected bar.
+     * @param date The presented date.chart of selected bar.
      * @param factor The size factor of the chart.
      * @param offset The offset of the chart.
      * @returns {number} The x offset for the tooltip.
@@ -81,9 +81,9 @@ export class TimeChartTooltipRenderer {
     }
 
     /**
-     * Returns the HTML content for the given time.chart.
+     * Returns the HTML content for the given date.chart.
      *
-     * @param date The time.chart to get the HTML content for.
+     * @param date The date.chart to get the HTML content for.
      * @returns {string} Return the rendered HTML content.
      */
     function getHTMLForDate(date) {
@@ -114,10 +114,10 @@ export class TimeChartTooltipRenderer {
     }
 
     /**
-     * Presents the tooltip next to bar presenting the given time.chart.
+     * Presents the tooltip next to bar presenting the given date.chart.
      *
      * @param event The mouse event.
-     * @param date The time.chart which is presented.
+     * @param date The date.chart which is presented.
      */
     this.showTooltip = function (event, date) {
 

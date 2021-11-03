@@ -19,12 +19,12 @@ export const MapChartConfig = {
   geoJSON: null,
   departmentsData: [],
   excludedFeatureCodes: [],
-  drawRectangleAroundSelection: false,
+  drawRectangleAroundSelection: true,
   sendsNotifications: true,
   featureIDAccessor: function (feature) {
     if (feature.id || feature.id === 0) return feature.id;
     if (feature.properties && isValue(feature.properties.id)) return feature.properties.id;
-    if (feature.properties && isValue(feature.properties.code)) return feature.properties.code;
+    if (feature.properties && isValue(feature.properties.code)) return Number(feature.properties.code);
     return hashCode(feature.properties);
   },
   featureNameAccessor: function (feature) {

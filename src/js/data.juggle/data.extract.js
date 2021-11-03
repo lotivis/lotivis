@@ -94,11 +94,11 @@ function toSet(array) {
 }
 
 /**
- * Returns the earliest time.chart occurring in the flat array of items.
+ * Returns the earliest date.chart occurring in the flat array of items.
  *
  * @param flatData The flat samples array.
  * @param dateAccess
- * @returns {*} The earliest time.chart.
+ * @returns {*} The earliest date.chart.
  */
 export function extractEarliestDate(flatData, dateAccess = (date) => date) {
   return extractDatesFromFlatData(flatData)
@@ -106,22 +106,22 @@ export function extractEarliestDate(flatData, dateAccess = (date) => date) {
 }
 
 /**
- * Returns the earliest time.chart occurring in the flat array of items.
+ * Returns the earliest date.chart occurring in the flat array of items.
  *
  * @param flatData The flat samples array.
  * @param dateAccess
- * @returns {*} The earliest time.chart.
+ * @returns {*} The earliest date.chart.
  */
 export function extractEarliestDateWithValue(flatData, dateAccess = (date) => date) {
   return extractEarliestDate(filterWithValue(flatData), dateAccess);
 }
 
 /**
- * Returns the latest time.chart occurring in the flat array of items.
+ * Returns the latest date.chart occurring in the flat array of items.
  *
  * @param flatData The flat samples array.
  * @param dateAccess
- * @returns {*} The latest time.chart.
+ * @returns {*} The latest date.chart.
  */
 export function extractLatestDate(flatData, dateAccess = (date) => date) {
   return extractDatesFromFlatData(flatData)
@@ -129,11 +129,11 @@ export function extractLatestDate(flatData, dateAccess = (date) => date) {
 }
 
 /**
- * Returns the latest time.chart occurring in the flat array of items.
+ * Returns the latest date.chart occurring in the flat array of items.
  *
  * @param flatData The flat samples array.
  * @param dateAccess
- * @returns {*} The latest time.chart.
+ * @returns {*} The latest date.chart.
  */
 export function extractLatestDateWithValue(flatData, dateAccess = (date) => date) {
   return extractLatestDate(filterWithValue(flatData), dateAccess);

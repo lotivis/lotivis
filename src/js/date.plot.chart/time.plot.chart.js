@@ -13,7 +13,7 @@ import {TimePlotBackgroundBarsRenderer} from "./time.plot.background.bars.render
 import {TimePlotBarsFractionsRenderer} from "./time.plot.bars.fractions.renderer";
 
 /**
- * A lotivis time.chart.plot.chart chart.
+ * A lotivis date.chart.plot.chart chart.
  *
  * @class TimePlotChart
  * @extends Chart
@@ -103,7 +103,7 @@ export class TimePlotChart extends Chart {
   }
 
   /**
-   * Updates the time.chart.plot.chart chart.
+   * Updates the date.chart.plot.chart chart.
    */
   update(controller, reason) {
     if (!this.updateSensible) return;

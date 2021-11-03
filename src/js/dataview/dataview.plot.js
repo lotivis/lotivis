@@ -10,7 +10,7 @@ import {combineByDate} from "../data.juggle/data.combine";
 import {sumOfValues} from "../data.juggle/data.sum";
 import {flatDataset} from "../data.juggle/data.flat";
 import {d3LibraryAccess} from "../shared/d3libaccess";
-import {lotivis_log} from "../shared/debug";
+import "../datasets.controller/datasets.controller.cache";
 
 /**
  *
@@ -40,17 +40,17 @@ function createPlotDataset(dataset, dateAccess) {
 }
 
 /**
- * Returns a new generated time.chart.plot.chart samples view for the current enabled samples of dataset of this controller.
+ * Returns a new generated date.chart.plot.chart samples view for the current enabled samples of dataset of this controller.
  */
 DatasetsController.prototype.getPlotDataview = function () {
 
-  let cachedDataView = this.getCached('time.chart.plot.chart');
+  let cachedDataView = this.getCached('date.chart.plot.chart');
   if (cachedDataView) {
     return cachedDataView;
   }
 
   let dateAccess = this.dateAccess;
-  let enabledDatasets = this.enabledDatasets();
+  let enabledDatasets = this.filteredDatasets();
   let dataview = {datasets: []};
 
   dataview.dates = extractDatesFromDatasets(enabledDatasets).sort();
@@ -76,7 +76,7 @@ DatasetsController.prototype.getPlotDataview = function () {
     });
   });
 
-  this.setCached(dataview, 'time.chart.plot.chart');
+  this.setCached(dataview, 'date.chart.plot.chart');
 
   return dataview;
 };

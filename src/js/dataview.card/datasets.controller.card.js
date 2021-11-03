@@ -1,13 +1,14 @@
-import {DataviewCard} from "./dataview.card";
+import {DataViewCard} from "./dataview.card";
 
 /**
- * @class DataviewDatasetsControllerCard
+ * @class DatasetsControllerCard
+ *
  * @extends DataviewCard
  */
-export class DataviewDatasetsControllerCard extends DataviewCard {
+export class DatasetsControllerCard extends DataViewCard {
 
   /**
-   * Creates a new instance of DataviewDatasetsControllerCard.
+   * Creates a new instance of DatasetsControllerCard.
    */
   constructor(parent) {
     super(parent);
@@ -27,7 +28,8 @@ export class DataviewDatasetsControllerCard extends DataviewCard {
       selection: {},
       datasets: this.datasetsController.datasets,
       flatData: this.datasetsController.flatData,
-      originalDatasets: this.datasetsController.originalDatasets
+      originalDatasets: this.datasetsController.originalDatasets,
+      snapshot: this.datasetsController.snapshot
     }, null, 2);
   }
 }

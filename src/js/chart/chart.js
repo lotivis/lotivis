@@ -47,12 +47,13 @@ export class Chart extends Component {
    * Updates the content of this chart by calling the 'update'-chain:
    *
    * ```
-   * precalculate();
    * remove();
+   * precalculate();
    * draw();
    * ```
    */
   update(datasetsController, reason) {
+    lotivis_log('[lotivis] ', this.constructor.name, 'update', reason);
     if (!this.updateSensible) return;
     this.remove();
     this.precalculate();

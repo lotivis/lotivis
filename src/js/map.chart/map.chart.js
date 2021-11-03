@@ -11,6 +11,8 @@ import {MapSelectionBoundsRenderer} from "./map.selection.bounds.renderer";
 import {MapChartConfig} from "./map.chart.config";
 import {MapBackgroundRenderer} from "./map.background.renderer";
 import {GeoJson} from "../geojson/geojson";
+import {MapSelectionRenderer} from "./map.selection.renderer";
+import {lotivis_log} from "../shared/debug";
 
 /**
  * A component which renders a GeoJSON with d3.
@@ -22,7 +24,7 @@ export class MapChart extends Chart {
   /**
    * Creates a new instance of MapChart.
    * @param parent The parental component.
-   * @param config The configuration of the location.chart chart.
+   * @param config The configuration of the map.chart chart.
    */
   constructor(parent, config) {
     super(parent, config);
@@ -55,6 +57,7 @@ export class MapChart extends Chart {
     this.labelRenderer = new MapLabelRenderer(this);
     this.legendRenderer = new MapLegendRenderer(this);
     this.selectionBoundsRenderer = new MapSelectionBoundsRenderer(this);
+    this.selectionRenderer = new MapSelectionRenderer(this);
     this.tooltipRenderer = new MapTooltipRenderer(this);
   }
 
@@ -73,6 +76,7 @@ export class MapChart extends Chart {
   }
 
   draw() {
+    lotivis_log('[lotivis] ', this.constructor.name, 'draw');
     this.backgroundRenderer.render();
     this.exteriorBorderRenderer.render();
     this.geoJSONRenderer.render();
@@ -82,6 +86,7 @@ export class MapChart extends Chart {
     this.tooltipRenderer.raise();
     this.selectionBoundsRenderer.render();
     this.selectionBoundsRenderer.raise();
+    this.selectionRenderer.render();
   }
 
   /**
@@ -103,7 +108,7 @@ export class MapChart extends Chart {
   }
 
   /**
-   * Tells this location.chart chart that the given feature was selected with the mouse.
+   * Tells this map.chart chart that the given feature was selected with the mouse.
    * @param event The mouse event.
    * @param feature The feature.
    */
@@ -114,6 +119,7 @@ export class MapChart extends Chart {
     this.updateSensible = false;
     this.datasetController.setLocationsFilter([locationID]);
     this.updateSensible = true;
+    this.selectionRenderer.render();
   }
 
   /**
@@ -131,7 +137,7 @@ export class MapChart extends Chart {
   }
 
   /**
-   * Tells the receiving location.chart chart that its `geoJSON` property did change.
+   * Tells the receiving map.chart chart that its `geoJSON` property did change.
    */
   geoJSONDidChange() {
     if (!this.geoJSON) return;

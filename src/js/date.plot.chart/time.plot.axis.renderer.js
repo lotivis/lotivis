@@ -7,12 +7,12 @@ export class TimePlotAxisRenderer {
   /**
    * Creates a new instance of PlotAxisRenderer.
    * @constructor
-   * @param plotChart The parental time.chart.plot.chart chart.
+   * @param plotChart The parental date.chart.plot.chart chart.
    */
   constructor(plotChart) {
 
     /**
-     * Appends axis on the top, left and bottom of the time.chart.plot.chart chart.
+     * Appends axis on the top, left and bottom of the date.chart.plot.chart chart.
      */
     this.renderAxis = function () {
       let margin = plotChart.config.margin;

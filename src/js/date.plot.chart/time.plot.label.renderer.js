@@ -10,12 +10,12 @@ export class TimePlotLabelRenderer {
    * Creates a new instance of TimePlotLabelRenderer.
    *
    * @constructor
-   * @param plotChart The parental time.chart.plot.chart chart.
+   * @param plotChart The parental date.chart.plot.chart chart.
    */
   constructor(plotChart) {
 
     /**
-     * Draws the labels on the bars on the time.chart.plot.chart chart.
+     * Draws the labels on the bars on the date.chart.plot.chart chart.
      */
     this.renderLabels = function () {
       if (!plotChart.config.showLabels) return;
@@ -28,7 +28,7 @@ export class TimePlotLabelRenderer {
         .append('g')
         .attr('transform', `translate(0,${(xBandwidth / 2) + 4})`)
         .append('text')
-        .attr('class', 'lotivis-time.chart.plot.chart-label')
+        .attr('class', 'lotivis-date.chart.plot.chart-label')
         .attr("id", (d) => 'rect-' + hashCode(d.label))
         .attr("x", (d) => xChart(d.firstDate) + (xBandwidth / 2))
         .attr("y", (d) => plotChart.yChart(d.label))

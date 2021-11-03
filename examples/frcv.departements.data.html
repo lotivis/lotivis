@@ -55,12 +55,12 @@
 
   Promise
     .all([
-      d3.json('/assets/tracks-per-departement.json'),
-      d3.json('/assets/words-per-departement.json'),
-      d3.json('/assets/words-per-departement-relative.json'),
-      d3.json('/assets/types-per-departement.json'),
-      d3.json('/assets/types-per-departement-relative.json'),
-      d3.json('/assets/departements.geojson')
+      d3.json('./assets/tracks-per-departement.json'),
+      d3.json('./assets/words-per-departement.json'),
+      d3.json('./assets/words-per-departement-relative.json'),
+      d3.json('./assets/types-per-departement.json'),
+      d3.json('./assets/types-per-departement-relative.json'),
+      d3.json('./assets/departements.geojson')
     ])
     .then(function (datasetsAndGeoJSON) {
       let rawGeoJSON = datasetsAndGeoJSON.pop();

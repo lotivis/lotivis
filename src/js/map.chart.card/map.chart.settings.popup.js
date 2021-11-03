@@ -22,7 +22,7 @@ export class MapChartSettingsPopup extends SettingsPopup {
     this.showLabelsCheckbox.onClick = function (checked) {
       this.mapChart.config.showLabels = checked;
       this.mapChart.update();
-      UrlParameters.getInstance().setWithoutDeleting('map.chart-show-labels', checked);
+      UrlParameters.getInstance().setWithoutDeleting('map-chart-show-labels', checked);
     }.bind(this);
   }
 

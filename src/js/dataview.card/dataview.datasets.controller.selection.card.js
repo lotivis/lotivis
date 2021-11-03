@@ -1,10 +1,10 @@
-import {DataviewCard} from "./dataview.card";
+import {DataViewCard} from "./dataview.card";
 
 /**
  * @class DataviewDatasetsControllerSelectionCard
  * @extends DataviewCard
  */
-export class DataviewDatasetsControllerSelectionCard extends DataviewCard {
+export class DataviewDatasetsControllerSelectionCard extends DataViewCard {
 
   /**
    * Creates a new instance of DataviewDatasetsControllerSelectionCard.

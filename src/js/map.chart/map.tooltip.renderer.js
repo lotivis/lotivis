@@ -12,7 +12,7 @@ export class MapTooltipRenderer {
 
   /**
    * Creates a new instance of MapTooltipRenderer.
-   * @param mapChart The parental location.chart chart.
+   * @param mapChart The parental map.chart chart.
    */
   constructor(mapChart) {
     this.mapChart = mapChart;
@@ -63,7 +63,7 @@ export class MapTooltipRenderer {
     }
 
     /**
-     * Called by location.chart geojson renderer when mouse enters an area drawn on the location.chart.
+     * Called by map.chart geojson renderer when mouse enters an area drawn on the map.chart.
      * @param event The mouse event.
      * @param feature The drawn feature (area).
      */
@@ -138,12 +138,12 @@ export class MapTooltipRenderer {
     };
 
     /**
-     * Called by location.chart geojson renderer when mouse leaves an area drawn on the location.chart.
+     * Called by map.chart geojson renderer when mouse leaves an area drawn on the map.chart.
      * @param event The mouse event.
      * @param feature The drawn feature (area).
      */
     this.mouseOut = function (event, feature) {
-      let style = styleForCSSClass('.lotivis-location.chart-area');
+      let style = styleForCSSClass('.lotivis-map.chart-area');
       let mapID = featureMapID(feature);
       mapChart.svg.select(`#${mapID}`)
         .style('stroke', style.stroke || 'black')

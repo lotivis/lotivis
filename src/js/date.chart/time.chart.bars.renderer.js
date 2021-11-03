@@ -1,14 +1,14 @@
 import {LotivisConfig} from "../shared/config";
 
 /**
- * Appends the bars to a time.chart chart.
+ * Appends the bars to a date.chart chart.
  * @class TimeChartBarsRenderer
  */
 export class TimeChartBarsRenderer {
 
   /**
    * Creates a new instance of TimeChartBarsRenderer.
-   * @param dateChart The parental time.chart chart.
+   * @param dateChart The parental date.chart chart.
    */
   constructor(dateChart) {
 

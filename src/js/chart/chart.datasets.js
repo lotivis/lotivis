@@ -13,7 +13,7 @@ Chart.prototype.setDatasetsController = function (newController) {
 };
 
 /**
- * Sets the datasets of this location.chart chart.
+ * Sets the datasets of this map.chart chart.
  * @param newDatasets The new dataset.
  */
 Chart.prototype.setDatasets = function (newDatasets) {

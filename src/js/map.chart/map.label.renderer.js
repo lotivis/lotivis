@@ -10,15 +10,15 @@ export class MapLabelRenderer {
 
   /**
    * Creates a new instance of MapLabelRenderer.
-   * @param mapChart The parental location.chart chart.
+   * @param mapChart The parental map.chart chart.
    */
   constructor(mapChart) {
 
     /**
-     * Removes any old labels from the location.chart.
+     * Removes any old labels from the map.chart.
      */
     function removeLabels() {
-      mapChart.svg.selectAll('.lotivis-location.chart-label').remove();
+      mapChart.svg.selectAll('.lotivis-map.chart-label').remove();
     }
 
     /**
@@ -30,7 +30,7 @@ export class MapLabelRenderer {
       let geoJSON = mapChart.geoJSON;
       if (!mapChart.geoJSON) return lotivis_log('[lotivis]  No GeoJSON to render.');
       let dataview = mapChart.dataview;
-      if (!dataview) return lotivis_log('[lotivis]  No dataview in location.chart.');
+      if (!dataview) return lotivis_log('[lotivis]  No dataview in map.chart.');
       if (!mapChart.config.showLabels) return lotivis_log('[lotivis]  Skip rendering labels due to configuration.');
 
       mapChart.svg
