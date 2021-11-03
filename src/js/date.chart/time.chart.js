@@ -1,12 +1,12 @@
 import {Color} from "../shared.color/color";
-import {DateAxisRenderer} from "./date.axis.renderer";
-import {DateLabelRenderer} from "./date.label.renderer";
-import {DateLegendRenderer} from "./date.legend.renderer";
-import {DateBarsRenderer} from "./date.bars.renderer";
-import {DateGhostBarsRenderer} from "./date.ghost.bars.renderer";
-import {DateTooltipRenderer} from "./date.tooltip.renderer";
+import {TimeChartAxisRenderer} from "./time.chart.axis.renderer";
+import {TimeChartLabelRenderer} from "./time.chart.label.renderer";
+import {TimeChartLegendRenderer} from "./time.chart.legend.renderer";
+import {TimeChartBarsRenderer} from "./time.chart.bars.renderer";
+import {TimeChartSelectionBarsRenderer} from "./time.chart.selection.bars.renderer";
+import {TimeChartTooltipRenderer} from "./time.chart.tooltip.renderer";
 import {Chart} from "../chart/chart";
-import {DateGridRenderer} from "./date.grid.renderer";
+import {TimeChartGridRenderer} from "./time.chart.grid.renderer";
 import {LotivisConfig} from "../shared/config";
 import {lotivis_log} from "../shared/debug";
 
@@ -38,8 +38,10 @@ const defaultConfig = {
  */
 export class TimeChart extends Chart {
 
+  // called by `Chart` superclass
   /**
    * Initializes this diachronic chart by setting the default values.
+   *
    * @override
    */
   initialize() {
@@ -69,13 +71,13 @@ export class TimeChart extends Chart {
   }
 
   initializeRenderers() {
-    this.axisRenderer = new DateAxisRenderer(this);
-    this.gridRenderer = new DateGridRenderer(this);
-    this.labelRenderer = new DateLabelRenderer(this);
-    this.legendRenderer = new DateLegendRenderer(this);
-    this.barsRenderer = new DateBarsRenderer(this);
-    this.ghostBarsRenderer = new DateGhostBarsRenderer(this);
-    this.tooltipRenderer = new DateTooltipRenderer(this);
+    this.axisRenderer = new TimeChartAxisRenderer(this);
+    this.gridRenderer = new TimeChartGridRenderer(this);
+    this.labelRenderer = new TimeChartLabelRenderer(this);
+    this.legendRenderer = new TimeChartLegendRenderer(this);
+    this.barsRenderer = new TimeChartBarsRenderer(this);
+    this.ghostBarsRenderer = new TimeChartSelectionBarsRenderer(this);
+    this.tooltipRenderer = new TimeChartTooltipRenderer(this);
   }
 
   /**

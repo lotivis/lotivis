@@ -18,7 +18,7 @@ export class MapLegendRenderer {
     function appendLegend() {
       legend = mapChart.svg
         .append('svg')
-        .attr('class', 'lotivis-location.chart-legend')
+        .attr('class', 'lotivis-location-chart-legend')
         .attr('width', mapChart.width)
         .attr('height', 200)
         .attr('x', 0)
@@ -54,7 +54,7 @@ export class MapLegendRenderer {
 
         legend
           .append('text')
-          .attr('class', 'lotivis-location.chart-legend-title')
+          .attr('class', 'lotivis-location-chart-legend-title')
           .attr('x', offset + 10)
           .attr('y', '20')
           .style('fill', color.rgbString())
@@ -66,7 +66,7 @@ export class MapLegendRenderer {
           .data(['Keine Daten'])
           .enter()
           .append("text")
-          .attr('class', 'lotivis-location.chart-legend-text')
+          .attr('class', 'lotivis-location-chart-legend-text')
           .attr('x', offset + 35)
           .attr('y', 44)
           .text(d => d);
@@ -77,7 +77,7 @@ export class MapLegendRenderer {
           .data([0])
           .enter()
           .append("rect")
-          .attr('class', 'lotivis-location.chart-legend-rect')
+          .attr('class', 'lotivis-location-chart-legend-rect')
           .style('fill', 'white')
           .attr('x', offset + 10)
           .attr('y', 30)
@@ -93,7 +93,7 @@ export class MapLegendRenderer {
           .data([0])
           .enter()
           .append("text")
-          .attr('class', 'lotivis-location.chart-legend-text')
+          .attr('class', 'lotivis-location-chart-legend-text')
           .attr('x', offset + 35)
           .attr('y', 64)
           .text(d => d);
@@ -104,7 +104,7 @@ export class MapLegendRenderer {
           .data([0])
           .enter()
           .append("rect")
-          .attr('class', 'lotivis-location.chart-legend-rect')
+          .attr('class', 'lotivis-location-chart-legend-rect')
           .style('fill', 'WhiteSmoke')
           .attr('x', offset + 10)
           .attr('y', 50)
@@ -119,7 +119,7 @@ export class MapLegendRenderer {
           .data(data)
           .enter()
           .append("rect")
-          .attr('class', 'lotivis-location.chart-legend-rect')
+          .attr('class', 'lotivis-location-chart-legend-rect')
           .style('fill', generator)
           .attr('x', offset + 10)
           .attr('y', (d, i) => (i * 20) + 70)
@@ -134,7 +134,7 @@ export class MapLegendRenderer {
           .data(data)
           .enter()
           .append("text")
-          .attr('class', 'lotivis-location.chart-legend-text')
+          .attr('class', 'lotivis-location-chart-legend-text')
           .attr('x', offset + 35)
           .attr('y', (d, i) => (i * 20) + 84)
           .text(function (d, i) {

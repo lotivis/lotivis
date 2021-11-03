@@ -5,7 +5,7 @@ import "../shared.color/color.stacks";
 /**
  *
  */
-export class DateLegendRenderer {
+export class TimeChartLegendRenderer {
 
   constructor(dateChart) {
 

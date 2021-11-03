@@ -13,7 +13,7 @@ export class MapSelectionBoundsRenderer {
     this.render = function () {
       this.bounds = mapChart.svg
         .append('rect')
-        .attr('class', 'lotivis-location.chart-selection-rect')
+        .attr('class', 'lotivis-location-chart-selection-rect')
         .style('fill-opacity', 0);
     };
 

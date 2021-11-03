@@ -13,6 +13,7 @@ export class MapGeoJSONRenderer {
 
     /**
      * To be called when the mouse enters an area drawn on the location.chart.
+     *
      * @param event The mouse event.
      * @param feature The drawn feature (area).
      */
@@ -24,6 +25,7 @@ export class MapGeoJSONRenderer {
 
     /**
      * To be called when the mouse leaves an area drawn on the location.chart.
+     *
      * @param event The mouse event.
      * @param feature The drawn feature (area).
      */
@@ -37,7 +39,7 @@ export class MapGeoJSONRenderer {
      * Renders the `presentedGeoJSON` property.
      */
     this.render = function () {
-      let geoJSON = mapChart.presentedGeoJSON;
+      let geoJSON = mapChart.geoJSON;
       if (!geoJSON) return lotivis_log('[lotivis]  No GeoJSON to render.');
       let idAccessor = mapChart.config.featureIDAccessor;
 
@@ -49,8 +51,8 @@ export class MapGeoJSONRenderer {
         .enter()
         .append('path')
         .attr('d', mapChart.path)
-        .attr('id', feature => `lotivis-map-area-${idAccessor(feature)}`)
-        .classed('lotivis-location.chart-area', true)
+        .attr('id', feature => `lotivis-location-chart-area-${idAccessor(feature)}`)
+        .classed('lotivis-location-chart-area', true)
         .style('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4')
         .style('fill', 'white')
         .style('fill-opacity', 1)

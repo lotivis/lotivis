@@ -10,9 +10,10 @@ export class MapBackgroundRenderer {
    */
   constructor(mapChart) {
 
-    function mouseEnter() {
+    function onMouseClick() {
       let controller = mapChart.datasetController;
       if (!controller) return;
+
       let filters = controller.locationFilters;
       if (!filters || filters.length === 0) return;
       mapChart.updateSensible = false;
@@ -32,7 +33,7 @@ export class MapBackgroundRenderer {
         .attr('width', mapChart.config.width)
         .attr('height', mapChart.config.height)
         .attr('fill', 'white')
-        .on('mouseenter', mouseEnter);
+        .on('click', onMouseClick);
     };
   }
 }

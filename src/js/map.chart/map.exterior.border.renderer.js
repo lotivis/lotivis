@@ -38,7 +38,7 @@ export class MapExteriorBorderRenderer {
         .append('path')
         .datum(borders)
         .attr('d', mapChart.path)
-        .attr('class', 'lotivis-location.chart-exterior-borders');
+        .attr('class', 'lotivis-location-chart-exterior-borders');
     };
   }
 }

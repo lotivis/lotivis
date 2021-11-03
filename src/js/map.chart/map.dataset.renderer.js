@@ -2,6 +2,7 @@ import {equals} from "../shared/equal";
 import {Color} from "../shared.color/color";
 import '../shared.color/color.location.chart';
 import {lotivis_log} from "../shared/debug";
+import {styleForCSSClass} from "../shared/style";
 
 /**
  *
@@ -21,26 +22,31 @@ export class MapDatasetRenderer {
      * Resets the `fill` and `fill-opacity` property of each area.
      */
     function resetAreas() {
-      // let style = styleForCSSClass('.lotivis-location.chart-area');
-      // mapChart.svg
-      //   .selectAll('.lotivis-location.chart-area')
-      //   .style('fill', 'whitesmoke')
-      //   .style('fill-opacity', 1);
+      let style = styleForCSSClass('.lotivis-location.chart-area');
+      mapChart.svg
+        .selectAll('.lotivis-location-chart-area')
+        .style('stroke', style.stroke || 'black')
+        .style('stroke-width', style['stroke-width'] || '1')
+        .style('stroke-dasharray', '1,4');
     }
 
     function featureMapID(feature) {
-      return `lotivis-map-area-${mapChart.config.featureIDAccessor(feature)}`;
+      return `lotivis-location-chart-area-${mapChart.config.featureIDAccessor(feature)}`;
     }
 
     /**
-     * Called by location.chart GeoJSON renderer when mouse enters an area drawn on the location.chart.
+     * Called by location.chart GeoJSON renderer when mouse enters an area drawn
+     * on the location chart.
+     *
      * @param event The mouse event.
      * @param feature The drawn feature (area).
      */
     this.mouseEnter = function (event, feature) {
       resetAreas();
+
       let color = Color.defaultTint.rgbString();
       let mapID = featureMapID(feature);
+      console.log(mapID);
       mapChart
         .svg
         .selectAll(`#${mapID}`)
@@ -51,7 +57,7 @@ export class MapDatasetRenderer {
 
       mapChart
         .svg
-        .selectAll('.lotivis-location.chart-label')
+        .selectAll('.lotivis-location-chart-label')
         .raise();
     };
 
@@ -86,7 +92,7 @@ export class MapDatasetRenderer {
           let opacity = Number(datasetEntry.value / max);
 
           mapChart.svg
-            .selectAll('.lotivis-location.chart-area')
+            .selectAll('.lotivis-location-chart-area')
             .filter((item) => equals(mapChart.config.featureIDAccessor(item), locationID))
             .style('fill', function () {
               if (opacity === 0) {
@@ -95,9 +101,7 @@ export class MapDatasetRenderer {
                 return generator(opacity);
               }
             });
-
         }
-
         return;
       }
     };

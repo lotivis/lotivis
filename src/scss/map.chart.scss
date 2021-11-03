@@ -1,9 +1,13 @@
 
-.lotivis-map {
+.lotivis-location-chart {
   // empty
 }
 
-.lotivis-map-area {
+.lotivis-map-chart-background {
+  cursor: pointer;
+}
+
+.lotivis-location-chart-area {
   fill: white;
   fill-opacity: 0;
   stroke: black;
@@ -11,7 +15,7 @@
   cursor: pointer;
 }
 
-.lotivis-map-exterior-borders {
+.lotivis-location-chart-exterior-borders {
   fill: white;
   fill-opacity: 0;
   stroke: green;
@@ -19,14 +23,14 @@
   pointer-events: none;
 }
 
-.lotivis-map-label {
+.lotivis-location-chart-label {
   fill: black;
   text-anchor: middle;
   font-size: 12px;
   pointer-events: none;
 }
 
-.lotivis-map-selection-rect {
+.lotivis-location-chart-selection-rect {
   pointer-events: none;
   position: absolute;
   fill: white;
@@ -36,19 +40,19 @@
   stroke-dasharray: 1, 3;
 }
 
-.lotivis-map-legend {
+.lotivis-location-chart-legend {
   // emtpty
 }
 
-.lotivis-map-legend-title {
+.lotivis-location-chart-legend-title {
   // emtpty
 }
 
-.lotivis-map-legend-text {
+.lotivis-location-chart-legend-text {
   // emtpty
 }
 
-.lotivis-map-legend-rect {
+.lotivis-location-chart-legend-rect {
   stroke: black;
   stroke-width: 1;
 }

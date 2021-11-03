@@ -134,7 +134,7 @@ export class MapTooltipRenderer {
         .style('left', left + 'px')
         .style('top', top + 'px');
 
-      mapChart.onSelectFeature(event, feature);
+      // mapChart.onSelectFeature(event, feature);
     };
 
     /**

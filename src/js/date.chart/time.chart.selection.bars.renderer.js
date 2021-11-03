@@ -3,12 +3,12 @@ import {toSaveID} from "../shared/selector";
 
 /**
  *
- * @class DateGhostBarsRenderer
+ * @class TimeChartSelectionBarsRenderer
  */
-export class DateGhostBarsRenderer {
+export class TimeChartSelectionBarsRenderer {
 
   /**
-   * Creates a new instance of DateGhostBarsRenderer.
+   * Creates a new instance of TimeChartSelectionBarsRenderer.
    * @param dateChart
    */
   constructor(dateChart) {
@@ -47,11 +47,15 @@ export class DateGhostBarsRenderer {
       this.hideAll();
       dateChart.tooltipRenderer.hideTooltip(event, date);
 
-      if (dateChart.config.sendsNotifications) {
-        dateChart.updateSensible = false;
-        dateChart.datasetController.resetFilters();
-        dateChart.updateSensible = true;
-      }
+      // if (dateChart.config.sendsNotifications) {
+      //   dateChart.updateSensible = false;
+      //   dateChart.datasetController.resetFilters();
+      //   dateChart.updateSensible = true;
+      // }
+    }
+
+    function onMouseClick(even, date) {
+      console.log('onMouseClick', date);
     }
 
     this.renderGhostBars = function () {

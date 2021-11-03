@@ -1,10 +1,10 @@
 /**
- * @class DateAxisRenderer
+ * @class TimeChartAxisRenderer
  */
-export class DateAxisRenderer {
+export class TimeChartAxisRenderer {
 
   /**
-   * Creates a new instance of DateAxisRenderer.
+   * Creates a new instance of TimeChartAxisRenderer.
    * @param dateChart The parental time.chart chart.
    */
   constructor(dateChart) {

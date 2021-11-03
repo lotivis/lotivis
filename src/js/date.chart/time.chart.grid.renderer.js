@@ -1,10 +1,10 @@
 /**
- * @class DateGridRenderer
+ * @class TimeChartGridRenderer
  */
-export class DateGridRenderer {
+export class TimeChartGridRenderer {
 
   /**
-   * Creates a new instance of DateGridRenderer.
+   * Creates a new instance of TimeChartGridRenderer.
    *
    * @param dateChart
    */

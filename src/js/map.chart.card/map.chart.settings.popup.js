@@ -3,7 +3,7 @@ import {UrlParameters} from "../shared/url.parameters";
 import {SettingsPopup} from "../shared.components/settings.popup";
 
 /**
- * A popup presenting a settings panel for a location.chart chart.
+ * A popup presenting a settings panel for a map.chart chart.
  *
  * @class MapChartSettingsPopup
  * @extends SettingsPopup
@@ -22,7 +22,7 @@ export class MapChartSettingsPopup extends SettingsPopup {
     this.showLabelsCheckbox.onClick = function (checked) {
       this.mapChart.config.showLabels = checked;
       this.mapChart.update();
-      UrlParameters.getInstance().setWithoutDeleting('location.chart-show-labels', checked);
+      UrlParameters.getInstance().setWithoutDeleting('map.chart-show-labels', checked);
     }.bind(this);
   }
 

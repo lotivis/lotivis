@@ -38,7 +38,7 @@ export class MapLabelRenderer {
         .data(geoJSON.features)
         .enter()
         .append('text')
-        .attr('class', 'lotivis-location.chart-label')
+        .attr('class', 'lotivis-location-chart-label')
         .text(function (feature) {
           let featureID = mapChart.config.featureIDAccessor(feature);
           let dataset = dataview.combinedData.find(dataset => equals(dataset.location, featureID));

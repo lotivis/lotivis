@@ -1,4 +1,4 @@
-import {MapChart} from "../location.chart/map.chart";
+import {MapChart} from "../map.chart/map.chart";
 import {MapChartSettingsPopup} from "./map.chart.settings.popup";
 import {ChartCard} from "../shared.components/chart.card";
 import {downloadImage} from "../shared/download";
@@ -14,14 +14,14 @@ export class MapChartCard extends ChartCard {
   /**
    * Creates a new instance of MapChartCard.
    * @param {Component|String} parent The parental component.
-   * @param config The config of the location.chart chart.
+   * @param config The config of the map.chart chart.
    */
   constructor(parent, config) {
-    super(parent || 'location.chart-chart-card', config);
+    super(parent || 'map.chart-chart-card', config);
   }
 
   /**
-   * Creates and injects the location.chart chart.
+   * Creates and injects the map.chart chart.
    */
   injectChart() {
     this.chartID = this.selector + '-chart';

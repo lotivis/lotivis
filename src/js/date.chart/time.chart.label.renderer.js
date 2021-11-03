@@ -1,11 +1,11 @@
 /**
  * Appends labels on top of the bars of a time.chart chart.
- * @class DateLabelRenderer
+ * @class TimeChartLabelRenderer
  */
-export class DateLabelRenderer {
+export class TimeChartLabelRenderer {
 
   /**
-   * Creates a new instance of DateLabelRenderer.
+   * Creates a new instance of TimeChartLabelRenderer.
    * @param dateChart The parental time.chart chart.
    */
   constructor(dateChart) {

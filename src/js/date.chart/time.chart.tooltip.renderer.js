@@ -4,12 +4,12 @@ import {LotivisConfig} from "../shared/config";
 /**
  * Injects and presents a tooltip on a time.chart chart.
  *
- * @class DateTooltipRenderer
+ * @class TimeChartTooltipRenderer
  */
-export class DateTooltipRenderer {
+export class TimeChartTooltipRenderer {
 
   /**
-   * Creates a new instance of DateTooltipRenderer.
+   * Creates a new instance of TimeChartTooltipRenderer.
    *
    * @constructor
    */
@@ -88,7 +88,8 @@ export class DateTooltipRenderer {
      */
     function getHTMLForDate(date) {
       let flatData = dateChart.datasetController
-        .enabledFlatData()
+        .snapshot
+        .flatData
         .filter(item => item.date === date);
 
       let first = flatData.first();
