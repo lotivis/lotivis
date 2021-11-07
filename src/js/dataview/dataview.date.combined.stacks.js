@@ -43,10 +43,10 @@ DatasetsController.prototype.getDateDataviewCombinedStacks = function (groupSize
 
   dataView.dateToItemsRelation = dateToItemsRelation(datasets, dateAccess);
   dataView.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets, dateAccess);
-  dataView.datasetStacks = createStackModel(this, datasets, dataview.dateToItemsRelation);
-  dataView.datasetStacksPresented = createStackModel(this, enabledDatasets, dataview.dateToItemsRelationPresented);
+  dataView.datasetStacks = createStackModel(this, datasets, dataView.dateToItemsRelation);
+  dataView.datasetStacksPresented = createStackModel(this, enabledDatasets, dataView.dateToItemsRelationPresented);
 
-  dataView.max = d3.max(dataview.datasetStacksPresented, function (stack) {
+  dataView.max = d3.max(dataView.datasetStacksPresented, function (stack) {
     return d3.max(stack, function (series) {
       return d3.max(series.map(item => item['1']));
     });
@@ -55,5 +55,5 @@ DatasetsController.prototype.getDateDataviewCombinedStacks = function (groupSize
   dataView.dates = extractDatesFromDatasets(enabledDatasets);
   dataView.enabledStacks = this.snapshot.stacks;
 
-  return dataview;
+  return dataView;
 };

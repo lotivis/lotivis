@@ -18,7 +18,7 @@ export class Dropdown extends Component {
     this.selector = createID();
     this.element = parent
       .append('div')
-      .classed('dropdown-container', true);
+      .classed('lotivis-dropdown-container', true);
     this.selectId = createID();
     this.renderLabel();
     this.renderSelect();
@@ -27,6 +27,7 @@ export class Dropdown extends Component {
   renderLabel() {
     this.label = this.element
       .append('label')
+      .classed('lotivis-dropdown-label', true)
       .attr('for', this.selectId);
   }
 

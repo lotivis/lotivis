@@ -32,6 +32,14 @@ function createPlotDataset(dataset, dateAccess) {
   newDataset.firstDate = firstDate;
   newDataset.lastDate = lastDate;
   newDataset.sum = sumOfValues(flatData);
+  // newDataset.min = d3.min();
+
+  // dataView.max = d3.max(flatData, function (stack) {
+  //   return d3.max(stack, function (series) {
+  //     return d3.max(series.map(item => item['1']));
+  //   });
+  // });
+
   newDataset.data = combineByDate(data)
     .sort((left, right) => left.dateNumeric - right.dateNumeric)
     .filter(item => (item.value || 0) > 0);
@@ -65,8 +73,6 @@ DatasetsController.prototype.getPlotDataview = function () {
     let lastIndex = dataview.dates.indexOf(newDataset.lastDate);
     newDataset.duration = lastIndex - firstIndex;
     dataview.datasets.push(newDataset);
-
-
   });
 
   dataview.labelsCount = dataview.datasets.length;
@@ -76,7 +82,7 @@ DatasetsController.prototype.getPlotDataview = function () {
     });
   });
 
-  this.setCached(dataview, 'date.chart.plot.chart');
+  this.setCached(dataview, 'plot');
 
   return dataview;
 };

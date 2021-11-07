@@ -1,12 +1,11 @@
-import {TimePlotBarsGradientCreator} from "./time.plot.bars.gradient.creator";
+import {PlotBarsGradientCreator} from "./plot.bars.gradient.creator";
 import {createIDFromDataset} from "../shared/selector";
-import {lotivis_log} from "../shared/debug";
 
 /**
  * Draws the bar on the date.chart.plot.chart chart.
- * @class TimePlotBarsRenderer
+ * @class PlotBarsGradientRenderer
  */
-export class TimePlotBarsRenderer {
+export class PlotBarsGradientRenderer {
 
   /**
    * Creates a new instance of PlotAxisRenderer.
@@ -18,7 +17,7 @@ export class TimePlotBarsRenderer {
     // constant for the radius of the drawn bars.
     const radius = 6;
 
-    this.gradientCreator = new TimePlotBarsGradientCreator(plotChart);
+    this.gradientCreator = new PlotBarsGradientCreator(plotChart);
     plotChart.definitions = plotChart.svg.append("defs");
 
     /**
@@ -42,13 +41,13 @@ export class TimePlotBarsRenderer {
       plotChart.bars = plotChart.barsData
         .append("rect")
         .attr("fill", (d) => `url(#lotivis-plot-gradient-${createIDFromDataset(d)})`)
-        .attr('class', 'lotivis-date.chart.plot.chart-bar')
+        .attr('class', 'lotivis-plot-bar')
         .attr("rx", radius)
         .attr("ry", radius)
         .attr("x", (d) => plotChart.xChart((d.duration < 0) ? d.lastDate : d.firstDate || 0))
         .attr("y", (d) => plotChart.yChart(d.label))
         .attr("height", plotChart.yChart.bandwidth())
-        .attr("id", (d) => 'rect-' + createIDFromDataset(d))
+        .attr("id", (d) => 'lotivis-plot-rect-' + createIDFromDataset(d))
         .attr("width", function (data) {
           if (!data.firstDate || !data.lastDate) return 0;
           return plotChart.xChart(data.lastDate) - plotChart.xChart(data.firstDate) + plotChart.xChart.bandwidth();

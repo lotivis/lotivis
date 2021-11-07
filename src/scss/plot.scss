@@ -1,41 +1,41 @@
 
-.lotivis-time-plot-chart {
+.lotivis-plot {
   // empty
 }
 
-.lotivis-time-plot-chart-background {
+.lotivis-plot-background {
   fill: red; // rgba(255,255,100, 0);
   background: red;
   color: red;
 }
 
-.lotivis-time-plot-chart-selection-rect {
+.lotivis-plot-selection-rect {
   border-radius: 10px;
   fill: $tint-color;
 }
 
-.lotivis-time-plot-chart-bar {
+.lotivis-plot-bar {
   stroke: lightgrey;
   stroke-width: 1;
   pointer-events: none;
 }
 
-.lotivis-time-plot-grid {
+.lotivis-plot-grid {
   color: lightgrey;
   stroke-width: 1;
 }
 
-.lotivis-time-plot-label {
+.lotivis-plot-label {
   fill: white;
   text-anchor: start;
   font-size: 12px;
   pointer-events: none;
 }
 
-.lotivis-time-plot-grid-x {
+.lotivis-plot-grid-x {
   // empty
 }
 
-.lotivis-time-plot-grid-y {
+.lotivis-plot-grid-y {
   // empty
 }

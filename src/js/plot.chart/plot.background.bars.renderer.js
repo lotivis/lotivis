@@ -1,13 +1,11 @@
 import {createIDFromDataset} from "../shared/selector";
-import {flatDatasets} from "../data.juggle/data.flat";
-import {combineByDate} from "../data.juggle/data.combine";
-import {Color} from "../shared.color/color";
 
 /**
- * Draws the bar on the time plot chart.
- * @class TimePlotBarsFractionsRenderer
+ * Draws the background / selection bars of a time plot chart.
+ *
+ * @class PlotBackgroundBarsRenderer
  */
-export class TimePlotBarsFractionsRenderer {
+export class PlotBackgroundBarsRenderer {
 
   /**
    * Creates a new instance of PlotAxisRenderer.
@@ -16,8 +14,15 @@ export class TimePlotBarsFractionsRenderer {
    */
   constructor(plotChart) {
 
-    // constant for the radius of the drawn bars.
-    const radius = 6;
+    function createID(dataset) {
+      return `lotivis-ghost-rect-${createIDFromDataset(dataset)}`;
+    }
+
+    function hideAll() {
+      plotChart.svg
+        .selectAll('.lotivis-plot-selection-rect')
+        .attr("opacity", 0);
+    };
 
     /**
      * To be called when the mouse enters a bar on the date.chart.plot.chart chart.
@@ -25,7 +30,15 @@ export class TimePlotBarsFractionsRenderer {
      * @param dataset The represented dataset.
      */
     function mouseEnter(event, dataset) {
-      // plotChart.tooltipRenderer.showTooltip.bind(plotChart)(event, dataset);
+      hideAll();
+
+      let id = createID(dataset);
+      plotChart
+        .svg
+        .select(`#${id}`)
+        .attr("opacity", 0.3);
+
+      plotChart.tooltipRenderer.showTooltip.bind(plotChart)(event, dataset);
       // plotChart.onSelectDataset(event, dataset);
     }
 
@@ -35,7 +48,8 @@ export class TimePlotBarsFractionsRenderer {
      * @param dataset The represented dataset.
      */
     function mouseOut(event, dataset) {
-      // plotChart.tooltipRenderer.hideTooltip.bind(plotChart)(event, dataset);
+      hideAll();
+      plotChart.tooltipRenderer.hideTooltip.bind(plotChart)(event, dataset);
     }
 
     /**
@@ -43,30 +57,27 @@ export class TimePlotBarsFractionsRenderer {
      */
     this.renderBars = function () {
       let datasets = plotChart.dataView.datasetsSorted || plotChart.dataView.datasets;
-      let flatData = flatDatasets(datasets);
-      flatData = combineByDate(flatData);
+      let firstDate = plotChart.dataView.firstDate;
+      let graphWidth = plotChart.graphWidth;
 
-      plotChart.barsData = plotChart
+      plotChart.backgrounBarsData = plotChart
         .svg
         .append("g")
         .selectAll("g")
-        .data(flatData)
+        .data(datasets)
         .enter();
 
-      plotChart.bars = plotChart.barsData
+      plotChart.backgrounBars = plotChart.backgrounBarsData
         .append("rect")
-        .attr("id", (d) => `lotivis-time-plot-chart-${createIDFromDataset(d)}`)
-        .attr('class', 'lotivis-time-plot-chart-bar')
-        .attr(`fill`, `blue`)
-        .attr("rx", radius)
-        .attr("ry", radius)
-        .attr("x", (d) => plotChart.xChart(d.date))
+        .attr("id", (d) => createID(d))
+        .attr('class', 'lotivis-plot-selection-rect')
+        .attr(`opacity`, 0)
+        .attr("x", plotChart.config.margin.left)
         .attr("y", (d) => plotChart.yChart(d.label))
         .attr("height", plotChart.yChart.bandwidth())
-        .attr("id", (d) => 'rect-' + createIDFromDataset(d))
+        .attr("width", graphWidth)
         .on('mouseenter', mouseEnter)
-        .on('mouseout', mouseOut)
-        .attr("width", plotChart.xChart.bandwidth());
+        .on('mouseout', mouseOut);
     };
   }
 }

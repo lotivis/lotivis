@@ -1,7 +1,7 @@
 /**
  * Draws the background of a time plot chart.
  */
-export class TimePlotBackgroundRenderer {
+export class PlotBackgroundRenderer {
 
   /**
    *
@@ -14,7 +14,7 @@ export class TimePlotBackgroundRenderer {
         .append('rect')
         .attr('width', plotChart.width)
         .attr('height', plotChart.height)
-        .attr('class', `lotivis-time-plot-chart-background`);
+        .attr('class', `lotivis-plot-background`);
     };
   }
 }

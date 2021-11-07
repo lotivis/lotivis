@@ -5,7 +5,7 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../dist/lotivis.css"/>
-  <title>Lotivis - Plot Data Example</title>
+  <title>Lotivis - Plot Chart</title>
 </head>
 <body>
 
@@ -17,11 +17,14 @@
       </a>
     </div>
     <div class="lotivis-col-8 lotivis-headline">
-      <h1>Plot Data</h1>
+      <h1>Plot Chart</h1>
     </div>
     <div class="lotivis-col-8">
-      <div id="time-plot-chart-card">
-        <!-- Plot Chart Here -->
+      <div id="plot-chart-card-gradient">
+        <!-- Plot Chart Card (type: gradient) Here -->
+      </div>
+      <div id="plot-chart-card-fraction">
+        <!-- Plot Chart Card (type: fraction) Here -->
       </div>
     </div>
     <div class="lotivis-col-4">
@@ -156,11 +159,13 @@
 
   lotivis.debug(true);
 
-  let plotChartCard = new lotivis.PlotChartCard();
+  let plotChartCard = new lotivis.PlotChartCard('plot-chart-card-gradient', { title: 'Gradient' });
+  let plotChartCard2 = new lotivis.PlotChartCard('plot-chart-card-fraction', { title: 'Fraction', type: 'fraction' });
   let datasetJSONCard = new lotivis.DatasetsJSONCard('datasets-json-card');
 
   let controller = new lotivis.DatasetController(data);
   plotChartCard.chart.setDatasetsController(controller);
+  plotChartCard2.chart.setDatasetsController(controller);
   datasetJSONCard.setDatasetsController(controller);
 
 </script>

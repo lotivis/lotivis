@@ -1,9 +1,9 @@
 /**
  * Draws a grid on the date.chart.plot.chart chart.
  *
- * @class TimePlotGridRenderer
+ * @class PlotGridRenderer
  */
-export class TimePlotGridRenderer {
+export class PlotGridRenderer {
 
   /**
    * Creates a new instance of TimePlotGridRenderer.
@@ -21,13 +21,13 @@ export class TimePlotGridRenderer {
 
       plotChart.svg
         .append('g')
-        .attr('class', 'lotivis-date.chart.plot.chart-grid lotivis-date.chart.plot.chart-grid-x')
+        .attr('class', 'lotivis-plot-grid lotivis-plot-grid-x')
         .attr('transform', 'translate(0,' + (plotChart.preferredHeight - plotChart.config.margin.bottom) + ')')
         .call(plotChart.xAxisGrid);
 
       plotChart.svg
         .append('g')
-        .attr('class', 'lotivis-date.chart.plot.chart-grid lotivis-date.chart.plot.chart-grid-y')
+        .attr('class', 'lotivis-plot-grid lotivis-plot-grid-y')
         .attr('transform', `translate(${plotChart.config.margin.left},0)`)
         .call(plotChart.yAxisGrid);
 

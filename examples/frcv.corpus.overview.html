@@ -73,8 +73,8 @@
   let loadingCard = d3.select('#loading');
 
   Promise.all([
-    d3.json('/assets/Departements.geojson'),
-    d3.json('/assets/frcv.corpus.datasets.json'),
+    d3.json('/examples/assets/departements.geojson'),
+    d3.json('/examples/assets/frcv.corpus.datasets.json'),
   ]).then(function (results) {
 
     // let corpus = new frc(results[2]);
@@ -101,7 +101,7 @@
     controller.register([
       mapChartCard.chart,
       dateChartCard.chart,
-      // plotChartCard.chart
+      plotChartCard.chart
     ]);
 
     loadingCard.style('display', 'none');

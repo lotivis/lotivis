@@ -2,13 +2,13 @@ import {LotivisConfig} from "../shared/config";
 
 /**
  * Appends and updates the tooltip of a date.chart.plot.chart chart.
- * @class TimePlotTooltipRenderer
+ * @class PlotTooltipRenderer
  * @see PlotChart
  */
-export class TimePlotTooltipRenderer {
+export class PlotTooltipRenderer {
 
   /**
-   * Creates a new instance of TimePlotTooltipRenderer.
+   * Creates a new instance of PlotTooltipRenderer.
    *
    * @constructor
    * @param plotChart

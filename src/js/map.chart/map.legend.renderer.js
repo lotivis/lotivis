@@ -1,4 +1,4 @@
-import {Color} from "../shared.color/color";
+import {Color} from "../shared/color";
 import {formatNumber} from "../shared/format";
 
 /**
@@ -50,7 +50,7 @@ export class MapLegendRenderer {
 
         let steps = 4;
         let data = [0, 1 / 4 * max, 1 / 2 * max, 3 / 4 * max, max];
-        let generator = Color.colorGenerator(max);
+        let generator = Color.mapColors(max);
 
         legend
           .append('text')

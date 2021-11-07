@@ -1,8 +1,8 @@
 /**
  * Draws the axis on the timm plot chart.
- * @class TimePlotAxisRenderer
+ * @class PlotAxisRenderer
  */
-export class TimePlotAxisRenderer {
+export class PlotAxisRenderer {
 
   /**
    * Creates a new instance of PlotAxisRenderer.

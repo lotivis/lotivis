@@ -5,7 +5,7 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../dist/lotivis.css"/>
-  <title>Lotivis - Plot Data Example</title>
+  <title>Lotivis - Plot Chart Showcase</title>
 </head>
 <body>
 
@@ -17,32 +17,50 @@
       </a>
     </div>
     <div class="lotivis-col-8 lotivis-headline">
-      <h1>Plot Data</h1>
+      <h1>Plot Chart Showcase</h1>
     </div>
     <div class="lotivis-col-2"></div>
-    <div class="lotivis-col-4">
-      <div id="card-1">
-        <!-- Plot Chart 1 Here -->
+    <div class="lotivis-col-6">
+      <div id="card-gradient">
+        <!-- Plot Chart (type: gradient) Here -->
       </div>
-      <div id="card-3">
-        <!-- Plot Chart 3 Here -->
+      <div id="card-gradient-hide-labels">
+        <!-- Plot Chart (type: gradient, hide labels) Here -->
       </div>
-      <div id="card-5">
-        <!-- Plot Chart 5 Here -->
+      <div id="card-gradient-sort-alphabetically">
+        <!-- Plot Chart (type: gradient, sort: alphabetically) Here -->
       </div>
-    </div>
-    <div class="lotivis-col-4">
-      <div id="card-2">
-        <!-- Plot Chart 2 Here -->
+      <div id="card-gradient-sort-duration">
+        <!-- Plot Chart (type: gradient, sort: duration) Here -->
       </div>
-      <div id="card-4">
-        <!-- Plot Chart 4 Here -->
+      <div id="card-gradient-sort-itensity">
+        <!-- Plot Chart (type: gradient, sort: itensity) Here -->
       </div>
-      <div id="card-6">
-        <!-- Plot Chart 6 Here -->
+      <div id="card-gradient-sort-first-date">
+        <!-- Plot Chart (type: gradient, sort: first date) Here -->
       </div>
     </div>
-    <div class="lotivis-col-4">
+    <div class="lotivis-col-6">
+      <div id="card-fraction">
+        <!-- Plot Chart (type: fraction) Here -->
+      </div>
+      <div id="card-fraction-hide-labels">
+        <!-- Plot Chart (type: fraction, hide labels) Here -->
+      </div>
+      <div id="card-fraction-sort-alphabetically">
+        <!-- Plot Chart (type: fraction, sort: alphabetically) Here -->
+      </div>
+      <div id="card-fraction-sort-duration">
+        <!-- Plot Chart (type: fraction, sort: duration) Here -->
+      </div>
+      <div id="card-fraction-sort-itensity">
+        <!-- Plot Chart (type: fraction, sort: itensity) Here -->
+      </div>
+      <div id="card-fraction-sort-first-date">
+        <!-- Plot Chart (type: fraction, sort: first date) Here -->
+      </div>
+    </div>
+    <div class="lotivis-col-6">
       <div id="datasets-json-card">
         <!-- Datasets JSON Card Here -->
       </div>
@@ -174,12 +192,60 @@
 
   lotivis.debug(true);
 
-  let plotChartCard1 = new lotivis.PlotChartCard('card-1');
-  let plotChartCard2 = new lotivis.PlotChartCard('card-2', {title: 'Hide Labels', showLabels: false});
-  let plotChartCard3 = new lotivis.PlotChartCard('card-3', {title: 'Sort alphabetically', sort: 'alphabetically'});
-  let plotChartCard4 = new lotivis.PlotChartCard('card-4', {title: 'Sort duration', sort: 'duration'});
-  let plotChartCard5 = new lotivis.PlotChartCard('card-5', {title: 'Sort itensity', sort: 'itensity'});
-  let plotChartCard6 = new lotivis.PlotChartCard('card-6', {title: 'Sort firstDate', sort: 'firstDate'});
+  let plotChartCard1 = new lotivis.PlotChartCard('card-gradient', {
+    title: 'Gradient'
+  });
+  let plotChartCard2 = new lotivis.PlotChartCard('card-gradient-hide-labels', {
+    title: 'Hide Labels',
+    showLabels: false
+  });
+  let plotChartCard3 = new lotivis.PlotChartCard('card-gradient-sort-alphabetically', {
+    title: 'Sort alphabetically',
+    sort: 'alphabetically'
+  });
+  let plotChartCard4 = new lotivis.PlotChartCard('card-gradient-sort-duration', {
+    title: 'Sort duration',
+    sort: 'duration'
+  });
+  let plotChartCard5 = new lotivis.PlotChartCard('card-gradient-sort-itensity', {
+    title: 'Sort itensity',
+    sort: 'itensity'
+  });
+  let plotChartCard6 = new lotivis.PlotChartCard('card-gradient-sort-first-date', {
+    title: 'Sort first date',
+    sort: 'firstDate'
+  });
+
+  let plotChartCard7 = new lotivis.PlotChartCard('card-fraction', {
+    title: 'Fraction',
+    type: 'fraction'
+  });
+  let plotChartCard8 = new lotivis.PlotChartCard('card-fraction-hide-labels', {
+    title: 'Hide Labels',
+    type: 'fraction',
+    showLabels: false
+  });
+  let plotChartCard9 = new lotivis.PlotChartCard('card-fraction-sort-alphabetically', {
+    title: 'Sort alphabetically',
+    type: 'fraction',
+    sort: 'alphabetically'
+  });
+  let plotChartCard10 = new lotivis.PlotChartCard('card-fraction-sort-duration', {
+    title: 'Sort duration',
+    type: 'fraction',
+    sort: 'duration'
+  });
+  let plotChartCard11 = new lotivis.PlotChartCard('card-fraction-sort-itensity', {
+    title: 'Sort itensity',
+    type: 'fraction',
+    sort: 'itensity'
+  });
+  let plotChartCard12 = new lotivis.PlotChartCard('card-fraction-sort-first-date', {
+    title: 'Sort first date',
+    type: 'fraction',
+    sort: 'firstDate'
+  });
+
   let datasetJSONCard = new lotivis.DatasetsJSONCard('datasets-json-card');
 
   let controller = new lotivis.DatasetController(data);
@@ -190,6 +256,12 @@
     plotChartCard4.chart,
     plotChartCard5.chart,
     plotChartCard6.chart,
+    plotChartCard7.chart,
+    plotChartCard8.chart,
+    plotChartCard9.chart,
+    plotChartCard10.chart,
+    plotChartCard11.chart,
+    plotChartCard12.chart,
     datasetJSONCard
   ]);
 

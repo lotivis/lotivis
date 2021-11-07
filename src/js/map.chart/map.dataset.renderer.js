@@ -1,6 +1,5 @@
 import {equals} from "../shared/equal";
-import {Color} from "../shared.color/color";
-import '../shared.color/color.location.chart';
+import {Color} from "../shared/color";
 import {lotivis_log} from "../shared/debug";
 import {styleForCSSClass} from "../shared/style";
 
@@ -16,7 +15,7 @@ export class MapDatasetRenderer {
    */
   constructor(mapChart) {
 
-    let generator = Color.colorGenerator(1);
+    let generator = Color.mapColors(1);
 
     /**
      * Resets the `fill` and `fill-opacity` property of each area.

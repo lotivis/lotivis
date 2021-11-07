@@ -1,24 +1,24 @@
 import {Chart} from "../chart/chart";
-import {TimePlotAxisRenderer} from "./time.plot.axis.renderer";
-import {TimePlotBarsRenderer} from "./time.plot.bars.renderer";
-import {TimePlotTooltipRenderer} from "./time.plot.tooltip.renderer";
-import {TimePlotLabelRenderer} from "./time.plot.label.renderer";
-import {TimePlotGridRenderer} from "./time.plot.grid.renderer";
-import {TimePlotBackgroundRenderer} from "./time.plot.background.renderer";
-import {defaultPlotChartConfig} from "./time.plot.chart.config";
-import {TimePlotChartSort} from "./time.plot.chart.sort";
+import {PlotAxisRenderer} from "./plot.axis.renderer";
+import {PlotTooltipRenderer} from "./plot.tooltip.renderer";
+import {PlotLabelRenderer} from "./plot.label.renderer";
+import {PlotGridRenderer} from "./plot.grid.renderer";
+import {PlotBackgroundRenderer} from "./plot.background.renderer";
+import {defaultPlotChartConfig, PlotChartType} from "./plot.chart.config";
+import {PlotChartSort} from "./plot.chart.sort";
 import "../dataview/dataview.plot";
-import {lotivis_log} from "../shared/debug";
-import {TimePlotBackgroundBarsRenderer} from "./time.plot.background.bars.renderer";
-import {TimePlotBarsFractionsRenderer} from "./time.plot.bars.fractions.renderer";
+import {PlotBackgroundBarsRenderer} from "./plot.background.bars.renderer";
+import {PlotBarsFractionsRenderer} from "./plot.bars.fractions.renderer";
+import {PlotBarsGradientRenderer} from "./plot.bars.gradient.renderer";
+import {PlotLabelsFractionsRenderer} from "./plot.labels.fractions.renderer";
 
 /**
  * A lotivis date.chart.plot.chart chart.
  *
- * @class TimePlotChart
+ * @class PlotChart
  * @extends Chart
  */
-export class TimePlotChart extends Chart {
+export class PlotChart extends Chart {
 
   /**
    * Initializes this diachronic chart by setting the default values.
@@ -35,13 +35,15 @@ export class TimePlotChart extends Chart {
     this.config.margin = margin;
 
     this.createSVG();
-    this.backgroundRenderer = new TimePlotBackgroundRenderer(this);
-    this.axisRenderer = new TimePlotAxisRenderer(this);
-    this.gridRenderer = new TimePlotGridRenderer(this);
-    this.backgroundBarsRenderer = new TimePlotBackgroundBarsRenderer(this);
-    this.barsRenderer = new TimePlotBarsFractionsRenderer(this);
-    this.labelsRenderer = new TimePlotLabelRenderer(this);
-    this.tooltipRenderer = new TimePlotTooltipRenderer(this);
+    this.backgroundRenderer = new PlotBackgroundRenderer(this);
+    this.axisRenderer = new PlotAxisRenderer(this);
+    this.gridRenderer = new PlotGridRenderer(this);
+    this.backgroundBarsRenderer = new PlotBackgroundBarsRenderer(this);
+    this.barsFractionsRenderer = new PlotBarsFractionsRenderer(this);
+    this.barsRenderer = new PlotBarsGradientRenderer(this);
+    this.labelsRenderer = new PlotLabelRenderer(this);
+    this.labelsFractionRenderer = new PlotLabelsFractionsRenderer(this);
+    this.tooltipRenderer = new PlotTooltipRenderer(this);
   }
 
   /**
@@ -98,8 +100,13 @@ export class TimePlotChart extends Chart {
     this.gridRenderer.render();
     this.axisRenderer.renderAxis();
     this.backgroundBarsRenderer.renderBars();
-    this.barsRenderer.renderBars();
-    this.labelsRenderer.renderLabels();
+    if (this.config.type === PlotChartType.gradient) {
+      this.barsRenderer.renderBars();
+      this.labelsRenderer.renderLabels();
+    } else {
+      this.barsFractionsRenderer.renderBars();
+      this.labelsFractionRenderer.renderLabels();
+    }
   }
 
   /**
@@ -160,19 +167,19 @@ export class TimePlotChart extends Chart {
     let datasets = this.dataView.datasets;
     let sortedDatasets = [];
     switch (this.config.sort) {
-      case TimePlotChartSort.alphabetically:
+      case PlotChartSort.alphabetically:
         sortedDatasets = datasets
           .sort((set1, set2) => set1.label > set2.label);
         break;
-      case TimePlotChartSort.duration:
+      case PlotChartSort.duration:
         sortedDatasets = datasets
           .sort((set1, set2) => set1.duration < set2.duration);
         break;
-      case TimePlotChartSort.intensity:
+      case PlotChartSort.intensity:
         sortedDatasets = datasets
           .sort((set1, set2) => set1.sum < set2.sum);
         break;
-      case TimePlotChartSort.firstDate:
+      case PlotChartSort.firstDate:
         sortedDatasets = datasets
           .sort((set1, set2) => set1.firstDate > set2.firstDate);
         break;

@@ -1,25 +1,25 @@
 import {Card} from "../shared.components/card";
 import {UrlParameters} from "../shared/url.parameters";
 import {ChartCard} from "../shared.components/chart.card";
-import {TimePlotChart} from "../date.plot.chart/time.plot.chart";
-import {TimePlotChartCardSettingsPopup} from "./time.plot.chart.card.settings.popup";
+import {PlotChart} from "../plot.chart/plot.chart";
+import {PlotChartCardSettingsPopup} from "./plot.chart.card.settings.popup";
 import {downloadImage} from "../shared/download";
 import {createDownloadFilename} from "../shared/filename";
 
 /**
  * A card containing a date.chart.plot.chart chart.
- * @class TimePlotChartCard
+ * @class PlotChartCard
  * @extends Card
  */
-export class TimePlotChartCard extends ChartCard {
+export class PlotChartCard extends ChartCard {
 
   /**
-   * Creates a new instance of TimePlotChartCard.
+   * Creates a new instance of PlotChartCard.
    * @param selector The selector
    * @param config
    */
   constructor(selector, config) {
-    let theSelector = selector || 'time-plot-chart-card';
+    let theSelector = selector || 'plot-chart-card';
     super(theSelector, config);
     this.injectRadioGroup();
     this.applyURLParameters();
@@ -32,7 +32,7 @@ export class TimePlotChartCard extends ChartCard {
   injectChart() {
     this.chartID = this.selector + '-chart';
     this.body.attr('id', this.chartID);
-    this.chart = new TimePlotChart(this.chartID, this.config);
+    this.chart = new PlotChart(this.chartID, this.config);
   }
 
   /**
@@ -51,7 +51,7 @@ export class TimePlotChartCard extends ChartCard {
   presentSettingsPopupAction() {
     let bodyElement = d3.select('body');
     let button = document.getElementById(this.moreButton.selector);
-    let settingsPopup = new TimePlotChartCardSettingsPopup(bodyElement);
+    let settingsPopup = new PlotChartCardSettingsPopup(bodyElement);
     settingsPopup.chart = this.chart;
     settingsPopup.showUnder(button, 'right');
   }

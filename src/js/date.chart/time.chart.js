@@ -1,4 +1,4 @@
-import {Color} from "../shared.color/color";
+import {Color} from "../shared/color";
 import {DateChartAxisRenderer} from "./date.chart.axis.renderer";
 import {TimeChartLabelRenderer} from "./time.chart.label.renderer";
 import {TimeChartLegendRenderer} from "./time.chart.legend.renderer";

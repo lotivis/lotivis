@@ -1,7 +1,7 @@
 /**
  * Enumeration of sorts available in the date.chart.plot.chart chart.
  */
-export const TimePlotChartSort = {
+export const PlotChartSort = {
   none: 'none',
   alphabetically: 'alphabetically',
   duration: 'duration',

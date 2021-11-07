@@ -1,16 +1,15 @@
-import {Color} from "../shared.color/color";
+import {Color} from "../shared/color";
 import {createIDFromDataset} from "../shared/selector";
-import {lotivis_log} from "../shared/debug";
 
 /**
  * Calculates and creates the gradients for the bars of a date.chart.plot.chart chart.
  *
- * @class TimePlotBarsGradientCreator
+ * @class PlotBarsGradientCreator
  */
-export class TimePlotBarsGradientCreator {
+export class PlotBarsGradientCreator {
 
   /**
-   * Creates a new instance of TimePlotBarsGradientCreator.
+   * Creates a new instance of PlotBarsGradientCreator.
    *
    * @constructor
    * @param plotChart The parental date.chart.plot.chart chart.
@@ -29,7 +28,7 @@ export class TimePlotBarsGradientCreator {
     let max = this.plotChart.dataView.max;
     let gradient = this.plotChart.definitions
       .append("linearGradient")
-      .attr("id", 'lotivis-date.chart.plot.chart-gradient-' + createIDFromDataset(dataset))
+      .attr("id", 'lotivis-plot-gradient-' + createIDFromDataset(dataset))
       .attr("x1", "0%")
       .attr("x2", "100%")
       .attr("y1", "0%")
@@ -51,7 +50,7 @@ export class TimePlotBarsGradientCreator {
       gradient
         .append("stop")
         .attr("offset", `100%`)
-        .attr("stop-shared.color", this.colorGenerator(opacity));
+        .attr("stop-color", this.colorGenerator(opacity));
 
     } else {
 
@@ -68,7 +67,7 @@ export class TimePlotBarsGradientCreator {
         gradient
           .append("stop")
           .attr("offset", `${datePercentage}%`)
-          .attr("stop-shared.color", this.colorGenerator(opacity));
+          .attr("stop-color", this.colorGenerator(opacity));
 
       }
     }

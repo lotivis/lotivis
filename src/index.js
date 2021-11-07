@@ -1,11 +1,6 @@
 import {
   Color
-} from "./js/shared.color/color";
-import './js/shared.color/color.defaults';
-import './js/shared.color/color.location.chart';
-import './js/shared.color/color.plot';
-import './js/shared.color/color.random';
-import './js/shared.color/color.stacks';
+} from "./js/shared/color";
 import {
   Button
 } from "./js/shared.components/button";
@@ -77,11 +72,11 @@ import {
   MapChartCard
 } from "./js/map.chart.card/map.chart.card";
 import {
-  TimePlotChart
-} from "./js/date.plot.chart/time.plot.chart";
+  PlotChart
+} from "./js/plot.chart/plot.chart";
 import {
-  TimePlotChartCard
-} from "./js/date.plot.chart.card/time.plot.chart.card";
+  PlotChartCard
+} from "./js/plot.chart.card/plot.chart.card";
 
 import {
   DatasetsController
@@ -163,8 +158,8 @@ exports.MapChart = MapChart;
 exports.MapChartCard = MapChartCard;
 
 // date.chart.plot.chart
-exports.PlotChart = TimePlotChart;
-exports.PlotChartCard = TimePlotChartCard;
+exports.PlotChart = PlotChart;
+exports.PlotChartCard = PlotChartCard;
 
 // datasets
 exports.DatasetController = DatasetsController;
