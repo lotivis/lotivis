@@ -30,7 +30,7 @@
   ],
   "scripts": {
     "develop": "rollup -c -w",
-    "serve": "http-server",
+    "serve": "http-server ./docs",
     "build": "rollup -c && sass src/index.scss > dist/lotivis.css",
     "test": "npm run build && mocha",
     "copy:to:frcv": "cp docs/js/lotivis.* ../frc-visualization/public/js/lib && cp docs/css/lotivis.* ../frc-visualization/public/css"

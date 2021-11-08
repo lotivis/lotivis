@@ -5,14 +5,14 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../dist/lotivis.css"/>
-  <title>Lotivis - Map Data</title>
+  <title>Lotivis - Map Simple</title>
 </head>
 <body>
 
 <div class="lotivis-container">
   <div class="lotivis-row">
     <div class="lotivis-col-2">
-      <a class="lotivis-anchor-back" href="../index.html">
+      <a class="lotivis-anchor-back" href="index.html">
         Back
       </a>
     </div>
@@ -21,7 +21,12 @@
     </div>
     <div class="lotivis-col-12">
       <div id="map-chart-card">
-        <!-- Map Chart Card Here -->
+
+      </div>
+    </div>
+    <div class="lotivis-wcol-12">
+      <div id="radio">
+
       </div>
     </div>
   </div>
@@ -34,18 +39,20 @@
 
 <script>
 
+  // print debug messages
   lotivis.debug(true);
-  const mapChartCard = new lotivis.MapChartCard('map-chart-card');
-  mapChartCard.chart.config.excludedFeatureCodes = ['2A', '2B'];
-  mapChartCard.chart.minimapFeatureCodes = ['75', '92', '93', '94'];
 
-  d3.json('assets/departements.geojson')
+  const geoJsonURLGermany = '/assets/Germany.geojson';
+  const mapChartCard = new lotivis.MapChartCard('map-chart-card');
+  const chart = mapChartCard.chart;
+
+  d3
+    .json(geoJsonURLGermany)
     .then(function (rawGeoJSON) {
-      mapChartCard.chart.setGeoJSON(rawGeoJSON);
+      chart.setGeoJSON(rawGeoJSON);
     });
 
 </script>
 
 </body>
-
 </html>

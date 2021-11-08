@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
+  <link rel="stylesheet" href="../dist/lotivis.css"/>
+  <title>Lotivis Examples</title>
+</head>
+<body>
+
+<div class="lotivis-container lotivis-menu">
+  <div class="lotivis-row">
+    <div class="lotivis-col-12 lotivis-headline">
+      <h1>
+        lotivis.js Examples
+      </h1>
+      Version: <span id="label-version"></span>
+    </div>
+    <div class="lotivis-col-4 menu">
+      <h2>Chart</h2>
+      <ul>
+        <li><a href="date.html">Chart</a></li>
+        <li><a href="date.stacked.html">Chart Stacked</a></li>
+        <li><a href="date.grouped.html">Chart Grouped</a></li>
+        <li><a href="date.grouped.stacked.html">Chart Grouped Stacked</a></li>
+        <li><a href="date.interpolate.html">Chart Interpolate</a></li>
+        <li><a href="debug.date.overview.html">Date (Overview)</a></li>
+      </ul>
+    </div>
+    <div class="lotivis-col-4 menu">
+      <h2>Map</h2>
+      <ul>
+        <li><a href="map.empty.html">Map Empty</a></li>
+        <li><a href="map.germany.html">Map Germany (Bundesländer)</a></li>
+
+        <li><a href="map.showcase.html">Map (Overview)</a></li>
+      </ul>
+    </div>
+    <div class="lotivis-col-4 menu">
+      <h2>Plot</h2>
+      <ul>
+        <li><a href="plot.html">Plot Chart</a></li>
+        <li><a href="plot.showcase.html">Plot Chart (Showcase)</a></li>
+
+      </ul>
+    </div>
+    <div class="lotivis-col-4 menu">
+      <h2>Debug</h2>
+      <ul>
+        <li><a href="interactive.sample.html">Sample 1</a></li>
+        <li><a href="debug.app.html">App</a></li>
+        <li><a href="debug.datasets.controller.html">Datasets Controller</a></li>
+        <li><a href="debug.datasets.controller.selection.html">Datasets Controller Selection</a></li>
+        <li><a href="debug.dataview.flat.html">Dataview Flat</a></li>
+        <li><a href="debug.dataview.time.chart.html">Dataview Time Chart</a></li>
+        <li><a href="debug.dataview.time.plot.chart.html">Dataview Time Plot Chart</a></li>
+        <li><a href="debug.dataview.location.chart.html">Dataview Location Chart</a></li>
+        <li><a href="debug.dataviews.html">Dataviews</a></li>
+        <li><a href="real.world.corona.html">Corona-Zahlen Zeitverlauf</a></li>
+      </ul>
+    </div>
+    <div class="lotivis-col-8 menu">
+      <h2>French Rap Corpus Visualization</h2>
+      <ul>
+        <li><a href="frcv.corpus.overview.html">Corpus Overview</a></li>
+        <li><a href="frcv.departements.data.html">Départements Data</a></li>
+        <li><a href="frcv.artists.active.range.html">Artists Active Range</a></li>
+        <li><a href="frcv.word.miff.html">Word: mif, mif', miff, miff', miffs, mifs, mille-f, mi-f, mi-f', 'mif'</a></li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
+<script src="../dist/lotivis.js"></script>
+
+<script>
+
+  lotivis.debug(true);
+
+  let versionLabel = document.getElementById('label-version');
+
+  fetch('./package.json')
+    .then(response => response.json())
+    .then(data => versionLabel.innerText = data.version);
+
+</script>
+
+</body>
+
+</html>

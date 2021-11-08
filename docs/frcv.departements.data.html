@@ -5,14 +5,14 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../dist/lotivis.css"/>
-  <title>Lotivis - Map Simple</title>
+  <title>Lotivis - Map Data</title>
 </head>
 <body>
 
 <div class="lotivis-container">
   <div class="lotivis-row">
     <div class="lotivis-col-2">
-      <a class="lotivis-anchor-back" href="../index.html">
+      <a class="lotivis-anchor-back" href="index.html">
         Back
       </a>
     </div>
@@ -21,12 +21,12 @@
     </div>
     <div class="lotivis-col-12">
       <div id="map-chart-card">
-
+        <!-- Map Chart Here -->
       </div>
-    </div>
-    <div class="lotivis-wcol-12">
-      <div id="radio">
-
+      <div class="lotivis-col-12">
+        <samp id="data">
+          <!-- Data Here -->
+        </samp>
       </div>
     </div>
   </div>
@@ -42,17 +42,35 @@
   // print debug messages
   lotivis.debug(true);
 
-  const geoJsonURLGermany = '/assets/Germany.geojson';
   const mapChartCard = new lotivis.MapChartCard('map-chart-card');
   const chart = mapChartCard.chart;
+  chart.config.excludedFeatureCodes = ['2A', '2B'];
 
-  d3
-    .json(geoJsonURLGermany)
-    .then(function (rawGeoJSON) {
+  mapChartCard.onSelectedDatasetChanged = function (value) {
+    let dataset = mapChartCard.datasets.find(dataset => dataset.stack === value);
+    let string = JSON.stringify(dataset, null, 4);
+    let element = document.getElementById('data');
+    element.innerHTML = string;
+  };
+
+  Promise
+    .all([
+      d3.json('./assets/tracks-per-departement.json'),
+      d3.json('./assets/words-per-departement.json'),
+      d3.json('./assets/words-per-departement-relative.json'),
+      d3.json('./assets/types-per-departement.json'),
+      d3.json('./assets/types-per-departement-relative.json'),
+      d3.json('./assets/departements.geojson')
+    ])
+    .then(function (datasetsAndGeoJSON) {
+      let rawGeoJSON = datasetsAndGeoJSON.pop();
+      let onlyDatasets = datasetsAndGeoJSON;
       chart.setGeoJSON(rawGeoJSON);
+      mapChartCard.setDatasets(onlyDatasets);
     });
 
 </script>
 
 </body>
+
 </html>
