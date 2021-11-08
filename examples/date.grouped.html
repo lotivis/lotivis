@@ -5,19 +5,19 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../dist/lotivis.css"/>
-  <title>Lotivis - Chart</title>
+  <title>Lotivis - Time Chart Grouped</title>
 </head>
 <body>
 
 <div class="lotivis-container-full">
   <div class="lotivis-row">
     <div class="lotivis-col-2">
-      <a class="lotivis-anchor-back" href="index.html">
+      <a class="lotivis-anchor-back" href="../index.html">
         Back
       </a>
     </div>
     <div class="lotivis-col-8 lotivis-headline">
-      <h1>Date Data</h1>
+      <h1>Date Chart Grouped</h1>
     </div>
     <div class="lotivis-col-8">
       <div id="date-chart-card">
@@ -42,7 +42,7 @@
   let datasetsCard = new lotivis.DatasetsJSONCard();
   let dateChartCard = new lotivis.DateChartCard();
 
-  fetch('assets/datasets-chart.json')
+  fetch('assets/example-datasets-location-time-grouped.json')
     .then(response => response.text())
     .then(text => JSON.parse(text))
     .then(function (json) {

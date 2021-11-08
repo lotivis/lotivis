@@ -5,19 +5,19 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../dist/lotivis.css"/>
-  <title>Data View Time Chart</title>
+  <title>Lotivis Examples - Dataviews</title>
 </head>
 <body>
 
 <div class="lotivis-container-full">
   <div class="lotivis-row">
     <div class="lotivis-col-2">
-      <a class="lotivis-anchor-back" href="index.html">
+      <a class="lotivis-anchor-back" href="../index.html">
         Back
       </a>
     </div>
     <div class="lotivis-col-8 lotivis-headline">
-      <h1>Data View Time Chart</h1>
+      <h1>Dataviews</h1>
     </div>
     <div class="lotivis-col-2">
       <!-- Empty-->
@@ -28,8 +28,8 @@
       </div>
     </div>
     <div class="lotivis-col-6">
-      <div id="data-view-time-chart-card">
-        <!-- Data View Time Chart Card Here -->
+      <div id="dataview-flat-card">
+        <!-- Dataview Flat Card Here -->
       </div>
     </div>
   </div>
@@ -42,8 +42,8 @@
 
   lotivis.debug(true);
 
-  let datasetsJSONCard = new lotivis.DatasetsJSONCard();
-  let dataViewFlatCard = new lotivis.DataViewTimeChartCard();
+  let datasetsJSONCard = new lotivis.DatasetsJSONCard('datasets-json-card');
+  let dataViewFlatCard = new lotivis.DataviewFlatCard('dataview-flat-card');
 
   d3.json('assets/debug.datasets.json')
     .then(datasets => {

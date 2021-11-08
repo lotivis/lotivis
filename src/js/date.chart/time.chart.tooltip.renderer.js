@@ -121,7 +121,7 @@ export class TimeChartTooltipRenderer {
      */
     this.showTooltip = function (event, date) {
 
-      // set docs content before positioning the tooltip cause the size is
+      // set examples content before positioning the tooltip cause the size is
       // calculated based on the size
       tooltip.html(getHTMLForDate(date));
 

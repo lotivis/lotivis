@@ -47,7 +47,7 @@ To start development run:
 // stars rollup with -c -w arguments
 $ npm run develop
 
-// starts a http-server serving the docs
+// starts a http-server serving the examples
 $ npm run develop:example
 
 // start developing...
