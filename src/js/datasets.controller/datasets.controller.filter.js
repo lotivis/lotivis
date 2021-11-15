@@ -60,6 +60,15 @@ DatasetsController.prototype.setLocationsFilter = function (locations) {
   this.notifyListeners('filter-locations');
 };
 
+DatasetsController.prototype.toggleLocation = function (location) {
+  const index = this.filters.locations.indexOf(location);
+  if (index !== -1) {
+    this.filters.locations.splice(index, 1);
+  } else {
+    this.filters.locations.push(location);
+  }
+};
+
 /**
  * Sets the dates filter.  Notifies listeners.
  * @param dates The dates to filter.

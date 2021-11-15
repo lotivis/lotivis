@@ -36,14 +36,13 @@ export class MapGeoJSONRenderer {
     }
 
     function mouseClick(event, feature) {
-      lotivis_log(`[lotivis]  onSelectFeature`);
       if (!feature || !feature.properties) return;
       if (!mapChart.datasetController) return;
 
       let locationID = feature.lotivisId;
-      mapChart.updateSensible = false;
-      mapChart.datasetController.setLocationsFilter([locationID]);
-      mapChart.updateSensible = true;
+      mapChart.makeUpdateInsensible();
+      mapChart.datasetController.toggleLocation(locationID);
+      mapChart.makeUpdateSensible();
       mapChart.selectionRenderer.render();
     }
 
