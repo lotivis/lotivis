@@ -67,6 +67,8 @@ DatasetsController.prototype.toggleLocation = function (location) {
   } else {
     this.filters.locations.push(location);
   }
+  this.calculateSnapshot();
+  this.notifyListeners('filter-locations');
 };
 
 /**

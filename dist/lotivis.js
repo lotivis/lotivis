@@ -3243,13 +3243,12 @@ class TimeChartSelectionBarsRenderer {
   constructor(dateChart) {
 
     function createID(date) {
-      return `ghost-rect-${toSaveID(String(date))}`;
+      return `lotivis-date-selection-rect-id-${toSaveID(String(date))}`;
     }
 
     this.hideAll = function () {
       dateChart.svg
         .selectAll('.lotivis-selection-rect')
-        // .transition()
         .attr("opacity", 0);
     };
 
@@ -3283,6 +3282,10 @@ class TimeChartSelectionBarsRenderer {
       // }
     }
 
+    function onMouseClick(even, date) {
+      console.log('onMouseClick', date);
+    }
+
     this.renderGhostBars = function () {
       let margin = dateChart.config.margin;
       let dates = dateChart.config.dateLabels || dateChart.dataview.dates;
@@ -3304,7 +3307,8 @@ class TimeChartSelectionBarsRenderer {
         .attr("width", dateChart.xChart.bandwidth())
         .attr("height", dateChart.config.height - margin.bottom - margin.top)
         .on('mouseenter', onMouseEnter.bind(this))
-        .on('mouseout', onMouserOut.bind(this));
+        .on('mouseout', onMouserOut.bind(this))
+        .on('click', onMouseClick.bind(this));
 
     };
   }
@@ -3399,7 +3403,7 @@ class TimeChartTooltipRenderer {
       let flatData = dateChart.datasetController
         .snapshot
         .flatData
-        .filter(item => item.date === date);
+        .filter(item => `${item.date}` === `${date}`);
 
       let first = flatData.first();
       let title;
@@ -3432,7 +3436,8 @@ class TimeChartTooltipRenderer {
 
       // set examples content before positioning the tooltip cause the size is
       // calculated based on the size
-      tooltip.html(getHTMLForDate(date));
+      const html = getHTMLForDate(date);
+      tooltip.html(html);
 
       // position tooltip
       let tooltipSize = getTooltipSize();
@@ -3526,6 +3531,90 @@ class TimeChartGridRenderer {
   }
 }
 
+/**
+ *
+ * @class TimeChartSelectionRenderer
+ */
+class TimeChartSelectionRenderer {
+
+  /**
+   * Creates a new instance of TimeChartSelectionBarsRenderer.
+   * @param dateChart
+   */
+  constructor(dateChart) {
+
+    function createID(date) {
+      return `lotivis-date-selection-rect-id-${toSaveID(String(date))}`;
+    }
+
+    this.hideAll = function () {
+      dateChart.svg
+        .selectAll('.lotivis-selection-rect-2')
+        .attr("opacity", 0);
+    };
+
+    function onMouseEnter(event, date) {
+      this.hideAll();
+      dateChart.datasetController;
+      let id = createID(date);
+
+      // if (dateChart.config.sendsNotifications) {
+      //   dateChart.updateSensible = false;
+      //   controller.setDatesFilter([date]);
+      //   dateChart.updateSensible = true;
+      // }
+
+      dateChart
+        .svg
+        .select(`#${id}`)
+        .attr("opacity", 0.3);
+
+      dateChart.tooltipRenderer.showTooltip(event, date);
+    }
+
+    function onMouserOut(event, date) {
+      this.hideAll();
+      dateChart.tooltipRenderer.hideTooltip(event, date);
+
+      // if (dateChart.config.sendsNotifications) {
+      //   dateChart.updateSensible = false;
+      //   dateChart.datasetController.resetFilters();
+      //   dateChart.updateSensible = true;
+      // }
+    }
+
+    function onMouseClick(even, date) {
+      console.log('onMouseClick', date);
+    }
+
+    this.renderGhostBars = function () {
+      let margin = dateChart.config.margin;
+      let dates = dateChart.config.dateLabels || dateChart.dataview.dates;
+
+      dateChart
+        .svg
+        .append("g")
+        .selectAll("rect")
+        .data(dates)
+        .enter()
+        .append("rect")
+        .attr("class", 'lotivis-selection-rect-2')
+        .attr("id", date => createID(date))
+        .attr("opacity", 0)
+        .attr("rx", LotivisConfig.barRadius)
+        .attr("ry", LotivisConfig.barRadius)
+        .attr("x", (date) => dateChart.xChart(date))
+        .attr("y", margin.top)
+        .attr("width", dateChart.xChart.bandwidth())
+        .attr("height", dateChart.config.height - margin.bottom - margin.top)
+        .on('mouseenter', onMouseEnter.bind(this))
+        .on('mouseout', onMouserOut.bind(this))
+        .on('click', onMouseClick.bind(this));
+
+    };
+  }
+}
+
 const defaultConfig = {
   width: 1000,
   height: 600,
@@ -3593,6 +3682,7 @@ class TimeChart extends Chart {
     this.legendRenderer = new TimeChartLegendRenderer(this);
     this.barsRenderer = new TimeChartBarsRenderer(this);
     this.ghostBarsRenderer = new TimeChartSelectionBarsRenderer(this);
+    this.selectionRenderer = new TimeChartSelectionRenderer(this);
     this.tooltipRenderer = new TimeChartTooltipRenderer(this);
   }
 
@@ -3665,6 +3755,7 @@ class TimeChart extends Chart {
     this.axisRenderer.render();
     this.gridRenderer.createAxis();
     this.gridRenderer.renderGrid();
+    this.selectionRenderer.renderGhostBars();
     this.ghostBarsRenderer.renderGhostBars();
 
     if (this.config.combineStacks) {
@@ -4180,29 +4271,54 @@ class MapTooltipRenderer {
       .style('opacity', 0);
 
     function featureMapID(feature) {
-      return `lotivis-map-area-${mapChart.config.featureIDAccessor(feature)}`;
+      return `lotivis-map-area-${feature.lotivisId}`;
     }
 
-    function htmlTitle(feature) {
-      let featureID = mapChart.config.featureIDAccessor(feature);
-      let featureName = mapChart.config.featureNameAccessor(feature);
-      return `ID: ${featureID}<br>Name: ${featureName}`;
+    function htmlTitle(features) {
+
+      if (features.length > 3) {
+        let featuresSlice = features.slice(0, 3);
+        let ids = featuresSlice.map(feature => `${feature.lotivisId}`).join(', ');
+        let names = featuresSlice.map(mapChart.config.featureNameAccessor).join(', ');
+        let moreCount = features.length - 3;
+        return `IDs: ${ids} (+${moreCount})<br>Names: ${names} (+${moreCount})`;
+      } else {
+        let ids = features.map(feature => `${feature.lotivisId}`).join(', ');
+        let names = features.map(mapChart.config.featureNameAccessor).join(', ');
+        return `IDs: ${ids}<br>Names: ${names}`;
+      }
     }
 
-    function htmlValues(feature) {
-      let components = [];
-      let featureID = mapChart.config.featureIDAccessor(feature);
-      if (mapChart.datasetController) {
-        let flatData = mapChart.datasetController.flatData;
-        let combined = combineByLocation(flatData);
-        let data = combined.filter(item => equals(item.location, featureID));
-        components.push('');
+    function htmlValues(features) {
+      if (!mapChart.datasetController) {
+        return '';
+      }
+
+      let flatData = mapChart.datasetController.flatData;
+      let combined = combineByLocation(flatData);
+      let combinedByLabel = {};
+
+      for (let i = 0; i < features.length; i++) {
+        let feature = features[i];
+        let data = combined.filter(item => equals(item.location, feature.lotivisId));
+
         for (let index = 0; index < data.length; index++) {
           let item = data[index];
           let label = (item.label || item.dataset || item.stack);
-          components.push(label + ': ' + formatNumber(item.value));
+
+          if (combinedByLabel[label]) {
+            combinedByLabel[label] += item.value;
+          } else {
+            combinedByLabel[label] = item.value;
+          }
         }
       }
+
+      let components = [''];
+      for (const label in combinedByLabel) {
+        components.push(label + ': ' + formatNumber(combinedByLabel[label]));
+      }
+
       return components.join('<br>');
     }
 
@@ -4216,14 +4332,7 @@ class MapTooltipRenderer {
       return [tooltipWidth + 20, tooltipHeight + 20];
     }
 
-    /**
-     * Called by map.chart geojson renderer when mouse enters an area drawn on the map.chart.
-     * @param event The mouse event.
-     * @param feature The drawn feature (area).
-     */
-    this.mouseEnter = function (event, feature) {
-
-      tooltip.html([htmlTitle(feature), htmlValues(feature)].join('<br>'));
+    function positionTooltip(event, feature) {
 
       // position tooltip
       let tooltipSize = getTooltipSize();
@@ -4288,7 +4397,32 @@ class MapTooltipRenderer {
         .style('left', left + 'px')
         .style('top', top + 'px');
 
-      // mapChart.onSelectFeature(event, feature);
+    }
+
+    /**
+     * Called by map.chart geojson renderer when mouse enters an area drawn on the map.chart.
+     * @param event The mouse event.
+     * @param feature The drawn feature (area).
+     */
+    this.mouseEnter = function (event, feature) {
+      if (mapChart.datasetController
+        && mapChart.datasetController.filters.locations.includes(feature.lotivisId)) {
+        tooltip.html(
+          [
+            htmlTitle(mapChart.selectedFeatures),
+            htmlValues(mapChart.selectedFeatures)
+          ].join('<br>')
+        );
+        positionTooltip(event, mapChart.selectionBorderGeoJSON.features[0]);
+      } else {
+        tooltip.html(
+          [
+            htmlTitle([feature]),
+            htmlValues([feature])
+          ].join('<br>')
+        );
+        positionTooltip(event, feature);
+      }
     };
 
     /**
@@ -4643,7 +4777,6 @@ class MapGeoJSONRenderer {
     function mouseEnter(event, feature) {
       mapChart.datasetRenderer.mouseEnter(event, feature);
       mapChart.tooltipRenderer.mouseEnter(event, feature);
-      // mapChart.selectionBoundsRenderer.mouseEnter(event, feature);
     }
 
     /**
@@ -4655,7 +4788,7 @@ class MapGeoJSONRenderer {
     function mouseOut(event, feature) {
       mapChart.datasetRenderer.mouseOut(event, feature);
       mapChart.tooltipRenderer.mouseOut(event, feature);
-      // mapChart.selectionBoundsRenderer.mouseOut(event, feature);
+      mapChart.selectionRenderer.raise();
     }
 
     function mouseClick(event, feature) {
@@ -4667,6 +4800,7 @@ class MapGeoJSONRenderer {
       mapChart.datasetController.toggleLocation(locationID);
       mapChart.makeUpdateSensible();
       mapChart.selectionRenderer.render();
+      mapChart.tooltipRenderer.mouseEnter(event, feature);
     }
 
     /**
@@ -4833,65 +4967,6 @@ function createGeoJSON(datasets) {
   };
 
   return geoJSON;
-}
-
-/**
- *
- * @class MapSelectionBoundsRenderer
- */
-
-class MapSelectionBoundsRenderer {
-
-  /**
-   * Creates a new instance of MapSelectionBoundsRenderer.
-   * @param mapChart The parental map.chart chart.
-   */
-  constructor(mapChart) {
-
-    this.render = function () {
-      this.bounds = mapChart.svg
-        .append('rect')
-        .attr('class', 'lotivis-location-chart-selection-rect')
-        .style('fill-opacity', 0);
-    };
-
-    /**
-     * Tells this renderer that the mouse moved in an area.
-     *
-     * @param event The mouse event.
-     * @param feature The feature (area) that the mouse is now pointing on.
-     */
-    this.mouseEnter = function (event, feature) {
-      lotivis_log(`mouseEnter`);
-      if (!mapChart.config.drawRectangleAroundSelection) return;
-      let projection = mapChart.projection;
-      let featureBounds = d3.geoBounds(feature);
-      let featureLowerLeft = projection(featureBounds[0]);
-      let featureUpperRight = projection(featureBounds[1]);
-      let featureBoundsWidth = featureUpperRight[0] - featureLowerLeft[0];
-      let featureBoundsHeight = featureLowerLeft[1] - featureUpperRight[1];
-      this.bounds
-        .style('width', featureBoundsWidth + 'px')
-        .style('height', featureBoundsHeight + 'px')
-        .style('x', featureLowerLeft[0])
-        .style('y', featureUpperRight[1])
-        .style('opacity', 1);
-    };
-
-    /**
-     * Tells this renderer that the mouse moved out of an area.
-     */
-    this.mouseOut = function () {
-      this.bounds.style('opacity', 0);
-    };
-
-    /**
-     * Raises the rectangle which draws the bounds.
-     */
-    this.raise = function () {
-      this.bounds.raise();
-    };
-  }
 }
 
 /**
@@ -5134,7 +5209,6 @@ class MapSelectionRenderer {
       }
 
       let filteredLocations = mapChart.datasetController.filters.locations;
-
       let selectedFeatures = [];
 
       for (let index = 0; index < allFeatures.length; index++) {
@@ -5161,54 +5235,32 @@ class MapSelectionRenderer {
 
       // return;
 
-      let selectedFeatures = getSelectedFeatures();
-      console.log('selectedFeatures.length', selectedFeatures);
-
-      let joinedFeatures = joinFeatures(selectedFeatures);
-      if (!joinedFeatures) {
+      mapChart.selectedFeatures = getSelectedFeatures();
+      mapChart.selectionBorderGeoJSON = joinFeatures(mapChart.selectedFeatures);
+      if (!mapChart.selectionBorderGeoJSON) {
         return lotivis_log('[lotivis]  No selected features to render.');
       }
 
-      console.log('joinedFeatures.features.length', joinedFeatures);
-
-      let size1 = mapChart.svg
-        .selectAll('#the-rect')
-        .size();
-
-      let size = mapChart.svg
-        .selectAll('.lotivis-map-chart-selection-rect')
-        .size();
-
-      console.log('size1', size1);
-      console.log('size', size);
-
       mapChart.svg
-        .selectAll('.lotivis-map-chart-selection-rect')
+        .selectAll('.lotivis-map-chart-selection-border')
         .remove();
 
       mapChart.svg
-        .selectAll('#the-rect')
-        .remove();
-
-      mapChart.svg
-        .selectAll('path')
+        .selectAll('.lotivis-map-chart-selection-border')
         .append('path')
-        .attr('class', 'lotivis-map-chart-selection-rect')
-        .data(joinedFeatures.features)
+        .attr('class', 'lotivis-map-chart-selection-border')
+        .data(mapChart.selectionBorderGeoJSON.features)
         .enter()
         .append('path')
         .attr('d', mapChart.path)
-        .style('stroke-dasharray', '1')
-        .style('fill', 'blue')
-        .style('fill-opacity', 1)
-        .attr('class', 'lotivis-map-chart-selection-rect')
+        .attr('class', 'lotivis-map-chart-selection-border')
         .raise();
+    };
 
-      let sizeAfter = mapChart.svg
-        .selectAll('.lotivis-map-chart-selection-rect')
-        .size();
-
-      console.log('sizeAfter', sizeAfter);
+    this.raise = function () {
+      mapChart.svg
+        .selectAll('.lotivis-map-chart-selection-border')
+        .raise();
     };
   }
 }
@@ -5256,7 +5308,6 @@ class MapChart extends Chart {
     this.exteriorBorderRenderer = new MapExteriorBorderRenderer(this);
     this.labelRenderer = new MapLabelRenderer(this);
     this.legendRenderer = new MapLegendRenderer(this);
-    this.selectionBoundsRenderer = new MapSelectionBoundsRenderer(this);
     this.selectionRenderer = new MapSelectionRenderer(this);
     this.tooltipRenderer = new MapTooltipRenderer(this);
   }
@@ -5287,8 +5338,6 @@ class MapChart extends Chart {
     this.datasetRenderer.render();
     this.labelRenderer.render();
     this.tooltipRenderer.raise();
-    this.selectionBoundsRenderer.render();
-    this.selectionBoundsRenderer.raise();
     this.selectionRenderer.render();
   }
 
@@ -6588,6 +6637,8 @@ DatasetsController.prototype.toggleLocation = function (location) {
   } else {
     this.filters.locations.push(location);
   }
+  this.calculateSnapshot();
+  this.notifyListeners('filter-locations');
 };
 
 /**

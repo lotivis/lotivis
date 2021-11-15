@@ -26,29 +26,54 @@ export class MapTooltipRenderer {
       .style('opacity', 0);
 
     function featureMapID(feature) {
-      return `lotivis-map-area-${mapChart.config.featureIDAccessor(feature)}`;
+      return `lotivis-map-area-${feature.lotivisId}`;
     }
 
-    function htmlTitle(feature) {
-      let featureID = mapChart.config.featureIDAccessor(feature);
-      let featureName = mapChart.config.featureNameAccessor(feature);
-      return `ID: ${featureID}<br>Name: ${featureName}`;
+    function htmlTitle(features) {
+
+      if (features.length > 3) {
+        let featuresSlice = features.slice(0, 3);
+        let ids = featuresSlice.map(feature => `${feature.lotivisId}`).join(', ');
+        let names = featuresSlice.map(mapChart.config.featureNameAccessor).join(', ');
+        let moreCount = features.length - 3;
+        return `IDs: ${ids} (+${moreCount})<br>Names: ${names} (+${moreCount})`;
+      } else {
+        let ids = features.map(feature => `${feature.lotivisId}`).join(', ');
+        let names = features.map(mapChart.config.featureNameAccessor).join(', ');
+        return `IDs: ${ids}<br>Names: ${names}`;
+      }
     }
 
-    function htmlValues(feature) {
-      let components = [];
-      let featureID = mapChart.config.featureIDAccessor(feature);
-      if (mapChart.datasetController) {
-        let flatData = mapChart.datasetController.flatData;
-        let combined = combineByLocation(flatData);
-        let data = combined.filter(item => equals(item.location, featureID));
-        components.push('');
+    function htmlValues(features) {
+      if (!mapChart.datasetController) {
+        return '';
+      }
+
+      let flatData = mapChart.datasetController.flatData;
+      let combined = combineByLocation(flatData);
+      let combinedByLabel = {};
+
+      for (let i = 0; i < features.length; i++) {
+        let feature = features[i];
+        let data = combined.filter(item => equals(item.location, feature.lotivisId));
+
         for (let index = 0; index < data.length; index++) {
           let item = data[index];
           let label = (item.label || item.dataset || item.stack);
-          components.push(label + ': ' + formatNumber(item.value));
+
+          if (combinedByLabel[label]) {
+            combinedByLabel[label] += item.value;
+          } else {
+            combinedByLabel[label] = item.value;
+          }
         }
       }
+
+      let components = [''];
+      for (const label in combinedByLabel) {
+        components.push(label + ': ' + formatNumber(combinedByLabel[label]));
+      }
+
       return components.join('<br>');
     }
 
@@ -62,14 +87,7 @@ export class MapTooltipRenderer {
       return [tooltipWidth + 20, tooltipHeight + 20];
     }
 
-    /**
-     * Called by map.chart geojson renderer when mouse enters an area drawn on the map.chart.
-     * @param event The mouse event.
-     * @param feature The drawn feature (area).
-     */
-    this.mouseEnter = function (event, feature) {
-
-      tooltip.html([htmlTitle(feature), htmlValues(feature)].join('<br>'));
+    function positionTooltip(event, feature) {
 
       // position tooltip
       let tooltipSize = getTooltipSize();
@@ -134,7 +152,32 @@ export class MapTooltipRenderer {
         .style('left', left + 'px')
         .style('top', top + 'px');
 
-      // mapChart.onSelectFeature(event, feature);
+    }
+
+    /**
+     * Called by map.chart geojson renderer when mouse enters an area drawn on the map.chart.
+     * @param event The mouse event.
+     * @param feature The drawn feature (area).
+     */
+    this.mouseEnter = function (event, feature) {
+      if (mapChart.datasetController
+        && mapChart.datasetController.filters.locations.includes(feature.lotivisId)) {
+        tooltip.html(
+          [
+            htmlTitle(mapChart.selectedFeatures),
+            htmlValues(mapChart.selectedFeatures)
+          ].join('<br>')
+        );
+        positionTooltip(event, mapChart.selectionBorderGeoJSON.features[0]);
+      } else {
+        tooltip.html(
+          [
+            htmlTitle([feature]),
+            htmlValues([feature])
+          ].join('<br>')
+        );
+        positionTooltip(event, feature);
+      }
     };
 
     /**

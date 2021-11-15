@@ -20,7 +20,6 @@ export class MapGeoJSONRenderer {
     function mouseEnter(event, feature) {
       mapChart.datasetRenderer.mouseEnter(event, feature);
       mapChart.tooltipRenderer.mouseEnter(event, feature);
-      // mapChart.selectionBoundsRenderer.mouseEnter(event, feature);
     }
 
     /**
@@ -32,7 +31,7 @@ export class MapGeoJSONRenderer {
     function mouseOut(event, feature) {
       mapChart.datasetRenderer.mouseOut(event, feature);
       mapChart.tooltipRenderer.mouseOut(event, feature);
-      // mapChart.selectionBoundsRenderer.mouseOut(event, feature);
+      mapChart.selectionRenderer.raise();
     }
 
     function mouseClick(event, feature) {
@@ -44,6 +43,7 @@ export class MapGeoJSONRenderer {
       mapChart.datasetController.toggleLocation(locationID);
       mapChart.makeUpdateSensible();
       mapChart.selectionRenderer.render();
+      mapChart.tooltipRenderer.mouseEnter(event, feature);
     }
 
     /**

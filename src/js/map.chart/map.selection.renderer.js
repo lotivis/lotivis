@@ -34,7 +34,6 @@ export class MapSelectionRenderer {
       }
 
       let filteredLocations = mapChart.datasetController.filters.locations;
-
       let selectedFeatures = [];
 
       for (let index = 0; index < allFeatures.length; index++) {
@@ -61,54 +60,32 @@ export class MapSelectionRenderer {
 
       // return;
 
-      let selectedFeatures = getSelectedFeatures();
-      console.log('selectedFeatures.length', selectedFeatures);
-
-      let joinedFeatures = joinFeatures(selectedFeatures);
-      if (!joinedFeatures) {
+      mapChart.selectedFeatures = getSelectedFeatures();
+      mapChart.selectionBorderGeoJSON = joinFeatures(mapChart.selectedFeatures);
+      if (!mapChart.selectionBorderGeoJSON) {
         return lotivis_log('[lotivis]  No selected features to render.');
       }
 
-      console.log('joinedFeatures.features.length', joinedFeatures);
-
-      let size1 = mapChart.svg
-        .selectAll('#the-rect')
-        .size();
-
-      let size = mapChart.svg
-        .selectAll('.lotivis-map-chart-selection-rect')
-        .size();
-
-      console.log('size1', size1);
-      console.log('size', size);
-
       mapChart.svg
-        .selectAll('.lotivis-map-chart-selection-rect')
+        .selectAll('.lotivis-map-chart-selection-border')
         .remove();
 
       mapChart.svg
-        .selectAll('#the-rect')
-        .remove();
-
-      mapChart.svg
-        .selectAll('path')
+        .selectAll('.lotivis-map-chart-selection-border')
         .append('path')
-        .attr('class', 'lotivis-map-chart-selection-rect')
-        .data(joinedFeatures.features)
+        .attr('class', 'lotivis-map-chart-selection-border')
+        .data(mapChart.selectionBorderGeoJSON.features)
         .enter()
         .append('path')
         .attr('d', mapChart.path)
-        .style('stroke-dasharray', '1')
-        .style('fill', 'blue')
-        .style('fill-opacity', 1)
-        .attr('class', 'lotivis-map-chart-selection-rect')
+        .attr('class', 'lotivis-map-chart-selection-border')
         .raise();
+    };
 
-      let sizeAfter = mapChart.svg
-        .selectAll('.lotivis-map-chart-selection-rect')
-        .size();
-
-      console.log('sizeAfter', sizeAfter);
+    this.raise = function () {
+      mapChart.svg
+        .selectAll('.lotivis-map-chart-selection-border')
+        .raise();
     };
   }
 }

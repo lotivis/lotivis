@@ -9,6 +9,7 @@ import {Chart} from "../chart/chart";
 import {TimeChartGridRenderer} from "./time.chart.grid.renderer";
 import {LotivisConfig} from "../shared/config";
 import {lotivis_log} from "../shared/debug";
+import {TimeChartSelectionRenderer} from "./time.chart.selection.renderer";
 
 const defaultConfig = {
   width: 1000,
@@ -77,6 +78,7 @@ export class TimeChart extends Chart {
     this.legendRenderer = new TimeChartLegendRenderer(this);
     this.barsRenderer = new TimeChartBarsRenderer(this);
     this.ghostBarsRenderer = new TimeChartSelectionBarsRenderer(this);
+    this.selectionRenderer = new TimeChartSelectionRenderer(this)
     this.tooltipRenderer = new TimeChartTooltipRenderer(this);
   }
 
@@ -149,6 +151,7 @@ export class TimeChart extends Chart {
     this.axisRenderer.render();
     this.gridRenderer.createAxis();
     this.gridRenderer.renderGrid();
+    this.selectionRenderer.renderGhostBars();
     this.ghostBarsRenderer.renderGhostBars();
 
     if (this.config.combineStacks) {

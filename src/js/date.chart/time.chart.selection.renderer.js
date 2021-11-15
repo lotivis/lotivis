@@ -3,9 +3,9 @@ import {toSaveID} from "../shared/selector";
 
 /**
  *
- * @class TimeChartSelectionBarsRenderer
+ * @class TimeChartSelectionRenderer
  */
-export class TimeChartSelectionBarsRenderer {
+export class TimeChartSelectionRenderer {
 
   /**
    * Creates a new instance of TimeChartSelectionBarsRenderer.
@@ -19,7 +19,7 @@ export class TimeChartSelectionBarsRenderer {
 
     this.hideAll = function () {
       dateChart.svg
-        .selectAll('.lotivis-selection-rect')
+        .selectAll('.lotivis-selection-rect-2')
         .attr("opacity", 0);
     };
 
@@ -68,7 +68,7 @@ export class TimeChartSelectionBarsRenderer {
         .data(dates)
         .enter()
         .append("rect")
-        .attr("class", 'lotivis-selection-rect')
+        .attr("class", 'lotivis-selection-rect-2')
         .attr("id", date => createID(date))
         .attr("opacity", 0)
         .attr("rx", LotivisConfig.barRadius)

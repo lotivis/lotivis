@@ -7,7 +7,6 @@ import {MapDatasetRenderer} from "./map.dataset.renderer";
 import {MapGeoJSONRenderer} from "./map.geojson.renderer";
 import {MapExteriorBorderRenderer} from "./map.exterior.border.renderer";
 import {createGeoJSON} from "../geojson/create.geojson";
-import {MapSelectionBoundsRenderer} from "./map.selection.bounds.renderer";
 import {MapChartConfig} from "./map.chart.config";
 import {MapBackgroundRenderer} from "./map.background.renderer";
 import {GeoJson} from "../geojson/geojson";
@@ -57,7 +56,6 @@ export class MapChart extends Chart {
     this.exteriorBorderRenderer = new MapExteriorBorderRenderer(this);
     this.labelRenderer = new MapLabelRenderer(this);
     this.legendRenderer = new MapLegendRenderer(this);
-    this.selectionBoundsRenderer = new MapSelectionBoundsRenderer(this);
     this.selectionRenderer = new MapSelectionRenderer(this);
     this.tooltipRenderer = new MapTooltipRenderer(this);
   }
@@ -88,8 +86,6 @@ export class MapChart extends Chart {
     this.datasetRenderer.render();
     this.labelRenderer.render();
     this.tooltipRenderer.raise();
-    this.selectionBoundsRenderer.render();
-    this.selectionBoundsRenderer.raise();
     this.selectionRenderer.render();
   }
 

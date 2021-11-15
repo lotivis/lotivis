@@ -90,7 +90,7 @@ export class TimeChartTooltipRenderer {
       let flatData = dateChart.datasetController
         .snapshot
         .flatData
-        .filter(item => item.date === date);
+        .filter(item => `${item.date}` === `${date}`);
 
       let first = flatData.first();
       let title;
@@ -123,7 +123,8 @@ export class TimeChartTooltipRenderer {
 
       // set examples content before positioning the tooltip cause the size is
       // calculated based on the size
-      tooltip.html(getHTMLForDate(date));
+      const html = getHTMLForDate(date);
+      tooltip.html(html);
 
       // position tooltip
       let tooltipSize = getTooltipSize();

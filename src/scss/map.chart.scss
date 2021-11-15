@@ -1,5 +1,5 @@
 
-.lotivis-location-chart {
+.lotivis-map-chart {
   // empty
 }
 
@@ -7,7 +7,7 @@
   cursor: pointer;
 }
 
-.lotivis-location-chart-area {
+.lotivis-map-chart-area {
   fill: white;
   fill-opacity: 0;
   stroke: black;
@@ -19,40 +19,41 @@
   fill: white;
   fill-opacity: 1;
   stroke: gray;
-  stroke-width: 3;
+  stroke-width: 4;
   stroke-opacity: 0.4;
   pointer-events: none;
 }
 
-.lotivis-location-chart-label {
+.lotivis-map-chart-label {
   fill: black;
   text-anchor: middle;
   font-size: 12px;
   pointer-events: none;
 }
 
-.lotivis-map-chart-selection-rect {
+.lotivis-map-chart-selection-border {
   pointer-events: none;
-  fill: white;
-  fill-opacity: 1;
+  fill: transparent;
+  fill-opacity: 0;
   stroke: red;
-  stroke-width: 13px;
-  stroke-dasharray: 1, 3;
+  stroke-width: 2px;
+  stroke-dasharray: 0;
+  pointer-events: none;
 }
 
-.lotivis-location-chart-legend {
+.lotivis-map-chart-legend {
   // emtpty
 }
 
-.lotivis-location-chart-legend-title {
+.lotivis-map-chart-legend-title {
   // emtpty
 }
 
-.lotivis-location-chart-legend-text {
+.lotivis-map-chart-legend-text {
   // emtpty
 }
 
-.lotivis-location-chart-legend-rect {
+.lotivis-map-chart-legend-rect {
   stroke: black;
   stroke-width: 1;
 }
