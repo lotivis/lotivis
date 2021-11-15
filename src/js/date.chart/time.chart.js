@@ -119,7 +119,6 @@ export class TimeChart extends Chart {
      * Prefer dates specified by configuration. Fallback to dates of datasets.
      */
     let dates = config.dateLabels || this.dataview.dates;
-    lotivis_log('dates of date-chart:', dates);
 
     this.xChart = d3
       .scaleBand()

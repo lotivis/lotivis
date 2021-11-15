@@ -25,7 +25,8 @@ export const MapChartConfig = {
     if (feature.id || feature.id === 0) return feature.id;
     if (feature.properties && isValue(feature.properties.id)) return feature.properties.id;
     if (feature.properties && isValue(feature.properties.code)) return Number(feature.properties.code);
-    return hashCode(feature.properties);
+    if (feature.properties) { return hashCode(JSON.stringify(feature.properties)); }
+    return hashCode(JSON.stringify(feature));
   },
   featureNameAccessor: function (feature) {
     if (isValue(feature.name)) return feature.name;

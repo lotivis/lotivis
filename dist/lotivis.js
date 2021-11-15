@@ -3635,7 +3635,6 @@ class TimeChart extends Chart {
      * Prefer dates specified by configuration. Fallback to dates of datasets.
      */
     let dates = config.dateLabels || this.dataview.dates;
-    lotivis_log('dates of date-chart:', dates);
 
     this.xChart = d3
       .scaleBand()
@@ -4492,10 +4491,11 @@ class MapLabelRenderer {
       removeLabels();
 
       let geoJSON = mapChart.geoJSON;
-      if (!mapChart.geoJSON) return lotivis_log('[lotivis]  No GeoJSON to render.');
+      if (!mapChart.geoJSON) return lotivis_log(`[lotivis]  No GeoJSON to render (${mapChart.selector}).`);
       let dataview = mapChart.dataview;
-      if (!dataview) return lotivis_log(`[lotivis]  MapLabelRenderer: no data view in map (${mapChart}).`);
-      if (!mapChart.config.showLabels) return lotivis_log('[lotivis]  Skip rendering labels due to configuration.');
+
+      if (!dataview) return lotivis_log(`[lotivis]  No dataview in map chart (${mapChart.selector}).`);
+      if (!mapChart.config.showLabels) return lotivis_log(`[lotivis]  Skip rendering labels due to configuration (${mapChart.selector}).`);
 
       mapChart.svg
         .selectAll('text')
@@ -4532,12 +4532,12 @@ class MapDatasetRenderer {
   constructor(mapChart) {
 
     let generator = Color$1.mapColors(1);
+    let style = styleForCSSClass('.lotivis-map.chart-area');
 
     /**
      * Resets the `fill` and `fill-opacity` property of each area.
      */
     function resetAreas() {
-      let style = styleForCSSClass('.lotivis-map.chart-area');
       mapChart.svg
         .selectAll('.lotivis-location-chart-area')
         .style('stroke', style.stroke || 'black')
@@ -4546,11 +4546,11 @@ class MapDatasetRenderer {
     }
 
     function featureMapID(feature) {
-      return `lotivis-location-chart-area-${mapChart.config.featureIDAccessor(feature)}`;
+      return `lotivis-location-chart-area-${feature.lotivisId}`;
     }
 
     /**
-     * Called by map.chart GeoJSON renderer when mouse enters an area drawn
+     * Called by map chart GeoJSON renderer when mouse enters an area drawn
      * on the location chart.
      *
      * @param event The mouse event.
@@ -4643,7 +4643,7 @@ class MapGeoJSONRenderer {
     function mouseEnter(event, feature) {
       mapChart.datasetRenderer.mouseEnter(event, feature);
       mapChart.tooltipRenderer.mouseEnter(event, feature);
-      mapChart.selectionBoundsRenderer.mouseEnter(event, feature);
+      // mapChart.selectionBoundsRenderer.mouseEnter(event, feature);
     }
 
     /**
@@ -4655,18 +4655,26 @@ class MapGeoJSONRenderer {
     function mouseOut(event, feature) {
       mapChart.datasetRenderer.mouseOut(event, feature);
       mapChart.tooltipRenderer.mouseOut(event, feature);
-      mapChart.selectionBoundsRenderer.mouseOut(event, feature);
+      // mapChart.selectionBoundsRenderer.mouseOut(event, feature);
+    }
+
+    function mouseClick(event, feature) {
+      if (!feature || !feature.properties) return;
+      if (!mapChart.datasetController) return;
+
+      let locationID = feature.lotivisId;
+      mapChart.makeUpdateInsensible();
+      mapChart.datasetController.toggleLocation(locationID);
+      mapChart.makeUpdateSensible();
+      mapChart.selectionRenderer.render();
     }
 
     /**
      * Renders the `presentedGeoJSON` property.
      */
     this.render = function () {
-      let geoJSON = mapChart.geoJSON;
-      if (!geoJSON) return lotivis_log('[lotivis]  No GeoJSON to render.');
-      let idAccessor = mapChart.config.featureIDAccessor;
-
-      // lotivis_log('geoJSON', geoJSON);
+      let geoJSON = mapChart.presentedGeoJSON;
+      if (!geoJSON) return;
 
       mapChart.areas = mapChart.svg
         .selectAll('path')
@@ -4674,12 +4682,12 @@ class MapGeoJSONRenderer {
         .enter()
         .append('path')
         .attr('d', mapChart.path)
-        .attr('id', feature => `lotivis-location-chart-area-${idAccessor(feature)}`)
+        .attr('id', feature => `lotivis-location-chart-area-${feature.lotivisId}`)
         .classed('lotivis-location-chart-area', true)
         .style('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4')
         .style('fill', 'white')
         .style('fill-opacity', 1)
-        .on('click', mapChart.onSelectFeature.bind(mapChart))
+        .on('click', mouseClick)
         .on('mouseenter', mouseEnter)
         .on('mouseout', mouseOut);
     };
@@ -4831,6 +4839,7 @@ function createGeoJSON(datasets) {
  *
  * @class MapSelectionBoundsRenderer
  */
+
 class MapSelectionBoundsRenderer {
 
   /**
@@ -4848,10 +4857,12 @@ class MapSelectionBoundsRenderer {
 
     /**
      * Tells this renderer that the mouse moved in an area.
+     *
      * @param event The mouse event.
      * @param feature The feature (area) that the mouse is now pointing on.
      */
     this.mouseEnter = function (event, feature) {
+      lotivis_log(`mouseEnter`);
       if (!mapChart.config.drawRectangleAroundSelection) return;
       let projection = mapChart.projection;
       let featureBounds = d3.geoBounds(feature);
@@ -4906,7 +4917,8 @@ const MapChartConfig = {
     if (feature.id || feature.id === 0) return feature.id;
     if (feature.properties && isValue(feature.properties.id)) return feature.properties.id;
     if (feature.properties && isValue(feature.properties.code)) return Number(feature.properties.code);
-    return hashCode(feature.properties);
+    if (feature.properties) { return hashCode(JSON.stringify(feature.properties)); }
+    return hashCode(JSON.stringify(feature));
   },
   featureNameAccessor: function (feature) {
     if (isValue(feature.name)) return feature.name;
@@ -5097,34 +5109,42 @@ class MapSelectionRenderer {
 
   /**
    * Creates a new instance of MapSelectionRenderer.
+   *
    * @param mapChart The parental map.chart chart.
    */
   constructor(mapChart) {
 
     if (!self.topojson) lotivis_log_once('Can\'t find topojson lib.  Skip rendering of exterior border.');
 
+    /**
+     * Returns the collection of selected features.
+     *
+     * @returns {*[]}
+     */
     function getSelectedFeatures() {
-      if (!mapChart.geoJSON) { return; }
-      if (!mapChart.datasetController) { return lotivis_log('[lotivis]  MapSelectionRenderer: no datasets controller'); }
 
-      let allFeatures = copy(mapChart.geoJSON.features);
+      if (!mapChart.geoJSON) {
+        return null;
+      }
+
+      let allFeatures = mapChart.presentedGeoJSON.features;
+
+      if (!mapChart.datasetController) {
+        return null;
+      }
+
       let filteredLocations = mapChart.datasetController.filters.locations;
-      console.log('getSelectedFeatures allFeatures', allFeatures);
-      console.log('getSelectedFeatures filteredLocations', filteredLocations);
-      console.log('getSelectedFeatures datasetController.filters', mapChart.datasetController.filters);
 
       let selectedFeatures = [];
 
       for (let index = 0; index < allFeatures.length; index++) {
         let feature = allFeatures[index];
-        let featureID = mapChart.config.featureIDAccessor(feature);
+        let featureID = feature.lotivisId;
 
         if (filteredLocations.indexOf(String(featureID)) !== -1) {
           selectedFeatures.push(feature);
         }
       }
-
-      console.log('getSelectedFeatures selectedFeatures', selectedFeatures);
 
       return selectedFeatures;
     }
@@ -5133,25 +5153,62 @@ class MapSelectionRenderer {
      * Renders the exterior border of the presented geo json.
      */
     this.render = function () {
+
       if (!self.topojson) {
         lotivis_log('[lotivis]  Can\'t find topojson library.');
         return;
       }
 
-      let selectedFeatures = joinFeatures(getSelectedFeatures());
-      if (!selectedFeatures) {
+      // return;
+
+      let selectedFeatures = getSelectedFeatures();
+      console.log('selectedFeatures.length', selectedFeatures);
+
+      let joinedFeatures = joinFeatures(selectedFeatures);
+      if (!joinedFeatures) {
         return lotivis_log('[lotivis]  No selected features to render.');
       }
+
+      console.log('joinedFeatures.features.length', joinedFeatures);
+
+      let size1 = mapChart.svg
+        .selectAll('#the-rect')
+        .size();
+
+      let size = mapChart.svg
+        .selectAll('.lotivis-map-chart-selection-rect')
+        .size();
+
+      console.log('size1', size1);
+      console.log('size', size);
+
+      mapChart.svg
+        .selectAll('.lotivis-map-chart-selection-rect')
+        .remove();
+
+      mapChart.svg
+        .selectAll('#the-rect')
+        .remove();
 
       mapChart.svg
         .selectAll('path')
         .append('path')
-        .data(selectedFeatures.features)
+        .attr('class', 'lotivis-map-chart-selection-rect')
+        .data(joinedFeatures.features)
         .enter()
         .append('path')
         .attr('d', mapChart.path)
+        .style('stroke-dasharray', '1')
+        .style('fill', 'blue')
+        .style('fill-opacity', 1)
         .attr('class', 'lotivis-map-chart-selection-rect')
         .raise();
+
+      let sizeAfter = mapChart.svg
+        .selectAll('.lotivis-map-chart-selection-rect')
+        .size();
+
+      console.log('sizeAfter', sizeAfter);
     };
   }
 }
@@ -5188,6 +5245,7 @@ class MapChart extends Chart {
 
     this.projection = d3.geoMercator();
     this.path = d3.geoPath().projection(this.projection);
+
     this.initializeRenderers();
   }
 
@@ -5219,6 +5277,9 @@ class MapChart extends Chart {
 
   draw() {
     lotivis_log('[lotivis] ', this.constructor.name, 'draw');
+    if (!this.geoJSON) {
+      return lotivis_log('[lotivis]  No GeoJSON to render.');
+    }
     this.backgroundRenderer.render();
     this.exteriorBorderRenderer.render();
     this.geoJSONRenderer.render();
@@ -5255,13 +5316,8 @@ class MapChart extends Chart {
    * @param feature The feature.
    */
   onSelectFeature(event, feature) {
-    if (!feature || !feature.properties) return;
-    if (!this.datasetController) return;
-    let locationID = this.config.featureIDAccessor(feature);
-    this.updateSensible = false;
-    this.datasetController.setLocationsFilter([locationID]);
-    this.updateSensible = true;
-    this.selectionRenderer.render();
+
+
   }
 
   /**
@@ -5285,7 +5341,19 @@ class MapChart extends Chart {
     if (!this.geoJSON) return;
     // precalculate the center of each feature
     this.geoJSON.features.forEach((feature) => feature.center = d3.geoCentroid(feature));
-    this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.excludedFeatureCodes);
+
+    if (this.config.excludedFeatureCodes) {
+      this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.excludedFeatureCodes);
+    }
+
+    // precalculate lotivis feature ids
+
+    let feature;
+    for (let i = 0; i < this.presentedGeoJSON.features.length; i++) {
+      feature = this.presentedGeoJSON.features[i];
+      this.presentedGeoJSON.features[i].lotivisId = this.config.featureIDAccessor(feature);
+    }
+
     this.zoomTo(this.geoJSON);
     this.draw();
 
@@ -6511,7 +6579,15 @@ DatasetsController.prototype.setLocationsFilter = function (locations) {
   this.filters.locations = stringVersions;
   this.calculateSnapshot();
   this.notifyListeners('filter-locations');
-  lotivis_log('filter-locations:', this.filters.locations);
+};
+
+DatasetsController.prototype.toggleLocation = function (location) {
+  const index = this.filters.locations.indexOf(location);
+  if (index !== -1) {
+    this.filters.locations.splice(index, 1);
+  } else {
+    this.filters.locations.push(location);
+  }
 };
 
 /**
@@ -6643,6 +6719,7 @@ class DatasetsColorsController {
 /**
  */
 DatasetsController.prototype.calculateSnapshot = function () {
+  lotivis_log(`[lotivis]  calculateSnapshot`);
   this.snapshot = {};
   this.snapshot.datasets = this.filteredDatasets();
   this.snapshot.flatData = flatDatasets(this.snapshot.datasets);
@@ -6879,7 +6956,6 @@ DatasetsController.prototype.getDateDataview = function (groupSize) {
 
   let cachedDataView = this.getCached('date');
   if (cachedDataView) {
-    lotivis_log('using cached');
     return cachedDataView;
   }
 
@@ -7033,6 +7109,7 @@ exports.DataViewCard = DataViewCard;
 exports.DataViewDateChartCard = DataViewDateChartCard;
 exports.DataViewDatePlotChartCard = DataViewDatePlotChartCard;
 exports.DataViewMapChartCard = DataViewMapChartCard;
+exports.DataViewMapCard = DataViewMapChartCard;
 exports.DataviewFlatCard = DataViewFlatCard;
 exports.DatasetsControllerCard = DatasetsControllerCard;
 exports.DatasetsControllerSnapshotCard = DatasetsControllerCard;

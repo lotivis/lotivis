@@ -143,6 +143,7 @@ exports.DataViewCard = DataViewCard;
 exports.DataViewDateChartCard = DataViewDateChartCard;
 exports.DataViewDatePlotChartCard = DataViewDatePlotChartCard;
 exports.DataViewMapChartCard = DataViewMapChartCard;
+exports.DataViewMapCard = DataViewMapChartCard;
 exports.DataviewFlatCard = DataViewFlatCard;
 exports.DatasetsControllerCard = DatasetsControllerCard;
 exports.DatasetsControllerSnapshotCard = DatasetsControllerCard;

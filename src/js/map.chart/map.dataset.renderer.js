@@ -16,12 +16,12 @@ export class MapDatasetRenderer {
   constructor(mapChart) {
 
     let generator = Color.mapColors(1);
+    let style = styleForCSSClass('.lotivis-map.chart-area');
 
     /**
      * Resets the `fill` and `fill-opacity` property of each area.
      */
     function resetAreas() {
-      let style = styleForCSSClass('.lotivis-map.chart-area');
       mapChart.svg
         .selectAll('.lotivis-location-chart-area')
         .style('stroke', style.stroke || 'black')
@@ -30,11 +30,11 @@ export class MapDatasetRenderer {
     }
 
     function featureMapID(feature) {
-      return `lotivis-location-chart-area-${mapChart.config.featureIDAccessor(feature)}`;
+      return `lotivis-location-chart-area-${feature.lotivisId}`;
     }
 
     /**
-     * Called by map.chart GeoJSON renderer when mouse enters an area drawn
+     * Called by map chart GeoJSON renderer when mouse enters an area drawn
      * on the location chart.
      *
      * @param event The mouse event.

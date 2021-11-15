@@ -22,19 +22,20 @@
     <div class="lotivis-col-2">
       <!-- Placeholder -->
     </div>
-    <div class="lotivis-col-6">
-      <div id="location-chart-card-1">
-        <!-- Location Chart 1 Code Here -->
+    <div class="lotivis-col-3">
+      <div id="map-chart-card-1">
+        <!-- Map Chart 1 Code Here -->
+      </div>
+      <div id="map-chart-card-3">
+        <!-- Map Chart 3 Code Here -->
       </div>
     </div>
-    <div class="lotivis-col-6">
-      <div id="location-chart-card-2">
-        <!-- Location Chart 2 Code Here -->
+    <div class="lotivis-col-3">
+      <div id="map-chart-card-2">
+        <!-- Map Chart 2 Code Here -->
       </div>
-    </div>
-    <div class="lotivis-col-6">
-      <div id="location-chart-card-3">
-        <!-- Location Chart 3 Code Here -->
+      <div id="map-chart-card-4">
+        <!-- Map Chart 4 Code Here -->
       </div>
     </div>
     <div class="lotivis-col-3">
@@ -43,14 +44,16 @@
       </div>
     </div>
     <div class="lotivis-col-3">
-      <div id="dataview-location-card">
-        <!-- Dataview Location Card Here -->
+      <div id="dataview-map-card">
+        <!-- Dataview Map Card Here -->
       </div>
     </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-server@3.0.1/dist/topojson-server.min.js"></script>
 <script src="../dist/lotivis.js"></script>
 
 <script>
@@ -62,28 +65,32 @@
       label: 'dataset_1',
       stack: 'dataset_1',
       data: [
-        {location: 45, date: 2000, value: 2},
-        {location: 45, date: 2001, value: 1},
-        {location: 45, date: 2002, value: 4},
-        {location: 45, date: 2003, value: 3},
+        {map: 45, date: 2000, value: 2},
+        {map: 45, date: 2001, value: 1},
+        {map: 45, date: 2002, value: 4},
+        {map: 45, date: 2003, value: 3},
       ]
     }
   ];
 
   let datasetsCard = new lotivis.DatasetsJSONCard();
-  let dataviewMapCard = new lotivis.DataViewMapChartCard('dataview-location-card');
+  let dataviewMapCard = new lotivis.DataViewMapCard('dataview-map-card');
 
-  let locationChartCard1 = new lotivis.MapChartCard('location-chart-card-1', {
-    title: 'Standard',
+  let mapChartCard1 = new lotivis.MapChartCard('map-chart-card-1', {
+    name: 'Standard',
     sendsNotifications: false
   });
-  let locationChartCard2 = new lotivis.MapChartCard('location-chart-card-2', {
-    title: 'Show Labels',
+  let mapChartCard2 = new lotivis.MapChartCard('map-chart-card-2', {
+    name: 'Show Labels',
     sendsNotifications: false,
     showLabels: true
   });
-  let locationChartCard3 = new lotivis.MapChartCard('location-chart-card-3', {
-    title: 'Exclude Features',
+  let mapChartCard3 = new lotivis.MapChartCard('map-chart-card-3', {
+    name: 'Standard',
+    sendsNotifications: false
+  });
+  let mapChartCard4 = new lotivis.MapChartCard('map-chart-card-4', {
+    name: 'Exclude Features',
     sendsNotifications: false,
     excludedFeatureCodes: ['2A', '2B']
   });
@@ -92,15 +99,22 @@
     .then(response => response.text())
     .then(text => JSON.parse(text))
     .then(geoJSON => {
-      locationChartCard1.chart.setGeoJSON(geoJSON);
-      locationChartCard2.chart.setGeoJSON(geoJSON);
-      locationChartCard3.chart.setGeoJSON(geoJSON);
+      mapChartCard1.chart.setGeoJSON(geoJSON);
+      mapChartCard2.chart.setGeoJSON(geoJSON);
+      mapChartCard3.chart.setGeoJSON(geoJSON);
+      mapChartCard4.chart.setGeoJSON(geoJSON);
+      return fetch('assets/example-datasets-location-time-grouped.json');
+    })
+    .then(response => response.text())
+    .then(text => JSON.parse(text))
+    .then(function (json) {
 
       let datasetsController = new lotivis.DatasetController(datasets);
       datasetsController.register([
-        locationChartCard1.chart,
-        locationChartCard2.chart,
-        locationChartCard3.chart,
+        mapChartCard1.chart,
+        mapChartCard2.chart,
+        mapChartCard3.chart,
+        mapChartCard4.chart,
         datasetsCard,
         dataviewMapCard
       ]);

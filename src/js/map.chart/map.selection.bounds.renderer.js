@@ -2,6 +2,8 @@
  *
  * @class MapSelectionBoundsRenderer
  */
+import {lotivis_log} from "../shared/debug";
+
 export class MapSelectionBoundsRenderer {
 
   /**
@@ -19,10 +21,12 @@ export class MapSelectionBoundsRenderer {
 
     /**
      * Tells this renderer that the mouse moved in an area.
+     *
      * @param event The mouse event.
      * @param feature The feature (area) that the mouse is now pointing on.
      */
     this.mouseEnter = function (event, feature) {
+      lotivis_log(`mouseEnter`);
       if (!mapChart.config.drawRectangleAroundSelection) return;
       let projection = mapChart.projection;
       let featureBounds = d3.geoBounds(feature);

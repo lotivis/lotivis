@@ -28,10 +28,11 @@ export class MapLabelRenderer {
       removeLabels();
 
       let geoJSON = mapChart.geoJSON;
-      if (!mapChart.geoJSON) return lotivis_log('[lotivis]  No GeoJSON to render.');
+      if (!mapChart.geoJSON) return lotivis_log(`[lotivis]  No GeoJSON to render (${mapChart.selector}).`);
       let dataview = mapChart.dataview;
-      if (!dataview) return lotivis_log(`[lotivis]  MapLabelRenderer: no data view in map (${mapChart}).`);
-      if (!mapChart.config.showLabels) return lotivis_log('[lotivis]  Skip rendering labels due to configuration.');
+
+      if (!dataview) return lotivis_log(`[lotivis]  No dataview in map chart (${mapChart.selector}).`);
+      if (!mapChart.config.showLabels) return lotivis_log(`[lotivis]  Skip rendering labels due to configuration (${mapChart.selector}).`);
 
       mapChart.svg
         .selectAll('text')

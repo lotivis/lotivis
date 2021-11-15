@@ -1126,7 +1126,15 @@ DatasetsController.prototype.setLocationsFilter = function (locations) {
   this.filters.locations = stringVersions;
   this.calculateSnapshot();
   this.notifyListeners('filter-locations');
-  lotivis_log('filter-locations:', this.filters.locations);
+};
+
+DatasetsController.prototype.toggleLocation = function (location) {
+  const index = this.filters.locations.indexOf(location);
+  if (index !== -1) {
+    this.filters.locations.splice(index, 1);
+  } else {
+    this.filters.locations.push(location);
+  }
 };
 
 /**
