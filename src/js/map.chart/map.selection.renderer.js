@@ -18,6 +18,7 @@ export class MapSelectionRenderer {
 
     function getSelectedFeatures() {
       if (!mapChart.geoJSON) { return; }
+      if (!mapChart.datasetController) { return lotivis_log('[lotivis]  MapSelectionRenderer: no datasets controller'); }
 
       let allFeatures = copy(mapChart.geoJSON.features);
       let filteredLocations = mapChart.datasetController.filters.locations;

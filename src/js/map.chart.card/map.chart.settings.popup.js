@@ -32,5 +32,8 @@ export class MapChartSettingsPopup extends SettingsPopup {
    */
   willShow() {
     this.showLabelsCheckbox.setChecked(this.mapChart.config.showLabels);
+    if (!this.mapChart.datasetController) {
+      this.showLabelsCheckbox.disable();
+    }
   }
 }

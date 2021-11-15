@@ -49,7 +49,7 @@ export class DataViewDatePlotChartCard extends DataViewCard {
   }
 }
 
-export class DataViewLocationChartCard extends DataViewCard {
+export class DataViewMapChartCard extends DataViewCard {
   getTitle() {
     return 'Dataview Map';
   }

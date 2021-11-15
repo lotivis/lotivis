@@ -56,7 +56,7 @@ import {
   DataViewDateChartCard,
   DataViewDatePlotChartCard,
   DataViewFlatCard,
-  DataViewLocationChartCard
+  DataViewMapChartCard
 } from "./js/dataview.card/dataview.card";
 
 import {
@@ -142,7 +142,7 @@ exports.DatasetCSVDateCard = DatasetCSVDateCard;
 exports.DataViewCard = DataViewCard;
 exports.DataViewDateChartCard = DataViewDateChartCard;
 exports.DataViewDatePlotChartCard = DataViewDatePlotChartCard;
-exports.DataViewMapChartCard = DataViewLocationChartCard;
+exports.DataViewMapChartCard = DataViewMapChartCard;
 exports.DataviewFlatCard = DataViewFlatCard;
 exports.DatasetsControllerCard = DatasetsControllerCard;
 exports.DatasetsControllerSnapshotCard = DatasetsControllerCard;

@@ -8,7 +8,7 @@
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 typeof define === 'function' && define.amd ? define(['exports'], factory) :
 (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.lotivis = {}));
-}(this, (function (exports) { 'use strict';
+})(this, (function (exports) { 'use strict';
 
 var d3LibraryAccess;
 try {
@@ -2092,7 +2092,7 @@ exports.DateWeekAssessor = DateWeekAssessor;
 
 var exports$1 = exports;
 
-exports.default = exports$1;
+exports["default"] = exports$1;
 
-})));
+}));
 //# sourceMappingURL=lotivis.tests.js.map

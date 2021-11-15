@@ -30,7 +30,7 @@ export class MapLabelRenderer {
       let geoJSON = mapChart.geoJSON;
       if (!mapChart.geoJSON) return lotivis_log('[lotivis]  No GeoJSON to render.');
       let dataview = mapChart.dataview;
-      if (!dataview) return lotivis_log('[lotivis]  No dataview in map.chart.');
+      if (!dataview) return lotivis_log(`[lotivis]  MapLabelRenderer: no data view in map (${mapChart}).`);
       if (!mapChart.config.showLabels) return lotivis_log('[lotivis]  Skip rendering labels due to configuration.');
 
       mapChart.svg

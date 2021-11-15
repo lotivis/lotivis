@@ -8,7 +8,7 @@
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 typeof define === 'function' && define.amd ? define(['exports'], factory) :
 (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.lotivis = {}));
-}(this, (function (exports) { 'use strict';
+})(this, (function (exports) { 'use strict';
 
 var d3LibraryAccess;
 try {
@@ -1719,7 +1719,6 @@ class Dropdown extends Component {
         options[i][0] || options[i].id;
         name = options[i][1] || options[i].translatedTitle;
       } else if (typeof options[i] === 'string') {
-        options[i];
         name = options[i];
       } else {
         options[i].id;
@@ -2916,7 +2915,7 @@ class DataViewDatePlotChartCard extends DataViewCard {
   }
 }
 
-class DataViewLocationChartCard extends DataViewCard {
+class DataViewMapChartCard extends DataViewCard {
   getTitle() {
     return 'Dataview Map';
   }
@@ -4495,7 +4494,7 @@ class MapLabelRenderer {
       let geoJSON = mapChart.geoJSON;
       if (!mapChart.geoJSON) return lotivis_log('[lotivis]  No GeoJSON to render.');
       let dataview = mapChart.dataview;
-      if (!dataview) return lotivis_log('[lotivis]  No dataview in map.chart.');
+      if (!dataview) return lotivis_log(`[lotivis]  MapLabelRenderer: no data view in map (${mapChart}).`);
       if (!mapChart.config.showLabels) return lotivis_log('[lotivis]  Skip rendering labels due to configuration.');
 
       mapChart.svg
@@ -5106,6 +5105,7 @@ class MapSelectionRenderer {
 
     function getSelectedFeatures() {
       if (!mapChart.geoJSON) { return; }
+      if (!mapChart.datasetController) { return lotivis_log('[lotivis]  MapSelectionRenderer: no datasets controller'); }
 
       let allFeatures = copy(mapChart.geoJSON.features);
       let filteredLocations = mapChart.datasetController.filters.locations;
@@ -5287,6 +5287,7 @@ class MapChart extends Chart {
     this.geoJSON.features.forEach((feature) => feature.center = d3.geoCentroid(feature));
     this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.excludedFeatureCodes);
     this.zoomTo(this.geoJSON);
+    this.draw();
 
     // this.backgroundRenderer.render();
     // this.exteriorBorderRenderer.render();
@@ -5324,6 +5325,9 @@ class MapChartSettingsPopup extends SettingsPopup {
    */
   willShow() {
     this.showLabelsCheckbox.setChecked(this.mapChart.config.showLabels);
+    if (!this.mapChart.datasetController) {
+      this.showLabelsCheckbox.disable();
+    }
   }
 }
 
@@ -7028,7 +7032,7 @@ exports.DatasetCSVDateCard = DatasetCSVDateCard;
 exports.DataViewCard = DataViewCard;
 exports.DataViewDateChartCard = DataViewDateChartCard;
 exports.DataViewDatePlotChartCard = DataViewDatePlotChartCard;
-exports.DataViewMapChartCard = DataViewLocationChartCard;
+exports.DataViewMapChartCard = DataViewMapChartCard;
 exports.DataviewFlatCard = DataViewFlatCard;
 exports.DatasetsControllerCard = DatasetsControllerCard;
 exports.DatasetsControllerSnapshotCard = DatasetsControllerCard;
@@ -7073,7 +7077,7 @@ var exports$1 = exports;
 
 console.log(`[lotivis]  lotivis module loaded.`);
 
-exports.default = exports$1;
+exports["default"] = exports$1;
 
-})));
+}));
 //# sourceMappingURL=lotivis.js.map

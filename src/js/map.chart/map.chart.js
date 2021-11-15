@@ -145,6 +145,7 @@ export class MapChart extends Chart {
     this.geoJSON.features.forEach((feature) => feature.center = d3.geoCentroid(feature));
     this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.excludedFeatureCodes);
     this.zoomTo(this.geoJSON);
+    this.draw();
 
     // this.backgroundRenderer.render();
     // this.exteriorBorderRenderer.render();
