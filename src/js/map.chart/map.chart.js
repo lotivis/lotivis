@@ -46,6 +46,7 @@ export class MapChart extends Chart {
 
     this.projection = d3.geoMercator();
     this.path = d3.geoPath().projection(this.projection);
+
     this.initializeRenderers();
   }
 
@@ -77,6 +78,9 @@ export class MapChart extends Chart {
 
   draw() {
     lotivis_log('[lotivis] ', this.constructor.name, 'draw');
+    if (!this.geoJSON) {
+      return lotivis_log('[lotivis]  No GeoJSON to render.');
+    }
     this.backgroundRenderer.render();
     this.exteriorBorderRenderer.render();
     this.geoJSONRenderer.render();
@@ -113,13 +117,8 @@ export class MapChart extends Chart {
    * @param feature The feature.
    */
   onSelectFeature(event, feature) {
-    if (!feature || !feature.properties) return;
-    if (!this.datasetController) return;
-    let locationID = this.config.featureIDAccessor(feature);
-    this.updateSensible = false;
-    this.datasetController.setLocationsFilter([locationID]);
-    this.updateSensible = true;
-    this.selectionRenderer.render();
+
+
   }
 
   /**
@@ -143,8 +142,21 @@ export class MapChart extends Chart {
     if (!this.geoJSON) return;
     // precalculate the center of each feature
     this.geoJSON.features.forEach((feature) => feature.center = d3.geoCentroid(feature));
-    this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.excludedFeatureCodes);
+
+    if (this.config.excludedFeatureCodes) {
+      this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.excludedFeatureCodes);
+    }
+
+    // precalculate lotivis feature ids
+
+    let feature;
+    for (let i = 0; i < this.presentedGeoJSON.features.length; i++) {
+      feature = this.presentedGeoJSON.features[i];
+      this.presentedGeoJSON.features[i].lotivisId = this.config.featureIDAccessor(feature);
+    }
+
     this.zoomTo(this.geoJSON);
+    this.draw();
 
     // this.backgroundRenderer.render();
     // this.exteriorBorderRenderer.render();

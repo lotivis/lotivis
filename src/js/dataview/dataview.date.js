@@ -14,7 +14,6 @@ DatasetsController.prototype.getDateDataview = function (groupSize) {
 
   let cachedDataView = this.getCached('date');
   if (cachedDataView) {
-    lotivis_log('using cached');
     return cachedDataView;
   }
 

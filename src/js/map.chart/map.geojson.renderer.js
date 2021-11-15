@@ -20,7 +20,7 @@ export class MapGeoJSONRenderer {
     function mouseEnter(event, feature) {
       mapChart.datasetRenderer.mouseEnter(event, feature);
       mapChart.tooltipRenderer.mouseEnter(event, feature);
-      mapChart.selectionBoundsRenderer.mouseEnter(event, feature);
+      // mapChart.selectionBoundsRenderer.mouseEnter(event, feature);
     }
 
     /**
@@ -32,18 +32,27 @@ export class MapGeoJSONRenderer {
     function mouseOut(event, feature) {
       mapChart.datasetRenderer.mouseOut(event, feature);
       mapChart.tooltipRenderer.mouseOut(event, feature);
-      mapChart.selectionBoundsRenderer.mouseOut(event, feature);
+      // mapChart.selectionBoundsRenderer.mouseOut(event, feature);
+    }
+
+    function mouseClick(event, feature) {
+      lotivis_log(`[lotivis]  onSelectFeature`);
+      if (!feature || !feature.properties) return;
+      if (!mapChart.datasetController) return;
+
+      let locationID = feature.lotivisId;
+      mapChart.updateSensible = false;
+      mapChart.datasetController.setLocationsFilter([locationID]);
+      mapChart.updateSensible = true;
+      mapChart.selectionRenderer.render();
     }
 
     /**
      * Renders the `presentedGeoJSON` property.
      */
     this.render = function () {
-      let geoJSON = mapChart.geoJSON;
-      if (!geoJSON) return lotivis_log('[lotivis]  No GeoJSON to render.');
-      let idAccessor = mapChart.config.featureIDAccessor;
-
-      // lotivis_log('geoJSON', geoJSON);
+      let geoJSON = mapChart.presentedGeoJSON;
+      if (!geoJSON) return;
 
       mapChart.areas = mapChart.svg
         .selectAll('path')
@@ -51,12 +60,12 @@ export class MapGeoJSONRenderer {
         .enter()
         .append('path')
         .attr('d', mapChart.path)
-        .attr('id', feature => `lotivis-location-chart-area-${idAccessor(feature)}`)
+        .attr('id', feature => `lotivis-location-chart-area-${feature.lotivisId}`)
         .classed('lotivis-location-chart-area', true)
         .style('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4')
         .style('fill', 'white')
         .style('fill-opacity', 1)
-        .on('click', mapChart.onSelectFeature.bind(mapChart))
+        .on('click', mouseClick)
         .on('mouseenter', mouseEnter)
         .on('mouseout', mouseOut);
     };

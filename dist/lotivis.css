@@ -440,7 +440,7 @@ input[type=checkbox] {
   fill: white;
   fill-opacity: 1;
   stroke: red;
-  stroke-width: 5px;
+  stroke-width: 13px;
   stroke-dasharray: 1, 3;
 }
 

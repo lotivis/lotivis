@@ -5,7 +5,7 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
   <link rel="stylesheet" href="../dist/lotivis.css"/>
-  <title>Lotivis - mif, mif', miff, miff', miffs, mifs, mille-f, mi-f, mi-f', 'mif'</title>
+  <title>Lotivis Examples - Debug Selection</title>
 </head>
 <body>
 
@@ -17,7 +17,7 @@
       </a>
     </div>
     <div class="lotivis-col-8 lotivis-headline">
-      <h1>mif, mif', miff, miff', miffs, mifs, mille-f, mi-f, mi-f', 'mif'</h1>
+      <h1>Debug Selection</h1>
     </div>
     <div class="lotivis-col-6">
       <div id="date-chart-card">
@@ -52,32 +52,20 @@
   let datasetsJSONCard = new lotivis.DatasetsJSONCard();
   let dateChartCard = new lotivis.DateChartCard();
   let plotChartCard = new lotivis.PlotChartCard();
-  let mapChartCard = new lotivis.MapChartCard('map-chart-card', {
-    excludedFeatureCodes: ['2A', '2B'],
-    featureIDAccessor: (feature) => {
-      return feature.properties.code
-    },
-    featureNameAccessor: (feature) => {
-      return feature.properties.nom
-    }
-  });
+  let mapChartCard = new lotivis.MapChartCard();
+  mapChartCard.chart.config.width = 1000;
+  mapChartCard.chart.config.height = 500;
 
-  dateChartCard.chart.config.dateLabels = Array.from(Array(26).keys()).map(number => String(number + 1995))
-
-  d3.json('assets/departements.geojson')
-    .then(function (json) {
-      mapChartCard.chart.setGeoJSON(json);
-      return d3.json('assets/miff.json');
-    })
+  d3.json('assets/example-datasets-location-time-grouped.json')
     .then(function (json) {
 
       let controller = new lotivis.DatasetController(json);
       controller.register([
-        // dateChartCard.chart,
+        dateChartCard.chart,
         mapChartCard.chart,
-        // plotChartCard.chart,
-        // datasetsJSONCard
-      ])
+        plotChartCard.chart,
+        datasetsJSONCard
+      ]);
 
     });
 

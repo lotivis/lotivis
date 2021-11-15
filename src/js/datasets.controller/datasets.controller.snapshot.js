@@ -14,6 +14,7 @@ import {lotivis_log} from "../shared/debug";
 /**
  */
 DatasetsController.prototype.calculateSnapshot = function () {
+  lotivis_log(`[lotivis]  calculateSnapshot`);
   this.snapshot = {};
   this.snapshot.datasets = this.filteredDatasets();
   this.snapshot.flatData = flatDatasets(this.snapshot.datasets);
