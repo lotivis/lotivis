@@ -1,16 +1,16 @@
 import {Chart} from "../chart/chart";
+import "../dataview/dataview.plot";
+import {defaultPlotChartConfig, PlotChartSort, PlotChartType} from "./plot.chart.config";
 import {PlotAxisRenderer} from "./plot.axis.renderer";
 import {PlotTooltipRenderer} from "./plot.tooltip.renderer";
 import {PlotLabelRenderer} from "./plot.label.renderer";
 import {PlotGridRenderer} from "./plot.grid.renderer";
 import {PlotBackgroundRenderer} from "./plot.background.renderer";
-import {defaultPlotChartConfig, PlotChartType} from "./plot.chart.config";
-import {PlotChartSort} from "./plot.chart.sort";
-import "../dataview/dataview.plot";
-import {PlotBackgroundBarsRenderer} from "./plot.background.bars.renderer";
+import {PlotChartHoverBarsRenderer} from "./plot.chart.hover.bars.renderer";
 import {PlotBarsFractionsRenderer} from "./plot.bars.fractions.renderer";
 import {PlotBarsGradientRenderer} from "./plot.bars.gradient.renderer";
 import {PlotLabelsFractionsRenderer} from "./plot.labels.fractions.renderer";
+import {PlotChartSelectionRenderer} from "./plot.chart.selection.renderer";
 
 /**
  * A lotivis date.chart.plot.chart chart.
@@ -38,11 +38,15 @@ export class PlotChart extends Chart {
     this.backgroundRenderer = new PlotBackgroundRenderer(this);
     this.axisRenderer = new PlotAxisRenderer(this);
     this.gridRenderer = new PlotGridRenderer(this);
-    this.backgroundBarsRenderer = new PlotBackgroundBarsRenderer(this);
+    this.selectionRenderer = new PlotChartSelectionRenderer(this);
+    this.hoverBarsRenderer = new PlotChartHoverBarsRenderer(this);
+
     this.barsFractionsRenderer = new PlotBarsFractionsRenderer(this);
     this.barsRenderer = new PlotBarsGradientRenderer(this);
+
     this.labelsRenderer = new PlotLabelRenderer(this);
     this.labelsFractionRenderer = new PlotLabelsFractionsRenderer(this);
+
     this.tooltipRenderer = new PlotTooltipRenderer(this);
   }
 
@@ -99,7 +103,8 @@ export class PlotChart extends Chart {
     this.backgroundRenderer.render();
     this.gridRenderer.render();
     this.axisRenderer.renderAxis();
-    this.backgroundBarsRenderer.renderBars();
+    this.selectionRenderer.render();
+    this.hoverBarsRenderer.render();
     if (this.config.type === PlotChartType.gradient) {
       this.barsRenderer.renderBars();
       this.labelsRenderer.renderLabels();
@@ -131,11 +136,16 @@ export class PlotChart extends Chart {
       .rangeRound([this.config.margin.left, this.config.width - this.config.margin.right])
       .paddingInner(0.1);
 
-    this.yChart = d3
+    this.yChartPadding = d3
       .scaleBand()
       .domain(this.dataView.labels || [])
       .rangeRound([this.height - this.config.margin.bottom, this.config.margin.top])
       .paddingInner(0.1);
+
+    this.yChart = d3
+      .scaleBand()
+      .domain(this.dataView.labels || [])
+      .rangeRound([this.height - this.config.margin.bottom, this.config.margin.top]);
 
     this.xAxisGrid = d3
       .axisBottom(this.xChart)
@@ -189,5 +199,6 @@ export class PlotChart extends Chart {
     }
 
     this.dataView.labels = sortedDatasets.map(dataset => String(dataset.label)).reverse();
+    this.dataView.datasetsSorted = this.dataView.labels;
   }
 }

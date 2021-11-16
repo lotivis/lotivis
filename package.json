@@ -33,7 +33,7 @@
     "serve": "http-server",
     "build": "rollup -c && sass src/index.scss > dist/lotivis.css",
     "test": "npm run build && mocha",
-    "copy:to:frcv": "cp examples/js/lotivis.* ../frc-visualization/public/js/lib && cp examples/css/lotivis.* ../frc-visualization/public/css"
+    "copy:to:frcv": "cp dist/lotivis.js ../frc-visualization/public/js/lib && cp dist/lotivis.css ../frc-visualization/public/css"
   },
   "bugs": {
     "url": "https://github.com/lukasdanckwerth/lotivis/issues"

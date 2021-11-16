@@ -3,9 +3,9 @@ import {createIDFromDataset} from "../shared/selector";
 /**
  * Draws the background / selection bars of a time plot chart.
  *
- * @class PlotBackgroundBarsRenderer
+ * @class PlotChartHoverBarsRenderer
  */
-export class PlotBackgroundBarsRenderer {
+export class PlotChartHoverBarsRenderer {
 
   /**
    * Creates a new instance of PlotAxisRenderer.
@@ -15,12 +15,12 @@ export class PlotBackgroundBarsRenderer {
   constructor(plotChart) {
 
     function createID(dataset) {
-      return `lotivis-ghost-rect-${createIDFromDataset(dataset)}`;
+      return `lotivis-plot-chart-hover-bar-id-${createIDFromDataset(dataset)}`;
     }
 
     function hideAll() {
       plotChart.svg
-        .selectAll('.lotivis-plot-selection-rect')
+        .selectAll('.lotivis-plot-chart-hover-bar')
         .attr("opacity", 0);
     };
 
@@ -50,14 +50,26 @@ export class PlotBackgroundBarsRenderer {
     function mouseOut(event, dataset) {
       hideAll();
       plotChart.tooltipRenderer.hideTooltip.bind(plotChart)(event, dataset);
+
+      if (event.buttons === 1) {
+        mouseClick(event, dataset);
+      }
+    }
+
+    function mouseClick(event, dataset) {
+      if (plotChart.config.sendsNotifications) {
+        plotChart.makeUpdateInsensible();
+        plotChart.datasetController.toggleDataset(dataset.label);
+        plotChart.makeUpdateSensible();
+      }
+      plotChart.selectionRenderer.update();
     }
 
     /**
      * Draws the bars.
      */
-    this.renderBars = function () {
-      let datasets = plotChart.dataView.datasetsSorted || plotChart.dataView.datasets;
-      let firstDate = plotChart.dataView.firstDate;
+    this.render = function () {
+      let datasets = plotChart.dataView.datasets;
       let graphWidth = plotChart.graphWidth;
 
       plotChart.backgrounBarsData = plotChart
@@ -70,14 +82,16 @@ export class PlotBackgroundBarsRenderer {
       plotChart.backgrounBars = plotChart.backgrounBarsData
         .append("rect")
         .attr("id", (d) => createID(d))
-        .attr('class', 'lotivis-plot-selection-rect')
+        .attr('class', 'lotivis-plot-chart-hover-bar')
         .attr(`opacity`, 0)
         .attr("x", plotChart.config.margin.left)
         .attr("y", (d) => plotChart.yChart(d.label))
         .attr("height", plotChart.yChart.bandwidth())
         .attr("width", graphWidth)
         .on('mouseenter', mouseEnter)
-        .on('mouseout', mouseOut);
+        .on('mouseout', mouseOut)
+        .on('click', mouseClick);
+
     };
   }
 }

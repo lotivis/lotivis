@@ -8,10 +8,21 @@ export class TimeChartLegendRenderer {
 
   constructor(dateChart) {
 
-    this.renderNormalLegend = function () {
+    /**
+     * Renders the legend of the date chart.
+     */
+    this.render = function () {
+      if (dateChart.config.combineStacks) {
+        renderCombinedStacksLegend();
+      } else {
+        renderDefaultLegend();
+      }
+    };
+
+    function renderDefaultLegend() {
       let config = dateChart.config;
       let controller = dateChart.datasetController;
-      let numberFormat = dateChart.numberFormat;
+      let numberFormat = dateChart.config.numberFormat;
       let datasets = controller.datasets;
       let datasetNames = controller.labels;
       let circleRadius = 6;
@@ -63,9 +74,9 @@ export class TimeChartLegendRenderer {
         }.bind(this));
     };
 
-    this.renderCombinedStacksLegend = function () {
+    function renderCombinedStacksLegend() {
       let stackNames = dateChart.datasetController.stacks;
-      let numberFormat = dateChart.numberFormat;
+      let numberFormat = dateChart.config.numberFormat;
       let circleRadius = 6;
       let labelMargin = 50;
 

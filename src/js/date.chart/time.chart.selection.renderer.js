@@ -8,56 +8,29 @@ import {toSaveID} from "../shared/selector";
 export class TimeChartSelectionRenderer {
 
   /**
-   * Creates a new instance of TimeChartSelectionBarsRenderer.
+   * Creates a new instance of TimeChartHoverBarsRenderer.
    * @param dateChart
    */
   constructor(dateChart) {
 
     function createID(date) {
-      return `lotivis-date-selection-rect-id-${toSaveID(String(date))}`;
+      return `lotivis-date-chart-selection-rect-id-${toSaveID(String(date))}`;
+    }
+
+    function getSelectedDates() {
+      if (!dateChart.datasetController) {
+        return [];
+      }
+      return dateChart.datasetController.filters.dates || [];
     }
 
     this.hideAll = function () {
       dateChart.svg
-        .selectAll('.lotivis-selection-rect-2')
-        .attr("opacity", 0);
+        .selectAll(`.lotivis-date-chart-selection-rect`)
+        .attr(`opacity`, 0);
     };
 
-    function onMouseEnter(event, date) {
-      this.hideAll();
-      let controller = dateChart.datasetController;
-      let id = createID(date);
-
-      // if (dateChart.config.sendsNotifications) {
-      //   dateChart.updateSensible = false;
-      //   controller.setDatesFilter([date]);
-      //   dateChart.updateSensible = true;
-      // }
-
-      dateChart
-        .svg
-        .select(`#${id}`)
-        .attr("opacity", 0.3);
-
-      dateChart.tooltipRenderer.showTooltip(event, date);
-    }
-
-    function onMouserOut(event, date) {
-      this.hideAll();
-      dateChart.tooltipRenderer.hideTooltip(event, date);
-
-      // if (dateChart.config.sendsNotifications) {
-      //   dateChart.updateSensible = false;
-      //   dateChart.datasetController.resetFilters();
-      //   dateChart.updateSensible = true;
-      // }
-    }
-
-    function onMouseClick(even, date) {
-      console.log('onMouseClick', date);
-    }
-
-    this.renderGhostBars = function () {
+    this.render = function () {
       let margin = dateChart.config.margin;
       let dates = dateChart.config.dateLabels || dateChart.dataview.dates;
 
@@ -68,19 +41,22 @@ export class TimeChartSelectionRenderer {
         .data(dates)
         .enter()
         .append("rect")
-        .attr("class", 'lotivis-selection-rect-2')
+        .attr("class", 'lotivis-date-chart-selection-rect')
         .attr("id", date => createID(date))
-        .attr("opacity", 0)
-        .attr("rx", LotivisConfig.barRadius)
-        .attr("ry", LotivisConfig.barRadius)
-        .attr("x", (date) => dateChart.xChart(date))
+        .attr("x", (date) => dateChart.xChartScale(date))
         .attr("y", margin.top)
-        .attr("width", dateChart.xChart.bandwidth())
-        .attr("height", dateChart.config.height - margin.bottom - margin.top)
-        .on('mouseenter', onMouseEnter.bind(this))
-        .on('mouseout', onMouserOut.bind(this))
-        .on('click', onMouseClick.bind(this));
+        .attr("opacity", 0)
+        .attr("width", dateChart.xChartScale.bandwidth())
+        .attr("height", dateChart.config.height - margin.bottom - margin.top);
 
+    };
+
+    this.update = function () {
+      let selectedDates = getSelectedDates();
+      dateChart
+        .svg
+        .selectAll(`.lotivis-date-chart-selection-rect`)
+        .attr(`opacity`, date => selectedDates.includes(date) ? 0.15 : 0);
     };
   }
 }

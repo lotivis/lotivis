@@ -26,7 +26,7 @@ export class DateChartAxisRenderer {
       // bottom axis
       dateChart.svg
         .append("g")
-        .call(d3.axisBottom(dateChart.xChart))
+        .call(d3.axisBottom(dateChart.xChartScale))
         .attr("transform", () => `translate(0,${height - margin.bottom})`);
 
     };

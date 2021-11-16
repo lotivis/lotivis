@@ -1,5 +1,6 @@
 
 .lotivis-time-chart {
+  // empty
 }
 
 .lotivis-time-chart-label {
@@ -20,12 +21,12 @@
   pointer-events: none;
 }
 
-.lotivis-selection-rect {
+.lotivis-date-chart-hover-bar {
   border-radius: 10px;
   fill: $tint-color;
 }
 
-.lotivis-selection-rect-2 {
-  border-radius: 10px;
+.lotivis-date-chart-selection-rect {
+  //border-radius: 10px;
   fill: red;
 }

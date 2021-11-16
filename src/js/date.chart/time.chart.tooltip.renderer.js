@@ -60,7 +60,7 @@ export class TimeChartTooltipRenderer {
      * @returns {number} The x offset for the tooltip.
      */
     function getXLeft(date, factor, offset, tooltipSize) {
-      let x = dateChart.xChart(date) * factor;
+      let x = dateChart.xChartScalePadding(date) * factor;
       return x + offset[0] - tooltipSize[0] - 22 - LotivisConfig.tooltipOffset;
     }
 
@@ -74,7 +74,7 @@ export class TimeChartTooltipRenderer {
      * @returns {number} The x offset for the tooltip.
      */
     function getXRight(date, factor, offset) {
-      let x = dateChart.xChart(date) + dateChart.xChart.bandwidth();
+      let x = dateChart.xChartScalePadding(date) + dateChart.xChartScalePadding.bandwidth();
       x *= factor;
       x += offset[0] + LotivisConfig.tooltipOffset;
       return x;
@@ -87,7 +87,8 @@ export class TimeChartTooltipRenderer {
      * @returns {string} Return the rendered HTML content.
      */
     function getHTMLForDate(date) {
-      let flatData = dateChart.datasetController
+      let flatData = dateChart
+        .datasetController
         .snapshot
         .flatData
         .filter(item => `${item.date}` === `${date}`);
@@ -133,7 +134,7 @@ export class TimeChartTooltipRenderer {
       let factor = dateChart.getElementEffectiveSize()[0] / dateChart.config.width;
       let offset = dateChart.getElementPosition();
       let top = getTop(factor, offset, tooltipSize);
-      let left = dateChart.xChart(date);
+      let left = dateChart.xChartScalePadding(date);
 
       // differ tooltip position on bar position
       if (left > (dateChart.config.width / 2)) {

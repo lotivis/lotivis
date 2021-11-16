@@ -32,18 +32,24 @@ export class MapGeoJSONRenderer {
       mapChart.datasetRenderer.mouseOut(event, feature);
       mapChart.tooltipRenderer.mouseOut(event, feature);
       mapChart.selectionRenderer.raise();
+
+      if (event.buttons === 1) {
+        mouseClick(event, feature);
+      }
     }
 
     function mouseClick(event, feature) {
       if (!feature || !feature.properties) return;
       if (!mapChart.datasetController) return;
 
-      let locationID = feature.lotivisId;
-      mapChart.makeUpdateInsensible();
-      mapChart.datasetController.toggleLocation(locationID);
-      mapChart.makeUpdateSensible();
-      mapChart.selectionRenderer.render();
-      mapChart.tooltipRenderer.mouseEnter(event, feature);
+      if (mapChart.config.sendsNotifications) {
+        let locationID = feature.lotivisId;
+        mapChart.makeUpdateInsensible();
+        mapChart.datasetController.toggleLocation(locationID);
+        mapChart.makeUpdateSensible();
+        mapChart.selectionRenderer.render();
+        mapChart.tooltipRenderer.mouseEnter(event, feature);
+      }
     }
 
     /**

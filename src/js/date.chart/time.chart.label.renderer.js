@@ -16,7 +16,7 @@ export class TimeChartLabelRenderer {
      */
     this.renderBarLabels = function (stack) {
 
-      let xChartRef = dateChart.xChart;
+      let xChartRef = dateChart.xChartScale;
       let yChartRef = dateChart.yChart;
       let xStackRef = dateChart.xStack;
       let numberFormat = dateChart.config.numberFormat;

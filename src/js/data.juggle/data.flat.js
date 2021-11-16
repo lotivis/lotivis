@@ -1,4 +1,5 @@
 import {copy} from "../shared/copy";
+import {lotivis_log} from "../shared/debug";
 
 /**
  * Returns a flat version of the given dataset collection.
@@ -26,7 +27,7 @@ export function flatDatasets(datasets) {
 export function flatDataset(dataset) {
   let flatData = [];
   if (!dataset.data) {
-    console.log('Lotivis: Flat samples for dataset without samples requested. Will return an empty array.');
+    lotivis_log(`[lotivis]  INFO Flat samples for dataset without samples requested. Will return an empty array.`, dataset);
     return flatData;
   }
   dataset.data.forEach(item => {

@@ -42,7 +42,7 @@ export class PlotBarsFractionsRenderer {
      * Draws the bars.
      */
     this.renderBars = function () {
-      let datasets = plotChart.dataView.datasetsSorted || plotChart.dataView.datasets;
+      let datasets = plotChart.dataView.datasets;
       let max = plotChart.dataView.max;
       let flatData = flatDatasets(datasets);
       flatData = combineByDate(flatData);
@@ -64,8 +64,8 @@ export class PlotBarsFractionsRenderer {
         .attr("rx", radius)
         .attr("ry", radius)
         .attr("x", (d) => plotChart.xChart(d.date))
-        .attr("y", (d) => plotChart.yChart(d.label))
-        .attr("height", plotChart.yChart.bandwidth())
+        .attr("y", (d) => plotChart.yChartPadding(d.label))
+        .attr("height", plotChart.yChartPadding.bandwidth())
         .attr("id", (d) => 'rect-' + createIDFromDataset(d))
         .on('mouseenter', mouseEnter)
         .on('mouseout', mouseOut)

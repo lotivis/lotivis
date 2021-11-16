@@ -60,8 +60,8 @@ import {
 } from "./js/dataview.card/dataview.card";
 
 import {
-  TimeChart
-} from "./js/date.chart/time.chart";
+  DateChart
+} from "./js/date.chart/date.chart";
 import {
   DateChartCard
 } from "./js/date.chart.card/date.chart.card";
@@ -151,7 +151,7 @@ exports.UpdatableDataviewCard = UpdatableDataviewCard;
 exports.EditableDataviewCard = EditableDataviewCard;
 
 // date.chart
-exports.DateChart = TimeChart;
+exports.DateChart = DateChart;
 exports.DateChartCard = DateChartCard;
 
 // map.chart

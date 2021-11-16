@@ -264,6 +264,33 @@ button.lotivis-button-round:active {
   color: white;
 }
 
+.lotivis-time-chart-label {
+  pointer-events: none;
+  font-size: 20px;
+}
+
+.lotivis-time-chart-legend-label {
+  font-size: 13px;
+}
+
+.lotivis-time-chart-legend-circle {
+  cursor: pointer;
+  stroke-width: 2;
+}
+
+.lotivis-time-chart-bar {
+  pointer-events: none;
+}
+
+.lotivis-date-chart-hover-bar {
+  border-radius: 10px;
+  fill: dodgerblue;
+}
+
+.lotivis-date-chart-selection-rect {
+  fill: red;
+}
+
 .lotivis-menu li {
   margin-top: 5px;
 }
@@ -456,9 +483,14 @@ input[type=checkbox] {
   color: red;
 }
 
-.lotivis-plot-selection-rect {
+.lotivis-plot-chart-hover-bar {
   border-radius: 10px;
   fill: dodgerblue;
+}
+
+.lotivis-plot-chart-selection-rect {
+  border-radius: 10px;
+  fill: red;
 }
 
 .lotivis-plot-bar {
@@ -619,34 +651,6 @@ svg {
 
 .lotivis-chart-svg {
   overflow: visible;
-}
-
-.lotivis-time-chart-label {
-  pointer-events: none;
-  font-size: 20px;
-}
-
-.lotivis-time-chart-legend-label {
-  font-size: 13px;
-}
-
-.lotivis-time-chart-legend-circle {
-  cursor: pointer;
-  stroke-width: 2;
-}
-
-.lotivis-time-chart-bar {
-  pointer-events: none;
-}
-
-.lotivis-selection-rect {
-  border-radius: 10px;
-  fill: dodgerblue;
-}
-
-.lotivis-selection-rect-2 {
-  border-radius: 10px;
-  fill: red;
 }
 
 .lotivis-tooltip {

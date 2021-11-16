@@ -1,10 +1,9 @@
-import {Color} from "../shared/color";
 import {Chart} from "../chart/chart";
 import {DateChartAxisRenderer} from "./date.chart.axis.renderer";
 import {TimeChartLabelRenderer} from "./time.chart.label.renderer";
 import {TimeChartLegendRenderer} from "./time.chart.legend.renderer";
 import {TimeChartBarsRenderer} from "./time.chart.bars.renderer";
-import {TimeChartSelectionBarsRenderer} from "./time.chart.selection.bars.renderer";
+import {TimeChartHoverBarsRenderer} from "./time.chart.hover.bars.renderer";
 import {TimeChartTooltipRenderer} from "./time.chart.tooltip.renderer";
 import {TimeChartGridRenderer} from "./time.chart.grid.renderer";
 import {TimeChartSelectionRenderer} from "./time.chart.selection.renderer";
@@ -12,10 +11,10 @@ import {DATE_CHART_CONFIG} from "./date.chart.config";
 
 /**
  *
- * @class TimeChart
+ * @class DateChart
  * @extends Chart
  */
-export class TimeChart extends Chart {
+export class DateChart extends Chart {
 
   // called by `Chart` superclass
   /**
@@ -33,20 +32,15 @@ export class TimeChart extends Chart {
    */
   initializeDefaultValues() {
 
-    let theConfig = this.config;
-    let margin;
+    let margin, config;
+
     margin = Object.assign({}, DATE_CHART_CONFIG.margin);
     margin = Object.assign(margin, this.config.margin);
 
-    let config = Object.assign({}, DATE_CHART_CONFIG);
+    config = Object.assign({}, DATE_CHART_CONFIG);
+
     this.config = Object.assign(config, this.config);
     this.config.margin = margin;
-
-    // this.labelColor = new Color(155, 155, 155).rgbString();
-
-    this.numberFormat = new Intl.NumberFormat('de-DE', {
-      maximumFractionDigits: 3
-    });
   }
 
   initializeRenderers() {
@@ -55,7 +49,7 @@ export class TimeChart extends Chart {
     this.labelRenderer = new TimeChartLabelRenderer(this);
     this.legendRenderer = new TimeChartLegendRenderer(this);
     this.barsRenderer = new TimeChartBarsRenderer(this);
-    this.ghostBarsRenderer = new TimeChartSelectionBarsRenderer(this);
+    this.ghostBarsRenderer = new TimeChartHoverBarsRenderer(this);
     this.selectionRenderer = new TimeChartSelectionRenderer(this);
     this.tooltipRenderer = new TimeChartTooltipRenderer(this);
   }
@@ -101,16 +95,22 @@ export class TimeChart extends Chart {
      */
     let dates = config.dateLabels || this.dataview.dates;
 
-    this.xChart = d3
+    this.xChartScale = d3
+      .scaleBand()
+      .domain(dates)
+      .rangeRound([margin.left, config.width - margin.right]);
+
+    this.xChartScalePadding = d3
       .scaleBand()
       .domain(dates)
       .rangeRound([margin.left, config.width - margin.right])
-      .paddingInner(0.1);
+      .paddingInner(0.2);
+
 
     this.xStack = d3
       .scaleBand()
       .domain(this.dataview.enabledStacks)
-      .rangeRound([0, this.xChart.bandwidth()])
+      .rangeRound([0, this.xChartScale.bandwidth()])
       .padding(0.05);
 
     this.yChart = d3
@@ -130,14 +130,9 @@ export class TimeChart extends Chart {
     this.axisRenderer.render();
     this.gridRenderer.createAxis();
     this.gridRenderer.renderGrid();
-    this.selectionRenderer.renderGhostBars();
+    this.selectionRenderer.render();
     this.ghostBarsRenderer.renderGhostBars();
-
-    if (this.config.combineStacks) {
-      this.legendRenderer.renderCombinedStacksLegend();
-    } else {
-      this.legendRenderer.renderNormalLegend();
-    }
+    this.legendRenderer.render();
 
     for (let index = 0; index < this.dataview.datasetStacksPresented.length; index++) {
       let stack = this.dataview.datasetStacksPresented[index];

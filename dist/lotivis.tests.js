@@ -258,6 +258,39 @@ function copy(object) {
   return JSON.parse(JSON.stringify(object));
 }
 
+const LotivisConfig = {
+  // The default margin to use for charts.
+  defaultMargin: 60,
+  // The default offset for the space between an object an the toolbar.
+  tooltipOffset: 7,
+  // The default radius to use for bars drawn on a chart.
+  barRadius: 5,
+  // A Boolean value indicating whether the debug logging is enabled.
+  debugLog: false,
+  // A Boolean value indicating whether the debug logging is enabled.
+  debug: true,
+  // A string which is used as prefix for download.
+  downloadFilePrefix: 'lotivis',
+  // A string which is used as separator between shared.components when creating a file name.
+  filenameSeparator: '_',
+  // A string which is used for unknown values.
+  unknown: 'LOTIVIS_UNKNOWN'
+};
+
+/**
+ * A collection of messages which already hast been printed.
+ * @type {*[]}
+ */
+let alreadyLogged = [];
+
+var lotivis_log_once = function (message) {
+  if (alreadyLogged.includes(message)) return;
+  alreadyLogged.push(message);
+  console.warn(`[lotivis]  Warning only once: ${message}`);
+};
+
+var lotivis_log = () => null;
+
 /**
  * Returns a flat version of the given dataset collection.
  *
@@ -284,7 +317,6 @@ function flatDatasets(datasets) {
 function flatDataset(dataset) {
   let flatData = [];
   if (!dataset.data) {
-    console.log('Lotivis: Flat samples for dataset without samples requested. Will return an empty array.');
     return flatData;
   }
   dataset.data.forEach(item => {
@@ -300,25 +332,6 @@ function flatDataset(dataset) {
   });
   return flatData;
 }
-
-const LotivisConfig = {
-  // The default margin to use for charts.
-  defaultMargin: 60,
-  // The default offset for the space between an object an the toolbar.
-  tooltipOffset: 7,
-  // The default radius to use for bars drawn on a chart.
-  barRadius: 5,
-  // A Boolean value indicating whether the debug logging is enabled.
-  debugLog: false,
-  // A Boolean value indicating whether the debug logging is enabled.
-  debug: true,
-  // A string which is used as prefix for download.
-  downloadFilePrefix: 'lotivis',
-  // A string which is used as separator between shared.components when creating a file name.
-  filenameSeparator: '_',
-  // A string which is used for unknown values.
-  unknown: 'LOTIVIS_UNKNOWN'
-};
 
 /**
  * Returns `true` if the given value not evaluates to false and is not 0. false else.
@@ -705,20 +718,6 @@ function dateToItemsRelation(datasets, dateAccess) {
     return datasetDate;
   });
 }
-
-/**
- * A collection of messages which already hast been printed.
- * @type {*[]}
- */
-let alreadyLogged = [];
-
-var lotivis_log_once = function (message) {
-  if (alreadyLogged.includes(message)) return;
-  alreadyLogged.push(message);
-  console.warn(`[lotivis]  Warning only once: ${message}`);
-};
-
-var lotivis_log = () => null;
 
 /**
  *
@@ -1152,8 +1151,20 @@ DatasetsController.prototype.setDatesFilter = function (dates) {
   lotivis_log('filter-dates:', this.filters.dates);
 };
 
+DatasetsController.prototype.toggleDate = function (date) {
+  const index = this.filters.dates.indexOf(date);
+  if (index !== -1) {
+    this.filters.dates.splice(index, 1);
+  } else {
+    this.filters.dates.push(date);
+  }
+  this.calculateSnapshot();
+  this.notifyListeners('filter-dates');
+};
+
 /**
  * Sets the datasets filter.  Notifies listeners.
+ *
  * @param datasets The datasets to filter.
  */
 DatasetsController.prototype.setDatasetsFilter = function (datasets) {
@@ -1172,6 +1183,7 @@ DatasetsController.prototype.setDatasetsFilter = function (datasets) {
  * @param notifyListeners A boolean value indicating whether to notify the listeners.  Default is `true`.
  */
 DatasetsController.prototype.toggleDataset = function (label, notifyListeners = true) {
+
   let index = this.filters.labels.indexOf(label);
   if (index !== -1) {
     this.filters.labels.splice(index, 1);
@@ -1180,6 +1192,7 @@ DatasetsController.prototype.toggleDataset = function (label, notifyListeners = 
   }
 
   if (!notifyListeners) return;
+  this.calculateSnapshot();
   this.notifyListeners('dataset-toggle');
 };
 

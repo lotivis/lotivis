@@ -65,6 +65,7 @@ export class MapDatasetRenderer {
      */
     this.mouseOut = function () {
       resetAreas();
+
     };
 
     /**

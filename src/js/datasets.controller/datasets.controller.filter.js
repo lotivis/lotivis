@@ -84,8 +84,20 @@ DatasetsController.prototype.setDatesFilter = function (dates) {
   lotivis_log('filter-dates:', this.filters.dates);
 };
 
+DatasetsController.prototype.toggleDate = function (date) {
+  const index = this.filters.dates.indexOf(date);
+  if (index !== -1) {
+    this.filters.dates.splice(index, 1);
+  } else {
+    this.filters.dates.push(date);
+  }
+  this.calculateSnapshot();
+  this.notifyListeners('filter-dates');
+};
+
 /**
  * Sets the datasets filter.  Notifies listeners.
+ *
  * @param datasets The datasets to filter.
  */
 DatasetsController.prototype.setDatasetsFilter = function (datasets) {
@@ -104,6 +116,7 @@ DatasetsController.prototype.setDatasetsFilter = function (datasets) {
  * @param notifyListeners A boolean value indicating whether to notify the listeners.  Default is `true`.
  */
 DatasetsController.prototype.toggleDataset = function (label, notifyListeners = true) {
+
   let index = this.filters.labels.indexOf(label);
   if (index !== -1) {
     this.filters.labels.splice(index, 1);
@@ -112,6 +125,7 @@ DatasetsController.prototype.toggleDataset = function (label, notifyListeners = 
   }
 
   if (!notifyListeners) return;
+  this.calculateSnapshot();
   this.notifyListeners('dataset-toggle');
 };
 

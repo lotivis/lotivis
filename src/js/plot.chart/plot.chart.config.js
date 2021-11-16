@@ -1,4 +1,3 @@
-import {PlotChartSort} from "./plot.chart.sort";
 import {LotivisConfig} from "../shared/config";
 
 /**
@@ -7,6 +6,17 @@ import {LotivisConfig} from "../shared/config";
 export const PlotChartType = {
   gradient: 'gradient',
   fraction: 'fraction'
+};
+
+/**
+ * Enumeration of sorts available in the date.chart.plot.chart chart.
+ */
+export const PlotChartSort = {
+  none: 'none',
+  alphabetically: 'alphabetically',
+  duration: 'duration',
+  intensity: 'intensity',
+  firstDate: 'firstDate'
 };
 
 /**
@@ -27,6 +37,7 @@ export const defaultPlotChartConfig = {
   showLabels: true,
   drawGrid: true,
   showTooltip: true,
+  sendsNotifications: true,
   lowColor: 'rgb(184, 233, 148)',
   highColor: 'rgb(0, 122, 255)',
   sort: PlotChartSort.none,

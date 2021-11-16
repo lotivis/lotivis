@@ -17,6 +17,7 @@ export class PlotGridRenderer {
      * Adds a grid to the chart.
      */
     this.render = function () {
+
       if (!plotChart.config.drawGrid) return;
 
       plotChart.svg

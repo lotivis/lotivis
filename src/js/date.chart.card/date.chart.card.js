@@ -1,5 +1,5 @@
 import {Card} from "../shared.components/card";
-import {TimeChart} from "../date.chart/time.chart";
+import {DateChart} from "../date.chart/date.chart";
 import {DateChartCardSettingsPopup} from "./date.chart.card.settings.popup";
 import {RadioGroup} from "../shared.components/radio.group";
 import {Option} from "../shared.components/option";
@@ -29,13 +29,13 @@ export class DateChartCard extends ChartCard {
   }
 
   /**
-   * Appends the `TimeChart` to this card.
+   * Appends the `DateChart` to this card.
    * @override
    */
   injectChart() {
     this.chartID = this.selector + '-chart';
     this.body.attr('id', this.chartID);
-    this.chart = new TimeChart(this.chartID, this.config);
+    this.chart = new DateChart(this.chartID, this.config);
     this.applyURLParameters();
   }
 

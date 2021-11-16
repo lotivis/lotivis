@@ -9,9 +9,14 @@
   color: red;
 }
 
-.lotivis-plot-selection-rect {
+.lotivis-plot-chart-hover-bar {
   border-radius: 10px;
   fill: $tint-color;
+}
+
+.lotivis-plot-chart-selection-rect {
+  border-radius: 10px;
+  fill: red;
 }
 
 .lotivis-plot-bar {

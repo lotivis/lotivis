@@ -38,9 +38,9 @@ export class TimeChartBarsRenderer {
         .attr('class', 'lotivis-time-chart-bar')
         .attr("rx", isCombineStacks ? 0 : barRadius)
         .attr("ry", isCombineStacks ? 0 : barRadius)
-        .attr("x", (d) => dateChart.xChart(d.data.date) + dateChart.xStack(stack.label))
+        .attr("x", (d) => dateChart.xChartScale(d.data.date) + dateChart.xStack(stack.label))
         .attr("y", (d) => dateChart.yChart(d[1]))
-        .attr("width", dateChart.xStack.bandwidth())
+        .attr("width", dateChart.xChartScalePadding.bandwidth())
         .attr("height", (d) => dateChart.yChart(d[0]) - dateChart.yChart(d[1]));
     };
   }

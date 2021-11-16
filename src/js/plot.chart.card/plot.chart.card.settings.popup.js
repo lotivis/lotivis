@@ -2,9 +2,8 @@ import {Checkbox} from "../shared.components/checkbox";
 import {UrlParameters} from "../shared/url.parameters";
 import {Dropdown} from "../shared.components/dropdown";
 import {Option} from "../shared.components/option";
-import {PlotChartSort} from "../plot.chart/plot.chart.sort";
 import {SettingsPopup} from "../shared.components/settings.popup";
-import {PlotChartType} from "../plot.chart/plot.chart.config";
+import {PlotChartSort, PlotChartType} from "../plot.chart/plot.chart.config";
 
 /**
  *

@@ -16,7 +16,7 @@ export class TimeChartGridRenderer {
     this.createAxis = function () {
 
       this.xAxisGrid = d3
-        .axisBottom(dateChart.xChart)
+        .axisBottom(dateChart.xChartScale)
         .tickSize(-dateChart.graphHeight)
         .tickFormat('');
 
