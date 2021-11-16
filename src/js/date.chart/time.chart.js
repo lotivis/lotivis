@@ -1,36 +1,14 @@
 import {Color} from "../shared/color";
+import {Chart} from "../chart/chart";
 import {DateChartAxisRenderer} from "./date.chart.axis.renderer";
 import {TimeChartLabelRenderer} from "./time.chart.label.renderer";
 import {TimeChartLegendRenderer} from "./time.chart.legend.renderer";
 import {TimeChartBarsRenderer} from "./time.chart.bars.renderer";
 import {TimeChartSelectionBarsRenderer} from "./time.chart.selection.bars.renderer";
 import {TimeChartTooltipRenderer} from "./time.chart.tooltip.renderer";
-import {Chart} from "../chart/chart";
 import {TimeChartGridRenderer} from "./time.chart.grid.renderer";
-import {LotivisConfig} from "../shared/config";
-import {lotivis_log} from "../shared/debug";
 import {TimeChartSelectionRenderer} from "./time.chart.selection.renderer";
-
-const defaultConfig = {
-  width: 1000,
-  height: 600,
-  margin: {
-    top: LotivisConfig.defaultMargin,
-    right: LotivisConfig.defaultMargin,
-    bottom: LotivisConfig.defaultMargin,
-    left: LotivisConfig.defaultMargin
-  },
-  showLabels: false,
-  combineStacks: false,
-  sendsNotifications: true,
-  labelColor: new Color(155, 155, 155),
-  numberFormat: Intl.NumberFormat('de-DE', {
-    maximumFractionDigits: 3
-  }),
-  dateAccess: function (date) {
-    return Date.parse(date);
-  }
-};
+import {DATE_CHART_CONFIG} from "./date.chart.config";
 
 /**
  *
@@ -50,21 +28,21 @@ export class TimeChart extends Chart {
     this.initializeRenderers();
   }
 
+  /**
+   *
+   */
   initializeDefaultValues() {
 
     let theConfig = this.config;
     let margin;
-    margin = Object.assign({}, defaultConfig.margin);
+    margin = Object.assign({}, DATE_CHART_CONFIG.margin);
     margin = Object.assign(margin, this.config.margin);
 
-    let config = Object.assign({}, defaultConfig);
+    let config = Object.assign({}, DATE_CHART_CONFIG);
     this.config = Object.assign(config, this.config);
     this.config.margin = margin;
 
-    this.datasets = [];
-
-    this.labelColor = new Color(155, 155, 155).rgbString();
-    this.type = 'bar';
+    // this.labelColor = new Color(155, 155, 155).rgbString();
 
     this.numberFormat = new Intl.NumberFormat('de-DE', {
       maximumFractionDigits: 3
@@ -78,7 +56,7 @@ export class TimeChart extends Chart {
     this.legendRenderer = new TimeChartLegendRenderer(this);
     this.barsRenderer = new TimeChartBarsRenderer(this);
     this.ghostBarsRenderer = new TimeChartSelectionBarsRenderer(this);
-    this.selectionRenderer = new TimeChartSelectionRenderer(this)
+    this.selectionRenderer = new TimeChartSelectionRenderer(this);
     this.tooltipRenderer = new TimeChartTooltipRenderer(this);
   }
 
@@ -113,9 +91,10 @@ export class TimeChart extends Chart {
    * Creates scales which are used to calculate the x and y positions of bars or circles.
    */
   createScales() {
+    if (!this.dataview) return;
+
     let config = this.config;
     let margin = config.margin;
-    if (!this.dataview) return;
 
     /*
      * Prefer dates specified by configuration. Fallback to dates of datasets.

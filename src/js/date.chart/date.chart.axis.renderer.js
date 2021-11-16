@@ -5,6 +5,7 @@ export class DateChartAxisRenderer {
 
   /**
    * Creates a new instance of DateChartAxisRenderer.
+   *
    * @param dateChart The parental date.chart chart.
    */
   constructor(dateChart) {
@@ -16,13 +17,13 @@ export class DateChartAxisRenderer {
       let height = dateChart.config.height;
       let margin = dateChart.config.margin;
 
-      // left
+      // left axis
       dateChart.svg
         .append("g")
         .call(d3.axisLeft(dateChart.yChart))
         .attr("transform", () => `translate(${margin.left},0)`);
 
-      // bottom
+      // bottom axis
       dateChart.svg
         .append("g")
         .call(d3.axisBottom(dateChart.xChart))

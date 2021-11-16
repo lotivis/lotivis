@@ -19,8 +19,8 @@ export class TimeChartLabelRenderer {
       let xChartRef = dateChart.xChart;
       let yChartRef = dateChart.yChart;
       let xStackRef = dateChart.xStack;
-      let numberFormat = dateChart.numberFormat;
-      let labelColor = dateChart.labelColor;
+      let numberFormat = dateChart.config.numberFormat;
+      let labelColor = dateChart.config.labelColor;
       let numberOfSeries = stack.length;
       let seriesIndex = 0;
       let bandwidth = xStackRef.bandwidth() / 2;

@@ -65,7 +65,7 @@ export class Chart extends Component {
    * @returns {LotivisUnimplementedMethodError}
    */
   precalculate() {
-    return new LotivisUnimplementedMethodError(`precalculate()`);
+    throw new LotivisUnimplementedMethodError(`precalculate()`);
   }
 
   /**
@@ -73,7 +73,7 @@ export class Chart extends Component {
    * @returns {LotivisUnimplementedMethodError}
    */
   remove() {
-    return new LotivisUnimplementedMethodError(`remove()`);
+    throw new LotivisUnimplementedMethodError(`remove()`);
   }
 
   /**
@@ -81,7 +81,7 @@ export class Chart extends Component {
    * @returns {LotivisUnimplementedMethodError}
    */
   draw() {
-    return new LotivisUnimplementedMethodError(`draw()`);
+    throw new LotivisUnimplementedMethodError(`draw()`);
   }
 
   /**

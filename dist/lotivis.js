@@ -1,5 +1,5 @@
 /*!
- * lotivis.js v1.0.90
+ * lotivis.js v1.0.91
  * https://github.com/lukasdanckwerth/lotivis#readme
  * (c) 2021 lotivis.js Lukas Danckwerth
  * Released under the MIT License
@@ -704,7 +704,7 @@ class Chart extends Component {
    * @returns {LotivisUnimplementedMethodError}
    */
   precalculate() {
-    return new LotivisUnimplementedMethodError(`precalculate()`);
+    throw new LotivisUnimplementedMethodError(`precalculate()`);
   }
 
   /**
@@ -712,7 +712,7 @@ class Chart extends Component {
    * @returns {LotivisUnimplementedMethodError}
    */
   remove() {
-    return new LotivisUnimplementedMethodError(`remove()`);
+    throw new LotivisUnimplementedMethodError(`remove()`);
   }
 
   /**
@@ -720,7 +720,7 @@ class Chart extends Component {
    * @returns {LotivisUnimplementedMethodError}
    */
   draw() {
-    return new LotivisUnimplementedMethodError(`draw()`);
+    throw new LotivisUnimplementedMethodError(`draw()`);
   }
 
   /**
@@ -2976,6 +2976,7 @@ class DateChartAxisRenderer {
 
   /**
    * Creates a new instance of DateChartAxisRenderer.
+   *
    * @param dateChart The parental date.chart chart.
    */
   constructor(dateChart) {
@@ -2987,13 +2988,13 @@ class DateChartAxisRenderer {
       let height = dateChart.config.height;
       let margin = dateChart.config.margin;
 
-      // left
+      // left axis
       dateChart.svg
         .append("g")
         .call(d3.axisLeft(dateChart.yChart))
         .attr("transform", () => `translate(${margin.left},0)`);
 
-      // bottom
+      // bottom axis
       dateChart.svg
         .append("g")
         .call(d3.axisBottom(dateChart.xChart))
@@ -3024,8 +3025,8 @@ class TimeChartLabelRenderer {
       let xChartRef = dateChart.xChart;
       let yChartRef = dateChart.yChart;
       let xStackRef = dateChart.xStack;
-      let numberFormat = dateChart.numberFormat;
-      let labelColor = dateChart.labelColor;
+      let numberFormat = dateChart.config.numberFormat;
+      let labelColor = dateChart.config.labelColor;
       let numberOfSeries = stack.length;
       let seriesIndex = 0;
       let bandwidth = xStackRef.bandwidth() / 2;
@@ -3287,6 +3288,7 @@ class TimeChartSelectionBarsRenderer {
     }
 
     this.renderGhostBars = function () {
+      let config = dateChart.config;
       let margin = dateChart.config.margin;
       let dates = dateChart.config.dateLabels || dateChart.dataview.dates;
 
@@ -3300,8 +3302,8 @@ class TimeChartSelectionBarsRenderer {
         .attr("class", 'lotivis-selection-rect')
         .attr("id", date => createID(date))
         .attr("opacity", 0)
-        .attr("rx", LotivisConfig.barRadius)
-        .attr("ry", LotivisConfig.barRadius)
+        .attr("rx", config.barRadius || LotivisConfig.barRadius)
+        .attr("ry", config.barRadius || LotivisConfig.barRadius)
         .attr("x", (date) => dateChart.xChart(date))
         .attr("y", margin.top)
         .attr("width", dateChart.xChart.bandwidth())
@@ -3413,17 +3415,19 @@ class TimeChartTooltipRenderer {
         title = `${date}`;
       }
 
+      let sum = 0;
       let dataHTML = combineByDate(flatData)
         .filter(item => item.value > 0)
         .map(function (item) {
           let color = dateChart.datasetController.getColorForDataset(item.dataset);
           let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
           let valueFormatted = dateChart.config.numberFormat.format(item.value);
+          sum += item.value;
           return `${divHTML} ${item.dataset}: <b>${valueFormatted}</b>`;
         })
         .join('<br>');
 
-      return `<b>${title}</b><br>${dataHTML}`;
+      return `<b>${title}</b><br>${dataHTML}<br><br>Sum: <b>${sum}</b>`;
     }
 
     /**
@@ -3615,7 +3619,7 @@ class TimeChartSelectionRenderer {
   }
 }
 
-const defaultConfig = {
+const DATE_CHART_CONFIG = {
   width: 1000,
   height: 600,
   margin: {
@@ -3654,21 +3658,21 @@ class TimeChart extends Chart {
     this.initializeRenderers();
   }
 
+  /**
+   *
+   */
   initializeDefaultValues() {
 
     this.config;
     let margin;
-    margin = Object.assign({}, defaultConfig.margin);
+    margin = Object.assign({}, DATE_CHART_CONFIG.margin);
     margin = Object.assign(margin, this.config.margin);
 
-    let config = Object.assign({}, defaultConfig);
+    let config = Object.assign({}, DATE_CHART_CONFIG);
     this.config = Object.assign(config, this.config);
     this.config.margin = margin;
 
-    this.datasets = [];
-
-    this.labelColor = new Color$1(155, 155, 155).rgbString();
-    this.type = 'bar';
+    // this.labelColor = new Color(155, 155, 155).rgbString();
 
     this.numberFormat = new Intl.NumberFormat('de-DE', {
       maximumFractionDigits: 3
@@ -3717,9 +3721,10 @@ class TimeChart extends Chart {
    * Creates scales which are used to calculate the x and y positions of bars or circles.
    */
   createScales() {
+    if (!this.dataview) return;
+
     let config = this.config;
     let margin = config.margin;
-    if (!this.dataview) return;
 
     /*
      * Prefer dates specified by configuration. Fallback to dates of datasets.

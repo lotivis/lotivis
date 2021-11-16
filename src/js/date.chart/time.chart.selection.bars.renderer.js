@@ -58,6 +58,7 @@ export class TimeChartSelectionBarsRenderer {
     }
 
     this.renderGhostBars = function () {
+      let config = dateChart.config;
       let margin = dateChart.config.margin;
       let dates = dateChart.config.dateLabels || dateChart.dataview.dates;
 
@@ -71,8 +72,8 @@ export class TimeChartSelectionBarsRenderer {
         .attr("class", 'lotivis-selection-rect')
         .attr("id", date => createID(date))
         .attr("opacity", 0)
-        .attr("rx", LotivisConfig.barRadius)
-        .attr("ry", LotivisConfig.barRadius)
+        .attr("rx", config.barRadius || LotivisConfig.barRadius)
+        .attr("ry", config.barRadius || LotivisConfig.barRadius)
         .attr("x", (date) => dateChart.xChart(date))
         .attr("y", margin.top)
         .attr("width", dateChart.xChart.bandwidth())

@@ -100,17 +100,19 @@ export class TimeChartTooltipRenderer {
         title = `${date}`;
       }
 
+      let sum = 0;
       let dataHTML = combineByDate(flatData)
         .filter(item => item.value > 0)
         .map(function (item) {
           let color = dateChart.datasetController.getColorForDataset(item.dataset);
           let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
           let valueFormatted = dateChart.config.numberFormat.format(item.value);
+          sum += item.value;
           return `${divHTML} ${item.dataset}: <b>${valueFormatted}</b>`;
         })
         .join('<br>');
 
-      return `<b>${title}</b><br>${dataHTML}`;
+      return `<b>${title}</b><br>${dataHTML}<br><br>Sum: <b>${sum}</b>`;
     }
 
     /**
