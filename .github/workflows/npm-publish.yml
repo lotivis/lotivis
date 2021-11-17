@@ -34,7 +34,7 @@ jobs:
         with:
           url: http://purge.jsdelivr.net/
           method: 'POST'
-          accept: 200
+          accept: 202
           timeout: 30000
           headers: '{ "cache-control": "no-cache", "content-type": "application/json" }'
           body: |

@@ -181,7 +181,7 @@ exports.DateWeekAssessor = DateWeekAssessor;
 
 // url parameters
 exports.URLParameters = UrlParameters;
-exports.version = '1.0.90';
+exports.version = '1.0.93';
 exports.versionShort = '1';
 
 export default exports;
