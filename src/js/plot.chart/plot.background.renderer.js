@@ -12,9 +12,12 @@ export class PlotBackgroundRenderer {
     this.render = function () {
       plotChart.svg
         .append('rect')
-        .attr('width', plotChart.width)
+        .attr('width', plotChart.width || plotChart.config.width)
         .attr('height', plotChart.height)
-        .attr('class', `lotivis-plot-background`);
+        .attr('class', `lotivis-plot-chart-background`)
+        .on('click', (event, some) => {
+          plotChart.datasetController.resetLabelFilters();
+        });
     };
   }
 }

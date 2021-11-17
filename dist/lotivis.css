@@ -108,6 +108,7 @@ button.lotivis-button-round:active {
   box-shadow: rgba(0, 0, 0, 0.05) 0 0 30px 0;
   color: #464845;
   margin: 0 0 20px 0;
+  overflow: hidden;
 }
 
 .lotivis-card-header {
@@ -446,6 +447,12 @@ input[type=checkbox] {
   cursor: pointer;
 }
 
+.lotivis-map-chart-area-hover {
+  stroke: dodgerblue;
+  stroke-width: 4;
+  stroke-dasharray: 0 !important;
+}
+
 .lotivis-map-chart-exterior-borders {
   fill: white;
   fill-opacity: 1;
@@ -466,8 +473,8 @@ input[type=checkbox] {
   pointer-events: none;
   fill: transparent;
   fill-opacity: 0;
-  stroke: red;
-  stroke-width: 2px;
+  stroke: dodgerblue;
+  stroke-width: 3px;
   stroke-dasharray: 0;
   pointer-events: none;
 }
@@ -477,10 +484,9 @@ input[type=checkbox] {
   stroke-width: 1;
 }
 
-.lotivis-plot-background {
-  fill: red;
-  background: red;
-  color: red;
+.lotivis-plot-chart-background {
+  fill: transparent;
+  cursor: pointer;
 }
 
 .lotivis-plot-chart-hover-bar {

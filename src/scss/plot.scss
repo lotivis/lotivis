@@ -3,10 +3,9 @@
   // empty
 }
 
-.lotivis-plot-background {
-  fill: red; // rgba(255,255,100, 0);
-  background: red;
-  color: red;
+.lotivis-plot-chart-background {
+  fill: transparent;
+  cursor: pointer;
 }
 
 .lotivis-plot-chart-hover-bar {

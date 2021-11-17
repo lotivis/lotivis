@@ -34,8 +34,8 @@ DatasetsController.prototype.calculateAdditionalData = function () {
   this.datasets = copy(this.datasets)
     .sort((left, right) => left.label > right.label);
 
-  this.datasets.forEach(function (dataset) {
-    dataset.data.forEach(function (item) {
+  this.datasets.forEach((dataset) => {
+    dataset.data.forEach((item) => {
       item.dateNumeric = dateAccess(item.date);
     });
     dataset.data = dataset.data

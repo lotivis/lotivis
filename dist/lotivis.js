@@ -237,6 +237,7 @@ exports.LotivisUnimplementedMethodError = LotivisUnimplementedMethodError;
 
 /**
  * A lotivis component.
+ *
  * @class Component
  */
 class Component {
@@ -694,6 +695,11 @@ class Chart extends Component {
   update(datasetsController, reason) {
     lotivis_log('[lotivis] ', this.constructor.name, 'update', reason);
     if (!this.updateSensible) return;
+    if (datasetsController) {
+      this.snapshot = datasetsController.snapshot;
+    }
+    lotivis_log('[lotivis] ', this.constructor.name, 'update', datasetsController);
+    lotivis_log('[lotivis] ', this.constructor.name, 'update', this.snapshot);
     this.remove();
     this.precalculate();
     this.draw();
@@ -3234,8 +3240,9 @@ class TimeChartBarsRenderer {
         .attr("ry", isCombineStacks ? 0 : barRadius)
         .attr("x", (d) => dateChart.xChartScale(d.data.date) + dateChart.xStack(stack.label))
         .attr("y", (d) => dateChart.yChart(d[1]))
-        .attr("width", dateChart.xChartScalePadding.bandwidth())
+        .attr("width", dateChart.xStack.bandwidth())
         .attr("height", (d) => dateChart.yChart(d[0]) - dateChart.yChart(d[1]));
+
     };
   }
 }
@@ -3407,7 +3414,6 @@ class TimeChartTooltipRenderer {
      */
     function getHTMLForDate(date) {
       let flatData = dateChart
-        .datasetController
         .snapshot
         .flatData
         .filter(item => `${item.date}` === `${date}`);
@@ -3432,7 +3438,8 @@ class TimeChartTooltipRenderer {
         })
         .join('<br>');
 
-      return `<b>${title}</b><br>${dataHTML}<br><br>Sum: <b>${sum}</b>`;
+      let sumFormatted = dateChart.config.numberFormat.format(sum);
+      return `<b>${title}</b><br>${dataHTML}<br><br>Sum: <b>${sumFormatted}</b>`;
     }
 
     /**
@@ -3595,7 +3602,7 @@ class TimeChartSelectionRenderer {
       dateChart
         .svg
         .selectAll(`.lotivis-date-chart-selection-rect`)
-        .attr(`opacity`, date => selectedDates.includes(date) ? 0.15 : 0);
+        .attr(`opacity`, date => selectedDates.includes(String(date)) ? 0.15 : 0);
     };
   }
 }
@@ -3734,11 +3741,15 @@ class DateChart extends Chart {
 
   /**
    * Creates and renders the chart.
+   *
    * @override
    */
   draw() {
     this.renderSVG();
-    if (!this.dataview || !this.dataview.datasetStacks || this.dataview.datasetStacks.length === 0) return;
+    if (!this.dataview
+      || !this.dataview.datasetStacks
+      || this.dataview.datasetStacks.length === 0) return;
+
     this.axisRenderer.render();
     this.gridRenderer.createAxis();
     this.gridRenderer.renderGrid();
@@ -3770,7 +3781,11 @@ class DateChart extends Chart {
       .attr('width', this.config.width)
       .attr('height', this.config.height)
       .attr('fill', 'white')
-      .attr('opacity', 0);
+      .attr('opacity', 0)
+      .attr('cursor', 'pointer')
+      .on('click', (event, some) => {
+        this.datasetController.resetDateFilters();
+      });
 
     this.graph = this.svg
       .append('g')
@@ -4493,7 +4508,7 @@ class MapLegendRenderer {
         legend
           .append("g")
           .selectAll("text")
-          .data(['Keine Daten'])
+          .data(['No Data'])
           .enter()
           .append("text")
           .attr('class', 'lotivis-location-chart-legend-text')
@@ -4569,7 +4584,7 @@ class MapLegendRenderer {
           .attr('y', (d, i) => (i * 20) + 84)
           .text(function (d, i) {
             if (d === 0) {
-              return '> 0'
+              return '> 0';
             } else {
               return formatNumber(((i / steps) * max));
             }
@@ -4648,21 +4663,20 @@ class MapDatasetRenderer {
   constructor(mapChart) {
 
     let generator = Color$1.mapColors(1);
-    let style = styleForCSSClass('.lotivis-map.chart-area');
+    let styleArea = styleForCSSClass('lotivis-map-chart-area');
+    styleForCSSClass('lotivis-map-chart-area-hover');
 
     /**
      * Resets the `fill` and `fill-opacity` property of each area.
      */
     function resetAreas() {
       mapChart.svg
-        .selectAll('.lotivis-location-chart-area')
-        .style('stroke', style.stroke || 'black')
-        .style('stroke-width', style['stroke-width'] || '1')
-        .style('stroke-dasharray', '1,4');
+        .selectAll('.lotivis-map-chart-area')
+        .classed('lotivis-map-chart-area-hover', false);
     }
 
     function featureMapID(feature) {
-      return `lotivis-location-chart-area-${feature.lotivisId}`;
+      return `lotivis-map-chart-area-id-${feature.lotivisId}`;
     }
 
     /**
@@ -4675,16 +4689,17 @@ class MapDatasetRenderer {
     this.mouseEnter = function (event, feature) {
       resetAreas();
 
-      let color = Color$1.defaultTint.rgbString();
+      styleArea.stroke || Color$1.defaultTint.rgbString();
       let mapID = featureMapID(feature);
 
       mapChart
         .svg
         .selectAll(`#${mapID}`)
         .raise()
-        .style('stroke', () => color)
-        .style('stroke-width', '2')
-        .style('stroke-dasharray', '0');
+        .classed('lotivis-map-chart-area-hover', true);
+        // .style('stroke', styleHover.stroke || color)
+        // .style('stroke-width', styleHover['stroke-width'] || '4')
+        // .style('stroke-dasharray', '0');
 
       mapChart
         .svg
@@ -4697,7 +4712,6 @@ class MapDatasetRenderer {
      */
     this.mouseOut = function () {
       resetAreas();
-
     };
 
     /**
@@ -4724,7 +4738,7 @@ class MapDatasetRenderer {
           let opacity = Number(datasetEntry.value / max);
 
           mapChart.svg
-            .selectAll('.lotivis-location-chart-area')
+            .selectAll('.lotivis-map-chart-area')
             .filter((item) => equals(mapChart.config.featureIDAccessor(item), locationID))
             .style('fill', function () {
               if (opacity === 0) {
@@ -4805,8 +4819,8 @@ class MapGeoJSONRenderer {
         .enter()
         .append('path')
         .attr('d', mapChart.path)
-        .attr('id', feature => `lotivis-location-chart-area-${feature.lotivisId}`)
-        .classed('lotivis-location-chart-area', true)
+        .attr('id', feature => `lotivis-map-chart-area-id-${feature.lotivisId}`)
+        .classed('lotivis-map-chart-area', true)
         .style('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4')
         .style('fill', 'white')
         .style('fill-opacity', 1)
@@ -5878,9 +5892,12 @@ class PlotBackgroundRenderer {
     this.render = function () {
       plotChart.svg
         .append('rect')
-        .attr('width', plotChart.width)
+        .attr('width', plotChart.width || plotChart.config.width)
         .attr('height', plotChart.height)
-        .attr('class', `lotivis-plot-background`);
+        .attr('class', `lotivis-plot-chart-background`)
+        .on('click', (event, some) => {
+          plotChart.datasetController.resetLabelFilters();
+        });
     };
   }
 }
@@ -6691,7 +6708,7 @@ DatasetsController.prototype.resetLabelFilters = function (notifyListeners = tru
   this.filters.labels = [];
   this.calculateSnapshot();
   if (!notifyListeners) return;
-  this.notifyListeners('reset-dates-filters');
+  this.notifyListeners('reset-label-filters');
 };
 
 /**
@@ -6734,11 +6751,12 @@ DatasetsController.prototype.setDatesFilter = function (dates) {
 };
 
 DatasetsController.prototype.toggleDate = function (date) {
-  const index = this.filters.dates.indexOf(date);
+  const stringVersion = String(date);
+  const index = this.filters.dates.indexOf(stringVersion);
   if (index !== -1) {
     this.filters.dates.splice(index, 1);
   } else {
-    this.filters.dates.push(date);
+    this.filters.dates.push(stringVersion);
   }
   this.calculateSnapshot();
   this.notifyListeners('filter-dates');
@@ -6883,8 +6901,8 @@ DatasetsController.prototype.calculateAdditionalData = function () {
   this.datasets = copy(this.datasets)
     .sort((left, right) => left.label > right.label);
 
-  this.datasets.forEach(function (dataset) {
-    dataset.data.forEach(function (item) {
+  this.datasets.forEach((dataset) => {
+    dataset.data.forEach((item) => {
       item.dateNumeric = dateAccess(item.date);
     });
     dataset.data = dataset.data

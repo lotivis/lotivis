@@ -122,11 +122,15 @@ export class DateChart extends Chart {
 
   /**
    * Creates and renders the chart.
+   *
    * @override
    */
   draw() {
     this.renderSVG();
-    if (!this.dataview || !this.dataview.datasetStacks || this.dataview.datasetStacks.length === 0) return;
+    if (!this.dataview
+      || !this.dataview.datasetStacks
+      || this.dataview.datasetStacks.length === 0) return;
+
     this.axisRenderer.render();
     this.gridRenderer.createAxis();
     this.gridRenderer.renderGrid();
@@ -158,7 +162,11 @@ export class DateChart extends Chart {
       .attr('width', this.config.width)
       .attr('height', this.config.height)
       .attr('fill', 'white')
-      .attr('opacity', 0);
+      .attr('opacity', 0)
+      .attr('cursor', 'pointer')
+      .on('click', (event, some) => {
+        this.datasetController.resetDateFilters();
+      });
 
     this.graph = this.svg
       .append('g')

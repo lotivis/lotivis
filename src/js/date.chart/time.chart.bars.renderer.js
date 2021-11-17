@@ -40,8 +40,9 @@ export class TimeChartBarsRenderer {
         .attr("ry", isCombineStacks ? 0 : barRadius)
         .attr("x", (d) => dateChart.xChartScale(d.data.date) + dateChart.xStack(stack.label))
         .attr("y", (d) => dateChart.yChart(d[1]))
-        .attr("width", dateChart.xChartScalePadding.bandwidth())
+        .attr("width", dateChart.xStack.bandwidth())
         .attr("height", (d) => dateChart.yChart(d[0]) - dateChart.yChart(d[1]));
+
     };
   }
 }

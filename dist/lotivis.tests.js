@@ -1109,7 +1109,7 @@ DatasetsController.prototype.resetLabelFilters = function (notifyListeners = tru
   this.filters.labels = [];
   this.calculateSnapshot();
   if (!notifyListeners) return;
-  this.notifyListeners('reset-dates-filters');
+  this.notifyListeners('reset-label-filters');
 };
 
 /**
@@ -1152,11 +1152,12 @@ DatasetsController.prototype.setDatesFilter = function (dates) {
 };
 
 DatasetsController.prototype.toggleDate = function (date) {
-  const index = this.filters.dates.indexOf(date);
+  const stringVersion = String(date);
+  const index = this.filters.dates.indexOf(stringVersion);
   if (index !== -1) {
     this.filters.dates.splice(index, 1);
   } else {
-    this.filters.dates.push(date);
+    this.filters.dates.push(stringVersion);
   }
   this.calculateSnapshot();
   this.notifyListeners('filter-dates');
@@ -1354,8 +1355,8 @@ DatasetsController.prototype.calculateAdditionalData = function () {
   this.datasets = copy(this.datasets)
     .sort((left, right) => left.label > right.label);
 
-  this.datasets.forEach(function (dataset) {
-    dataset.data.forEach(function (item) {
+  this.datasets.forEach((dataset) => {
+    dataset.data.forEach((item) => {
       item.dateNumeric = dateAccess(item.date);
     });
     dataset.data = dataset.data

@@ -42,9 +42,16 @@
   // print debug messages
   lotivis.debug(true);
 
-  const mapChartCard = new lotivis.MapChartCard('map-chart-card');
+  const mapChartCard = new lotivis.MapChartCard('map-chart-card', {
+    excludedFeatureCodes: ['2A', '2B'],
+    featureIDAccessor: (feature) => {
+      return feature.properties.code
+    },
+    featureNameAccessor: (feature) => {
+      return feature.properties.nom
+    }
+  });
   const chart = mapChartCard.chart;
-  chart.config.excludedFeatureCodes = ['2A', '2B'];
 
   mapChartCard.onSelectedDatasetChanged = function (value) {
     let dataset = mapChartCard.datasets.find(dataset => dataset.stack === value);

@@ -16,21 +16,20 @@ export class MapDatasetRenderer {
   constructor(mapChart) {
 
     let generator = Color.mapColors(1);
-    let style = styleForCSSClass('.lotivis-map.chart-area');
+    let styleArea = styleForCSSClass('lotivis-map-chart-area');
+    let styleHover = styleForCSSClass('lotivis-map-chart-area-hover');
 
     /**
      * Resets the `fill` and `fill-opacity` property of each area.
      */
     function resetAreas() {
       mapChart.svg
-        .selectAll('.lotivis-location-chart-area')
-        .style('stroke', style.stroke || 'black')
-        .style('stroke-width', style['stroke-width'] || '1')
-        .style('stroke-dasharray', '1,4');
+        .selectAll('.lotivis-map-chart-area')
+        .classed('lotivis-map-chart-area-hover', false);
     }
 
     function featureMapID(feature) {
-      return `lotivis-location-chart-area-${feature.lotivisId}`;
+      return `lotivis-map-chart-area-id-${feature.lotivisId}`;
     }
 
     /**
@@ -43,16 +42,17 @@ export class MapDatasetRenderer {
     this.mouseEnter = function (event, feature) {
       resetAreas();
 
-      let color = Color.defaultTint.rgbString();
+      let color = styleArea.stroke || Color.defaultTint.rgbString();
       let mapID = featureMapID(feature);
 
       mapChart
         .svg
         .selectAll(`#${mapID}`)
         .raise()
-        .style('stroke', () => color)
-        .style('stroke-width', '2')
-        .style('stroke-dasharray', '0');
+        .classed('lotivis-map-chart-area-hover', true);
+        // .style('stroke', styleHover.stroke || color)
+        // .style('stroke-width', styleHover['stroke-width'] || '4')
+        // .style('stroke-dasharray', '0');
 
       mapChart
         .svg
@@ -65,7 +65,6 @@ export class MapDatasetRenderer {
      */
     this.mouseOut = function () {
       resetAreas();
-
     };
 
     /**
@@ -92,7 +91,7 @@ export class MapDatasetRenderer {
           let opacity = Number(datasetEntry.value / max);
 
           mapChart.svg
-            .selectAll('.lotivis-location-chart-area')
+            .selectAll('.lotivis-map-chart-area')
             .filter((item) => equals(mapChart.config.featureIDAccessor(item), locationID))
             .style('fill', function () {
               if (opacity === 0) {

@@ -68,7 +68,16 @@
 
   //
   let dateChartCard = new lotivis.DateChartCard('date-chart-card');
-  let mapChartCard = new lotivis.MapChartCard('map-chart-card');
+  let mapChartCard = new lotivis.MapChartCard('map-chart-card', {
+    title: 'Map Chart',
+    excludedFeatureCodes: ['2A', '2B'],
+    featureIDAccessor: (feature) => {
+      return feature.properties.code
+    },
+    featureNameAccessor: (feature) => {
+      return feature.properties.nom
+    }
+  });
   let plotChartCard = new lotivis.PlotChartCard('plot-chart-card');
   let loadingCard = d3.select('#loading');
 

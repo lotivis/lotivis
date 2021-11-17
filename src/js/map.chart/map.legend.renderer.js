@@ -63,7 +63,7 @@ export class MapLegendRenderer {
         legend
           .append("g")
           .selectAll("text")
-          .data(['Keine Daten'])
+          .data(['No Data'])
           .enter()
           .append("text")
           .attr('class', 'lotivis-location-chart-legend-text')
@@ -139,7 +139,7 @@ export class MapLegendRenderer {
           .attr('y', (d, i) => (i * 20) + 84)
           .text(function (d, i) {
             if (d === 0) {
-              return '> 0'
+              return '> 0';
             } else {
               return formatNumber(((i / steps) * max));
             }

@@ -56,7 +56,7 @@ export class TimeChartSelectionRenderer {
       dateChart
         .svg
         .selectAll(`.lotivis-date-chart-selection-rect`)
-        .attr(`opacity`, date => selectedDates.includes(date) ? 0.15 : 0);
+        .attr(`opacity`, date => selectedDates.includes(String(date)) ? 0.15 : 0);
     };
   }
 }

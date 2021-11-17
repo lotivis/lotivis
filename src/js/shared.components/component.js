@@ -3,6 +3,7 @@ import {LotivisError, LotivisElementNotFoundError} from "../data.juggle/data.val
 
 /**
  * A lotivis component.
+ *
  * @class Component
  */
 export class Component {

@@ -15,6 +15,12 @@
   cursor: pointer;
 }
 
+.lotivis-map-chart-area-hover {
+  stroke: $tint-color;
+  stroke-width: 4;
+  stroke-dasharray: 0 !important;
+}
+
 .lotivis-map-chart-exterior-borders {
   fill: white;
   fill-opacity: 1;
@@ -35,8 +41,8 @@
   pointer-events: none;
   fill: transparent;
   fill-opacity: 0;
-  stroke: red;
-  stroke-width: 2px;
+  stroke: $tint-color;
+  stroke-width: 3px;
   stroke-dasharray: 0;
   pointer-events: none;
 }

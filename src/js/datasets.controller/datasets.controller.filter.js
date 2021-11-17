@@ -42,7 +42,7 @@ DatasetsController.prototype.resetLabelFilters = function (notifyListeners = tru
   this.filters.labels = [];
   this.calculateSnapshot();
   if (!notifyListeners) return;
-  this.notifyListeners('reset-dates-filters');
+  this.notifyListeners('reset-label-filters');
 };
 
 /**
@@ -85,11 +85,12 @@ DatasetsController.prototype.setDatesFilter = function (dates) {
 };
 
 DatasetsController.prototype.toggleDate = function (date) {
-  const index = this.filters.dates.indexOf(date);
+  const stringVersion = String(date);
+  const index = this.filters.dates.indexOf(stringVersion);
   if (index !== -1) {
     this.filters.dates.splice(index, 1);
   } else {
-    this.filters.dates.push(date);
+    this.filters.dates.push(stringVersion);
   }
   this.calculateSnapshot();
   this.notifyListeners('filter-dates');

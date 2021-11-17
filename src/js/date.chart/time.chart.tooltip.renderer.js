@@ -88,7 +88,6 @@ export class TimeChartTooltipRenderer {
      */
     function getHTMLForDate(date) {
       let flatData = dateChart
-        .datasetController
         .snapshot
         .flatData
         .filter(item => `${item.date}` === `${date}`);
@@ -113,7 +112,8 @@ export class TimeChartTooltipRenderer {
         })
         .join('<br>');
 
-      return `<b>${title}</b><br>${dataHTML}<br><br>Sum: <b>${sum}</b>`;
+      let sumFormatted = dateChart.config.numberFormat.format(sum);
+      return `<b>${title}</b><br>${dataHTML}<br><br>Sum: <b>${sumFormatted}</b>`;
     }
 
     /**
