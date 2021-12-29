@@ -1,6 +1,5 @@
 import {combineByDate, combineByLocation, combineByStacks} from "../data.juggle/data.combine";
 import {sumOfDataset, sumOfLabel, sumOfStack} from "../data.juggle/data.sum";
-import {d3LibraryAccess} from "../shared/d3libaccess";
 import {DefaultDateAccess} from "../data.date.assessor/date.assessor";
 import {InvalidFormatError} from "../data.juggle/data.validate.error";
 import {DataViewCache} from "../dataview/data.view.cache";
@@ -65,8 +64,8 @@ export class DatasetsController {
   }
 
   getMax() {
-    return d3LibraryAccess.max(this.datasets, function (dataset) {
-      return d3LibraryAccess.max(dataset.data, function (item) {
+    return d3.max(this.datasets, function (dataset) {
+      return d3.max(dataset.data, function (item) {
         return item.value;
       });
     });

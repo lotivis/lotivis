@@ -9,7 +9,6 @@ import {
 import {combineByDate} from "../data.juggle/data.combine";
 import {sumOfValues} from "../data.juggle/data.sum";
 import {flatDataset} from "../data.juggle/data.flat";
-import {d3LibraryAccess} from "../shared/d3libaccess";
 import "../datasets.controller/datasets.controller.cache";
 
 /**
@@ -76,8 +75,8 @@ DatasetsController.prototype.getPlotDataview = function () {
   });
 
   dataview.labelsCount = dataview.datasets.length;
-  dataview.max = d3LibraryAccess.max(dataview.datasets, function (dataset) {
-    return d3LibraryAccess.max(dataset.data, function (item) {
+  dataview.max = d3.max(dataview.datasets, function (dataset) {
+    return d3.max(dataset.data, function (item) {
       return item.value;
     });
   });

@@ -1,4 +1,3 @@
-
 .lotivis-container {
   padding: 10px 50px 0 50px;
   margin: auto;
@@ -12,7 +11,8 @@
   font-size: $primary-font-size;
 }
 
-.lotivis-row, .lotivis-group {
+.lotivis-row,
+.lotivis-group {
   width: 100%;
   display: inline-flex;
   flex-wrap: wrap;

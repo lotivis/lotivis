@@ -1,5 +1,6 @@
 import {joinFeatures} from "../geojson/join.features";
 import {lotivis_log, lotivis_log_once} from "../shared/debug";
+import * as topojson from "topojson-client";
 
 /**
  *
@@ -13,13 +14,13 @@ export class MapExteriorBorderRenderer {
    */
   constructor(mapChart) {
 
-    if (!self.topojson) lotivis_log_once('Can\'t find topojson lib.  Skip rendering of exterior border.');
+    // if (!topojson) lotivis_log_once('Can\'t find topojson lib.  Skip rendering of exterior border.');
 
     /**
      * Renders the exterior border of the presented geo json.
      */
     this.render = function () {
-      if (!self.topojson) {
+      if (!topojson) {
         lotivis_log('[lotivis]  Can\'t find topojson library.');
         return;
       }

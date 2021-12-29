@@ -1,7 +1,9 @@
 /* eslint-env es6 */
 const resolve = require('@rollup/plugin-node-resolve').default;
+const execute = require('rollup-plugin-execute');
 const pkg = require('./package.json');
-const postcss = require('rollup-plugin-postcss');
+const babel = require('rollup-plugin-babel');
+const commonjs = require('rollup-plugin-commonjs');
 
 const banner = `/*!
  * lotivis.js v${pkg.version}
@@ -14,40 +16,40 @@ module.exports = [
   // UMD builds
   {
     input: 'src/index.js',
-    plugins: [ resolve() ],
+    plugins: [
+      babel({
+        exclude: 'node_modules/**'
+      }),
+      resolve({
+        jsnext: true
+      }),
+      commonjs(),
+      execute('sass src/index.scss > dist/lotivis.css'),
+      execute('sass --style compressed src/index.scss > dist/lotivis.min.css')
+    ],
     output: {
       sourcemap: true,
       name: 'lotivis',
-    file: 'dist/lotivis.js',
-      banner,
+      file: 'dist/lotivis.js', banner,
       format: 'umd',
-      esModule: false,
+      // esModule: false,
       exports: "named",
       indent: false,
-    },
-  },
-  {
-    input: 'src/index.scss',
-    plugins: [
-      postcss({
-        extract: true,
-        use: ['sass'],
-      }),
-    ],
-    output: {
-      name: 'lotivis',
-      file: 'dist/lotivis.css',
+      // globals: {
+      //   'd3': 'd3',
+      // }
     },
   },
   // Tests
   {
     input: 'src/index.tests.js',
-    plugins: [ resolve() ],
+    plugins: [
+      resolve()
+    ],
     output: {
       sourcemap: true,
       name: 'lotivis',
       file: 'dist/lotivis.tests.js',
-      banner,
       format: 'umd',
       esModule: false,
       exports: "named",

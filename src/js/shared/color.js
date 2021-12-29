@@ -1,5 +1,3 @@
-import {d3LibraryAccess} from "./d3libaccess";
-
 /**
  * Color defined by r,g,b.
  * @class Color
@@ -67,7 +65,7 @@ export class Color {
  */
 Color.colorsForStack = function (stackNumber, amount = 1) {
   let colorCouple = Color.stackColors[stackNumber % Color.stackColors.length];
-  let colorGenerator = d3LibraryAccess
+  let colorGenerator = d3
     .scaleLinear()
     .domain([0, amount])
     .range([colorCouple[0], colorCouple[1]]);

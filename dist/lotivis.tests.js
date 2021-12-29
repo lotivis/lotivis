@@ -1,21 +1,8 @@
-/*!
- * lotivis.js v1.0.91
- * https://github.com/lukasdanckwerth/lotivis#readme
- * (c) 2021 lotivis.js Lukas Danckwerth
- * Released under the MIT License
- */
 (function (global, factory) {
 typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
 typeof define === 'function' && define.amd ? define(['exports'], factory) :
 (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.lotivis = {}));
 })(this, (function (exports) { 'use strict';
-
-var d3LibraryAccess;
-try {
-  d3LibraryAccess = require('d3');
-} catch (e) {
-  d3LibraryAccess = d3;
-}
 
 /**
  * Color defined by r,g,b.
@@ -83,7 +70,7 @@ class Color {
  */
 Color.colorsForStack = function (stackNumber, amount = 1) {
   let colorCouple = Color.stackColors[stackNumber % Color.stackColors.length];
-  let colorGenerator = d3LibraryAccess
+  let colorGenerator = d3
     .scaleLinear()
     .domain([0, amount])
     .range([colorCouple[0], colorCouple[1]]);
@@ -956,8 +943,8 @@ class DatasetsController {
   }
 
   getMax() {
-    return d3LibraryAccess.max(this.datasets, function (dataset) {
-      return d3LibraryAccess.max(dataset.data, function (item) {
+    return d3.max(this.datasets, function (dataset) {
+      return d3.max(dataset.data, function (item) {
         return item.value;
       });
     });
@@ -1692,8 +1679,8 @@ DatasetsController.prototype.getPlotDataview = function () {
   });
 
   dataview.labelsCount = dataview.datasets.length;
-  dataview.max = d3LibraryAccess.max(dataview.datasets, function (dataset) {
-    return d3LibraryAccess.max(dataset.data, function (item) {
+  dataview.max = d3.max(dataview.datasets, function (dataset) {
+    return d3.max(dataset.data, function (item) {
       return item.value;
     });
   });
