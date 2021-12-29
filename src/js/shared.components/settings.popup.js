@@ -1,11 +1,13 @@
-import {Popup} from './popup';
+import { Popup } from "./popup";
+import { Button } from "./button";
+import { downloadImage } from "../shared/download";
+import { createDownloadFilename } from "../shared/filename";
 
 /**
  * @class SettingsPopup
  * @extends Popup
  */
 export class SettingsPopup extends Popup {
-
   /**
    * Creates a new instance of SettingsPopup.
    */
@@ -19,9 +21,14 @@ export class SettingsPopup extends Popup {
    */
   inject() {
     super.inject();
-    this.card.setTitle('Settings');
-    this.card.content.classed('lotivis-card-body-settings', true);
-    this.row = this.card.content.append('div').classed('lotivis-row', true);
+    this.card.setTitle("");
+    this.row = this.card.content.append("div").classed("row", true);
+
+    let container = this.row.append("div");
+    this.screenshotButton = new Button(container);
+    this.screenshotButton.setText("Make Screenshot");
+    this.screenshotButton.element.classed("ltv-button", true);
+    this.screenshotButton.onClick = this.screenshotButtonAction.bind(this);
   }
 
   /**
@@ -30,6 +37,17 @@ export class SettingsPopup extends Popup {
    * @override
    */
   preferredSize() {
-    return {width: 240, height: 600};
+    return { width: 240, height: 600 };
+  }
+
+  /**
+   * Triggered when the screenshot button is pushed.
+   *
+   * Should be overridden by subclasses.
+   */
+  screenshotButtonAction() {
+    let filename = this.chart.datasetController.getFilename() || "unknown";
+    let downloadFilename = createDownloadFilename(filename, `chart`);
+    downloadImage(this.chart.svgSelector, downloadFilename);
   }
 }

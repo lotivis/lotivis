@@ -16,7 +16,7 @@
     <title>Lotivis - Map Data</title>
   </head>
   <body>
-    <div class="container mt-3">
+    <div class="lotivis-container">
       <div class="row">
         <div class="col-2">
           <a class="lotivis-anchor-back" href="../index.html">
@@ -48,16 +48,9 @@
       // print debug messages
       lotivis.debug(true);
 
-      const mapChartCard = new lotivis.MapChartCard("map-chart-card", {
-        excludedFeatureCodes: ["2A", "2B"],
-        featureIDAccessor: feature => {
-          return feature.properties.code;
-        },
-        featureNameAccessor: feature => {
-          return feature.properties.nom;
-        }
-      });
+      const mapChartCard = new lotivis.MapChartCard("map-chart-card");
       const chart = mapChartCard.chart;
+      chart.config.excludedFeatureCodes = ["2A", "2B"];
 
       mapChartCard.onSelectedDatasetChanged = function(value) {
         let dataset = mapChartCard.datasets.find(

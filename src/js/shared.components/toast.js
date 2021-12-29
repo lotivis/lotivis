@@ -1,5 +1,5 @@
-import {Component} from "./component";
-import {Button} from "./button";
+import { Component } from "./component";
+import { Button } from "./button";
 
 /**
  * A toast in the top of the page.
@@ -8,7 +8,6 @@ import {Button} from "./button";
  * @extends Component
  */
 export class Toast extends Component {
-
   /**
    * Creates a new instance of Toast.
    * @constructor
@@ -16,23 +15,15 @@ export class Toast extends Component {
    */
   constructor(parent) {
     super(parent);
-    this.element = this
-      .parent
-      .append('div')
-      .attr('class', 'lotivis-data-card-status-tooltip')
-      .style('opacity', 0)
-      .style('display', `none`);
-    this.row = this.element
-      .append('div')
-      .attr('class', 'lotivis-row');
-    this.leftComponnt = this.row
-      .append('div')
-      .attr('class', 'lotivis-col-6');
-    this.rightComponent = this.row
-      .append('div')
-      .attr('class', 'lotivis-col-6');
-    this.hideButton = new Button(this.rightComponent)
-      .setText(`Hello`);
+    this.element = this.parent
+      .append("div")
+      .attr("class", "lotivis-data-card-status-tooltip")
+      .style("opacity", 0)
+      .style("display", `none`);
+    this.row = this.element.append("div").attr("class", "row");
+    this.leftComponnt = this.row.append("div").attr("class", "col-6");
+    this.rightComponent = this.row.append("div").attr("class", "col-6");
+    this.hideButton = new Button(this.rightComponent).setText(`Hello`);
   }
 
   /**
@@ -41,7 +32,7 @@ export class Toast extends Component {
    */
   show() {
     super.show();
-    this.element.style('opacity', 1);
+    this.element.style("opacity", 1);
     return this;
   }
 
@@ -51,7 +42,7 @@ export class Toast extends Component {
    */
   hide() {
     super.hide();
-    this.element.style('opacity', 0);
+    this.element.style("opacity", 0);
   }
 
   /**

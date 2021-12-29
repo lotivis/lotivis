@@ -1,6 +1,6 @@
-import {hashCode} from "../shared/hash";
-import {isValue} from "../shared/value";
-import {LotivisConfig} from "../shared/config";
+import { hashCode } from "../shared/hash";
+import { isValue } from "../shared/value";
+import { LotivisConfig } from "../shared/config";
 
 /**
  *
@@ -21,17 +21,23 @@ export const MapChartConfig = {
   excludedFeatureCodes: [],
   drawRectangleAroundSelection: true,
   sendsNotifications: true,
-  featureIDAccessor: function (feature) {
+  featureIDAccessor: function(feature) {
     if (feature.id || feature.id === 0) return feature.id;
-    if (feature.properties && isValue(feature.properties.id)) return feature.properties.id;
-    if (feature.properties && isValue(feature.properties.code)) return Number(feature.properties.code);
-    if (feature.properties) { return hashCode(JSON.stringify(feature.properties)); }
+    if (feature.properties && isValue(feature.properties.id))
+      return feature.properties.id;
+    if (feature.properties && isValue(feature.properties.code))
+      return Number(feature.properties.code);
+    if (feature.properties) {
+      return hashCode(JSON.stringify(feature.properties));
+    }
     return hashCode(JSON.stringify(feature));
   },
-  featureNameAccessor: function (feature) {
+  featureNameAccessor: function(feature) {
     if (isValue(feature.name)) return feature.name;
-    if (feature.properties && isValue(feature.properties.name)) return feature.properties.name;
-    if (feature.properties && isValue(feature.properties.nom)) return feature.properties.nom;
+    if (feature.properties && isValue(feature.properties.name))
+      return feature.properties.name;
+    if (feature.properties && isValue(feature.properties.nom))
+      return feature.properties.nom;
     return LotivisConfig.unknown;
   }
 };

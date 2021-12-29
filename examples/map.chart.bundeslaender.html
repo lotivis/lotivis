@@ -13,7 +13,7 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="../dist/lotivis.css" />
-    <title>___HEADLINE___</title>
+    <title>Lotivis - Map Simple</title>
   </head>
   <body>
     <div class="lotivis-container">
@@ -24,34 +24,39 @@
           </a>
         </div>
         <div class="col-8 lotivis-headline">
-          <h1>Headline</h1>
+          <h1>Map Data</h1>
         </div>
-        <div class="col-6">
-          <div id="date-chart-card">
-            <!-- Date Chart Card Here -->
-          </div>
-          <div id="plot-chart-card">
-            <!-- Plot Chart Card Here -->
-          </div>
+        <div class="col-12">
+          <div id="map-chart-card"></div>
         </div>
-        <div class="col-6">
-          <div id="map-chart-card">
-            <!-- Map Chart Card Here -->
-          </div>
-        </div>
-        <div class="col-6">
-          <div id="data-card">
-            <!-- Map Chart Card Here -->
-          </div>
+        <div class="lotivis-wcol-12">
+          <div id="radio"></div>
         </div>
       </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-server@3.0.1/dist/topojson-server.min.js"></script>
     <script src="../dist/lotivis.js"></script>
 
     <script>
+      // print debug messages
       lotivis.debug(true);
+
+      const mapChartCard = new lotivis.MapChartCard("map-chart-card");
+      const chart = mapChartCard.chart;
+
+      chart.config.featureNameAccessor = feature => {
+        return feature.properties["NAME_3"];
+      };
+      chart.config.featureIDAccessor = feature => {
+        return feature.properties["ID_3"];
+      };
+
+      d3.json("/examples/assets/germany.geojson").then(function(rawGeoJSON) {
+        chart.setGeoJSON(rawGeoJSON);
+      });
     </script>
   </body>
 </html>

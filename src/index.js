@@ -1,14 +1,12 @@
 import { Color } from "./js/shared/color";
 import { Button } from "./js/shared.components/button";
 import { Component } from "./js/shared.components/component";
-import { RadioGroup } from "./js/shared.components/radio.group";
 import { Toast } from "./js/shared.components/toast";
 import { Option } from "./js/shared.components/option";
 import "./js/chart/chart.datasets";
 import { Card } from "./js/shared.components/card";
 import { Checkbox } from "./js/shared.components/checkbox";
 
-import { ModalPopup } from "./js/shared.components/modal.popup";
 import { Dropdown } from "./js/shared.components/dropdown";
 import { Popup } from "./js/shared.components/popup";
 
@@ -69,9 +67,7 @@ exports.Card = Card;
 exports.Checkbox = Checkbox;
 exports.Component = Component;
 exports.Dropdown = Dropdown;
-exports.ModalPopup = ModalPopup;
 exports.Popup = Popup;
-exports.RadioGroup = RadioGroup;
 exports.Option = Option;
 exports.Toast = Toast;
 

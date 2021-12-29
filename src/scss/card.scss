@@ -1,67 +1,33 @@
-.lotivis-card {
+.ltv-card {
   background-color: #ffffff;
-  // border: 1px solid rgba(0, 0, 0, 0.1);
-  // border-radius: $radius;
-  // box-shadow: rgba(0, 0, 0, 0.05) 0 0 30px 0;
-  // color: #464845;
-  margin: 0 0 20px 0;
+  border-radius: $small-border;
   overflow: hidden;
 }
 
-.lotivis-card-header {
-  padding: $small-border;
+.ltv-card-header {
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  height: 14px;
-
-  .lotivis-card-header-right {
-    overflow: visible;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    text-align: right;
-    //margin-left: auto;
-  }
-
-  .lotivis-card-header-center {
-    overflow: visible;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    margin: auto;
-  }
-
-  .lotivis-card-header-left {
-    overflow: visible;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .lotivis-title-label {
-    font-weight: bold;
-    font-size: $primary-title-font-size;
-  }
-}
-
-.lotivis-card-body {
   width: 100%;
-
-  .lotivis-card-body-content {
-    //margin: $spacing;
-  }
-
-  .lotivis-card-body-settings {
-    margin: 10px;
-
-    div {
-      display: block;
-      line-height: 1.2;
-    }
-  }
+  display: inline-flex;
+  flex-wrap: wrap;
+  line-height: 1;
 }
 
-.lotivis-card-body-margin {
-  padding: 20px;
+.ltv-right {
+  overflow: visible;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
 }
 
-.lotivis-card-footer {
-  padding: $small-border;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+.ltv-center {
+  overflow: visible;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: auto;
+}
+
+.ltv-left {
+  overflow: visible;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

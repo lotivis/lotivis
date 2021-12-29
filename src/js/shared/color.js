@@ -3,7 +3,6 @@
  * @class Color
  */
 export class Color {
-
   /**
    * Creates a new instance of Color.
    * @param r The red value.
@@ -46,8 +45,8 @@ export class Color {
   static mapColors(till) {
     return d3
       .scaleLinear()
-      .domain([0, 1 / 3 * till, 2 / 3 * till, till])
-      .range(['yellow', 'orange', 'red', 'purple']);
+      .domain([0, (1 / 3) * till, (2 / 3) * till, till])
+      .range(["yellow", "orange", "red", "purple"]);
   }
 
   static plotColor(till) {
@@ -56,14 +55,14 @@ export class Color {
     //   .scaleLinear()
     //   .domain([0, 1 / 2 * till, till])
     //   .range(['lightgreen', 'steelblue', 'purple']);
-  };
+  }
 }
 
 /**
  * Returns a randomly generated shared.color.
  * @returns {[]}
  */
-Color.colorsForStack = function (stackNumber, amount = 1) {
+Color.colorsForStack = function(stackNumber, amount = 1) {
   let colorCouple = Color.stackColors[stackNumber % Color.stackColors.length];
   let colorGenerator = d3
     .scaleLinear()
@@ -97,5 +96,5 @@ Color.stackColors = [
   [Color.redHigh, Color.redLow],
   [Color.greenHight, Color.greenLow],
   [Color.organgeHigh, Color.organgeLow],
-  [Color.lightBlueHight, Color.lightBlueLow],
+  [Color.lightBlueHight, Color.lightBlueLow]
 ];

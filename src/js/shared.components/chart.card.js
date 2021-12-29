@@ -1,9 +1,9 @@
-import {Card} from "./card";
-import {Button} from "./button";
-import {RadioGroup} from "./radio.group";
-import {Option} from "./option";
-import {LotivisUnimplementedMethodError} from "../data.juggle/data.validate.error";
-import {lotivis_log} from "../shared/debug";
+import { Card } from "./card";
+import { Button } from "./button";
+import { Dropdown } from "./dropdown";
+import { Option } from "./option";
+import { LotivisUnimplementedMethodError } from "../data.juggle/data.validate.error";
+import { lotivis_log } from "../shared/debug";
 
 /**
  * A lotivis card with a chart.
@@ -11,15 +11,13 @@ import {lotivis_log} from "../shared/debug";
  * @extends Card
  */
 export class ChartCard extends Card {
-
   /**
    * Creates a new instance of ChartCard.
    * @param parent The parental component.
    * @param config The configuration
    */
   constructor(parent, config) {
-
-    if (parent && config && typeof parent === 'string') {
+    if (parent && config && typeof parent === "string") {
       config.selector = parent;
       super(config);
     } else {
@@ -33,7 +31,9 @@ export class ChartCard extends Card {
     this.injectChart();
 
     let cardSelector = this.selector;
-    this.setTitle((config && config.title) ? config.title : (cardSelector || 'No Title'));
+    this.setTitle(
+      config && config.title ? config.title : cardSelector || "No Title"
+    );
   }
 
   /**
@@ -48,14 +48,9 @@ export class ChartCard extends Card {
    * Creates and injects a screenshot button and a more button.
    */
   injectButtons() {
-    this.screenshotButton = new Button(this.headerRightComponent);
-    this.screenshotButton.setText('Screenshot');
-    this.screenshotButton.element.classed('simple-button', true);
-    this.screenshotButton.onClick = this.screenshotButtonAction.bind(this);
-
     this.moreButton = new Button(this.headerRightComponent);
-    this.moreButton.setText('More');
-    this.moreButton.element.classed('simple-button', true);
+    this.moreButton.setText("More");
+    this.moreButton.element.classed("ltv-button", true);
     this.moreButton.onClick = this.presentSettingsPopupAction.bind(this);
   }
 
@@ -63,13 +58,15 @@ export class ChartCard extends Card {
    * Creates and injects a radio button group.
    */
   injectRadioGroup() {
-    this.radioGroup = new RadioGroup(this.headerCenterComponent);
-    this.radioGroup.onChange = function (value) {
-      let dataset = this.datasets.find(function (dataset) {
+    this.dropdown = new Dropdown(this.headerCenterComponent);
+    this.dropdown.onChange = function(value) {
+      let dataset = this.datasets.find(function(dataset) {
         if (!dataset.label) return false;
         return dataset.label.split(` `).join(`-`) === value;
       });
-      if (!dataset) return lotivis_log(`Can't find dataset with label ${value}`);
+      dataset = this.datasets.find(dataset => dataset.label === value);
+      if (!dataset)
+        return lotivis_log(`Can't find dataset with label ${value}`);
       this.setDataset(dataset);
     }.bind(this);
   }
@@ -79,9 +76,9 @@ export class ChartCard extends Card {
    */
   updateRadioGroup() {
     if (!this.datasets) return;
-    let names = this.datasets.map(dataset => dataset.label || 'Unknown Label');
+    let names = this.datasets.map(dataset => dataset.label || "Unknown Label");
     let options = names.map(name => new Option(name));
-    this.radioGroup.setOptions(options);
+    this.dropdown.setOptions(options);
   }
 
   /**
@@ -100,8 +97,8 @@ export class ChartCard extends Card {
    * @param dataset
    */
   setDataset(dataset) {
-    lotivis_log('this.chart: ' + this.chart);
-    lotivis_log('this.chart: ', dataset);
+    lotivis_log("this.chart: " + this.chart);
+    lotivis_log("this.chart: ", dataset);
     if (!this.chart) return;
     if (Array.isArray(dataset)) {
       this.chart.setDatasets(dataset);
@@ -114,15 +111,6 @@ export class ChartCard extends Card {
       let index = (this.datasets || []).indexOf(dataset);
       this.onSelectedDatasetChanged(dataset, index, datasetLabel);
     }
-  }
-
-  /**
-   * Triggered when the screenshot button is pushed.
-   *
-   * Should be overridden by subclasses.
-   */
-  screenshotButtonAction() {
-    return new LotivisUnimplementedMethodError(`screenshotButtonAction()`);
   }
 
   /**

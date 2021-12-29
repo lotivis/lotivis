@@ -1,4 +1,4 @@
-import {Component} from "./component";
+import { Component } from "./component";
 
 /**
  * A button
@@ -7,7 +7,6 @@ import {Component} from "./component";
  * @extends Component
  */
 export class Button extends Component {
-
   /**
    * Creates an instance of Button.
    *
@@ -15,21 +14,24 @@ export class Button extends Component {
    * @param {Component} parent The parental component.
    * @param style The style of the button.  One of default|back|forward
    */
-  constructor(parent, style = 'default') {
+  constructor(parent, style = "default") {
     super(parent);
 
     this.element = parent
-      .append('button')
-      .attr('id', this.selector)
-      .attr('class', 'lotivis-button')
-      .on('click', function (event) {
-        if (!this.onClick) return;
-        this.onClick(event);
-      }.bind(this));
+      .append("button")
+      .attr("id", this.selector)
+      .attr("class", "ltv-button")
+      .on(
+        "click",
+        function(event) {
+          if (!this.onClick) return;
+          this.onClick(event);
+        }.bind(this)
+      );
 
     switch (style) {
-      case 'round':
-        this.element.classed('lotivis-button-round', true);
+      case "round":
+        this.element.classed("ltv-button-round", true);
         break;
       default:
         break;

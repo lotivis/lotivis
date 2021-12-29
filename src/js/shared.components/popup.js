@@ -1,7 +1,7 @@
-import {Component} from './component';
-import {createID} from '../shared/selector';
-import {Card} from './card';
-import {Button} from './button';
+import { Component } from "./component";
+import { createID } from "../shared/selector";
+import { Card } from "./card";
+import { Button } from "./button";
 
 /**
  * A lotivis popup.
@@ -14,12 +14,11 @@ import {Button} from './button';
  * @extends Component
  */
 export class Popup extends Component {
-
   /**
    * Creates a new instance of Popup.
    * @param parent The parental component.
    */
-  constructor(parent = d3.select('body')) {
+  constructor(parent = d3.select("body")) {
     super(parent);
     this.injectUnderground(parent);
     this.injectContainer();
@@ -47,9 +46,9 @@ export class Popup extends Component {
   injectUnderground(parent) {
     this.modalBackgroundId = createID();
     this.modalBackground = parent
-      .append('div')
-      .classed('lotivis-popup-underground lotivis-fade-in', true)
-      .attr('id', this.modalBackgroundId);
+      .append("div")
+      .classed("ltv-popup-underground ltv-fade-in", true)
+      .attr("id", this.modalBackgroundId);
   }
 
   /**
@@ -58,9 +57,9 @@ export class Popup extends Component {
   injectContainer() {
     this.elementId = createID();
     this.element = this.modalBackground
-      .append('div')
-      .classed('lotivis-popup', true)
-      .attr('id', this.elementId);
+      .append("div")
+      .classed("ltv-popup", true)
+      .attr("id", this.elementId);
   }
 
   /**
@@ -68,7 +67,7 @@ export class Popup extends Component {
    */
   injectCard() {
     this.card = new Card(this.element);
-    this.card.element.classed('lotivis-popup', true);
+    this.card.element.classed("ltv-popup", true);
   }
 
   /**
@@ -76,20 +75,16 @@ export class Popup extends Component {
    */
   injectCloseButton() {
     this.closeButton = new Button(this.card.headerRightComponent);
-    this.closeButton.element.classed('lotivis-button-small', true);
-    this.closeButton.setText('Close');
+    this.closeButton.setText("Close");
   }
 
   /**
    * Appends an on click listener to the button.
    */
   addCloseActionListeners() {
-    let validIDs = [
-      this.closeButton.selector,
-      this.modalBackgroundId
-    ];
+    let validIDs = [this.closeButton.selector, this.modalBackgroundId];
     let popup = this;
-    this.modalBackground.on('click', function (event) {
+    this.modalBackground.on("click", function(event) {
       if (!event || !event.target) return;
       if (!validIDs.includes(event.target.id)) return;
       popup.dismiss();
@@ -121,7 +116,7 @@ export class Popup extends Component {
    */
   show() {
     if (this.willShow) this.willShow();
-    this.getUnderground().style.display = 'block';
+    this.getUnderground().style.display = "block";
     if (this.didShow) this.didShow();
   }
 
@@ -148,7 +143,7 @@ export class Popup extends Component {
    */
   dismiss() {
     if (this.willDismiss) this.willDismiss();
-    this.getUnderground().style.display = 'none';
+    this.getUnderground().style.display = "none";
     if (this.willRemoveDOMElement) this.willRemoveDOMElement();
     this.getUnderground().remove();
   }
@@ -157,28 +152,29 @@ export class Popup extends Component {
     return document.getElementById(this.modalBackgroundId);
   }
 
-  showUnder(sourceElement, position = 'center') {
+  showUnder(sourceElement, position = "center") {
     if (!sourceElement) return;
 
     let preferredSize = this.preferredSize();
     let origin = this.calculateBottomCenter(sourceElement);
 
-    if (position === 'left') {
+    if (position === "left") {
       origin.x -= origin.width / 2;
-    } else if (position === 'right') {
+    } else if (position === "right") {
       origin.x -= preferredSize.width - origin.width / 2;
-    } else { // assume center
-      origin.x -= (preferredSize.width / 2);
+    } else {
+      // assume center
+      origin.x -= preferredSize.width / 2;
     }
 
     let id = this.elementId;
     let popup = document.getElementById(id);
 
-    popup.style.position = 'absolute';
-    popup.style.width = preferredSize.width + 'px';
+    popup.style.position = "absolute";
+    popup.style.width = preferredSize.width + "px";
     // popup.style.height = preferredSize.height + 'px';
-    popup.style.left = origin.x + 'px';
-    popup.style.top = origin.y + 'px';
+    popup.style.left = origin.x + "px";
+    popup.style.top = origin.y + "px";
 
     this.show();
   }
@@ -188,9 +184,9 @@ export class Popup extends Component {
     let popup = document.getElementById(id);
     let preferredSize = this.preferredSize();
 
-    popup.style.position = 'relative';
-    popup.style.margin = '50px auto';
-    popup.style.width = preferredSize.width + 'px';
+    popup.style.position = "relative";
+    popup.style.margin = "50px auto";
+    popup.style.width = preferredSize.width + "px";
 
     this.show();
   }
@@ -217,7 +213,7 @@ export class Popup extends Component {
    */
   calculateBottomCenter(element, respectWindowScroll = false) {
     let rect = element.getBoundingClientRect();
-    let x = rect.x + (rect.width / 2);
+    let x = rect.x + rect.width / 2;
     let y = rect.y + rect.height;
 
     if (respectWindowScroll) {

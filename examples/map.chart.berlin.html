@@ -13,18 +13,18 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="../dist/lotivis.css" />
-    <title>Lotivis - Map Data</title>
+    <title>Lotivis - Map Chart Berlin</title>
   </head>
   <body>
-    <div class="container mt-3">
+    <div class="container">
       <div class="row">
         <div class="col-2">
           <a class="lotivis-anchor-back" href="../index.html">
             Back
           </a>
         </div>
-        <div class="col-8 lotivis-headline">
-          <h1>Map Data</h1>
+        <div class="col-8 text-center">
+          <h1>Map Chart Berlin</h1>
         </div>
         <div class="col-12">
           <div id="map-chart-card">
@@ -48,16 +48,12 @@
       // print debug messages
       lotivis.debug(true);
 
-      const mapChartCard = new lotivis.MapChartCard("map-chart-card", {
-        excludedFeatureCodes: ["2A", "2B"],
-        featureIDAccessor: feature => {
-          return feature.properties.code;
-        },
-        featureNameAccessor: feature => {
-          return feature.properties.nom;
-        }
-      });
+      const mapChartCard = new lotivis.MapChartCard("map-chart-card");
       const chart = mapChartCard.chart;
+
+      chart.config.featureIDAccessor = function(feature) {
+        return feature.properties.cartodb_id;
+      };
 
       mapChartCard.onSelectedDatasetChanged = function(value) {
         let dataset = mapChartCard.datasets.find(
@@ -68,18 +64,8 @@
         element.innerHTML = string;
       };
 
-      Promise.all([
-        d3.json("./assets/tracks-per-departement.json"),
-        d3.json("./assets/words-per-departement.json"),
-        d3.json("./assets/words-per-departement-relative.json"),
-        d3.json("./assets/types-per-departement.json"),
-        d3.json("./assets/types-per-departement-relative.json"),
-        d3.json("./assets/departements.geojson")
-      ]).then(function(datasetsAndGeoJSON) {
-        let rawGeoJSON = datasetsAndGeoJSON.pop();
-        let onlyDatasets = datasetsAndGeoJSON;
+      d3.json("./assets/berlin.geojson").then(rawGeoJSON => {
         chart.setGeoJSON(rawGeoJSON);
-        mapChartCard.setDatasets(onlyDatasets);
       });
     </script>
   </body>

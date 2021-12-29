@@ -1,6 +1,6 @@
-import {Checkbox} from "../shared.components/checkbox";
-import {UrlParameters} from "../shared/url.parameters";
-import {SettingsPopup} from "../shared.components/settings.popup";
+import { Checkbox } from "../shared.components/checkbox";
+import { UrlParameters } from "../shared/url.parameters";
+import { SettingsPopup } from "../shared.components/settings.popup";
 
 /**
  *
@@ -8,7 +8,6 @@ import {SettingsPopup} from "../shared.components/settings.popup";
  * @extends SettingsPopup
  */
 export class DateChartCardSettingsPopup extends SettingsPopup {
-
   inject() {
     super.inject();
     this.injectShowLabelsCheckbox();
@@ -16,24 +15,30 @@ export class DateChartCardSettingsPopup extends SettingsPopup {
   }
 
   injectShowLabelsCheckbox() {
-    let container = this.row.append('div');
+    let container = this.row.append("div");
     this.showLabelsCheckbox = new Checkbox(container);
-    this.showLabelsCheckbox.setText('Labels');
-    this.showLabelsCheckbox.onClick = function (checked) {
+    this.showLabelsCheckbox.setText("Labels");
+    this.showLabelsCheckbox.onClick = function(checked) {
       this.chart.config.showLabels = checked;
       this.chart.update();
-      UrlParameters.getInstance().set(`showLabels-${this.chart.selector}`, checked);
+      UrlParameters.getInstance().set(
+        `showLabels-${this.chart.selector}`,
+        checked
+      );
     }.bind(this);
   }
 
   injectCombineStacksCheckbox() {
-    let container = this.row.append('div');
+    let container = this.row.append("div");
     this.combineStacksCheckbox = new Checkbox(container);
-    this.combineStacksCheckbox.setText('Combine Stacks');
-    this.combineStacksCheckbox.onClick = function (checked) {
+    this.combineStacksCheckbox.setText("Combine Stacks");
+    this.combineStacksCheckbox.onClick = function(checked) {
       this.chart.config.combineStacks = checked;
       this.chart.update();
-      UrlParameters.getInstance().set(`combineStacks-${this.chart.selector}`, checked);
+      UrlParameters.getInstance().set(
+        `combineStacks-${this.chart.selector}`,
+        checked
+      );
     }.bind(this);
   }
 

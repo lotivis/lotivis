@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="../dist/lotivis.css" />
+    <title>Lotivis Examples - Map Chart Showcase</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <a class="lotivis-anchor-back" href="../index.html">
+            Back
+          </a>
+        </div>
+        <div class="col-8 lotivis-headline">
+          <h1>Map Chart Showcase</h1>
+        </div>
+        <div class="col-2">
+          <!-- Placeholder -->
+        </div>
+        <div class="col-3">
+          <div id="map-chart-card-1">
+            <!-- Map Chart 1 Code Here -->
+          </div>
+          <div id="map-chart-card-3">
+            <!-- Map Chart 3 Code Here -->
+          </div>
+        </div>
+        <div class="col-3">
+          <div id="map-chart-card-2">
+            <!-- Map Chart 2 Code Here -->
+          </div>
+          <div id="map-chart-card-4">
+            <!-- Map Chart 4 Code Here -->
+          </div>
+        </div>
+        <div class="col-3">
+          <div id="datasets-json-card">
+            <!-- Dataset JSON Card Here -->
+          </div>
+        </div>
+        <div class="col-3">
+          <div id="dataview-map-card">
+            <!-- Dataview Map Card Here -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/topojson-server@3.0.1/dist/topojson-server.min.js"></script>
+    <script src="../dist/lotivis.js"></script>
+
+    <script>
+      lotivis.debug(true);
+
+      let datasets = [
+        {
+          label: "dataset_1",
+          stack: "dataset_1",
+          data: [
+            { map: 45, date: 2000, value: 2 },
+            { map: 45, date: 2001, value: 1 },
+            { map: 45, date: 2002, value: 4 },
+            { map: 45, date: 2003, value: 3 }
+          ]
+        }
+      ];
+
+      let datasetsCard = new lotivis.DatasetsJSONCard();
+      let dataviewMapCard = new lotivis.DataViewMapCard("dataview-map-card");
+
+      let mapChartCard1 = new lotivis.MapChartCard("map-chart-card-1", {
+        name: "Standard",
+        sendsNotifications: false
+      });
+      let mapChartCard2 = new lotivis.MapChartCard("map-chart-card-2", {
+        name: "Show Labels",
+        sendsNotifications: false,
+        showLabels: true
+      });
+      let mapChartCard3 = new lotivis.MapChartCard("map-chart-card-3", {
+        name: "Standard",
+        sendsNotifications: false
+      });
+      let mapChartCard4 = new lotivis.MapChartCard("map-chart-card-4", {
+        name: "Exclude Features",
+        sendsNotifications: false,
+        excludedFeatureCodes: ["2A", "2B"]
+      });
+
+      fetch("assets/departements.geojson")
+        .then(response => response.text())
+        .then(text => JSON.parse(text))
+        .then(geoJSON => {
+          mapChartCard1.chart.setGeoJSON(geoJSON);
+          mapChartCard2.chart.setGeoJSON(geoJSON);
+          mapChartCard3.chart.setGeoJSON(geoJSON);
+          mapChartCard4.chart.setGeoJSON(geoJSON);
+          return fetch("assets/example-datasets-location-time-grouped.json");
+        })
+        .then(response => response.text())
+        .then(text => JSON.parse(text))
+        .then(function(json) {
+          let datasetsController = new lotivis.DatasetController(datasets);
+          datasetsController.register([
+            mapChartCard1.chart,
+            mapChartCard2.chart,
+            mapChartCard3.chart,
+            mapChartCard4.chart,
+            datasetsCard,
+            dataviewMapCard
+          ]);
+        });
+    </script>
+  </body>
+</html>

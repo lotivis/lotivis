@@ -9,7 +9,6 @@ typeof define === 'function' && define.amd ? define(['exports'], factory) :
  * @class Color
  */
 class Color {
-
   /**
    * Creates a new instance of Color.
    * @param r The red value.
@@ -51,8 +50,8 @@ class Color {
   static mapColors(till) {
     return d3
       .scaleLinear()
-      .domain([0, 1 / 3 * till, 2 / 3 * till, till])
-      .range(['yellow', 'orange', 'red', 'purple']);
+      .domain([0, (1 / 3) * till, (2 / 3) * till, till])
+      .range(["yellow", "orange", "red", "purple"]);
   }
 
   static plotColor(till) {
@@ -61,14 +60,14 @@ class Color {
     //   .scaleLinear()
     //   .domain([0, 1 / 2 * till, till])
     //   .range(['lightgreen', 'steelblue', 'purple']);
-  };
+  }
 }
 
 /**
  * Returns a randomly generated shared.color.
  * @returns {[]}
  */
-Color.colorsForStack = function (stackNumber, amount = 1) {
+Color.colorsForStack = function(stackNumber, amount = 1) {
   let colorCouple = Color.stackColors[stackNumber % Color.stackColors.length];
   let colorGenerator = d3
     .scaleLinear()
@@ -102,7 +101,7 @@ Color.stackColors = [
   [Color.redHigh, Color.redLow],
   [Color.greenHight, Color.greenLow],
   [Color.organgeHigh, Color.organgeLow],
-  [Color.lightBlueHight, Color.lightBlueLow],
+  [Color.lightBlueHight, Color.lightBlueLow]
 ];
 
 /**
@@ -1862,17 +1861,23 @@ function extractObjects(topology) {
 Following code from:
 https://gist.github.com/Jezternz/c8e9fafc2c114e079829974e3764db75
 
-We use this function to save samples.parse a CSV file.
+We use this function to save parse a CSV file.
  */
 
 const csvStringToArray = strData => {
-  const objPattern = new RegExp(("(\\,|\\r?\\n|\\r|^)(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^\\,\\r\\n]*))"), "gi");
-  let arrMatches = null, arrData = [[]];
-  while (arrMatches = objPattern.exec(strData)) {
+  const objPattern = new RegExp(
+    '(\\,|\\r?\\n|\\r|^)(?:"([^"]*(?:""[^"]*)*)"|([^\\,\\r\\n]*))',
+    "gi"
+  );
+  let arrMatches = null,
+    arrData = [[]];
+  while ((arrMatches = objPattern.exec(strData))) {
     if (arrMatches[1].length && arrMatches[1] !== ",") arrData.push([]);
-    arrData[arrData.length - 1].push(arrMatches[2] ?
-      arrMatches[2].replace(new RegExp("\"\"", "g"), "\"") :
-      arrMatches[3]);
+    arrData[arrData.length - 1].push(
+      arrMatches[2]
+        ? arrMatches[2].replace(new RegExp('""', "g"), '"')
+        : arrMatches[3]
+    );
   }
   return arrData;
 };

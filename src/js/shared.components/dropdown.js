@@ -1,5 +1,5 @@
-import {Component} from "./component";
-import {createID} from "../shared/selector";
+import { Component } from "./component";
+import { createID } from "../shared/selector";
 
 /**
  *
@@ -7,7 +7,6 @@ import {createID} from "../shared/selector";
  * @extends Component
  */
 export class Dropdown extends Component {
-
   /**
    * Creates a new instance of Dropdown.
    * @param parent The parent or selector.
@@ -17,35 +16,36 @@ export class Dropdown extends Component {
     this.inputElements = [];
     this.selector = createID();
     this.element = parent
-      .append('div')
-      .classed('lotivis-dropdown-container', true);
+      .append("div")
+      .classed("lotivis-dropdown-container", true);
     this.selectId = createID();
     this.renderLabel();
     this.renderSelect();
+    this.hide();
   }
 
   renderLabel() {
     this.label = this.element
-      .append('label')
-      .classed('lotivis-dropdown-label', true)
-      .attr('for', this.selectId);
+      .append("label")
+      .classed("lotivis-dropdown-label", true)
+      .attr("for", this.selectId);
   }
 
   renderSelect() {
     let thisReference = this;
     this.select = this.element
-      .append('select')
-      .attr('id', this.selectId)
-      .on('change', function (event) {
+      .append("select")
+      .attr("id", this.selectId)
+      .on("change", function(event) {
         thisReference.onClick(event);
       });
   }
 
   addOption(optionId, optionName) {
     return this.select
-      .append('option')
-      .attr('id', optionId)
-      .attr('value', optionId)
+      .append("option")
+      .attr("id", optionId)
+      .attr("value", optionId)
       .text(optionName);
   }
 
@@ -57,7 +57,7 @@ export class Dropdown extends Component {
       if (Array.isArray(options[i])) {
         id = options[i][0] || options[i].id;
         name = options[i][1] || options[i].translatedTitle;
-      } else if (typeof options[i] === 'string') {
+      } else if (typeof options[i] === "string") {
         id = options[i];
         name = options[i];
       } else {
@@ -68,11 +68,18 @@ export class Dropdown extends Component {
       let inputElement = this.addOption(name, name);
       this.inputElements.push(inputElement);
     }
+
+    if (options.length === 0) {
+      this.hide();
+    } else {
+      this.show();
+    }
+
     return this;
   }
 
   removeAllInputs() {
-    this.element.selectAll('input').remove();
+    this.element.selectAll("input").remove();
     return this;
   }
 
@@ -90,11 +97,10 @@ export class Dropdown extends Component {
   }
 
   onChange(argument) {
-    console.log('argument: ' + argument);
-    if (typeof argument !== 'string') {
+    console.log("argument: " + argument);
+    if (typeof argument !== "string") {
       this.onChange = argument;
     } else {
-
     }
     return this;
   }
@@ -112,9 +118,11 @@ export class Dropdown extends Component {
   }
 
   setSelectedOption(optionID) {
-    if (this.inputElements.find(function (item) {
-      return item.attr('value') === optionID;
-    }) !== undefined) {
+    if (
+      this.inputElements.find(function(item) {
+        return item.attr("value") === optionID;
+      }) !== undefined
+    ) {
       this.value = optionID;
     }
     return this;
@@ -129,10 +137,10 @@ export class Dropdown extends Component {
   }
 }
 
-Dropdown.create = function (selector, options, selectedOption, onChange) {
+Dropdown.create = function(selector, options, selectedOption, onChange) {
   let div = d3.select(`#${selector}`);
   let dropdown = new Dropdown(div);
-  dropdown.setLabelText('Group Size');
+  dropdown.setLabelText("Group Size");
   dropdown.setOptions(options);
   dropdown.setSelectedOption(selectedOption);
   dropdown.setOnChange(onChange);

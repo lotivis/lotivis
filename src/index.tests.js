@@ -1,10 +1,7 @@
-import {Color} from "./js/shared/color";
-import {GeoJson} from "./js/geojson/geojson";
-import {Feature} from "./js/geojson/feature";
-import {
-  flatDataset,
-  flatDatasets
-} from "./js/data.juggle/data.flat";
+import { Color } from "./js/shared/color";
+import { GeoJson } from "./js/geojson/geojson";
+import { Feature } from "./js/geojson/feature";
+import { flatDataset, flatDatasets } from "./js/data.juggle/data.flat";
 import {
   combine,
   combineByDate,
@@ -25,14 +22,9 @@ import {
   extractStacksFromDatasets,
   extractStacksFromFlatData
 } from "./js/data.juggle/data.extract";
-import {
-  sumOfDataset,
-  sumOfStack
-} from "./js/data.juggle/data.sum";
-import {
-  dateToItemsRelation
-} from "./js/data.juggle/data.relations";
-import {DatasetsController} from "./js/datasets.controller/datasets.controller";
+import { sumOfDataset, sumOfStack } from "./js/data.juggle/data.sum";
+import { dateToItemsRelation } from "./js/data.juggle/data.relations";
+import { DatasetsController } from "./js/datasets.controller/datasets.controller";
 import "./js/datasets.controller/datasets.controller.listeners";
 import "./js/datasets.controller/datasets.controller.filter";
 import "./js/datasets.controller/datasets.controller.colors";
@@ -40,28 +32,32 @@ import "./js/datasets.controller/datasets.controller.data";
 import "./js/dataview/dataview.date";
 import "./js/dataview/dataview.plot";
 import "./js/dataview/dataview.location";
-import {renderCSV} from "./js/data.render/render.csv";
-import {createGeoJSON} from "./js/geojson/create.geojson";
-import {joinFeatures} from "./js/geojson/join.features";
+import { renderCSV } from "./js/data.render/render.csv";
+import { createGeoJSON } from "./js/geojson/create.geojson";
+import { joinFeatures } from "./js/geojson/join.features";
 import {
   combineDatasetsByRatio,
   combineDataByGroupsize
 } from "./js/data.juggle/data.combine.ratio";
-import {parseCSV} from "./js/data.parse/parse.csv";
-import {parseCSVDate} from "./js/data.parse/parse.csv.date";
-import {equals, objectsEqual} from "./js/shared/equal";
-import {renderCSVDate} from "./js/data.render/render.csv.date";
-import {createDatasets} from "./js/data.juggle/data.create.datasets";
-import {copy} from "./js/shared/copy";
-import {appendExtensionIfNeeded} from "./js/shared/filename";
+import { parseCSV } from "./js/data.parse/parse.csv";
+import { parseCSVDate } from "./js/data.parse/parse.csv.date";
+import { equals, objectsEqual } from "./js/shared/equal";
+import { renderCSVDate } from "./js/data.render/render.csv.date";
+import { createDatasets } from "./js/data.juggle/data.create.datasets";
+import { copy } from "./js/shared/copy";
+import { appendExtensionIfNeeded } from "./js/shared/filename";
 import {
   FormattedDateAccess,
   DateGermanAssessor,
   DefaultDateAccess,
   DateWeekAssessor
 } from "./js/data.date.assessor/date.assessor";
-import {validateDataItem, validateDataset, validateDatasets} from "./js/data.juggle/data.validate";
-import {isValue} from "./js/shared/value";
+import {
+  validateDataItem,
+  validateDataset,
+  validateDatasets
+} from "./js/data.juggle/data.validate";
+import { isValue } from "./js/shared/value";
 
 exports.Color = Color;
 exports.DatasetsController = DatasetsController;

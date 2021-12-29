@@ -1,5 +1,8 @@
-import {camel2title, createID} from "../shared/selector";
-import {LotivisError, LotivisElementNotFoundError} from "../data.juggle/data.validate.error";
+import { camel2title, createID } from "../shared/selector";
+import {
+  LotivisError,
+  LotivisElementNotFoundError
+} from "../data.juggle/data.validate.error";
 
 /**
  * A lotivis component.
@@ -7,13 +10,12 @@ import {LotivisError, LotivisElementNotFoundError} from "../data.juggle/data.val
  * @class Component
  */
 export class Component {
-
   /**
    * Creates a new instance of Component.
    * @param {Component|string|{}} parent The parental component or selector.
    */
   constructor(parent) {
-    if (!parent) throw new LotivisError('No parent or selector specified.');
+    if (!parent) throw new LotivisError("No parent or selector specified.");
     if (Object.getPrototypeOf(parent) === String.prototype) {
       this.initializeFromSelector(parent);
     } else if (Object.getPrototypeOf(parent) === Object.prototype) {
@@ -30,7 +32,7 @@ export class Component {
    */
   initializeFromSelector(selector) {
     this.selector = selector;
-    this.parent = d3.select('#' + selector);
+    this.parent = d3.select("#" + selector);
     if (this.parent.empty()) throw new LotivisElementNotFoundError(selector);
   }
 
@@ -42,7 +44,8 @@ export class Component {
       let selector = camel2title(this.constructor.name)
         .toLowerCase()
         .trim()
-        .split(` `).join(`-`);
+        .split(` `)
+        .join(`-`);
 
       this.initializeFromSelector(selector);
     }
@@ -57,25 +60,25 @@ export class Component {
 
   show() {
     if (!this.element) return;
-    this.element.style('display', '');
+    this.element.style("display", "");
     return this;
   }
 
   hide() {
     if (!this.element) return;
-    this.element.style('display', 'none');
+    this.element.style("display", "none");
     return this;
   }
 
   get isVisible() {
     if (!this.element) return false;
-    return this.element.style('display') !== 'none';
+    return this.element.style("display") !== "none";
   }
 
   getElementEffectiveSize() {
     if (!this.element) return [0, 0];
-    let width = this.element.style('width').replace('px', '');
-    let height = this.element.style('height').replace('px', '');
+    let width = this.element.style("width").replace("px", "");
+    let height = this.element.style("height").replace("px", "");
     return [Number(width), Number(height)];
   }
 
@@ -95,7 +98,7 @@ export class Component {
   toString() {
     let components = [this.constructor.name];
     if (this.selector) components.push(`'${this.selector}'`);
-    return `[${components.join(' ')}]`;
+    return `[${components.join(" ")}]`;
   }
 
   /**
@@ -103,7 +106,7 @@ export class Component {
    * @returns {*|"undefined"|"object"|"boolean"|"number"|"string"|"function"|"symbol"|"bigint"}
    */
   getClassname() {
-    if (!this.constructor || !this.constructor.name) return (typeof this);
+    if (!this.constructor || !this.constructor.name) return typeof this;
     return this.constructor.name;
   }
 }
