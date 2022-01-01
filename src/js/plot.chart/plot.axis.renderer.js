@@ -3,18 +3,16 @@
  * @class PlotAxisRenderer
  */
 export class PlotAxisRenderer {
-
   /**
    * Creates a new instance of PlotAxisRenderer.
    * @constructor
    * @param plotChart The parental date.chart.plot.chart chart.
    */
   constructor(plotChart) {
-
     /**
      * Appends axis on the top, left and bottom of the date.chart.plot.chart chart.
      */
-    this.renderAxis = function () {
+    this.renderAxis = function() {
       let margin = plotChart.config.margin;
 
       // top
@@ -33,8 +31,10 @@ export class PlotAxisRenderer {
       plotChart.svg
         .append("g")
         .call(d3.axisBottom(plotChart.xChart))
-        .attr("transform", () => `translate(0,${plotChart.height - margin.bottom})`);
-
+        .attr(
+          "transform",
+          () => `translate(0,${plotChart.height - margin.bottom})`
+        );
     };
   }
 }

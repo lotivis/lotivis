@@ -3,14 +3,12 @@
  * @class MapBackgroundRenderer
  */
 export class MapBackgroundRenderer {
-
   /**
    * Creates a new instance of MapBackgroundRenderer.
    *
    * @param mapChart The parental map.chart chart.
    */
   constructor(mapChart) {
-
     function onMouseClick() {
       let controller = mapChart.datasetController;
       if (!controller) return;
@@ -27,16 +25,16 @@ export class MapBackgroundRenderer {
     /**
      * Appends a background rectangle.
      */
-    this.render = function () {
+    this.render = function() {
       // create a background rectangle for receiving mouse enter events
       // in order to reset the location samples filter.
       mapChart.svg
-        .append('rect')
-        .attr('class', 'lotivis-map-chart-background')
-        .attr('width', mapChart.config.width)
-        .attr('height', mapChart.config.height)
-        .attr('fill', 'white')
-        .on('click', onMouseClick);
+        .append("rect")
+        .attr("class", "ltv-map-chart-background")
+        .attr("width", mapChart.config.width)
+        .attr("height", mapChart.config.height)
+        .attr("fill", "white")
+        .on("click", onMouseClick);
     };
   }
 }

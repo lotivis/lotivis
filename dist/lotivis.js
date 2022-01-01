@@ -339,12 +339,6 @@ class Button extends Component {
       if (!this.onClick) return;
       this.onClick(event);
     }.bind(this));
-
-    switch (style) {
-      case "round":
-        this.element.classed("ltv-button-round", true);
-        break;
-    }
   }
   /**
    * Sets the text of the button.
@@ -510,9 +504,9 @@ class Chart extends Component {
    */
   constructor(parent, config) {
     super(parent);
-    this.svgSelector = (this.selector || createID()) + '-svg';
+    this.svgSelector = (this.selector || createID()) + "-svg";
     this.element = this.parent;
-    this.element.attr('id', this.selector);
+    this.element.attr("id", this.selector);
     this.config = config || {};
     this.updateSensible = true;
     this.initialize();
@@ -543,27 +537,18 @@ class Chart extends Component {
 
 
   update(datasetsController, reason) {
-    lotivis_log('[lotivis] ', this.constructor.name, 'update', reason);
+    lotivis_log("[lotivis] ", this.constructor.name, "update", reason);
     if (!this.updateSensible) return;
 
     if (datasetsController) {
       this.snapshot = datasetsController.snapshot;
     }
 
-    lotivis_log('[lotivis] ', this.constructor.name, 'update', datasetsController);
-    lotivis_log('[lotivis] ', this.constructor.name, 'update', this.snapshot);
+    lotivis_log("[lotivis] ", this.constructor.name, "update", datasetsController);
+    lotivis_log("[lotivis] ", this.constructor.name, "update", this.snapshot);
     this.remove();
     this.precalculate();
     this.draw();
-  }
-  /**
-   * Precalculates data for this chart.
-   * @returns {LotivisUnimplementedMethodError}
-   */
-
-
-  precalculate() {
-    throw new LotivisUnimplementedMethodError(`precalculate()`);
   }
   /**
    * Removes any old content from this chart.
@@ -573,6 +558,15 @@ class Chart extends Component {
 
   remove() {
     throw new LotivisUnimplementedMethodError(`remove()`);
+  }
+  /**
+   * Precalculates data for this chart.
+   * @returns {LotivisUnimplementedMethodError}
+   */
+
+
+  precalculate() {
+    throw new LotivisUnimplementedMethodError(`precalculate()`);
   }
   /**
    * Appends / draw the shared.components of this chart.
@@ -2917,7 +2911,7 @@ class TimeChartBarsRenderer {
       let isCombineStacks = config.combineStacks || false;
       let colors = dateChart.datasetController.getColorsForStack(stack.stack) || Color.defaultTint;
       let barRadius = config.barRadius || LotivisConfig.barRadius;
-      dateChart.svg.append("g").selectAll("g").data(stack).enter().append("g").attr("fill", (stackData, index) => isCombineStacks ? colors[0] : stack.colors[index]).selectAll("rect").data(data => data).enter().append("rect").attr('class', 'lotivis-time-chart-bar').attr("rx", isCombineStacks ? 0 : barRadius).attr("ry", isCombineStacks ? 0 : barRadius).attr("x", d => dateChart.xChartScale(d.data.date) + dateChart.xStack(stack.label)).attr("y", d => dateChart.yChart(d[1])).attr("width", dateChart.xStack.bandwidth()).attr("height", d => dateChart.yChart(d[0]) - dateChart.yChart(d[1]));
+      dateChart.svg.append("g").selectAll("g").data(stack).enter().append("g").attr("fill", (stackData, index) => isCombineStacks ? colors[0] : stack.colors[index]).selectAll("rect").data(data => data).enter().append("rect").attr("class", "ltv-date-chart-bar").attr("rx", isCombineStacks ? 0 : barRadius).attr("ry", isCombineStacks ? 0 : barRadius).attr("x", d => dateChart.xChartScale(d.data.date) + dateChart.xStack(stack.label)).attr("y", d => dateChart.yChart(d[1])).attr("width", dateChart.xStack.bandwidth()).attr("height", d => dateChart.yChart(d[0]) - dateChart.yChart(d[1]));
     };
   }
 
@@ -2936,11 +2930,11 @@ class TimeChartHoverBarsRenderer {
    */
   constructor(dateChart) {
     function createID(date) {
-      return `lotivis-date-chart-hover-bar-id-${toSaveID(String(date))}`;
+      return `ltv-date-chart-hover-bar-id-${toSaveID(String(date))}`;
     }
 
     this.hideAll = function () {
-      dateChart.svg.selectAll(`.lotivis-date-chart-hover-bar`).attr(`opacity`, 0);
+      dateChart.svg.selectAll(`.ltv-date-chart-hover-bar`).attr(`opacity`, 0);
     };
 
     function onMouseEnter(event, date) {
@@ -2972,7 +2966,7 @@ class TimeChartHoverBarsRenderer {
       let config = dateChart.config;
       let margin = config.margin;
       let dates = dateChart.config.dateLabels || dateChart.dataview.dates;
-      dateChart.svg.append("g").selectAll("rect").data(dates).enter().append("rect").attr("class", 'lotivis-date-chart-hover-bar').attr("id", date => createID(date)).attr("opacity", 0).attr("x", date => dateChart.xChartScale(date)).attr("y", margin.top).attr("width", dateChart.xChartScale.bandwidth()).attr("height", config.height - margin.bottom - margin.top).on('mouseenter', onMouseEnter.bind(this)).on('mouseout', onMouserOut.bind(this)).on('mousedrag', onMouserOut.bind(this)).on('click', onMouseClick.bind(this));
+      dateChart.svg.append("g").selectAll("rect").data(dates).enter().append("rect").attr("class", "ltv-date-chart-hover-bar").attr("id", date => createID(date)).attr("opacity", 0).attr("x", date => dateChart.xChartScale(date)).attr("y", margin.top).attr("width", dateChart.xChartScale.bandwidth()).attr("height", config.height - margin.bottom - margin.top).on("mouseenter", onMouseEnter.bind(this)).on("mouseout", onMouserOut.bind(this)).on("mousedrag", onMouserOut.bind(this)).on("click", onMouseClick.bind(this));
     };
   }
 
@@ -2991,8 +2985,8 @@ class TimeChartTooltipRenderer {
    * @constructor
    */
   constructor(dateChart) {
-    const tooltip = dateChart.element.append('div').attr('class', 'lotivis-tooltip').attr('rx', 5) // corner radius
-    .attr('ry', 5).style('opacity', 0);
+    const tooltip = dateChart.element.append("div").attr("class", "ltv-tooltip").attr("rx", 5) // corner radius
+    .attr("ry", 5).style("opacity", 0);
     /**
      * Returns the size [width, height] of the tooltip.
      *
@@ -3000,8 +2994,8 @@ class TimeChartTooltipRenderer {
      */
 
     function getTooltipSize() {
-      let tooltipWidth = Number(tooltip.style('width').replace('px', ''));
-      let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
+      let tooltipWidth = Number(tooltip.style("width").replace("px", ""));
+      let tooltipHeight = Number(tooltip.style("height").replace("px", ""));
       return [tooltipWidth, tooltipHeight];
     }
     /**
@@ -3079,7 +3073,7 @@ class TimeChartTooltipRenderer {
         let valueFormatted = dateChart.config.numberFormat.format(item.value);
         sum += item.value;
         return `${divHTML} ${item.dataset}: <b>${valueFormatted}</b>`;
-      }).join('<br>');
+      }).join("<br>");
       let sumFormatted = dateChart.config.numberFormat.format(sum);
       return `<b>${title}</b><br>${dataHTML}<br><br>Sum: <b>${sumFormatted}</b>`;
     }
@@ -3110,7 +3104,7 @@ class TimeChartTooltipRenderer {
       } // update position and opacity of tooltip
 
 
-      tooltip.style('left', `${left}px`).style('top', `${top}px`).style('opacity', 1);
+      tooltip.style("left", `${left}px`).style("top", `${top}px`).style("opacity", 1);
     };
     /**
      * Hides the tooltip.  Does nothing if tooltips opacity is already 0.
@@ -3118,8 +3112,8 @@ class TimeChartTooltipRenderer {
 
 
     this.hideTooltip = function () {
-      if (+tooltip.style('opacity') === 0) return;
-      tooltip.style('opacity', 0);
+      if (+tooltip.style("opacity") === 0) return;
+      tooltip.style("opacity", 0);
     };
   }
 
@@ -3171,7 +3165,7 @@ class TimeChartSelectionRenderer {
    */
   constructor(dateChart) {
     function createID(date) {
-      return `lotivis-date-chart-selection-rect-id-${toSaveID(String(date))}`;
+      return `ltv-date-chart-selection-rect-id-${toSaveID(String(date))}`;
     }
 
     function getSelectedDates() {
@@ -3183,18 +3177,18 @@ class TimeChartSelectionRenderer {
     }
 
     this.hideAll = function () {
-      dateChart.svg.selectAll(`.lotivis-date-chart-selection-rect`).attr(`opacity`, 0);
+      dateChart.svg.selectAll(`.ltv-date-chart-selection-rect`).attr(`opacity`, 0);
     };
 
     this.render = function () {
       let margin = dateChart.config.margin;
       let dates = dateChart.config.dateLabels || dateChart.dataview.dates;
-      dateChart.svg.append("g").selectAll("rect").data(dates).enter().append("rect").attr("class", 'lotivis-date-chart-selection-rect').attr("id", date => createID(date)).attr("x", date => dateChart.xChartScale(date)).attr("y", margin.top).attr("opacity", 0).attr("width", dateChart.xChartScale.bandwidth()).attr("height", dateChart.config.height - margin.bottom - margin.top);
+      dateChart.svg.append("g").selectAll("rect").data(dates).enter().append("rect").attr("class", "ltv-date-chart-selection-rect").attr("id", date => createID(date)).attr("x", date => dateChart.xChartScale(date)).attr("y", margin.top).attr("opacity", 0).attr("width", dateChart.xChartScale.bandwidth()).attr("height", dateChart.config.height - margin.bottom - margin.top);
     };
 
     this.update = function () {
       let selectedDates = getSelectedDates();
-      dateChart.svg.selectAll(`.lotivis-date-chart-selection-rect`).attr(`opacity`, date => selectedDates.includes(String(date)) ? 0.15 : 0);
+      dateChart.svg.selectAll(`.ltv-date-chart-selection-rect`).attr(`opacity`, date => selectedDates.includes(String(date)) ? 0.15 : 0);
     };
   }
 
@@ -3270,7 +3264,7 @@ class DateChart extends Chart {
 
 
   remove() {
-    this.element.selectAll('svg').remove();
+    this.element.selectAll("svg").remove();
   }
   /**
    * @override
@@ -3342,11 +3336,11 @@ class DateChart extends Chart {
 
 
   renderSVG() {
-    this.svg = this.element.append('svg').attr('class', 'lotivis-chart-svg lotivis-date.chart-chart').attr('preserveAspectRatio', 'xMidYMid meet').attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`).attr('id', this.svgSelector);
-    this.background = this.svg.append('rect').attr('width', this.config.width).attr('height', this.config.height).attr('fill', 'white').attr('opacity', 0).attr('cursor', 'pointer').on('click', (event, some) => {
+    this.svg = this.element.append("svg").attr("class", "ltv-chart-svg ltv-date-chart-svg").attr("preserveAspectRatio", "xMidYMid meet").attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`).attr("id", this.svgSelector);
+    this.background = this.svg.append("rect").attr("width", this.config.width).attr("height", this.config.height).attr("fill", "white").attr("opacity", 0).attr("cursor", "pointer").on("click", (event, some) => {
       this.datasetController.resetDateFilters();
     });
-    this.graph = this.svg.append('g').attr('width', this.graphWidth).attr('height', this.graphHeight).attr('transform', `translate(${this.config.margin.left},${this.config.margin.top})`);
+    this.graph = this.svg.append("g").attr("width", this.graphWidth).attr("height", this.graphHeight).attr("transform", `translate(${this.config.margin.left},${this.config.margin.top})`);
   }
   /**
    * Toggle the enabled of the dataset with the given label.
@@ -3472,7 +3466,7 @@ class SettingsPopup extends Popup {
     let container = this.row.append("div");
     this.screenshotButton = new Button(container);
     this.screenshotButton.setText("Make Screenshot");
-    this.screenshotButton.element.classed("ltv-button", true);
+    this.screenshotButton.element.classed("ltv-button ltv-button-block", true);
     this.screenshotButton.onClick = this.screenshotButtonAction.bind(this);
   }
   /**
@@ -3841,8 +3835,8 @@ class MapTooltipRenderer {
    */
   constructor(mapChart) {
     this.mapChart = mapChart;
-    let tooltip = mapChart.element.append('div').attr('class', 'lotivis-tooltip').attr('rx', 5) // corner radius
-    .attr('ry', 5).style('opacity', 0);
+    let tooltip = mapChart.element.append("div").attr("class", "ltv-tooltip").attr("rx", 5) // corner radius
+    .attr("ry", 5).style("opacity", 0);
 
     function featureMapID(feature) {
       return `lotivis-map-area-${feature.lotivisId}`;
@@ -3851,20 +3845,20 @@ class MapTooltipRenderer {
     function htmlTitle(features) {
       if (features.length > 3) {
         let featuresSlice = features.slice(0, 3);
-        let ids = featuresSlice.map(feature => `${feature.lotivisId}`).join(', ');
-        let names = featuresSlice.map(mapChart.config.featureNameAccessor).join(', ');
+        let ids = featuresSlice.map(feature => `${feature.lotivisId}`).join(", ");
+        let names = featuresSlice.map(mapChart.config.featureNameAccessor).join(", ");
         let moreCount = features.length - 3;
         return `IDs: ${ids} (+${moreCount})<br>Names: ${names} (+${moreCount})`;
       } else {
-        let ids = features.map(feature => `${feature.lotivisId}`).join(', ');
-        let names = features.map(mapChart.config.featureNameAccessor).join(', ');
+        let ids = features.map(feature => `${feature.lotivisId}`).join(", ");
+        let names = features.map(mapChart.config.featureNameAccessor).join(", ");
         return `IDs: ${ids}<br>Names: ${names}`;
       }
     }
 
     function htmlValues(features) {
       if (!mapChart.datasetController) {
-        return '';
+        return "";
       }
 
       let flatData = mapChart.datasetController.flatData;
@@ -3887,13 +3881,13 @@ class MapTooltipRenderer {
         }
       }
 
-      let components = [''];
+      let components = [""];
 
       for (const label in combinedByLabel) {
-        components.push(label + ': ' + formatNumber(combinedByLabel[label]));
+        components.push(label + ": " + formatNumber(combinedByLabel[label]));
       }
 
-      return components.join('<br>');
+      return components.join("<br>");
     }
     /**
      * Returns the size of the tooltip.
@@ -3902,8 +3896,8 @@ class MapTooltipRenderer {
 
 
     function getTooltipSize() {
-      let tooltipWidth = Number(tooltip.style('width').replace('px', '') || 200);
-      let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
+      let tooltipWidth = Number(tooltip.style("width").replace("px", "") || 200);
+      let tooltipHeight = Number(tooltip.style("height").replace("px", ""));
       return [tooltipWidth + 20, tooltipHeight + 20];
     }
 
@@ -3968,7 +3962,7 @@ class MapTooltipRenderer {
       }
 
       let left = getTooltipLeft();
-      tooltip.style('opacity', 1).style('left', left + 'px').style('top', top + 'px');
+      tooltip.style("opacity", 1).style("left", left + "px").style("top", top + "px");
     }
     /**
      * Called by map.chart geojson renderer when mouse enters an area drawn on the map.chart.
@@ -3979,10 +3973,10 @@ class MapTooltipRenderer {
 
     this.mouseEnter = function (event, feature) {
       if (mapChart.datasetController && mapChart.datasetController.filters.locations.includes(feature.lotivisId)) {
-        tooltip.html([htmlTitle(mapChart.selectedFeatures), htmlValues(mapChart.selectedFeatures)].join('<br>'));
+        tooltip.html([htmlTitle(mapChart.selectedFeatures), htmlValues(mapChart.selectedFeatures)].join("<br>"));
         positionTooltip(event, mapChart.selectionBorderGeoJSON.features[0]);
       } else {
-        tooltip.html([htmlTitle([feature]), htmlValues([feature])].join('<br>'));
+        tooltip.html([htmlTitle([feature]), htmlValues([feature])].join("<br>"));
         positionTooltip(event, feature);
       }
     };
@@ -3994,10 +3988,10 @@ class MapTooltipRenderer {
 
 
     this.mouseOut = function (event, feature) {
-      let style = styleForCSSClass('.lotivis-map.chart-area');
+      let style = styleForCSSClass(".lotivis-map.chart-area");
       let mapID = featureMapID(feature);
-      mapChart.svg.select(`#${mapID}`).style('stroke', style.stroke || 'black').style('stroke-width', style['stroke-width'] || '0.7').style('stroke-dasharray', feature => feature.departmentsData ? '0' : '1,4');
-      tooltip.style('opacity', 0);
+      mapChart.svg.select(`#${mapID}`).style("stroke", style.stroke || "black").style("stroke-width", style["stroke-width"] || "0.7").style("stroke-dasharray", feature => feature.departmentsData ? "0" : "1,4");
+      tooltip.style("opacity", 0);
     };
     /**
      * Raises the tooltip and the rectangle which draws the bounds.
@@ -4026,12 +4020,12 @@ class MapLegendRenderer {
     let legend;
 
     function appendLegend() {
-      legend = mapChart.svg.append('svg').attr('class', 'lotivis-location-chart-legend').attr('width', mapChart.width).attr('height', 200).attr('x', 0).attr('y', 0);
+      legend = mapChart.svg.append("svg").attr("class", "ltv-map-chart-legend").attr("width", mapChart.width).attr("height", 200).attr("x", 0).attr("y", 0);
     }
 
     function removeDatasetLegend() {
-      legend.selectAll('rect').remove();
-      legend.selectAll('text').remove();
+      legend.selectAll("rect").remove();
+      legend.selectAll("text").remove();
     }
 
     this.render = function () {
@@ -4051,15 +4045,15 @@ class MapLegendRenderer {
         let steps = 4;
         let data = [0, 1 / 4 * max, 1 / 2 * max, 3 / 4 * max, max];
         let generator = Color$1.mapColors(max);
-        legend.append('text').attr('class', 'lotivis-location-chart-legend-title').attr('x', offset + 10).attr('y', '20').style('fill', color.rgbString()).text(stackName);
-        legend.append("g").selectAll("text").data(['No Data']).enter().append("text").attr('class', 'lotivis-location-chart-legend-text').attr('x', offset + 35).attr('y', 44).text(d => d);
-        legend.append('g').selectAll("rect").data([0]).enter().append("rect").attr('class', 'lotivis-location-chart-legend-rect').style('fill', 'white').attr('x', offset + 10).attr('y', 30).attr('width', 18).attr('height', 18).style('stroke-dasharray', '1,3').style('stroke', 'black').style('stroke-width', 1);
-        legend.append("g").selectAll("text").data([0]).enter().append("text").attr('class', 'lotivis-location-chart-legend-text').attr('x', offset + 35).attr('y', 64).text(d => d);
-        legend.append('g').selectAll("rect").data([0]).enter().append("rect").attr('class', 'lotivis-location-chart-legend-rect').style('fill', 'WhiteSmoke').attr('x', offset + 10).attr('y', 50).attr('width', 18).attr('height', 18).style('stroke', 'black').style('stroke-width', 1);
-        legend.append("g").selectAll("rect").data(data).enter().append("rect").attr('class', 'lotivis-location-chart-legend-rect').style('fill', generator).attr('x', offset + 10).attr('y', (d, i) => i * 20 + 70).attr('width', 18).attr('height', 18).style('stroke', 'black').style('stroke-width', 1);
-        legend.append("g").selectAll("text").data(data).enter().append("text").attr('class', 'lotivis-location-chart-legend-text').attr('x', offset + 35).attr('y', (d, i) => i * 20 + 84).text(function (d, i) {
+        legend.append("text").attr("class", "ltv-map-chart-legend-title").attr("x", offset + 10).attr("y", "20").style("fill", color.rgbString()).text(stackName);
+        legend.append("g").selectAll("text").data(["No Data"]).enter().append("text").attr("class", "ltv-map-chart-legend-text").attr("x", offset + 35).attr("y", 44).text(d => d);
+        legend.append("g").selectAll("rect").data([0]).enter().append("rect").attr("class", "ltv-map-chart-legend-rect").style("fill", "white").attr("x", offset + 10).attr("y", 30).attr("width", 18).attr("height", 18).style("stroke-dasharray", "1,3").style("stroke", "black").style("stroke-width", 1);
+        legend.append("g").selectAll("text").data([0]).enter().append("text").attr("class", "lotivis-location-chart-legend-text").attr("x", offset + 35).attr("y", 64).text(d => d);
+        legend.append("g").selectAll("rect").data([0]).enter().append("rect").attr("class", "ltv-map-chart-legend-rect").style("fill", "WhiteSmoke").attr("x", offset + 10).attr("y", 50).attr("width", 18).attr("height", 18).style("stroke", "black").style("stroke-width", 1);
+        legend.append("g").selectAll("rect").data(data).enter().append("rect").attr("class", "ltv-map-chart-legend-rect").style("fill", generator).attr("x", offset + 10).attr("y", (d, i) => i * 20 + 70).attr("width", 18).attr("height", 18).style("stroke", "black").style("stroke-width", 1);
+        legend.append("g").selectAll("text").data(data).enter().append("text").attr("class", "ltv-map-chart-legend-text").attr("x", offset + 35).attr("y", (d, i) => i * 20 + 84).text(function (d, i) {
           if (d === 0) {
-            return '> 0';
+            return "> 0";
           } else {
             return formatNumber(i / steps * max);
           }
@@ -4086,7 +4080,7 @@ class MapLabelRenderer {
      * Removes any old labels from the map.chart.
      */
     function removeLabels() {
-      mapChart.svg.selectAll('.lotivis-map.chart-label').remove();
+      mapChart.svg.selectAll(".ltv-map.chart-label").remove();
     }
     /**
      * Appends labels from datasets.
@@ -4100,13 +4094,13 @@ class MapLabelRenderer {
       let dataview = mapChart.dataview;
       if (!dataview) return lotivis_log(`[lotivis]  No dataview in map chart (${mapChart.selector}).`);
       if (!mapChart.config.showLabels) return lotivis_log(`[lotivis]  Skip rendering labels due to configuration (${mapChart.selector}).`);
-      mapChart.svg.selectAll('text').data(geoJSON.features).enter().append('text').attr('class', 'lotivis-location-chart-label').text(function (feature) {
+      mapChart.svg.selectAll("text").data(geoJSON.features).enter().append("text").attr("class", "ltv-map-chart-label").text(function (feature) {
         let featureID = mapChart.config.featureIDAccessor(feature);
         let dataset = dataview.combinedData.find(dataset => equals(dataset.location, featureID));
-        return dataset ? formatNumber(dataset.value) : '';
-      }).attr('x', function (feature) {
+        return dataset ? formatNumber(dataset.value) : "";
+      }).attr("x", function (feature) {
         return mapChart.projection(feature.center)[0];
-      }.bind(this)).attr('y', function (feature) {
+      }.bind(this)).attr("y", function (feature) {
         return mapChart.projection(feature.center)[1];
       }.bind(this));
     };
@@ -4126,18 +4120,18 @@ class MapDatasetRenderer {
    */
   constructor(mapChart) {
     let generator = Color$1.mapColors(1);
-    let styleArea = styleForCSSClass('lotivis-map-chart-area');
-    styleForCSSClass('lotivis-map-chart-area-hover');
+    let styleArea = styleForCSSClass("ltv-map-chart-area");
+    styleForCSSClass("ltv-map-chart-area-hover");
     /**
      * Resets the `fill` and `fill-opacity` property of each area.
      */
 
     function resetAreas() {
-      mapChart.svg.selectAll('.lotivis-map-chart-area').classed('lotivis-map-chart-area-hover', false);
+      mapChart.svg.selectAll(".ltv-map-chart-area").classed("ltv-map-chart-area-hover", false);
     }
 
     function featureMapID(feature) {
-      return `lotivis-map-chart-area-id-${feature.lotivisId}`;
+      return `ltv-map-chart-area-id-${feature.lotivisId}`;
     }
     /**
      * Called by map chart GeoJSON renderer when mouse enters an area drawn
@@ -4152,11 +4146,11 @@ class MapDatasetRenderer {
       resetAreas();
       styleArea.stroke || Color$1.defaultTint.rgbString();
       let mapID = featureMapID(feature);
-      mapChart.svg.selectAll(`#${mapID}`).raise().classed('lotivis-map-chart-area-hover', true); // .style('stroke', styleHover.stroke || color)
+      mapChart.svg.selectAll(`#${mapID}`).raise().classed("ltv-map-chart-area-hover", true); // .style('stroke', styleHover.stroke || color)
       // .style('stroke-width', styleHover['stroke-width'] || '4')
       // .style('stroke-dasharray', '0');
 
-      mapChart.svg.selectAll('.lotivis-location-chart-label').raise();
+      mapChart.svg.selectAll(".ltv-location-chart-label").raise();
     };
     /**
      * Tells this renderer that the mouse moved out of an area.
@@ -4172,8 +4166,8 @@ class MapDatasetRenderer {
 
 
     this.render = function () {
-      if (!mapChart.geoJSON) return lotivis_log('[lotivis]  No GeoJSON to render.');
-      if (!mapChart.dataview) return lotivis_log('[lotivis]  No data view property.');
+      if (!mapChart.geoJSON) return lotivis_log("[lotivis]  No GeoJSON to render.");
+      if (!mapChart.dataview) return lotivis_log("[lotivis]  No data view property.");
       let stackNames = mapChart.dataview.stacks;
       let combinedData = mapChart.dataview.combinedData;
       resetAreas();
@@ -4187,9 +4181,9 @@ class MapDatasetRenderer {
           let datasetEntry = dataForStack[index];
           let locationID = datasetEntry.location;
           let opacity = Number(datasetEntry.value / max);
-          mapChart.svg.selectAll('.lotivis-map-chart-area').filter(item => equals(mapChart.config.featureIDAccessor(item), locationID)).style('fill', function () {
+          mapChart.svg.selectAll(".ltv-map-chart-area").filter(item => equals(mapChart.config.featureIDAccessor(item), locationID)).style("fill", function () {
             if (opacity === 0) {
-              return 'WhiteSmoke';
+              return "WhiteSmoke";
             } else {
               return generator(opacity);
             }
@@ -4262,7 +4256,7 @@ class MapGeoJSONRenderer {
     this.render = function () {
       let geoJSON = mapChart.presentedGeoJSON;
       if (!geoJSON) return;
-      mapChart.areas = mapChart.svg.selectAll('path').data(geoJSON.features).enter().append('path').attr('d', mapChart.path).attr('id', feature => `lotivis-map-chart-area-id-${feature.lotivisId}`).classed('lotivis-map-chart-area', true).style('stroke-dasharray', feature => feature.departmentsData ? '0' : '1,4').style('fill', 'white').style('fill-opacity', 1).on('click', mouseClick).on('mouseenter', mouseEnter).on('mouseout', mouseOut);
+      mapChart.areas = mapChart.svg.selectAll("path").data(geoJSON.features).enter().append("path").attr("d", mapChart.path).attr("id", feature => `ltv-map-chart-area-id-${feature.lotivisId}`).classed("ltv-map-chart-area", true).style("stroke-dasharray", feature => feature.departmentsData ? "0" : "1,4").style("fill", "white").style("fill-opacity", 1).on("click", mouseClick).on("mouseenter", mouseEnter).on("mouseout", mouseOut);
     };
   }
 
@@ -4824,24 +4818,24 @@ class MapExteriorBorderRenderer {
      */
     this.render = function () {
       if (!topojson$1) {
-        lotivis_log('[lotivis]  Can\'t find topojson library.');
+        lotivis_log("[lotivis]  Can't find topojson library.");
         return;
       }
 
       let geoJSON = mapChart.geoJSON;
 
       if (!geoJSON) {
-        lotivis_log('[lotivis]  No GeoJSON to render.');
+        lotivis_log("[lotivis]  No GeoJSON to render.");
         return;
       }
 
       let borders = joinFeatures(geoJSON.features);
 
       if (!borders) {
-        return lotivis_log('[lotivis]  No borders to render.');
+        return lotivis_log("[lotivis]  No borders to render.");
       }
 
-      mapChart.svg.selectAll('path').append('path').data(borders.features).enter().append('path').attr('d', mapChart.path).attr('class', 'lotivis-map-chart-exterior-borders').raise();
+      mapChart.svg.selectAll("path").append("path").data(borders.features).enter().append("path").attr("d", mapChart.path).attr("class", "ltv-map-chart-exterior-borders").raise();
     };
   }
 
@@ -4965,7 +4959,7 @@ class MapBackgroundRenderer {
     this.render = function () {
       // create a background rectangle for receiving mouse enter events
       // in order to reset the location samples filter.
-      mapChart.svg.append('rect').attr('class', 'lotivis-map-chart-background').attr('width', mapChart.config.width).attr('height', mapChart.config.height).attr('fill', 'white').on('click', onMouseClick);
+      mapChart.svg.append("rect").attr("class", "ltv-map-chart-background").attr("width", mapChart.config.width).attr("height", mapChart.config.height).attr("fill", "white").on("click", onMouseClick);
     };
   }
 
@@ -5109,7 +5103,7 @@ class MapSelectionRenderer {
    * @param mapChart The parental map.chart chart.
    */
   constructor(mapChart) {
-    if (!self.topojson) lotivis_log_once('Can\'t find topojson lib.  Skip rendering of exterior border.');
+    if (!self.topojson) lotivis_log_once("Can't find topojson lib.  Skip rendering of exterior border.");
     /**
      * Returns the collection of selected features.
      *
@@ -5148,7 +5142,7 @@ class MapSelectionRenderer {
 
     this.render = function () {
       if (!self.topojson) {
-        lotivis_log('[lotivis]  Can\'t find topojson library.');
+        lotivis_log("[lotivis]  Can't find topojson library.");
         return;
       } // return;
 
@@ -5157,15 +5151,15 @@ class MapSelectionRenderer {
       mapChart.selectionBorderGeoJSON = joinFeatures(mapChart.selectedFeatures);
 
       if (!mapChart.selectionBorderGeoJSON) {
-        return lotivis_log('[lotivis]  No selected features to render.');
+        return lotivis_log("[lotivis]  No selected features to render.");
       }
 
-      mapChart.svg.selectAll('.lotivis-map-chart-selection-border').remove();
-      mapChart.svg.selectAll('.lotivis-map-chart-selection-border').append('path').attr('class', 'lotivis-map-chart-selection-border').data(mapChart.selectionBorderGeoJSON.features).enter().append('path').attr('d', mapChart.path).attr('class', 'lotivis-map-chart-selection-border').raise();
+      mapChart.svg.selectAll(".ltv-map-chart-selection-border").remove();
+      mapChart.svg.selectAll(".ltv-map-chart-selection-border").append("path").attr("class", "ltv-map-chart-selection-border").data(mapChart.selectionBorderGeoJSON.features).enter().append("path").attr("d", mapChart.path).attr("class", "ltv-map-chart-selection-border").raise();
     };
 
     this.raise = function () {
-      mapChart.svg.selectAll('.lotivis-map-chart-selection-border').raise();
+      mapChart.svg.selectAll(".ltv-map-chart-selection-border").raise();
     };
   }
 
@@ -5230,10 +5224,10 @@ class MapChart extends Chart {
   }
 
   draw() {
-    lotivis_log('[lotivis] ', this.constructor.name, 'draw');
+    lotivis_log("[lotivis] ", this.constructor.name, "draw");
 
     if (!this.geoJSON) {
-      return lotivis_log('[lotivis]  No GeoJSON to render.');
+      return lotivis_log("[lotivis]  No GeoJSON to render.");
     }
 
     this.backgroundRenderer.render();
@@ -5251,7 +5245,7 @@ class MapChart extends Chart {
 
 
   renderSVG() {
-    this.svg = this.element.append('svg').attr('id', this.svgSelector).attr('viewBox', `0 0 ${this.config.width} ${this.config.height}`);
+    this.svg = this.element.append("svg").classed("ltv-chart-svg ltv-map-chart-svg", true).attr("id", this.svgSelector).attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`);
   }
   /**
    * Sets the size of the projection to fit the given geo json.
@@ -5277,7 +5271,7 @@ class MapChart extends Chart {
 
 
   setGeoJSON(newGeoJSON) {
-    if (typeof newGeoJSON === 'object' && newGeoJSON.prototype === 'GeoJSON') {
+    if (typeof newGeoJSON === "object" && newGeoJSON.prototype === "GeoJSON") {
       this.geoJSON = newGeoJSON;
     } else {
       this.geoJSON = new GeoJson(newGeoJSON);
@@ -5369,7 +5363,7 @@ class MapChartCard extends ChartCard {
    * @param config The config of the map.chart chart.
    */
   constructor(parent, config) {
-    super(parent || 'map-chart-card', config);
+    super(parent || "map-chart-card", config);
   }
   /**
    * Creates and injects the map.chart chart.
@@ -5377,8 +5371,8 @@ class MapChartCard extends ChartCard {
 
 
   injectChart() {
-    this.chartID = this.selector + '-chart';
-    this.body.attr('id', this.chartID);
+    this.chartID = this.selector + "-chart";
+    this.body.attr("id", this.chartID);
     this.chart = new MapChart(this.chartID, this.config);
   }
   /**
@@ -5388,7 +5382,7 @@ class MapChartCard extends ChartCard {
 
 
   screenshotButtonAction() {
-    let filename = 'Unknown';
+    let filename = "Unknown";
 
     if (this.chart && this.chart.datasetController) {
       filename = this.chart.datasetController.getFilename();
@@ -5403,11 +5397,11 @@ class MapChartCard extends ChartCard {
 
 
   presentSettingsPopupAction() {
-    let bodyElement = d3.select('body');
+    let bodyElement = d3.select("body");
     let button = document.getElementById(this.moreButton.selector);
     let settingsPopup = new MapChartSettingsPopup(bodyElement);
     settingsPopup.mapChart = this.chart;
-    settingsPopup.showUnder(button, 'right');
+    settingsPopup.showUnder(button, "right");
   }
 
 }
@@ -5491,19 +5485,19 @@ DatasetsController.prototype.getPlotDataview = function () {
  */
 
 const PlotChartType = {
-  gradient: 'gradient',
-  fraction: 'fraction'
+  gradient: "gradient",
+  fraction: "fraction"
 };
 /**
  * Enumeration of sorts available in the date.chart.plot.chart chart.
  */
 
 const PlotChartSort = {
-  none: 'none',
-  alphabetically: 'alphabetically',
-  duration: 'duration',
-  intensity: 'intensity',
-  firstDate: 'firstDate'
+  none: "none",
+  alphabetically: "alphabetically",
+  duration: "duration",
+  intensity: "intensity",
+  firstDate: "firstDate"
 };
 /**
  *
@@ -5525,11 +5519,11 @@ const defaultPlotChartConfig = {
   drawGrid: true,
   showTooltip: true,
   sendsNotifications: true,
-  lowColor: 'rgb(184, 233, 148)',
-  highColor: 'rgb(0, 122, 255)',
+  lowColor: "rgb(184, 233, 148)",
+  highColor: "rgb(0, 122, 255)",
   sort: PlotChartSort.none,
   type: PlotChartType.gradient,
-  numberFormat: Intl.NumberFormat('de-DE', {
+  numberFormat: Intl.NumberFormat("de-DE", {
     maximumFractionDigits: 3
   })
 };
@@ -5575,8 +5569,8 @@ class PlotTooltipRenderer {
    * @param plotChart
    */
   constructor(plotChart) {
-    const tooltip = plotChart.element.append('div').attr('class', 'lotivis-tooltip').attr('rx', 5) // corner radius
-    .attr('ry', 5).style('opacity', 0);
+    const tooltip = plotChart.element.append("div").attr("class", "ltv-tooltip").attr("rx", 5) // corner radius
+    .attr("ry", 5).style("opacity", 0);
     /**
      * Returns the HTML content for the given dataset.
      * @param dataset The dataset to represent in HTML.
@@ -5586,13 +5580,13 @@ class PlotTooltipRenderer {
       let components = [];
       let sum = dataset.data.map(item => item.value).reduce((acc, next) => +acc + +next, 0);
       let formatted = plotChart.config.numberFormat.format(sum);
-      components.push('Label: ' + dataset.label);
-      components.push('');
-      components.push('Start: ' + dataset.firstDate);
-      components.push('End: ' + dataset.lastDate);
-      components.push('');
-      components.push('Items: ' + formatted);
-      components.push('');
+      components.push("Label: " + dataset.label);
+      components.push("");
+      components.push("Start: " + dataset.firstDate);
+      components.push("End: " + dataset.lastDate);
+      components.push("");
+      components.push("Items: " + formatted);
+      components.push("");
       let filtered = dataset.data.filter(item => item.value !== 0);
 
       for (let index = 0; index < filtered.length; index++) {
@@ -5601,7 +5595,7 @@ class PlotTooltipRenderer {
         components.push(`${entry.date}: ${formatted}`);
       }
 
-      return components.join('<br/>');
+      return components.join("<br/>");
     }
     /**
      * Returns the pixel position for to tooltip to display it aligned to the left of a bar.
@@ -5630,7 +5624,7 @@ class PlotTooltipRenderer {
       if (!plotChart.config.showTooltip) return;
       tooltip.html(getHTMLContentForDataset(dataset)); // position tooltip
 
-      let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
+      let tooltipHeight = Number(tooltip.style("height").replace("px", ""));
       let factor = plotChart.getElementEffectiveSize()[0] / plotChart.config.width;
       let offset = plotChart.getElementPosition();
       let top = plotChart.yChart(dataset.label) * factor;
@@ -5645,7 +5639,7 @@ class PlotTooltipRenderer {
       }
 
       let left = getTooltipLeftForDataset(dataset, factor, offset);
-      tooltip.style('left', left + 'px').style('top', top + 'px').style('opacity', 1);
+      tooltip.style("left", left + "px").style("top", top + "px").style("opacity", 1);
     };
     /**
      * Hides the tooltip by setting its opacity to 0.
@@ -5660,8 +5654,8 @@ class PlotTooltipRenderer {
         controller.resetFilters();
       }
 
-      if (+tooltip.style('opacity') === 0) return;
-      tooltip.style('opacity', 0);
+      if (+tooltip.style("opacity") === 0) return;
+      tooltip.style("opacity", 0);
     };
   }
 
@@ -5687,7 +5681,7 @@ class PlotLabelRenderer {
       if (!plotChart.config.showLabels) return;
       let xBandwidth = plotChart.yChart.bandwidth();
       let xChart = plotChart.xChart;
-      plotChart.labels = plotChart.barsData.append('g').attr('transform', `translate(0,${xBandwidth / 2 + 4})`).append('text').attr('class', 'lotivis-plot-label').attr("id", d => 'rect-' + hashCode(d.label)).attr("x", d => xChart(d.firstDate) + xBandwidth / 2).attr("y", d => plotChart.yChart(d.label)).attr("width", d => xChart(d.lastDate) - xChart(d.firstDate) + xBandwidth).text(function (dataset) {
+      plotChart.labels = plotChart.barsData.append("g").attr("transform", `translate(0,${xBandwidth / 2 + 4})`).append("text").attr("class", "ltv-plot-label").attr("id", d => "rect-" + hashCode(d.label)).attr("x", d => xChart(d.firstDate) + xBandwidth / 2).attr("y", d => plotChart.yChart(d.label)).attr("width", d => xChart(d.lastDate) - xChart(d.firstDate) + xBandwidth).text(function (dataset) {
         if (dataset.sum === 0) return;
         let formatted = plotChart.config.numberFormat.format(dataset.sum);
         return `${dataset.duration + 1} years, ${formatted} items`;
@@ -5715,8 +5709,8 @@ class PlotGridRenderer {
      */
     this.render = function () {
       if (!plotChart.config.drawGrid) return;
-      plotChart.svg.append('g').attr('class', 'lotivis-plot-grid lotivis-plot-grid-x').attr('transform', 'translate(0,' + (plotChart.preferredHeight - plotChart.config.margin.bottom) + ')').call(plotChart.xAxisGrid);
-      plotChart.svg.append('g').attr('class', 'lotivis-plot-grid lotivis-plot-grid-y').attr('transform', `translate(${plotChart.config.margin.left},0)`).call(plotChart.yAxisGrid);
+      plotChart.svg.append("g").attr("class", "ltv-plot-grid ltv-plot-grid-x").attr("transform", "translate(0," + (plotChart.preferredHeight - plotChart.config.margin.bottom) + ")").call(plotChart.xAxisGrid);
+      plotChart.svg.append("g").attr("class", "ltv-plot-grid ltv-plot-grid-y").attr("transform", `translate(${plotChart.config.margin.left},0)`).call(plotChart.yAxisGrid);
     };
   }
 
@@ -5732,7 +5726,7 @@ class PlotBackgroundRenderer {
    */
   constructor(plotChart) {
     this.render = function () {
-      plotChart.svg.append('rect').attr('width', plotChart.width || plotChart.config.width).attr('height', plotChart.height).attr('class', `lotivis-plot-chart-background`).on('click', (event, some) => {
+      plotChart.svg.append("rect").attr("width", plotChart.width || plotChart.config.width).attr("height", plotChart.height).attr("class", `ltv-plot-chart-background`).on("click", (event, some) => {
         plotChart.datasetController.resetLabelFilters();
       });
     };
@@ -5754,17 +5748,18 @@ class PlotChartHoverBarsRenderer {
    */
   constructor(plotChart) {
     function createID(dataset) {
-      return `lotivis-plot-chart-hover-bar-id-${createIDFromDataset(dataset)}`;
+      return `ltv-plot-chart-hover-bar-id-${createIDFromDataset(dataset)}`;
     }
 
     function hideAll() {
-      plotChart.svg.selectAll('.lotivis-plot-chart-hover-bar').attr("opacity", 0);
+      plotChart.svg.selectAll(".ltv-plot-chart-hover-bar").attr("opacity", 0);
     }
     /**
      * To be called when the mouse enters a bar on the date.chart.plot.chart chart.
      * @param event The mouse event.
      * @param dataset The represented dataset.
      */
+
 
     function mouseEnter(event, dataset) {
       hideAll();
@@ -5806,7 +5801,7 @@ class PlotChartHoverBarsRenderer {
       let datasets = plotChart.dataView.datasets;
       let graphWidth = plotChart.graphWidth;
       plotChart.backgrounBarsData = plotChart.svg.append("g").selectAll("g").data(datasets).enter();
-      plotChart.backgrounBars = plotChart.backgrounBarsData.append("rect").attr("id", d => createID(d)).attr('class', 'lotivis-plot-chart-hover-bar').attr(`opacity`, 0).attr("x", plotChart.config.margin.left).attr("y", d => plotChart.yChart(d.label)).attr("height", plotChart.yChart.bandwidth()).attr("width", graphWidth).on('mouseenter', mouseEnter).on('mouseout', mouseOut).on('click', mouseClick);
+      plotChart.backgrounBars = plotChart.backgrounBarsData.append("rect").attr("id", d => createID(d)).attr("class", "ltv-plot-chart-hover-bar").attr(`opacity`, 0).attr("x", plotChart.config.margin.left).attr("y", d => plotChart.yChart(d.label)).attr("height", plotChart.yChart.bandwidth()).attr("width", graphWidth).on("mouseenter", mouseEnter).on("mouseout", mouseOut).on("click", mouseClick);
     };
   }
 
@@ -5856,7 +5851,7 @@ class PlotBarsFractionsRenderer {
       flatData = combineByDate(flatData);
       plotChart.barsData = plotChart.svg.append("g").selectAll("g").data(flatData).enter();
       let colors = Color$1.mapColors(max);
-      plotChart.bars = plotChart.barsData.append("rect").attr("id", d => `lotivis-plot-bar-${createIDFromDataset(d)}`).attr('class', 'lotivis-plot-bar').attr(`fill`, d => colors(d.value)).attr("rx", radius).attr("ry", radius).attr("x", d => plotChart.xChart(d.date)).attr("y", d => plotChart.yChartPadding(d.label)).attr("height", plotChart.yChartPadding.bandwidth()).attr("id", d => 'rect-' + createIDFromDataset(d)).on('mouseenter', mouseEnter).on('mouseout', mouseOut).attr("width", plotChart.xChart.bandwidth());
+      plotChart.bars = plotChart.barsData.append("rect").attr("id", d => `ltv-plot-bar-${createIDFromDataset(d)}`).attr("class", "ltv-plot-bar").attr(`fill`, d => colors(d.value)).attr("rx", radius).attr("ry", radius).attr("x", d => plotChart.xChart(d.date)).attr("y", d => plotChart.yChartPadding(d.label)).attr("height", plotChart.yChartPadding.bandwidth()).attr("id", d => "rect-" + createIDFromDataset(d)).on("mouseenter", mouseEnter).on("mouseout", mouseOut).attr("width", plotChart.xChart.bandwidth());
     };
   }
 
@@ -5887,7 +5882,7 @@ class PlotBarsGradientCreator {
 
   createGradient(dataset) {
     let max = this.plotChart.dataView.max;
-    let gradient = this.plotChart.definitions.append("linearGradient").attr("id", 'lotivis-plot-gradient-' + createIDFromDataset(dataset)).attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
+    let gradient = this.plotChart.definitions.append("linearGradient").attr("id", "ltv-plot-gradient-" + createIDFromDataset(dataset)).attr("x1", "0%").attr("x2", "100%").attr("y1", "0%").attr("y2", "0%");
     let data = dataset.data;
     let count = data.length;
     let latestDate = dataset.lastDate;
@@ -5943,7 +5938,7 @@ class PlotBarsGradientRenderer {
       }
 
       plotChart.barsData = plotChart.svg.append("g").selectAll("g").data(datasets).enter();
-      plotChart.bars = plotChart.barsData.append("rect").attr("fill", d => `url(#lotivis-plot-gradient-${createIDFromDataset(d)})`).attr('class', 'lotivis-plot-bar').attr("rx", radius).attr("ry", radius).attr("x", d => plotChart.xChart(d.duration < 0 ? d.lastDate : d.firstDate || 0)).attr("y", d => plotChart.yChartPadding(d.label)).attr("height", plotChart.yChartPadding.bandwidth()).attr("id", d => 'lotivis-plot-rect-' + createIDFromDataset(d)).attr("width", function (data) {
+      plotChart.bars = plotChart.barsData.append("rect").attr("fill", d => `url(#ltv-plot-gradient-${createIDFromDataset(d)})`).attr("class", "ltv-plot-bar").attr("rx", radius).attr("ry", radius).attr("x", d => plotChart.xChart(d.duration < 0 ? d.lastDate : d.firstDate || 0)).attr("y", d => plotChart.yChartPadding(d.label)).attr("height", plotChart.yChartPadding.bandwidth()).attr("id", d => "ltv-plot-rect-" + createIDFromDataset(d)).attr("width", function (data) {
         if (!data.firstDate || !data.lastDate) return 0;
         return plotChart.xChart(data.lastDate) - plotChart.xChart(data.firstDate) + plotChart.xChart.bandwidth();
       }.bind(this));
@@ -5971,7 +5966,7 @@ class PlotLabelsFractionsRenderer {
     this.renderLabels = function () {
       if (!plotChart.config.showLabels) return;
       let xBandwidth = plotChart.yChart.bandwidth();
-      plotChart.labels = plotChart.barsData.append('g').attr('transform', `translate(0,${xBandwidth / 2 + 4})`).append('text').attr('class', 'lotivis-plot-label').attr("id", d => 'rect-' + hashCode(d.label)).attr("x", d => plotChart.xChart(d.date) + 4).attr("y", d => plotChart.yChart(d.label)).text(function (dataset) {
+      plotChart.labels = plotChart.barsData.append("g").attr("transform", `translate(0,${xBandwidth / 2 + 4})`).append("text").attr("class", "ltv-plot-label").attr("id", d => "rect-" + hashCode(d.label)).attr("x", d => plotChart.xChart(d.date) + 4).attr("y", d => plotChart.yChart(d.label)).text(function (dataset) {
         if (dataset.sum === 0) return;
         let formatted = plotChart.config.numberFormat.format(dataset.value);
         return `${formatted}`;
@@ -5996,7 +5991,7 @@ class PlotChartSelectionRenderer {
    */
   constructor(plotChart) {
     function createID(dataset) {
-      return `lotivis-plot-chart-selection-rect-id-${createIDFromDataset(dataset)}`;
+      return `ltv-plot-chart-selection-rect-id-${createIDFromDataset(dataset)}`;
     }
     /**
      * Draws the bars.
@@ -6007,17 +6002,17 @@ class PlotChartSelectionRenderer {
       let datasets = plotChart.dataView.datasets;
       let graphWidth = plotChart.graphWidth;
       plotChart.selectionBarsData = plotChart.svg.append("g").selectAll("g").data(datasets).enter();
-      plotChart.selectionBars = plotChart.selectionBarsData.append("rect").attr("id", d => createID(d)).attr('class', 'lotivis-plot-chart-selection-rect').attr(`opacity`, 0).attr("x", plotChart.config.margin.left).attr("y", d => plotChart.yChart(d.label)).attr("height", plotChart.yChart.bandwidth()).attr("width", graphWidth);
+      plotChart.selectionBars = plotChart.selectionBarsData.append("rect").attr("id", d => createID(d)).attr("class", "ltv-plot-chart-selection-rect").attr(`opacity`, 0).attr("x", plotChart.config.margin.left).attr("y", d => plotChart.yChart(d.label)).attr("height", plotChart.yChart.bandwidth()).attr("width", graphWidth);
     };
 
     this.update = function () {
       let selectedLabels = getSelectedLabels();
-      plotChart.svg.selectAll(`.lotivis-plot-chart-selection-rect`).attr(`opacity`, dataset => selectedLabels.includes(dataset.label) ? 0.3 : 0);
-      console.log('selectedLabels', selectedLabels);
+      plotChart.svg.selectAll(`.ltv-plot-chart-selection-rect`).attr(`opacity`, dataset => selectedLabels.includes(dataset.label) ? 0.3 : 0);
+      console.log("selectedLabels", selectedLabels);
     };
 
     function getSelectedLabels() {
-      console.log('plotChart.datasetController.filters', plotChart.datasetController.filters);
+      console.log("plotChart.datasetController.filters", plotChart.datasetController.filters);
       return plotChart.datasetController.filters.labels || [];
     }
   }
@@ -6061,15 +6056,15 @@ class PlotChart extends Chart {
 
 
   createSVG() {
-    this.svg = this.element.append('svg').attr('id', this.svgSelector).attr('class', 'lotivis-chart-svg').attr('preserveAspectRatio', 'xMidYMid meet').attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`);
+    this.svg = this.element.append("svg").attr("id", this.svgSelector).attr("class", "ltv-chart-svg ltv-plot-chart-svg").attr("preserveAspectRatio", "xMidYMid meet").attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`);
   }
   /**
-   * Removes any (old) shared.components from the svg.
+   * Removes any (old) components from the svg.
    */
 
 
   remove() {
-    this.svg.selectAll('*').remove();
+    this.svg.selectAll("*").remove();
   }
   /**
    *
@@ -6123,7 +6118,7 @@ class PlotChart extends Chart {
 
   update(controller, reason) {
     if (!this.updateSensible) return;
-    if (reason === 'dates-filter') return;
+    if (reason === "dates-filter") return;
     this.remove();
     this.precalculate();
     this.draw();
@@ -6137,8 +6132,8 @@ class PlotChart extends Chart {
     this.xChart = d3.scaleBand().domain(this.dataView.dates || []).rangeRound([this.config.margin.left, this.config.width - this.config.margin.right]).paddingInner(0.1);
     this.yChartPadding = d3.scaleBand().domain(this.dataView.labels || []).rangeRound([this.height - this.config.margin.bottom, this.config.margin.top]).paddingInner(0.1);
     this.yChart = d3.scaleBand().domain(this.dataView.labels || []).rangeRound([this.height - this.config.margin.bottom, this.config.margin.top]);
-    this.xAxisGrid = d3.axisBottom(this.xChart).tickSize(-this.graphHeight).tickFormat('');
-    this.yAxisGrid = d3.axisLeft(this.yChart).tickSize(-this.graphWidth).tickFormat('');
+    this.xAxisGrid = d3.axisBottom(this.xChart).tickSize(-this.graphHeight).tickFormat("");
+    this.yAxisGrid = d3.axisLeft(this.yChart).tickSize(-this.graphWidth).tickFormat("");
   }
   /**
    *

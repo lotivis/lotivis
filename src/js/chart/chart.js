@@ -1,7 +1,7 @@
-import {Component} from "../shared.components/component";
-import {createID} from "../shared/selector";
-import {LotivisUnimplementedMethodError} from "../data.juggle/data.validate.error";
-import {lotivis_log} from "../shared/debug";
+import { Component } from "../shared.components/component";
+import { createID } from "../shared/selector";
+import { LotivisUnimplementedMethodError } from "../data.juggle/data.validate.error";
+import { lotivis_log } from "../shared/debug";
 
 /**
  * Superclass for lotivis charts.
@@ -12,7 +12,6 @@ import {lotivis_log} from "../shared/debug";
  * @see PlotChart
  */
 export class Chart extends Component {
-
   /**
    * Creates an instance of DiachronicChart.
    * @constructor
@@ -22,9 +21,9 @@ export class Chart extends Component {
   constructor(parent, config) {
     super(parent);
 
-    this.svgSelector = (this.selector || createID()) + '-svg';
+    this.svgSelector = (this.selector || createID()) + "-svg";
     this.element = this.parent;
-    this.element.attr('id', this.selector);
+    this.element.attr("id", this.selector);
     this.config = config || {};
     this.updateSensible = true;
     this.initialize();
@@ -53,24 +52,21 @@ export class Chart extends Component {
    * ```
    */
   update(datasetsController, reason) {
-    lotivis_log('[lotivis] ', this.constructor.name, 'update', reason);
+    lotivis_log("[lotivis] ", this.constructor.name, "update", reason);
     if (!this.updateSensible) return;
     if (datasetsController) {
       this.snapshot = datasetsController.snapshot;
     }
-    lotivis_log('[lotivis] ', this.constructor.name, 'update', datasetsController);
-    lotivis_log('[lotivis] ', this.constructor.name, 'update', this.snapshot);
+    lotivis_log(
+      "[lotivis] ",
+      this.constructor.name,
+      "update",
+      datasetsController
+    );
+    lotivis_log("[lotivis] ", this.constructor.name, "update", this.snapshot);
     this.remove();
     this.precalculate();
     this.draw();
-  }
-
-  /**
-   * Precalculates data for this chart.
-   * @returns {LotivisUnimplementedMethodError}
-   */
-  precalculate() {
-    throw new LotivisUnimplementedMethodError(`precalculate()`);
   }
 
   /**
@@ -79,6 +75,14 @@ export class Chart extends Component {
    */
   remove() {
     throw new LotivisUnimplementedMethodError(`remove()`);
+  }
+
+  /**
+   * Precalculates data for this chart.
+   * @returns {LotivisUnimplementedMethodError}
+   */
+  precalculate() {
+    throw new LotivisUnimplementedMethodError(`precalculate()`);
   }
 
   /**

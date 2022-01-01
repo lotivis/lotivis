@@ -1,22 +1,22 @@
-import {LotivisConfig} from "../shared/config";
+import { LotivisConfig } from "../shared/config";
 
 /**
  * Enumeration of available style types of a plot chart.
  */
 export const PlotChartType = {
-  gradient: 'gradient',
-  fraction: 'fraction'
+  gradient: "gradient",
+  fraction: "fraction"
 };
 
 /**
  * Enumeration of sorts available in the date.chart.plot.chart chart.
  */
 export const PlotChartSort = {
-  none: 'none',
-  alphabetically: 'alphabetically',
-  duration: 'duration',
-  intensity: 'intensity',
-  firstDate: 'firstDate'
+  none: "none",
+  alphabetically: "alphabetically",
+  duration: "duration",
+  intensity: "intensity",
+  firstDate: "firstDate"
 };
 
 /**
@@ -38,11 +38,11 @@ export const defaultPlotChartConfig = {
   drawGrid: true,
   showTooltip: true,
   sendsNotifications: true,
-  lowColor: 'rgb(184, 233, 148)',
-  highColor: 'rgb(0, 122, 255)',
+  lowColor: "rgb(184, 233, 148)",
+  highColor: "rgb(0, 122, 255)",
   sort: PlotChartSort.none,
   type: PlotChartType.gradient,
-  numberFormat: Intl.NumberFormat('de-DE', {
+  numberFormat: Intl.NumberFormat("de-DE", {
     maximumFractionDigits: 3
-  }),
+  })
 };

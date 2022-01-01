@@ -1,15 +1,14 @@
-import {combineByLocation} from "../data.juggle/data.combine";
-import {styleForCSSClass} from "../shared/style";
-import {formatNumber} from "../shared/format";
-import {equals} from "../shared/equal";
-import {LotivisConfig} from "../shared/config";
+import { combineByLocation } from "../data.juggle/data.combine";
+import { styleForCSSClass } from "../shared/style";
+import { formatNumber } from "../shared/format";
+import { equals } from "../shared/equal";
+import { LotivisConfig } from "../shared/config";
 
 /**
  *
  * @class MapTooltipRenderer
  */
 export class MapTooltipRenderer {
-
   /**
    * Creates a new instance of MapTooltipRenderer.
    * @param mapChart The parental map.chart chart.
@@ -17,36 +16,40 @@ export class MapTooltipRenderer {
   constructor(mapChart) {
     this.mapChart = mapChart;
 
-    let tooltip = mapChart
-      .element
-      .append('div')
-      .attr('class', 'lotivis-tooltip')
-      .attr('rx', 5) // corner radius
-      .attr('ry', 5)
-      .style('opacity', 0);
+    let tooltip = mapChart.element
+      .append("div")
+      .attr("class", "ltv-tooltip")
+      .attr("rx", 5) // corner radius
+      .attr("ry", 5)
+      .style("opacity", 0);
 
     function featureMapID(feature) {
       return `lotivis-map-area-${feature.lotivisId}`;
     }
 
     function htmlTitle(features) {
-
       if (features.length > 3) {
         let featuresSlice = features.slice(0, 3);
-        let ids = featuresSlice.map(feature => `${feature.lotivisId}`).join(', ');
-        let names = featuresSlice.map(mapChart.config.featureNameAccessor).join(', ');
+        let ids = featuresSlice
+          .map(feature => `${feature.lotivisId}`)
+          .join(", ");
+        let names = featuresSlice
+          .map(mapChart.config.featureNameAccessor)
+          .join(", ");
         let moreCount = features.length - 3;
         return `IDs: ${ids} (+${moreCount})<br>Names: ${names} (+${moreCount})`;
       } else {
-        let ids = features.map(feature => `${feature.lotivisId}`).join(', ');
-        let names = features.map(mapChart.config.featureNameAccessor).join(', ');
+        let ids = features.map(feature => `${feature.lotivisId}`).join(", ");
+        let names = features
+          .map(mapChart.config.featureNameAccessor)
+          .join(", ");
         return `IDs: ${ids}<br>Names: ${names}`;
       }
     }
 
     function htmlValues(features) {
       if (!mapChart.datasetController) {
-        return '';
+        return "";
       }
 
       let flatData = mapChart.datasetController.flatData;
@@ -55,11 +58,13 @@ export class MapTooltipRenderer {
 
       for (let i = 0; i < features.length; i++) {
         let feature = features[i];
-        let data = combined.filter(item => equals(item.location, feature.lotivisId));
+        let data = combined.filter(item =>
+          equals(item.location, feature.lotivisId)
+        );
 
         for (let index = 0; index < data.length; index++) {
           let item = data[index];
-          let label = (item.label || item.dataset || item.stack);
+          let label = item.label || item.dataset || item.stack;
 
           if (combinedByLabel[label]) {
             combinedByLabel[label] += item.value;
@@ -69,12 +74,12 @@ export class MapTooltipRenderer {
         }
       }
 
-      let components = [''];
+      let components = [""];
       for (const label in combinedByLabel) {
-        components.push(label + ': ' + formatNumber(combinedByLabel[label]));
+        components.push(label + ": " + formatNumber(combinedByLabel[label]));
       }
 
-      return components.join('<br>');
+      return components.join("<br>");
     }
 
     /**
@@ -82,13 +87,14 @@ export class MapTooltipRenderer {
      * @returns {number[]}
      */
     function getTooltipSize() {
-      let tooltipWidth = Number(tooltip.style('width').replace('px', '') || 200);
-      let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
+      let tooltipWidth = Number(
+        tooltip.style("width").replace("px", "") || 200
+      );
+      let tooltipHeight = Number(tooltip.style("height").replace("px", ""));
       return [tooltipWidth + 20, tooltipHeight + 20];
     }
 
     function positionTooltip(event, feature) {
-
       // position tooltip
       let tooltipSize = getTooltipSize();
       let projection = mapChart.projection;
@@ -109,9 +115,9 @@ export class MapTooltipRenderer {
        */
       function getTooltipLeft() {
         let left = featureLowerLeft[0];
-        left += (featureBoundsWidth / 2);
+        left += featureBoundsWidth / 2;
         left *= factor;
-        left -= (tooltipSize[0] / 2);
+        left -= tooltipSize[0] / 2;
         left += positionOffset[0];
         return left;
       }
@@ -140,7 +146,7 @@ export class MapTooltipRenderer {
       }
 
       let top = 0;
-      if (featureLowerLeft[1] > (mapChart.config.height / 2)) {
+      if (featureLowerLeft[1] > mapChart.config.height / 2) {
         top = getTooltipLocationAbove();
       } else {
         top = getTooltipLocationUnder();
@@ -148,10 +154,9 @@ export class MapTooltipRenderer {
 
       let left = getTooltipLeft();
       tooltip
-        .style('opacity', 1)
-        .style('left', left + 'px')
-        .style('top', top + 'px');
-
+        .style("opacity", 1)
+        .style("left", left + "px")
+        .style("top", top + "px");
     }
 
     /**
@@ -159,22 +164,21 @@ export class MapTooltipRenderer {
      * @param event The mouse event.
      * @param feature The drawn feature (area).
      */
-    this.mouseEnter = function (event, feature) {
-      if (mapChart.datasetController
-        && mapChart.datasetController.filters.locations.includes(feature.lotivisId)) {
+    this.mouseEnter = function(event, feature) {
+      if (
+        mapChart.datasetController &&
+        mapChart.datasetController.filters.locations.includes(feature.lotivisId)
+      ) {
         tooltip.html(
           [
             htmlTitle(mapChart.selectedFeatures),
             htmlValues(mapChart.selectedFeatures)
-          ].join('<br>')
+          ].join("<br>")
         );
         positionTooltip(event, mapChart.selectionBorderGeoJSON.features[0]);
       } else {
         tooltip.html(
-          [
-            htmlTitle([feature]),
-            htmlValues([feature])
-          ].join('<br>')
+          [htmlTitle([feature]), htmlValues([feature])].join("<br>")
         );
         positionTooltip(event, feature);
       }
@@ -185,20 +189,23 @@ export class MapTooltipRenderer {
      * @param event The mouse event.
      * @param feature The drawn feature (area).
      */
-    this.mouseOut = function (event, feature) {
-      let style = styleForCSSClass('.lotivis-map.chart-area');
+    this.mouseOut = function(event, feature) {
+      let style = styleForCSSClass(".lotivis-map.chart-area");
       let mapID = featureMapID(feature);
-      mapChart.svg.select(`#${mapID}`)
-        .style('stroke', style.stroke || 'black')
-        .style('stroke-width', style['stroke-width'] || '0.7')
-        .style('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4');
-      tooltip.style('opacity', 0);
+      mapChart.svg
+        .select(`#${mapID}`)
+        .style("stroke", style.stroke || "black")
+        .style("stroke-width", style["stroke-width"] || "0.7")
+        .style("stroke-dasharray", feature =>
+          feature.departmentsData ? "0" : "1,4"
+        );
+      tooltip.style("opacity", 0);
     };
 
     /**
      * Raises the tooltip and the rectangle which draws the bounds.
      */
-    this.raise = function () {
+    this.raise = function() {
       tooltip.raise();
     };
   }

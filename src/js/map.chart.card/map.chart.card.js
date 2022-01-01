@@ -1,8 +1,8 @@
-import {MapChart} from "../map.chart/map.chart";
-import {MapChartSettingsPopup} from "./map.chart.settings.popup";
-import {ChartCard} from "../shared.components/chart.card";
-import {downloadImage} from "../shared/download";
-import {createDownloadFilename} from "../shared/filename";
+import { MapChart } from "../map.chart/map.chart";
+import { MapChartSettingsPopup } from "./map.chart.settings.popup";
+import { ChartCard } from "../shared.components/chart.card";
+import { downloadImage } from "../shared/download";
+import { createDownloadFilename } from "../shared/filename";
 
 /**
  * A lotivis card containing a location chart.
@@ -10,22 +10,21 @@ import {createDownloadFilename} from "../shared/filename";
  * @extends ChartCard
  */
 export class MapChartCard extends ChartCard {
-
   /**
    * Creates a new instance of MapChartCard.
    * @param {Component|String} parent The parental component.
    * @param config The config of the map.chart chart.
    */
   constructor(parent, config) {
-    super(parent || 'map-chart-card', config);
+    super(parent || "map-chart-card", config);
   }
 
   /**
    * Creates and injects the map.chart chart.
    */
   injectChart() {
-    this.chartID = this.selector + '-chart';
-    this.body.attr('id', this.chartID);
+    this.chartID = this.selector + "-chart";
+    this.body.attr("id", this.chartID);
     this.chart = new MapChart(this.chartID, this.config);
   }
 
@@ -34,7 +33,7 @@ export class MapChartCard extends ChartCard {
    * @override
    */
   screenshotButtonAction() {
-    let filename = 'Unknown';
+    let filename = "Unknown";
     if (this.chart && this.chart.datasetController) {
       filename = this.chart.datasetController.getFilename();
     }
@@ -46,10 +45,10 @@ export class MapChartCard extends ChartCard {
    * Triggered when the more button is pushed.
    */
   presentSettingsPopupAction() {
-    let bodyElement = d3.select('body');
+    let bodyElement = d3.select("body");
     let button = document.getElementById(this.moreButton.selector);
     let settingsPopup = new MapChartSettingsPopup(bodyElement);
     settingsPopup.mapChart = this.chart;
-    settingsPopup.showUnder(button, 'right');
+    settingsPopup.showUnder(button, "right");
   }
 }

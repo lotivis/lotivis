@@ -1,13 +1,16 @@
+// More classes set by lotivis
+//
+// .ltv-map-chart-svg
+// .ltv-map-chart-svg-tooltip
+// .ltv-map-chart-legend
+// .ltv-map-chart-legend-title
+// .ltv-map-chart-legend-text
 
-.lotivis-map-chart {
-  // empty
-}
-
-.lotivis-map-chart-background {
+.ltv-map-chart-background {
   cursor: pointer;
 }
 
-.lotivis-map-chart-area {
+.ltv-map-chart-area {
   fill: white;
   fill-opacity: 0;
   stroke: black;
@@ -15,13 +18,13 @@
   cursor: pointer;
 }
 
-.lotivis-map-chart-area-hover {
+.ltv-map-chart-area-hover {
   stroke: $tint-color;
   stroke-width: 4;
   stroke-dasharray: 0 !important;
 }
 
-.lotivis-map-chart-exterior-borders {
+.ltv-map-chart-exterior-borders {
   fill: white;
   fill-opacity: 1;
   stroke: gray;
@@ -30,14 +33,14 @@
   pointer-events: none;
 }
 
-.lotivis-map-chart-label {
+.ltv-map-chart-label {
   fill: black;
   text-anchor: middle;
   font-size: 12px;
   pointer-events: none;
 }
 
-.lotivis-map-chart-selection-border {
+.ltv-map-chart-selection-border {
   pointer-events: none;
   fill: transparent;
   fill-opacity: 0;
@@ -47,19 +50,7 @@
   pointer-events: none;
 }
 
-.lotivis-map-chart-legend {
-  // emtpty
-}
-
-.lotivis-map-chart-legend-title {
-  // emtpty
-}
-
-.lotivis-map-chart-legend-text {
-  // emtpty
-}
-
-.lotivis-map-chart-legend-rect {
+.ltv-map-chart-legend-rect {
   stroke: black;
   stroke-width: 1;
 }

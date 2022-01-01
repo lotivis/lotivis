@@ -1,4 +1,4 @@
-import {LotivisConfig} from "../shared/config";
+import { LotivisConfig } from "../shared/config";
 
 /**
  * Appends and updates the tooltip of a date.chart.plot.chart chart.
@@ -6,7 +6,6 @@ import {LotivisConfig} from "../shared/config";
  * @see PlotChart
  */
 export class PlotTooltipRenderer {
-
   /**
    * Creates a new instance of PlotTooltipRenderer.
    *
@@ -14,14 +13,12 @@ export class PlotTooltipRenderer {
    * @param plotChart
    */
   constructor(plotChart) {
-
-    const tooltip = plotChart
-      .element
-      .append('div')
-      .attr('class', 'lotivis-tooltip')
-      .attr('rx', 5) // corner radius
-      .attr('ry', 5)
-      .style('opacity', 0);
+    const tooltip = plotChart.element
+      .append("div")
+      .attr("class", "ltv-tooltip")
+      .attr("rx", 5) // corner radius
+      .attr("ry", 5)
+      .style("opacity", 0);
 
     /**
      * Returns the HTML content for the given dataset.
@@ -30,16 +27,18 @@ export class PlotTooltipRenderer {
     function getHTMLContentForDataset(dataset) {
       let components = [];
 
-      let sum = dataset.data.map(item => item.value).reduce((acc, next) => +acc + +next, 0);
+      let sum = dataset.data
+        .map(item => item.value)
+        .reduce((acc, next) => +acc + +next, 0);
       let formatted = plotChart.config.numberFormat.format(sum);
 
-      components.push('Label: ' + dataset.label);
-      components.push('');
-      components.push('Start: ' + dataset.firstDate);
-      components.push('End: ' + dataset.lastDate);
-      components.push('');
-      components.push('Items: ' + formatted);
-      components.push('');
+      components.push("Label: " + dataset.label);
+      components.push("");
+      components.push("Start: " + dataset.firstDate);
+      components.push("End: " + dataset.lastDate);
+      components.push("");
+      components.push("Items: " + formatted);
+      components.push("");
 
       let filtered = dataset.data.filter(item => item.value !== 0);
       for (let index = 0; index < filtered.length; index++) {
@@ -48,7 +47,7 @@ export class PlotTooltipRenderer {
         components.push(`${entry.date}: ${formatted}`);
       }
 
-      return components.join('<br/>');
+      return components.join("<br/>");
     }
 
     /**
@@ -71,20 +70,25 @@ export class PlotTooltipRenderer {
      * @param event The mouse event.
      * @param dataset The dataset.
      */
-    this.showTooltip = function (event, dataset) {
+    this.showTooltip = function(event, dataset) {
       if (!plotChart.config.showTooltip) return;
       tooltip.html(getHTMLContentForDataset(dataset));
 
       // position tooltip
-      let tooltipHeight = Number(tooltip.style('height').replace('px', ''));
-      let factor = plotChart.getElementEffectiveSize()[0] / plotChart.config.width;
+      let tooltipHeight = Number(tooltip.style("height").replace("px", ""));
+      let factor =
+        plotChart.getElementEffectiveSize()[0] / plotChart.config.width;
       let offset = plotChart.getElementPosition();
 
       let top = plotChart.yChart(dataset.label) * factor;
       top += offset[1];
 
-      if ((plotChart.yChart(dataset.label) - plotChart.config.margin.top) <= (plotChart.graphHeight / 2)) {
-        top += (plotChart.config.lineHeight * factor) + LotivisConfig.tooltipOffset;
+      if (
+        plotChart.yChart(dataset.label) - plotChart.config.margin.top <=
+        plotChart.graphHeight / 2
+      ) {
+        top +=
+          plotChart.config.lineHeight * factor + LotivisConfig.tooltipOffset;
       } else {
         top -= tooltipHeight + 20; // subtract padding
         top -= LotivisConfig.tooltipOffset;
@@ -93,15 +97,15 @@ export class PlotTooltipRenderer {
       let left = getTooltipLeftForDataset(dataset, factor, offset);
 
       tooltip
-        .style('left', left + 'px')
-        .style('top', top + 'px')
-        .style('opacity', 1);
+        .style("left", left + "px")
+        .style("top", top + "px")
+        .style("opacity", 1);
     };
 
     /**
      * Hides the tooltip by setting its opacity to 0.
      */
-    this.hideTooltip = function () {
+    this.hideTooltip = function() {
       let controller = plotChart.datasetController;
       let filters = controller.datasetFilters;
 
@@ -109,8 +113,8 @@ export class PlotTooltipRenderer {
         controller.resetFilters();
       }
 
-      if (+tooltip.style('opacity') === 0) return;
-      tooltip.style('opacity', 0);
+      if (+tooltip.style("opacity") === 0) return;
+      tooltip.style("opacity", 0);
     };
   }
 }

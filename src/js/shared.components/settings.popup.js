@@ -27,7 +27,7 @@ export class SettingsPopup extends Popup {
     let container = this.row.append("div");
     this.screenshotButton = new Button(container);
     this.screenshotButton.setText("Make Screenshot");
-    this.screenshotButton.element.classed("ltv-button", true);
+    this.screenshotButton.element.classed("ltv-button ltv-button-block", true);
     this.screenshotButton.onClick = this.screenshotButtonAction.bind(this);
   }
 

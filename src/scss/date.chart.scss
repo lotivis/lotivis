@@ -1,32 +1,35 @@
+// .ltv-date-chart-svg
+// .ltv-date-chart-tooltip
 
-.lotivis-time-chart {
+.ltv-date-chart {
   // empty
 }
 
-.lotivis-time-chart-label {
+.ltv-date-chart-label {
   pointer-events: none;
   font-size: 20px;
 }
 
-.lotivis-time-chart-legend-label {
+.ltv-date-chart-legend-label {
   font-size: 13px;
 }
 
-.lotivis-time-chart-legend-circle {
+.ltv-date-chart-legend-circle {
   cursor: pointer;
   stroke-width: 2;
 }
 
-.lotivis-time-chart-bar {
+.ltv-date-chart-bar {
   pointer-events: none;
+  border-radius: 10px;
 }
 
-.lotivis-date-chart-hover-bar {
+.ltv-date-chart-hover-bar {
   border-radius: 10px;
   fill: $tint-color;
 }
 
-.lotivis-date-chart-selection-rect {
+.ltv-date-chart-selection-rect {
   //border-radius: 10px;
   fill: red;
 }

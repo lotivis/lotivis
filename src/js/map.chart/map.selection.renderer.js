@@ -1,20 +1,21 @@
-import {lotivis_log, lotivis_log_once} from "../shared/debug";
-import {joinFeatures} from "../geojson/join.features";
+import { lotivis_log, lotivis_log_once } from "../shared/debug";
+import { joinFeatures } from "../geojson/join.features";
 
 /**
  *
  * @class MapSelectionRenderer
  */
 export class MapSelectionRenderer {
-
   /**
    * Creates a new instance of MapSelectionRenderer.
    *
    * @param mapChart The parental map.chart chart.
    */
   constructor(mapChart) {
-
-    if (!self.topojson) lotivis_log_once('Can\'t find topojson lib.  Skip rendering of exterior border.');
+    if (!self.topojson)
+      lotivis_log_once(
+        "Can't find topojson lib.  Skip rendering of exterior border."
+      );
 
     /**
      * Returns the collection of selected features.
@@ -22,7 +23,6 @@ export class MapSelectionRenderer {
      * @returns {*[]}
      */
     function getSelectedFeatures() {
-
       if (!mapChart.geoJSON) {
         return null;
       }
@@ -51,10 +51,9 @@ export class MapSelectionRenderer {
     /**
      * Renders the exterior border of the presented geo json.
      */
-    this.render = function () {
-
+    this.render = function() {
       if (!self.topojson) {
-        lotivis_log('[lotivis]  Can\'t find topojson library.');
+        lotivis_log("[lotivis]  Can't find topojson library.");
         return;
       }
 
@@ -63,29 +62,25 @@ export class MapSelectionRenderer {
       mapChart.selectedFeatures = getSelectedFeatures();
       mapChart.selectionBorderGeoJSON = joinFeatures(mapChart.selectedFeatures);
       if (!mapChart.selectionBorderGeoJSON) {
-        return lotivis_log('[lotivis]  No selected features to render.');
+        return lotivis_log("[lotivis]  No selected features to render.");
       }
 
-      mapChart.svg
-        .selectAll('.lotivis-map-chart-selection-border')
-        .remove();
+      mapChart.svg.selectAll(".ltv-map-chart-selection-border").remove();
 
       mapChart.svg
-        .selectAll('.lotivis-map-chart-selection-border')
-        .append('path')
-        .attr('class', 'lotivis-map-chart-selection-border')
+        .selectAll(".ltv-map-chart-selection-border")
+        .append("path")
+        .attr("class", "ltv-map-chart-selection-border")
         .data(mapChart.selectionBorderGeoJSON.features)
         .enter()
-        .append('path')
-        .attr('d', mapChart.path)
-        .attr('class', 'lotivis-map-chart-selection-border')
+        .append("path")
+        .attr("d", mapChart.path)
+        .attr("class", "ltv-map-chart-selection-border")
         .raise();
     };
 
-    this.raise = function () {
-      mapChart.svg
-        .selectAll('.lotivis-map-chart-selection-border')
-        .raise();
+    this.raise = function() {
+      mapChart.svg.selectAll(".ltv-map-chart-selection-border").raise();
     };
   }
 }

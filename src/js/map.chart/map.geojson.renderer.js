@@ -1,16 +1,14 @@
-import {lotivis_log} from "../shared/debug";
+import { lotivis_log } from "../shared/debug";
 
 /**
  * @class MapGeoJSONRenderer
  */
 export class MapGeoJSONRenderer {
-
   /**
    * Creates a new instance of MapGeoJSONRenderer.
    * @param mapChart The parental map.chart chart.
    */
   constructor(mapChart) {
-
     /**
      * To be called when the mouse enters an area drawn on the map.chart.
      *
@@ -55,24 +53,26 @@ export class MapGeoJSONRenderer {
     /**
      * Renders the `presentedGeoJSON` property.
      */
-    this.render = function () {
+    this.render = function() {
       let geoJSON = mapChart.presentedGeoJSON;
       if (!geoJSON) return;
 
       mapChart.areas = mapChart.svg
-        .selectAll('path')
+        .selectAll("path")
         .data(geoJSON.features)
         .enter()
-        .append('path')
-        .attr('d', mapChart.path)
-        .attr('id', feature => `lotivis-map-chart-area-id-${feature.lotivisId}`)
-        .classed('lotivis-map-chart-area', true)
-        .style('stroke-dasharray', (feature) => feature.departmentsData ? '0' : '1,4')
-        .style('fill', 'white')
-        .style('fill-opacity', 1)
-        .on('click', mouseClick)
-        .on('mouseenter', mouseEnter)
-        .on('mouseout', mouseOut);
+        .append("path")
+        .attr("d", mapChart.path)
+        .attr("id", feature => `ltv-map-chart-area-id-${feature.lotivisId}`)
+        .classed("ltv-map-chart-area", true)
+        .style("stroke-dasharray", feature =>
+          feature.departmentsData ? "0" : "1,4"
+        )
+        .style("fill", "white")
+        .style("fill-opacity", 1)
+        .on("click", mouseClick)
+        .on("mouseenter", mouseEnter)
+        .on("mouseout", mouseOut);
     };
   }
 }

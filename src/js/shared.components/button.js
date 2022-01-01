@@ -28,14 +28,6 @@ export class Button extends Component {
           this.onClick(event);
         }.bind(this)
       );
-
-    switch (style) {
-      case "round":
-        this.element.classed("ltv-button-round", true);
-        break;
-      default:
-        break;
-    }
   }
 
   /**

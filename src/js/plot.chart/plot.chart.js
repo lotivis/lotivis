@@ -1,16 +1,20 @@
-import {Chart} from "../chart/chart";
+import { Chart } from "../chart/chart";
 import "../dataview/dataview.plot";
-import {defaultPlotChartConfig, PlotChartSort, PlotChartType} from "./plot.chart.config";
-import {PlotAxisRenderer} from "./plot.axis.renderer";
-import {PlotTooltipRenderer} from "./plot.tooltip.renderer";
-import {PlotLabelRenderer} from "./plot.label.renderer";
-import {PlotGridRenderer} from "./plot.grid.renderer";
-import {PlotBackgroundRenderer} from "./plot.background.renderer";
-import {PlotChartHoverBarsRenderer} from "./plot.chart.hover.bars.renderer";
-import {PlotBarsFractionsRenderer} from "./plot.bars.fractions.renderer";
-import {PlotBarsGradientRenderer} from "./plot.bars.gradient.renderer";
-import {PlotLabelsFractionsRenderer} from "./plot.labels.fractions.renderer";
-import {PlotChartSelectionRenderer} from "./plot.chart.selection.renderer";
+import {
+  defaultPlotChartConfig,
+  PlotChartSort,
+  PlotChartType
+} from "./plot.chart.config";
+import { PlotAxisRenderer } from "./plot.axis.renderer";
+import { PlotTooltipRenderer } from "./plot.tooltip.renderer";
+import { PlotLabelRenderer } from "./plot.label.renderer";
+import { PlotGridRenderer } from "./plot.grid.renderer";
+import { PlotBackgroundRenderer } from "./plot.background.renderer";
+import { PlotChartHoverBarsRenderer } from "./plot.chart.hover.bars.renderer";
+import { PlotBarsFractionsRenderer } from "./plot.bars.fractions.renderer";
+import { PlotBarsGradientRenderer } from "./plot.bars.gradient.renderer";
+import { PlotLabelsFractionsRenderer } from "./plot.labels.fractions.renderer";
+import { PlotChartSelectionRenderer } from "./plot.chart.selection.renderer";
 
 /**
  * A lotivis date.chart.plot.chart chart.
@@ -19,12 +23,10 @@ import {PlotChartSelectionRenderer} from "./plot.chart.selection.renderer";
  * @extends Chart
  */
 export class PlotChart extends Chart {
-
   /**
    * Initializes this diachronic chart by setting the default values.
    */
   initialize() {
-
     let theConfig = this.config;
     let margin;
     margin = Object.assign({}, defaultPlotChartConfig.margin);
@@ -55,29 +57,28 @@ export class PlotChart extends Chart {
    */
   createSVG() {
     this.svg = this.element
-      .append('svg')
-      .attr('id', this.svgSelector)
-      .attr('class', 'lotivis-chart-svg')
-      .attr('preserveAspectRatio', 'xMidYMid meet')
+      .append("svg")
+      .attr("id", this.svgSelector)
+      .attr("class", "ltv-chart-svg ltv-plot-chart-svg")
+      .attr("preserveAspectRatio", "xMidYMid meet")
       .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`);
   }
 
   /**
-   * Removes any (old) shared.components from the svg.
+   * Removes any (old) components from the svg.
    */
   remove() {
-    this.svg.selectAll('*').remove();
+    this.svg.selectAll("*").remove();
   }
 
   /**
    *
    */
   precalculate() {
-
     if (this.datasetController) {
       this.dataView = this.datasetController.getPlotDataview();
     } else {
-      this.dataView = {datasets: [], barsCount: 0};
+      this.dataView = { datasets: [], barsCount: 0 };
     }
 
     this.sortDatasets();
@@ -86,12 +87,14 @@ export class PlotChart extends Chart {
     let barsCount = this.dataView.labelsCount || 0;
 
     this.graphWidth = this.config.width - margin.left - margin.right;
-    this.graphHeight = (barsCount * this.config.lineHeight);
+    this.graphHeight = barsCount * this.config.lineHeight;
     this.height = this.graphHeight + margin.top + margin.bottom;
     this.preferredHeight = this.height;
 
-    this.svg
-      .attr("viewBox", `0 0 ${this.config.width} ${this.preferredHeight}`);
+    this.svg.attr(
+      "viewBox",
+      `0 0 ${this.config.width} ${this.preferredHeight}`
+    );
 
     this.createScales();
   }
@@ -119,7 +122,7 @@ export class PlotChart extends Chart {
    */
   update(controller, reason) {
     if (!this.updateSensible) return;
-    if (reason === 'dates-filter') return;
+    if (reason === "dates-filter") return;
     this.remove();
     this.precalculate();
     this.draw();
@@ -129,34 +132,41 @@ export class PlotChart extends Chart {
    * Creates scales which are used to calculate the x and y positions of bars or circles.
    */
   createScales() {
-
     this.xChart = d3
       .scaleBand()
       .domain(this.dataView.dates || [])
-      .rangeRound([this.config.margin.left, this.config.width - this.config.margin.right])
+      .rangeRound([
+        this.config.margin.left,
+        this.config.width - this.config.margin.right
+      ])
       .paddingInner(0.1);
 
     this.yChartPadding = d3
       .scaleBand()
       .domain(this.dataView.labels || [])
-      .rangeRound([this.height - this.config.margin.bottom, this.config.margin.top])
+      .rangeRound([
+        this.height - this.config.margin.bottom,
+        this.config.margin.top
+      ])
       .paddingInner(0.1);
 
     this.yChart = d3
       .scaleBand()
       .domain(this.dataView.labels || [])
-      .rangeRound([this.height - this.config.margin.bottom, this.config.margin.top]);
+      .rangeRound([
+        this.height - this.config.margin.bottom,
+        this.config.margin.top
+      ]);
 
     this.xAxisGrid = d3
       .axisBottom(this.xChart)
       .tickSize(-this.graphHeight)
-      .tickFormat('');
+      .tickFormat("");
 
     this.yAxisGrid = d3
       .axisLeft(this.yChart)
       .tickSize(-this.graphWidth)
-      .tickFormat('');
-
+      .tickFormat("");
   }
 
   /**
@@ -178,27 +188,29 @@ export class PlotChart extends Chart {
     let sortedDatasets = [];
     switch (this.config.sort) {
       case PlotChartSort.alphabetically:
-        sortedDatasets = datasets
-          .sort((set1, set2) => set1.label > set2.label);
+        sortedDatasets = datasets.sort((set1, set2) => set1.label > set2.label);
         break;
       case PlotChartSort.duration:
-        sortedDatasets = datasets
-          .sort((set1, set2) => set1.duration < set2.duration);
+        sortedDatasets = datasets.sort(
+          (set1, set2) => set1.duration < set2.duration
+        );
         break;
       case PlotChartSort.intensity:
-        sortedDatasets = datasets
-          .sort((set1, set2) => set1.sum < set2.sum);
+        sortedDatasets = datasets.sort((set1, set2) => set1.sum < set2.sum);
         break;
       case PlotChartSort.firstDate:
-        sortedDatasets = datasets
-          .sort((set1, set2) => set1.firstDate > set2.firstDate);
+        sortedDatasets = datasets.sort(
+          (set1, set2) => set1.firstDate > set2.firstDate
+        );
         break;
       default:
         sortedDatasets = datasets;
         break;
     }
 
-    this.dataView.labels = sortedDatasets.map(dataset => String(dataset.label)).reverse();
+    this.dataView.labels = sortedDatasets
+      .map(dataset => String(dataset.label))
+      .reverse();
     this.dataView.datasetsSorted = this.dataView.labels;
   }
 }

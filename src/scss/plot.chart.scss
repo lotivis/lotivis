@@ -1,44 +1,36 @@
-.lotivis-plot {
-  // empty
-}
+// .ltv-plot-chart-svg
+// .ltv-plot-grid-x
+// .ltv-plot-grid-y
 
-.lotivis-plot-chart-background {
+.ltv-plot-chart-background {
   fill: transparent;
   cursor: pointer;
 }
 
-.lotivis-plot-chart-hover-bar {
-  border-radius: 10px;
-  fill: $tint-color;
-}
-
-.lotivis-plot-chart-selection-rect {
-  border-radius: 10px;
-  fill: red;
-}
-
-.lotivis-plot-bar {
+.ltv-plot-bar {
   stroke: lightgrey;
   stroke-width: 1;
   pointer-events: none;
 }
 
-.lotivis-plot-grid {
+.ltv-plot-chart-hover-bar {
+  border-radius: 10px;
+  fill: $tint-color;
+}
+
+.ltv-plot-chart-selection-rect {
+  border-radius: 10px;
+  fill: red;
+}
+
+.ltv-plot-grid {
   color: lightgrey;
   stroke-width: 1;
 }
 
-.lotivis-plot-label {
+.ltv-plot-label {
   fill: white;
   text-anchor: start;
   font-size: 12px;
   pointer-events: none;
-}
-
-.lotivis-plot-grid-x {
-  // empty
-}
-
-.lotivis-plot-grid-y {
-  // empty
 }

@@ -1,17 +1,17 @@
-import {Chart} from '../chart/chart';
-import {removeFeatures} from "../geojson/remove.features";
-import {MapTooltipRenderer} from "./map.tooltip.renderer";
-import {MapLegendRenderer} from "./map.legend.renderer";
-import {MapLabelRenderer} from "./map.label.renderer";
-import {MapDatasetRenderer} from "./map.dataset.renderer";
-import {MapGeoJSONRenderer} from "./map.geojson.renderer";
-import {MapExteriorBorderRenderer} from "./map.exterior.border.renderer";
-import {createGeoJSON} from "../geojson/create.geojson";
-import {MapChartConfig} from "./map.chart.config";
-import {MapBackgroundRenderer} from "./map.background.renderer";
-import {GeoJson} from "../geojson/geojson";
-import {MapSelectionRenderer} from "./map.selection.renderer";
-import {lotivis_log} from "../shared/debug";
+import { Chart } from "../chart/chart";
+import { removeFeatures } from "../geojson/remove.features";
+import { MapTooltipRenderer } from "./map.tooltip.renderer";
+import { MapLegendRenderer } from "./map.legend.renderer";
+import { MapLabelRenderer } from "./map.label.renderer";
+import { MapDatasetRenderer } from "./map.dataset.renderer";
+import { MapGeoJSONRenderer } from "./map.geojson.renderer";
+import { MapExteriorBorderRenderer } from "./map.exterior.border.renderer";
+import { createGeoJSON } from "../geojson/create.geojson";
+import { MapChartConfig } from "./map.chart.config";
+import { MapBackgroundRenderer } from "./map.background.renderer";
+import { GeoJson } from "../geojson/geojson";
+import { MapSelectionRenderer } from "./map.selection.renderer";
+import { lotivis_log } from "../shared/debug";
 
 /**
  * A component which renders a GeoJSON with d3.
@@ -19,7 +19,6 @@ import {lotivis_log} from "../shared/debug";
  * @extends Chart
  */
 export class MapChart extends Chart {
-
   /**
    * Creates a new instance of MapChart.
    * @param parent The parental component.
@@ -75,9 +74,9 @@ export class MapChart extends Chart {
   }
 
   draw() {
-    lotivis_log('[lotivis] ', this.constructor.name, 'draw');
+    lotivis_log("[lotivis] ", this.constructor.name, "draw");
     if (!this.geoJSON) {
-      return lotivis_log('[lotivis]  No GeoJSON to render.');
+      return lotivis_log("[lotivis]  No GeoJSON to render.");
     }
     this.backgroundRenderer.render();
     this.exteriorBorderRenderer.render();
@@ -94,9 +93,10 @@ export class MapChart extends Chart {
    */
   renderSVG() {
     this.svg = this.element
-      .append('svg')
-      .attr('id', this.svgSelector)
-      .attr('viewBox', `0 0 ${this.config.width} ${this.config.height}`);
+      .append("svg")
+      .classed("ltv-chart-svg ltv-map-chart-svg", true)
+      .attr("id", this.svgSelector)
+      .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`);
   }
 
   /**
@@ -112,17 +112,14 @@ export class MapChart extends Chart {
    * @param event The mouse event.
    * @param feature The feature.
    */
-  onSelectFeature(event, feature) {
-
-
-  }
+  onSelectFeature(event, feature) {}
 
   /**
    * Sets the presented geo json.
    * @param newGeoJSON
    */
   setGeoJSON(newGeoJSON) {
-    if (typeof newGeoJSON === 'object' && newGeoJSON.prototype === 'GeoJSON') {
+    if (typeof newGeoJSON === "object" && newGeoJSON.prototype === "GeoJSON") {
       this.geoJSON = newGeoJSON;
     } else {
       this.geoJSON = new GeoJson(newGeoJSON);
@@ -137,10 +134,15 @@ export class MapChart extends Chart {
   geoJSONDidChange() {
     if (!this.geoJSON) return;
     // precalculate the center of each feature
-    this.geoJSON.features.forEach((feature) => feature.center = d3.geoCentroid(feature));
+    this.geoJSON.features.forEach(
+      feature => (feature.center = d3.geoCentroid(feature))
+    );
 
     if (this.config.excludedFeatureCodes) {
-      this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.excludedFeatureCodes);
+      this.presentedGeoJSON = removeFeatures(
+        this.geoJSON,
+        this.config.excludedFeatureCodes
+      );
     }
 
     // precalculate lotivis feature ids
@@ -148,7 +150,9 @@ export class MapChart extends Chart {
     let feature;
     for (let i = 0; i < this.presentedGeoJSON.features.length; i++) {
       feature = this.presentedGeoJSON.features[i];
-      this.presentedGeoJSON.features[i].lotivisId = this.config.featureIDAccessor(feature);
+      this.presentedGeoJSON.features[
+        i
+      ].lotivisId = this.config.featureIDAccessor(feature);
     }
 
     this.zoomTo(this.geoJSON);
