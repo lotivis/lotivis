@@ -6,7 +6,7 @@
  */
 export function styleForCSSClass(className) {
   let selector = className;
-  if (!selector.startsWith('.')) selector = '.' + selector;
+  if (!selector.startsWith(".")) selector = "." + selector;
   let element = document.querySelector(selector);
   if (!element) return {};
   let style = getComputedStyle(element);

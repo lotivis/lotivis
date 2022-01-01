@@ -23,7 +23,7 @@ export class Button extends Component {
       .attr("class", "ltv-button")
       .on(
         "click",
-        function(event) {
+        function (event) {
           if (!this.onClick) return;
           this.onClick(event);
         }.bind(this)

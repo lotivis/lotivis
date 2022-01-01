@@ -1,6 +1,6 @@
-import {TextareaCard} from "../shared.components/textarea.card";
-import {lotivis_log} from "../shared/debug";
-import {LotivisUnimplementedMethodError} from "../data.juggle/data.validate.error";
+import { TextareaCard } from "../shared.components/textarea.card";
+import { lotivis_log } from "../shared/debug";
+import { LotivisUnimplementedMethodError } from "../data.juggle/data.validate.error";
 
 /**
  *
@@ -8,7 +8,6 @@ import {LotivisUnimplementedMethodError} from "../data.juggle/data.validate.erro
  * @extends TextareaCard
  */
 export class UpdatableDataviewCard extends TextareaCard {
-
   /**
    * Creates a new instance of UpdatableDataviewCard.
    * @param parent The parental element or a selector (id).
@@ -22,10 +21,10 @@ export class UpdatableDataviewCard extends TextareaCard {
 
   /**
    * Sets the dataset controller.
-   * @param newDatasetController
+   * @param newDatasetsController
    */
-  setDatasetsController(newDatasetController) {
-    this.datasetsController = newDatasetController;
+  setDatasetsController(newDatasetsController) {
+    this.datasetsController = newDatasetsController;
     this.datasetsController.addListener(this);
   }
 
@@ -39,7 +38,9 @@ export class UpdatableDataviewCard extends TextareaCard {
       lotivis_log(`[lotivis]  NOT sensible ${this}. Reason '${reason}'.`);
       return;
     } else if (this.config && this.config.updateSensible === false) {
-      lotivis_log(`[lotivis]  NOT sensible (Config) ${this}. Reason '${reason}'.`);
+      lotivis_log(
+        `[lotivis]  NOT sensible (Config) ${this}. Reason '${reason}'.`
+      );
       return;
     } else if (!datasetsController) {
       lotivis_log(`[lotivis]  NO controller ${this}. Reason '${reason}'.`);

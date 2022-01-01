@@ -1,7 +1,7 @@
-import {csvStringToArray} from "../shared/csv.to.array";
-import {trimByChar} from "../shared/trim";
-import {createDatasets} from "../data.juggle/data.create.datasets";
-import {lotivis_log} from "../shared/debug";
+import { csvStringToArray } from "../shared/csv.to.array";
+import { trimByChar } from "../shared/trim";
+import { createDatasets } from "../data.juggle/data.create.datasets";
+import { lotivis_log } from "../shared/debug";
 
 export function parseCSV(text) {
   let flatData = [];
@@ -9,8 +9,9 @@ export function parseCSV(text) {
   let headlines = arrays.shift();
 
   for (let lineIndex = 0; lineIndex < arrays.length; lineIndex++) {
-
-    let lineArray = arrays[lineIndex].map(element => trimByChar(element, `"`));
+    let lineArray = arrays[lineIndex].map((element) =>
+      trimByChar(element, `"`)
+    );
 
     if (lineArray.length < 5) {
       lotivis_log(`Skipping row: ${lineArray}`);
@@ -22,7 +23,7 @@ export function parseCSV(text) {
       stack: lineArray[1],
       value: +lineArray[2],
       date: lineArray[3],
-      location: lineArray[4]
+      location: lineArray[4],
     });
   }
 

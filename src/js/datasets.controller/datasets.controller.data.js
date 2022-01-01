@@ -1,6 +1,6 @@
-import {DatasetsController} from "./datasets.controller";
-import {copy} from "../shared/copy";
-import {validateDatasets} from "../data.juggle/data.validate";
+import { DatasetsController } from "./datasets.controller";
+import { copy } from "../shared/copy";
+import { validateDatasets } from "../data.juggle/data.validate";
 import "./datasets.controller.snapshot";
 
 /*
@@ -48,13 +48,15 @@ DatasetsController.prototype.addDataset = function (dataset) {
 DatasetsController.prototype.addDatasets = function (datasets) {
   if (!this.datasets || !Array.isArray(this.datasets)) return;
   if (!datasets || !Array.isArray(datasets)) return;
-  if (this.datasets.find(dataset => dataset.label === datasets.label)) {
-    throw new Error(`DatasetsController already contains a dataset with the same label (${datasets.label}).`);
+  if (this.datasets.find((dataset) => dataset.label === datasets.label)) {
+    throw new Error(
+      `DatasetsController already contains a dataset with the same label (${datasets.label}).`
+    );
   }
   this.cache.invalidate();
-  datasets.forEach(dataset => this.datasets.push(dataset));
+  datasets.forEach((dataset) => this.datasets.push(dataset));
   this.datasetsDidChange();
-  this.notifyListeners('datasets-update');
+  this.notifyListeners("datasets-update");
 };
 
 /**
@@ -76,12 +78,14 @@ DatasetsController.prototype.removeDatasets = function (labels) {
   if (!this.datasets || !Array.isArray(this.datasets)) return;
   if (!labels || !Array.isArray(labels)) return;
   this.cache.invalidate();
-  labels.forEach(function (label) {
-    let candidate = this.datasets.find(dataset => dataset.label === label);
-    if (!candidate) return;
-    let index = this.datasets.indexOf(candidate);
-    if (index < 0) return;
-    this.datasets = this.datasets.splice(index, 1);
-  }.bind(this));
+  labels.forEach(
+    function (label) {
+      let candidate = this.datasets.find((dataset) => dataset.label === label);
+      if (!candidate) return;
+      let index = this.datasets.indexOf(candidate);
+      if (index < 0) return;
+      this.datasets = this.datasets.splice(index, 1);
+    }.bind(this)
+  );
   this.datasetsDidChange();
 };

@@ -13,7 +13,7 @@ export class DateChartAxisRenderer {
     /**
      * Appends the `left` and `bottom` axis to the date.chart chart.
      */
-    this.render = function() {
+    this.render = function () {
       let height = dateChart.config.height;
       let margin = dateChart.config.margin;
 

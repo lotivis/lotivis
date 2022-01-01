@@ -6,7 +6,7 @@
  * @returns {*} The sum.
  */
 export function sumOfDataset(flatData, dataset) {
-  return sumOfValues(flatData.filter(item => item.dataset === dataset));
+  return sumOfValues(flatData.filter((item) => item.dataset === dataset));
 }
 
 /**
@@ -17,7 +17,7 @@ export function sumOfDataset(flatData, dataset) {
  * @returns {*} The sum.
  */
 export function sumOfLabel(flatData, label) {
-  return sumOfValues(flatData.filter(item => item.label === label));
+  return sumOfValues(flatData.filter((item) => item.label === label));
 }
 
 /**
@@ -28,7 +28,7 @@ export function sumOfLabel(flatData, label) {
  * @returns {*} The sum.
  */
 export function sumOfStack(flatData, stack) {
-  return sumOfValues(flatData.filter(item => item.stack === stack));
+  return sumOfValues(flatData.filter((item) => item.stack === stack));
 }
 
 /**
@@ -39,6 +39,6 @@ export function sumOfStack(flatData, stack) {
  */
 export function sumOfValues(flatData) {
   return flatData
-    .map(item => +(item.value || 0))
+    .map((item) => +(item.value || 0))
     .reduce((acc, next) => acc + next, 0);
 }

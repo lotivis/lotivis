@@ -1,7 +1,7 @@
-import {DatasetsController} from "./datasets.controller";
-import {objectsEqual} from "../shared/equal";
-import {lotivis_log} from "../shared/debug";
-import {copy} from "../shared/copy";
+import { DatasetsController } from "./datasets.controller";
+import { objectsEqual } from "../shared/equal";
+import { lotivis_log } from "../shared/debug";
+import { copy } from "../shared/copy";
 
 /**
  * Resets all filters.  Notifies listeners.
@@ -12,37 +12,43 @@ DatasetsController.prototype.resetFilters = function (notifyListeners = true) {
   this.filters.labels = [];
   this.calculateSnapshot();
   if (!notifyListeners) return;
-  this.notifyListeners('reset-filters');
+  this.notifyListeners("reset-filters");
 };
 
 /**
  * Resets locations filters.  Notifies listeners.
  */
-DatasetsController.prototype.resetLocationFilters = function (notifyListeners = true) {
+DatasetsController.prototype.resetLocationFilters = function (
+  notifyListeners = true
+) {
   this.filters.locations = [];
   this.calculateSnapshot();
   if (!notifyListeners) return;
-  this.notifyListeners('reset-location-filters');
+  this.notifyListeners("reset-location-filters");
 };
 
 /**
  * Resets date filters.  Notifies listeners.
  */
-DatasetsController.prototype.resetDateFilters = function (notifyListeners = true) {
+DatasetsController.prototype.resetDateFilters = function (
+  notifyListeners = true
+) {
   this.filters.dates = [];
   this.calculateSnapshot();
   if (!notifyListeners) return;
-  this.notifyListeners('reset-dates-filters');
+  this.notifyListeners("reset-dates-filters");
 };
 
 /**
  * Resets label filters.  Notifies listeners.
  */
-DatasetsController.prototype.resetLabelFilters = function (notifyListeners = true) {
+DatasetsController.prototype.resetLabelFilters = function (
+  notifyListeners = true
+) {
   this.filters.labels = [];
   this.calculateSnapshot();
   if (!notifyListeners) return;
-  this.notifyListeners('reset-label-filters');
+  this.notifyListeners("reset-label-filters");
 };
 
 /**
@@ -51,13 +57,15 @@ DatasetsController.prototype.resetLabelFilters = function (notifyListeners = tru
  * @param locations The locations to filter.
  */
 DatasetsController.prototype.setLocationsFilter = function (locations) {
-  let stringVersions = locations.map(location => String(location)).filter(item => item.length > 0);
+  let stringVersions = locations
+    .map((location) => String(location))
+    .filter((item) => item.length > 0);
   if (objectsEqual(this.filters.locations, stringVersions)) {
     return lotivis_log(`[lotivis]  Location filters not changed.`);
   }
   this.filters.locations = stringVersions;
   this.calculateSnapshot();
-  this.notifyListeners('filter-locations');
+  this.notifyListeners("filter-locations");
 };
 
 DatasetsController.prototype.toggleLocation = function (location) {
@@ -68,7 +76,7 @@ DatasetsController.prototype.toggleLocation = function (location) {
     this.filters.locations.push(location);
   }
   this.calculateSnapshot();
-  this.notifyListeners('filter-locations');
+  this.notifyListeners("filter-locations");
 };
 
 /**
@@ -76,12 +84,15 @@ DatasetsController.prototype.toggleLocation = function (location) {
  * @param dates The dates to filter.
  */
 DatasetsController.prototype.setDatesFilter = function (dates) {
-  let stringVersions = dates.map(date => String(date)).filter(item => item.length > 0);
-  if (objectsEqual(this.filters.dates, stringVersions)) return lotivis_log(`[lotivis]  Date filters not changed.`);
+  let stringVersions = dates
+    .map((date) => String(date))
+    .filter((item) => item.length > 0);
+  if (objectsEqual(this.filters.dates, stringVersions))
+    return lotivis_log(`[lotivis]  Date filters not changed.`);
   this.filters.dates = stringVersions;
   this.calculateSnapshot();
-  this.notifyListeners('filter-dates');
-  lotivis_log('filter-dates:', this.filters.dates);
+  this.notifyListeners("filter-dates");
+  lotivis_log("filter-dates:", this.filters.dates);
 };
 
 DatasetsController.prototype.toggleDate = function (date) {
@@ -93,7 +104,7 @@ DatasetsController.prototype.toggleDate = function (date) {
     this.filters.dates.push(stringVersion);
   }
   this.calculateSnapshot();
-  this.notifyListeners('filter-dates');
+  this.notifyListeners("filter-dates");
 };
 
 /**
@@ -102,12 +113,15 @@ DatasetsController.prototype.toggleDate = function (date) {
  * @param datasets The datasets to filter.
  */
 DatasetsController.prototype.setDatasetsFilter = function (datasets) {
-  let stringVersions = datasets.map(dataset => String(dataset)).filter(item => item.length > 0);
-  if (objectsEqual(this.filters.labels, stringVersions)) return lotivis_log(`[lotivis]  Dataset filters not changed.`);
+  let stringVersions = datasets
+    .map((dataset) => String(dataset))
+    .filter((item) => item.length > 0);
+  if (objectsEqual(this.filters.labels, stringVersions))
+    return lotivis_log(`[lotivis]  Dataset filters not changed.`);
   this.filters.labels = stringVersions;
   this.calculateSnapshot();
-  this.notifyListeners('filter-labels');
-  lotivis_log('filter-labels:', this.filters.labels);
+  this.notifyListeners("filter-labels");
+  lotivis_log("filter-labels:", this.filters.labels);
 };
 
 /**
@@ -116,8 +130,10 @@ DatasetsController.prototype.setDatasetsFilter = function (datasets) {
  * @param label The label of the dataset.
  * @param notifyListeners A boolean value indicating whether to notify the listeners.  Default is `true`.
  */
-DatasetsController.prototype.toggleDataset = function (label, notifyListeners = true) {
-
+DatasetsController.prototype.toggleDataset = function (
+  label,
+  notifyListeners = true
+) {
   let index = this.filters.labels.indexOf(label);
   if (index !== -1) {
     this.filters.labels.splice(index, 1);
@@ -127,7 +143,7 @@ DatasetsController.prototype.toggleDataset = function (label, notifyListeners = 
 
   if (!notifyListeners) return;
   this.calculateSnapshot();
-  this.notifyListeners('dataset-toggle');
+  this.notifyListeners("dataset-toggle");
 };
 
 /**
@@ -148,8 +164,10 @@ DatasetsController.prototype.filteredDatasets = function () {
   if (this.filters.locations && this.filters.locations.length > 0) {
     let locationFilters = this.filters.locations;
     filtered = filtered.map(function (dataset) {
-      dataset.data = dataset.data
-        .filter(data => locationFilters.includes(String(data.location))) || [];
+      dataset.data =
+        dataset.data.filter((data) =>
+          locationFilters.includes(String(data.location))
+        ) || [];
       return dataset;
     });
   }
@@ -157,11 +175,13 @@ DatasetsController.prototype.filteredDatasets = function () {
   if (this.filters.dates && this.filters.dates.length > 0) {
     let dateFilters = this.filters.dates;
     filtered = filtered.map(function (dataset) {
-      dataset.data = dataset.data
-        .filter(data => dateFilters.includes(String(data.date))) || [];
+      dataset.data =
+        dataset.data.filter((data) =>
+          dateFilters.includes(String(data.date))
+        ) || [];
       return dataset;
     });
   }
 
-  return filtered.filter(dataset => dataset.data.length > 0);
+  return filtered.filter((dataset) => dataset.data.length > 0);
 };

@@ -1,9 +1,10 @@
+import * as d3 from "d3";
+
 /**
  *
  * @class UrlParameters
  */
 export class UrlParameters {
-
   /**
    * Returns the singleton instance.
    *
@@ -26,10 +27,10 @@ export class UrlParameters {
 
   getBoolean(parameter, defaultValue = false) {
     let value = this.getURL().searchParams.get(parameter);
-    return value ? value === 'true' : defaultValue;
+    return value ? value === "true" : defaultValue;
   }
 
-  getString(parameter, defaultValue = '') {
+  getString(parameter, defaultValue = "") {
     return this.getURL().searchParams.get(parameter) || defaultValue;
   }
 
@@ -65,23 +66,21 @@ export class UrlParameters {
     // console.log('window.lotivisApplication: ' + window.lotivisApplication);
     // window.lotivisApplication.currentPage.updateFooter();
     const url = this.getURL();
-    d3
-      .select('#lotivis-url-container')
-      .text(url);
+    d3.select("#lotivis-url-container").text(url);
   }
 }
 
-UrlParameters.language = 'language';
-UrlParameters.page = 'page';
-UrlParameters.query = 'query';
-UrlParameters.searchViewMode = 'search-view-mode';
-UrlParameters.chartType = 'chart-type';
-UrlParameters.chartShowLabels = 'chart-show-labels';
-UrlParameters.chartCombineStacks = 'combine-stacks';
-UrlParameters.contentType = 'content-type';
-UrlParameters.valueType = 'value-type';
-UrlParameters.searchSensitivity = 'search-sensitivity';
-UrlParameters.startYear = 'start-year';
-UrlParameters.endYear = 'end-year';
+UrlParameters.language = "language";
+UrlParameters.page = "page";
+UrlParameters.query = "query";
+UrlParameters.searchViewMode = "search-view-mode";
+UrlParameters.chartType = "chart-type";
+UrlParameters.chartShowLabels = "chart-show-labels";
+UrlParameters.chartCombineStacks = "combine-stacks";
+UrlParameters.contentType = "content-type";
+UrlParameters.valueType = "value-type";
+UrlParameters.searchSensitivity = "search-sensitivity";
+UrlParameters.startYear = "start-year";
+UrlParameters.endYear = "end-year";
 
-UrlParameters.showTestData = 'show-samples';
+UrlParameters.showTestData = "show-samples";

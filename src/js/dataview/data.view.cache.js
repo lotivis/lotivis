@@ -28,7 +28,7 @@ export class DataViewCache {
      * @param datasetFilters The collection of filtered datasets.
      * @returns {*}
      */
-    this.getDataView = function(
+    this.getDataView = function (
       type,
       locationFilters,
       dateFilters,
@@ -46,7 +46,7 @@ export class DataViewCache {
      * @param dateFilters The collection of filtered dates.
      * @param datasetFilters The collection of filtered datasets.
      */
-    this.setDataView = function(
+    this.setDataView = function (
       dataView,
       type,
       locationFilters,
@@ -60,7 +60,7 @@ export class DataViewCache {
     /**
      * Invalidates the cache.
      */
-    this.invalidate = function() {
+    this.invalidate = function () {
       content = {};
     };
   }

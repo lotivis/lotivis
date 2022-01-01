@@ -11,7 +11,7 @@ export function combine(flattenList) {
   let copiedList = copy(flattenList);
   for (let index = 0; index < copiedList.length; index++) {
     let listItem = copiedList[index];
-    let entry = combined.find(function(entryItem) {
+    let entry = combined.find(function (entryItem) {
       return (
         entryItem.dataset === listItem.dataset &&
         entryItem.stack === listItem.stack &&
@@ -52,7 +52,7 @@ export function combineByStacks(flattenList) {
   for (let index = 0; index < flattenList.length; index++) {
     let listItem = flattenList[index];
 
-    let entry = combined.find(function(entryItem) {
+    let entry = combined.find(function (entryItem) {
       return (
         entryItem.stack === listItem.stack &&
         entryItem.location === listItem.location &&
@@ -90,7 +90,7 @@ export function combineByDate(flatData) {
   let combined = [];
   for (let index = 0; index < flatData.length; index++) {
     let listItem = flatData[index];
-    let entry = combined.find(function(entryItem) {
+    let entry = combined.find(function (entryItem) {
       return (
         entryItem.dataset === listItem.dataset &&
         entryItem.stack === listItem.stack &&
@@ -123,7 +123,7 @@ export function combineByLocation(flatData) {
   let combined = [];
   for (let index = 0; index < flatData.length; index++) {
     let listItem = flatData[index];
-    let entry = combined.find(function(entryItem) {
+    let entry = combined.find(function (entryItem) {
       return (
         entryItem.dataset === listItem.dataset &&
         entryItem.stack === listItem.stack &&

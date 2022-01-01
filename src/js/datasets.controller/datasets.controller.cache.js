@@ -1,4 +1,4 @@
-import {DatasetsController} from "./datasets.controller";
+import { DatasetsController } from "./datasets.controller";
 
 DatasetsController.prototype.getCached = function (type) {
   return this.cache.getDataView(

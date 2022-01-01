@@ -1,9 +1,9 @@
 import {
   extractDatesFromDatasets,
-  extractLabelsFromDatasets
+  extractLabelsFromDatasets,
 } from "./data.extract";
-import {flatDatasets} from "./data.flat";
-import {combineByDate} from "./data.combine";
+import { flatDatasets } from "./data.flat";
+import { combineByDate } from "./data.combine";
 
 /**
  *
@@ -12,7 +12,6 @@ import {combineByDate} from "./data.combine";
  * @returns {{date.chart: *}[]}
  */
 export function dateToItemsRelation(datasets, dateAccess) {
-
   let flatData = flatDatasets(datasets);
   flatData = combineByDate(flatData);
 
@@ -27,12 +26,12 @@ export function dateToItemsRelation(datasets, dateAccess) {
   let listOfLabels = extractLabelsFromDatasets(datasets);
 
   return listOfDates.map(function (date) {
-    let datasetDate = {date: date};
+    let datasetDate = { date: date };
     flatData
-      .filter(item => item.date === date)
+      .filter((item) => item.date === date)
       .forEach(function (entry) {
         datasetDate[entry.dataset] = entry.value;
-        datasetDate.total = entry.dateTotal;
+        datasetDate.total = entry.dateTotal ?? entry.value;
       });
 
     // addDataset zero values for empty datasets

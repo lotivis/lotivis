@@ -19,7 +19,7 @@ export class DataValidateError extends LotivisError {
 
 export class MissingPropertyError extends DataValidateError {
   constructor(message, data) {
-    super(message + ' ' + JSON.stringify(data || {}));
+    super(message + " " + JSON.stringify(data || {}));
     this.data = data;
   }
 }
@@ -41,10 +41,3 @@ export class LotivisUnimplementedMethodError extends LotivisError {
     super(`Subclasses must override function '${functionName}'.`);
   }
 }
-
-exports.LotivisError = LotivisError;
-exports.DataValidateError = DataValidateError;
-exports.MissingPropertyError = MissingPropertyError;
-exports.InvalidFormatError = InvalidFormatError;
-exports.GeoJSONValidateError = GeoJSONValidateError;
-exports.LotivisUnimplementedMethodError = LotivisUnimplementedMethodError;

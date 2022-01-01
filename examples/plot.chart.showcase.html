@@ -19,9 +19,7 @@
     <div class="container mt-3">
       <div class="row">
         <div class="col-2">
-          <a href="../index.html">
-            Back
-          </a>
+          <a href="../index.html"> Back </a>
         </div>
         <div class="col-8 text-center">
           <h1>Plot Chart Showcase</h1>
@@ -85,29 +83,29 @@
             {
               location: 1,
               date: 2000,
-              value: 0
+              value: 0,
             },
             {
               location: 1,
               date: 2001,
-              value: 1
+              value: 1,
             },
             {
               location: 1,
               date: 2002,
-              value: 2
+              value: 2,
             },
             {
               location: 1,
               date: 2003,
-              value: 3
+              value: 3,
             },
             {
               location: 1,
               date: 2004,
-              value: 4
-            }
-          ]
+              value: 4,
+            },
+          ],
         },
         {
           label: "dataset_2",
@@ -115,29 +113,29 @@
             {
               location: 1,
               date: 2000,
-              value: 0
+              value: 0,
             },
             {
               location: 1,
               date: 2001,
-              value: 2
+              value: 2,
             },
             {
               location: 1,
               date: 2002,
-              value: 4
+              value: 4,
             },
             {
               location: 1,
               date: 2003,
-              value: 2
+              value: 2,
             },
             {
               location: 1,
               date: 2004,
-              value: 0
-            }
-          ]
+              value: 0,
+            },
+          ],
         },
         {
           label: "dataset_3",
@@ -145,29 +143,29 @@
             {
               location: 1,
               date: 2000,
-              value: 5
+              value: 5,
             },
             {
               location: 1,
               date: 2001,
-              value: 4
+              value: 4,
             },
             {
               location: 1,
               date: 2002,
-              value: 3
+              value: 3,
             },
             {
               location: 1,
               date: 2003,
-              value: 2
+              value: 2,
             },
             {
               location: 1,
               date: 2004,
-              value: 0
-            }
-          ]
+              value: 0,
+            },
+          ],
         },
         {
           label: "dataset_4",
@@ -175,9 +173,9 @@
             {
               location: 1,
               date: 2000,
-              value: 3
-            }
-          ]
+              value: 3,
+            },
+          ],
         },
         {
           label: "dataset_5",
@@ -185,67 +183,67 @@
             {
               location: 1,
               date: 2003,
-              value: 5
-            }
-          ]
+              value: 5,
+            },
+          ],
         },
         {
           label: "dataset_6",
-          data: []
-        }
+          data: [],
+        },
       ];
 
       lotivis.debug(true);
 
       let plotChartCard1 = new lotivis.PlotChartCard("card-gradient", {
-        title: "Gradient"
+        title: "Gradient",
       });
       let plotChartCard2 = new lotivis.PlotChartCard(
         "card-gradient-hide-labels",
         {
           title: "Hide Labels",
-          showLabels: false
+          showLabels: false,
         }
       );
       let plotChartCard3 = new lotivis.PlotChartCard(
         "card-gradient-sort-alphabetically",
         {
           title: "Sort alphabetically",
-          sort: "alphabetically"
+          sort: "alphabetically",
         }
       );
       let plotChartCard4 = new lotivis.PlotChartCard(
         "card-gradient-sort-duration",
         {
           title: "Sort duration",
-          sort: "duration"
+          sort: "duration",
         }
       );
       let plotChartCard5 = new lotivis.PlotChartCard(
         "card-gradient-sort-itensity",
         {
           title: "Sort itensity",
-          sort: "itensity"
+          sort: "itensity",
         }
       );
       let plotChartCard6 = new lotivis.PlotChartCard(
         "card-gradient-sort-first-date",
         {
           title: "Sort first date",
-          sort: "firstDate"
+          sort: "firstDate",
         }
       );
 
       let plotChartCard7 = new lotivis.PlotChartCard("card-fraction", {
         title: "Fraction",
-        type: "fraction"
+        type: "fraction",
       });
       let plotChartCard8 = new lotivis.PlotChartCard(
         "card-fraction-hide-labels",
         {
           title: "Hide Labels",
           type: "fraction",
-          showLabels: false
+          showLabels: false,
         }
       );
       let plotChartCard9 = new lotivis.PlotChartCard(
@@ -253,7 +251,7 @@
         {
           title: "Sort alphabetically",
           type: "fraction",
-          sort: "alphabetically"
+          sort: "alphabetically",
         }
       );
       let plotChartCard10 = new lotivis.PlotChartCard(
@@ -261,7 +259,7 @@
         {
           title: "Sort duration",
           type: "fraction",
-          sort: "duration"
+          sort: "duration",
         }
       );
       let plotChartCard11 = new lotivis.PlotChartCard(
@@ -269,7 +267,7 @@
         {
           title: "Sort itensity",
           type: "fraction",
-          sort: "itensity"
+          sort: "itensity",
         }
       );
       let plotChartCard12 = new lotivis.PlotChartCard(
@@ -277,13 +275,13 @@
         {
           title: "Sort first date",
           type: "fraction",
-          sort: "firstDate"
+          sort: "firstDate",
         }
       );
 
       let datasetJSONCard = new lotivis.DatasetsJSONCard("datasets-json-card");
 
-      let controller = new lotivis.DatasetController(data);
+      let controller = new lotivis.DatasetsController(data);
       controller.register([
         plotChartCard1.chart,
         plotChartCard2.chart,
@@ -297,7 +295,7 @@
         plotChartCard10.chart,
         plotChartCard11.chart,
         plotChartCard12.chart,
-        datasetJSONCard
+        datasetJSONCard,
       ]);
     </script>
   </body>

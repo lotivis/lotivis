@@ -19,9 +19,7 @@
     <div class="container mt-3">
       <div class="row">
         <div class="col-2">
-          <a href="../index.html">
-            Back
-          </a>
+          <a href="../index.html"> Back </a>
         </div>
         <div class="col-8 text-center">
           <h1>Map Chart Showcase</h1>
@@ -71,9 +69,9 @@
             { map: 45, date: 2000, value: 2 },
             { map: 45, date: 2001, value: 1 },
             { map: 45, date: 2002, value: 4 },
-            { map: 45, date: 2003, value: 3 }
-          ]
-        }
+            { map: 45, date: 2003, value: 3 },
+          ],
+        },
       ];
 
       let datasetsCard = new lotivis.DatasetsJSONCard();
@@ -81,44 +79,44 @@
 
       let mapChartCard1 = new lotivis.MapChartCard("map-chart-card-1", {
         name: "Standard",
-        sendsNotifications: false
+        sendsNotifications: false,
       });
       let mapChartCard2 = new lotivis.MapChartCard("map-chart-card-2", {
         name: "Show Labels",
         sendsNotifications: false,
-        showLabels: true
+        showLabels: true,
       });
       let mapChartCard3 = new lotivis.MapChartCard("map-chart-card-3", {
         name: "Standard",
-        sendsNotifications: false
+        sendsNotifications: false,
       });
       let mapChartCard4 = new lotivis.MapChartCard("map-chart-card-4", {
         name: "Exclude Features",
         sendsNotifications: false,
-        excludedFeatureCodes: ["2A", "2B"]
+        excludedFeatureCodes: ["2A", "2B"],
       });
 
       fetch("assets/departements.geojson")
-        .then(response => response.text())
-        .then(text => JSON.parse(text))
-        .then(geoJSON => {
+        .then((response) => response.text())
+        .then((text) => JSON.parse(text))
+        .then((geoJSON) => {
           mapChartCard1.chart.setGeoJSON(geoJSON);
           mapChartCard2.chart.setGeoJSON(geoJSON);
           mapChartCard3.chart.setGeoJSON(geoJSON);
           mapChartCard4.chart.setGeoJSON(geoJSON);
           return fetch("assets/example-datasets-location-time-grouped.json");
         })
-        .then(response => response.text())
-        .then(text => JSON.parse(text))
-        .then(function(json) {
-          let datasetsController = new lotivis.DatasetController(datasets);
+        .then((response) => response.text())
+        .then((text) => JSON.parse(text))
+        .then(function (json) {
+          let datasetsController = new lotivis.DatasetsController(datasets);
           datasetsController.register([
             mapChartCard1.chart,
             mapChartCard2.chart,
             mapChartCard3.chart,
             mapChartCard4.chart,
             datasetsCard,
-            dataviewMapCard
+            dataviewMapCard,
           ]);
         });
     </script>

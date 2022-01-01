@@ -25,10 +25,12 @@ export class PlotTooltipRenderer {
      * @param dataset The dataset to represent in HTML.
      */
     function getHTMLContentForDataset(dataset) {
+      console.log("dataset", dataset);
+
       let components = [];
 
       let sum = dataset.data
-        .map(item => item.value)
+        .map((item) => item.value)
         .reduce((acc, next) => +acc + +next, 0);
       let formatted = plotChart.config.numberFormat.format(sum);
 
@@ -40,7 +42,7 @@ export class PlotTooltipRenderer {
       components.push("Items: " + formatted);
       components.push("");
 
-      let filtered = dataset.data.filter(item => item.value !== 0);
+      let filtered = dataset.data.filter((item) => item.value !== 0);
       for (let index = 0; index < filtered.length; index++) {
         let entry = filtered[index];
         let formatted = plotChart.config.numberFormat.format(entry.value);
@@ -70,7 +72,7 @@ export class PlotTooltipRenderer {
      * @param event The mouse event.
      * @param dataset The dataset.
      */
-    this.showTooltip = function(event, dataset) {
+    this.showTooltip = function (event, dataset) {
       if (!plotChart.config.showTooltip) return;
       tooltip.html(getHTMLContentForDataset(dataset));
 
@@ -105,7 +107,7 @@ export class PlotTooltipRenderer {
     /**
      * Hides the tooltip by setting its opacity to 0.
      */
-    this.hideTooltip = function() {
+    this.hideTooltip = function () {
       let controller = plotChart.datasetController;
       let filters = controller.datasetFilters;
 

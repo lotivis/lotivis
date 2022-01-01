@@ -19,9 +19,7 @@
     <div class="container mt-3">
       <div class="row">
         <div class="col-2">
-          <a href="../index.html">
-            Back
-          </a>
+          <a href="../index.html"> Back </a>
         </div>
         <div class="col-8 text-center">
           <h1>Date Data Stacked</h1>
@@ -50,54 +48,54 @@
             {
               location: 1,
               date: 2000,
-              value: 0
+              value: 0,
             },
             {
               location: 1,
               date: 2001,
-              value: 1
+              value: 1,
             },
             {
               location: 1,
               date: 2002,
-              value: 2
+              value: 2,
             },
             {
               location: 1,
               date: 2003,
-              value: 3
+              value: 3,
             },
             {
               location: 1,
               date: 2004,
-              value: 4
+              value: 4,
             },
             {
               location: 2,
               date: 2000,
-              value: 2
+              value: 2,
             },
             {
               location: 2,
               date: 2001,
-              value: 3
+              value: 3,
             },
             {
               location: 2,
               date: 2002,
-              value: 4
+              value: 4,
             },
             {
               location: 2,
               date: 2003,
-              value: 5
+              value: 5,
             },
             {
               location: 2,
               date: 2004,
-              value: 6
-            }
-          ]
+              value: 6,
+            },
+          ],
         },
         {
           label: "dataset_1_1",
@@ -106,29 +104,29 @@
             {
               location: 1,
               date: 2000,
-              value: 8
+              value: 8,
             },
             {
               location: 1,
               date: 2001,
-              value: 6
+              value: 6,
             },
             {
               location: 1,
               date: 2002,
-              value: 4
+              value: 4,
             },
             {
               location: 1,
               date: 2003,
-              value: 2
+              value: 2,
             },
             {
               location: 1,
               date: 2004,
-              value: 0
-            }
-          ]
+              value: 0,
+            },
+          ],
         },
         {
           label: "dataset_2",
@@ -137,54 +135,54 @@
             {
               location: 1,
               date: 2000,
-              value: 5
+              value: 5,
             },
             {
               location: 1,
               date: 2001,
-              value: 5
+              value: 5,
             },
             {
               location: 1,
               date: 2002,
-              value: 5
+              value: 5,
             },
             {
               location: 1,
               date: 2003,
-              value: 5
+              value: 5,
             },
             {
               location: 1,
               date: 2004,
-              value: 5
+              value: 5,
             },
             {
               location: 2,
               date: 2000,
-              value: 8
+              value: 8,
             },
             {
               location: 2,
               date: 2001,
-              value: 7
+              value: 7,
             },
             {
               location: 2,
               date: 2002,
-              value: 6
+              value: 6,
             },
             {
               location: 2,
               date: 2003,
-              value: 5
+              value: 5,
             },
             {
               location: 2,
               date: 2004,
-              value: 4
-            }
-          ]
+              value: 4,
+            },
+          ],
         },
         {
           label: "dataset_3",
@@ -193,55 +191,55 @@
             {
               location: 1,
               date: 2000,
-              value: 5
+              value: 5,
             },
             {
               location: 1,
               date: 2001,
-              value: 4
+              value: 4,
             },
             {
               location: 1,
               date: 2002,
-              value: 3
+              value: 3,
             },
             {
               location: 1,
               date: 2003,
-              value: 2
+              value: 2,
             },
             {
               location: 1,
               date: 2004,
-              value: 1
+              value: 1,
             },
             {
               location: 2,
               date: 2000,
-              value: 5
+              value: 5,
             },
             {
               location: 2,
               date: 2001,
-              value: 6
+              value: 6,
             },
             {
               location: 2,
               date: 2002,
-              value: 7
+              value: 7,
             },
             {
               location: 2,
               date: 2003,
-              value: 8
+              value: 8,
             },
             {
               location: 2,
               date: 2004,
-              value: 9
-            }
-          ]
-        }
+              value: 9,
+            },
+          ],
+        },
       ];
 
       lotivis.debug(true);
@@ -249,7 +247,7 @@
       let datasetsCard = new lotivis.DatasetsJSONCard();
       let dateChartCard = new lotivis.DateChartCard();
 
-      let datasetsController = new lotivis.DatasetController(data);
+      let datasetsController = new lotivis.DatasetsController(data);
 
       dateChartCard.chart.setDatasetsController(datasetsController);
       datasetsCard.setDatasetsController(datasetsController);

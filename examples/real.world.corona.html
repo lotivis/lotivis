@@ -19,9 +19,7 @@
     <div class="container mt-3">
       <div class="row">
         <div class="col-2">
-          <a href="../index.html">
-            Back
-          </a>
+          <a href="../index.html"> Back </a>
         </div>
         <div class="col-8 text-center">
           <h1>Corona-Zahlen Zeitverlauf</h1>
@@ -38,7 +36,7 @@
                 <!-- Dropdown Here -->
               </div>
             </div>
-            <div class="lotivis-card-body" style="overflow: scroll;">
+            <div class="lotivis-card-body" style="overflow: scroll">
               <div style="width: 2000px">
                 <div id="date-chart">
                   <!-- Date Chart Here -->
@@ -65,20 +63,20 @@
           top: 30,
           left: 120,
           bottom: 30,
-          right: 30
-        }
+          right: 30,
+        },
       });
       let dateChart = new lotivis.DateChart("date-chart", {
         height: 400,
         width: 2000,
         margin: {
-          top: 20
+          top: 20,
         },
         groupSize: 7,
-        sendsNotifications: false
+        sendsNotifications: false,
       });
 
-      let datasetsController = new lotivis.DatasetController([]);
+      let datasetsController = new lotivis.DatasetsController([]);
       datasetsController.dateAccess = lotivis.GermanDateAccess;
 
       dateChart.setDatasetsController(datasetsController);
@@ -89,7 +87,7 @@
         "dropdown-group-size", // selector
         ["1 Day", "2 Days", "1 Week", "2 Weeks", "1 Month"], // options
         "1 Week", // selected option
-        function(value) {
+        function (value) {
           // on change
           switch (value) {
             case "1 Day":
@@ -118,8 +116,8 @@
       let url = "assets/cvd_sh_verlauf.csv";
 
       fetch(url)
-        .then(response => response.text())
-        .then(function(rawCSV) {
+        .then((response) => response.text())
+        .then(function (rawCSV) {
           let datasets = lotivis.parseCSVDate(rawCSV);
           datasetsController.setDatasets(datasets);
         })

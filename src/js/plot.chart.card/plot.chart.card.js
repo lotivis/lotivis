@@ -5,6 +5,7 @@ import { PlotChart } from "../plot.chart/plot.chart";
 import { PlotChartCardSettingsPopup } from "./plot.chart.card.settings.popup";
 import { downloadImage } from "../shared/download";
 import { createDownloadFilename } from "../shared/filename";
+import * as d3 from "d3";
 
 /**
  * A card containing a date.chart.plot.chart chart.

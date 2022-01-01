@@ -61,7 +61,7 @@ export class PlotChartHoverBarsRenderer {
     /**
      * Draws the bars.
      */
-    this.render = function() {
+    this.render = function () {
       let datasets = plotChart.dataView.datasets;
       let graphWidth = plotChart.graphWidth;
 
@@ -73,11 +73,11 @@ export class PlotChartHoverBarsRenderer {
 
       plotChart.backgrounBars = plotChart.backgrounBarsData
         .append("rect")
-        .attr("id", d => createID(d))
+        .attr("id", (d) => createID(d))
         .attr("class", "ltv-plot-chart-hover-bar")
         .attr(`opacity`, 0)
         .attr("x", plotChart.config.margin.left)
-        .attr("y", d => plotChart.yChart(d.label))
+        .attr("y", (d) => plotChart.yChart(d.label))
         .attr("height", plotChart.yChart.bandwidth())
         .attr("width", graphWidth)
         .on("mouseenter", mouseEnter)

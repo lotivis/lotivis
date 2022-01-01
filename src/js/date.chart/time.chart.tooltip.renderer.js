@@ -87,7 +87,7 @@ export class TimeChartTooltipRenderer {
      */
     function getHTMLForDate(date) {
       let flatData = dateChart.snapshot.flatData.filter(
-        item => `${item.date}` === `${date}`
+        (item) => `${item.date}` === `${date}`
       );
 
       let first = flatData.first();
@@ -100,8 +100,8 @@ export class TimeChartTooltipRenderer {
 
       let sum = 0;
       let dataHTML = combineByDate(flatData)
-        .filter(item => item.value > 0)
-        .map(function(item) {
+        .filter((item) => item.value > 0)
+        .map(function (item) {
           let color = dateChart.datasetController.getColorForDataset(
             item.dataset
           );
@@ -122,7 +122,7 @@ export class TimeChartTooltipRenderer {
      * @param event The mouse event.
      * @param date The date.chart which is presented.
      */
-    this.showTooltip = function(event, date) {
+    this.showTooltip = function (event, date) {
       // set examples content before positioning the tooltip cause the size is
       // calculated based on the size
       const html = getHTMLForDate(date);
@@ -153,7 +153,7 @@ export class TimeChartTooltipRenderer {
     /**
      * Hides the tooltip.  Does nothing if tooltips opacity is already 0.
      */
-    this.hideTooltip = function() {
+    this.hideTooltip = function () {
       if (+tooltip.style("opacity") === 0) return;
       tooltip.style("opacity", 0);
     };

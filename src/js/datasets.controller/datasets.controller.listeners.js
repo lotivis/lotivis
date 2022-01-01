@@ -1,5 +1,5 @@
-import {DatasetsController} from "./datasets.controller";
-import {lotivis_log} from "../shared/debug";
+import { DatasetsController } from "./datasets.controller";
+import { lotivis_log } from "../shared/debug";
 
 /**
  * Appends the given listener to the collection of listeners.
@@ -8,10 +8,13 @@ import {lotivis_log} from "../shared/debug";
  */
 DatasetsController.prototype.addListener = function (listener) {
   if (!this.listeners) this.listeners = [];
-  if (!listener.update) return lotivis_log('Listener unqualified.');
-  if (this.listeners.includes(listener)) return lotivis_log(`[lotivis]  Attempt to add listener twice (${listener}).`);
+  if (!listener.update) return lotivis_log("Listener unqualified.");
+  if (this.listeners.includes(listener))
+    return lotivis_log(
+      `[lotivis]  Attempt to add listener twice (${listener}).`
+    );
   this.listeners.push(listener);
-  listener.update(this, 'registration');
+  listener.update(this, "registration");
 };
 
 /**
@@ -20,7 +23,7 @@ DatasetsController.prototype.addListener = function (listener) {
  * @param listener The listener to removeDataset.
  */
 DatasetsController.prototype.removeListener = function (listener) {
-  if (!this.listeners) return lotivis_log('No listeners property.');
+  if (!this.listeners) return lotivis_log("No listeners property.");
   let index = this.listeners.indexOf(listener);
   if (index === -1) return lotivis_log(`Listener not registered: ${listener}`);
   this.listeners = this.listeners.splice(index, 1);
@@ -30,18 +33,18 @@ DatasetsController.prototype.removeListener = function (listener) {
  * Notifies all listeners.
  * @param reason The reason to send to the listener.  Default is 'none'.
  */
-DatasetsController.prototype.notifyListeners = function (reason = 'none') {
+DatasetsController.prototype.notifyListeners = function (reason = "none") {
   if (!this.listeners) return;
   for (let index = 0; index < this.listeners.length; index++) {
     let listener = this.listeners[index];
     if (!listener.update) {
-      lotivis_log('Listener unqualified.');
+      lotivis_log("Listener unqualified.");
       continue;
     }
     lotivis_log(`listener: ${listener}`);
-    console.timeStamp('will update ' + listener);
+    console.timeStamp("will update " + listener);
     listener.update(this, reason);
-    console.timeStamp('did update ' + listener);
+    console.timeStamp("did update " + listener);
   }
 };
 

@@ -64,7 +64,7 @@ export class Color {
  * Returns a randomly generated shared.color.
  * @returns {[]}
  */
-Color.colorsForStack = function(stackNumber, amount = 1) {
+Color.colorsForStack = function (stackNumber, amount = 1) {
   let colorCouple = Color.stackColors[stackNumber % Color.stackColors.length];
   let colorGenerator = d3
     .scaleLinear()
@@ -98,5 +98,5 @@ Color.stackColors = [
   [Color.redHigh, Color.redLow],
   [Color.greenHight, Color.greenLow],
   [Color.organgeHigh, Color.organgeLow],
-  [Color.lightBlueHight, Color.lightBlueLow]
+  [Color.lightBlueHight, Color.lightBlueLow],
 ];

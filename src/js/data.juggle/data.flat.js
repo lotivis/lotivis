@@ -36,7 +36,7 @@ export function flatDataset(dataset) {
     );
     return flatData;
   }
-  dataset.data.forEach(item => {
+  dataset.data.forEach((item) => {
     let newItem = {};
     newItem.dataset = dataset.label;
     newItem.label = dataset.label;

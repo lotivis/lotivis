@@ -1,6 +1,6 @@
 import {
   InvalidFormatError,
-  MissingPropertyError
+  MissingPropertyError,
 } from "./data.validate.error";
 
 /**
@@ -9,7 +9,6 @@ import {
  * @throws InvalidFormatError
  */
 export function validateDatasets(datasets) {
-
   if (!datasets) {
     throw new InvalidFormatError(`No dataset given.`);
   } else if (!Array.isArray(datasets)) {
@@ -33,9 +32,13 @@ export function validateDataset(dataset) {
   } else if (!dataset.label) {
     throw new MissingPropertyError(`Missing label for dataset. ${dataset}`);
   } else if (!dataset.data) {
-    throw new MissingPropertyError(`Invalid data. Property is not an array. Dataset: ${dataset.label}`);
+    throw new MissingPropertyError(
+      `Invalid data. Property is not an array. Dataset: ${dataset.label}`
+    );
   } else if (!Array.isArray(dataset.data)) {
-    throw new InvalidFormatError(`Invalid data. Property is not an array. Dataset: ${dataset.label}`);
+    throw new InvalidFormatError(
+      `Invalid data. Property is not an array. Dataset: ${dataset.label}`
+    );
   }
 
   let data = dataset;

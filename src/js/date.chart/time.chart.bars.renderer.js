@@ -14,7 +14,9 @@ export class TimeChartBarsRenderer {
      * Appends the bar for the given stack.
      * @param stack The stack to append the bar for.
      */
-    this.renderBars = function(stack) {
+    this.renderBars = function (stack) {
+      console.log("stack", stack);
+
       let config = dateChart.config || {};
       let isCombineStacks = config.combineStacks || false;
       let colors =
@@ -25,27 +27,28 @@ export class TimeChartBarsRenderer {
       dateChart.svg
         .append("g")
         .selectAll("g")
-        .data(stack)
+        .data(stack.series)
         .enter()
         .append("g")
         .attr("fill", (stackData, index) =>
           isCombineStacks ? colors[0] : stack.colors[index]
         )
         .selectAll("rect")
-        .data(data => data)
+        .data((serie) => serie)
         .enter()
         .append("rect")
         .attr("class", "ltv-date-chart-bar")
         .attr("rx", isCombineStacks ? 0 : barRadius)
         .attr("ry", isCombineStacks ? 0 : barRadius)
-        .attr(
-          "x",
-          d =>
-            dateChart.xChartScale(d.data.date) + dateChart.xStack(stack.label)
-        )
-        .attr("y", d => dateChart.yChart(d[1]))
+        .attr("x", (item) => {
+          return (
+            dateChart.xChartScale(item.data.date) +
+            dateChart.xStack(stack.label)
+          );
+        })
+        .attr("y", (d) => dateChart.yChart(d[1]))
         .attr("width", dateChart.xStack.bandwidth())
-        .attr("height", d => dateChart.yChart(d[0]) - dateChart.yChart(d[1]));
+        .attr("height", (d) => dateChart.yChart(d[0]) - dateChart.yChart(d[1]));
     };
   }
 }

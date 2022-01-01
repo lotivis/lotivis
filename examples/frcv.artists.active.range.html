@@ -19,9 +19,7 @@
     <div class="container mt-3">
       <div class="row">
         <div class="col-2">
-          <a href="../index.html">
-            Back
-          </a>
+          <a href="../index.html"> Back </a>
         </div>
         <div class="col-8 text-center">
           <h1>Plot Data</h1>
@@ -47,22 +45,22 @@
       let datasetJSONCard = new lotivis.DatasetsJSONCard("datasets-json-card");
       let plotChartCard = new lotivis.PlotChartCard("plot-chart-card", {
         margin: {
-          left: 140
-        }
+          left: 140,
+        },
       });
 
       Promise.all([
-        d3.json("assets/artists-active-range.json"),
-        d3.json("assets/artists-active-range-female.json"),
-        d3.json("assets/artists-active-range-male.json"),
-        d3.json("assets/artists-active-range-groups.json")
-      ]).then(function(datasetsCollection) {
+        lotivis.d3.json("assets/artists-active-range.json"),
+        lotivis.d3.json("assets/artists-active-range-female.json"),
+        lotivis.d3.json("assets/artists-active-range-male.json"),
+        lotivis.d3.json("assets/artists-active-range-groups.json"),
+      ]).then(function (datasetsCollection) {
         datasetsCollection[0].label = "All";
         datasetsCollection[1].label = "Female";
         datasetsCollection[2].label = "Male";
         datasetsCollection[3].label = "Group";
 
-        plotChartCard.onSelectedDatasetChanged = function(
+        plotChartCard.onSelectedDatasetChanged = function (
           index,
           dataset,
           label

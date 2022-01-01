@@ -1,18 +1,16 @@
-import {Color} from "../shared/color";
+import { Color } from "../shared/color";
 
 /**
  *
  * @class DatasetsColorsController
  */
 export class DatasetsColorsController {
-
   /**
    * Creates a new instance of DatasetsColorsController.
    * @param workingDatasets
    * @param stacks
    */
   constructor(workingDatasets, stacks) {
-
     let datasets = workingDatasets;
     let labelToColor = {};
     let stackToColors = {};

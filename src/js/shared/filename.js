@@ -1,4 +1,4 @@
-import {LotivisConfig} from "./config";
+import { LotivisConfig } from "./config";
 
 /**
  * Appends the given string in extension to the given string filename if filename not already ends with this extension.
@@ -9,7 +9,7 @@ import {LotivisConfig} from "./config";
  * @returns {*|string} The filename with the given extension.
  */
 export function appendExtensionIfNeeded(filename, extension) {
-  if (extension === '' || extension === '.') return filename;
+  if (extension === "" || extension === ".") return filename;
   extension = extension.startsWith(".") ? extension : `.${extension}`;
   return filename.endsWith(extension) ? filename : `${filename}${extension}`;
 }

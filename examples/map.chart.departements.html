@@ -19,9 +19,7 @@
     <div class="container mt-3">
       <div class="row">
         <div class="col-2">
-          <a href="../index.html">
-            Back
-          </a>
+          <a href="../index.html"> Back </a>
         </div>
         <div class="col-8 text-center">
           <h1>Map Data</h1>
@@ -49,14 +47,16 @@
       const chart = mapChartCard.chart;
       chart.config.excludedFeatureCodes = ["2A", "2B"];
 
-      mapChartCard.onSelectedDatasetChanged = function(value) {
+      mapChartCard.onSelectedDatasetChanged = function (value) {
         let dataset = mapChartCard.datasets.find(
-          dataset => dataset.stack === value
+          (dataset) => dataset.stack === value
         );
         let string = JSON.stringify(dataset, null, 4);
         let element = document.getElementById("data");
         element.innerHTML = string;
       };
+
+      const d3 = lotivis.d3;
 
       Promise.all([
         d3.json("./assets/tracks-per-departement.json"),
@@ -64,8 +64,8 @@
         d3.json("./assets/words-per-departement-relative.json"),
         d3.json("./assets/types-per-departement.json"),
         d3.json("./assets/types-per-departement-relative.json"),
-        d3.json("./assets/departements.geojson")
-      ]).then(function(datasetsAndGeoJSON) {
+        d3.json("./assets/departements.geojson"),
+      ]).then(function (datasetsAndGeoJSON) {
         let rawGeoJSON = datasetsAndGeoJSON.pop();
         let onlyDatasets = datasetsAndGeoJSON;
         chart.setGeoJSON(rawGeoJSON);

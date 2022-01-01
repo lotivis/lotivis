@@ -2,6 +2,7 @@ import { Component } from "./component";
 import { createID } from "../shared/selector";
 import { Card } from "./card";
 import { Button } from "./button";
+import * as d3 from "d3";
 
 /**
  * A lotivis popup.
@@ -84,7 +85,7 @@ export class Popup extends Component {
   addCloseActionListeners() {
     let validIDs = [this.closeButton.selector, this.modalBackgroundId];
     let popup = this;
-    this.modalBackground.on("click", function(event) {
+    this.modalBackground.on("click", function (event) {
       if (!event || !event.target) return;
       if (!validIDs.includes(event.target.id)) return;
       popup.dismiss();
@@ -200,7 +201,7 @@ export class Popup extends Component {
   preferredSize() {
     return {
       width: 300,
-      height: 300
+      height: 300,
     };
   }
 
@@ -225,7 +226,7 @@ export class Popup extends Component {
       x: x,
       y: y,
       width: rect.width,
-      height: rect.height
+      height: rect.height,
     };
   }
 }

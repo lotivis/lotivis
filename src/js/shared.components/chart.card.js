@@ -59,12 +59,12 @@ export class ChartCard extends Card {
    */
   injectRadioGroup() {
     this.dropdown = new Dropdown(this.headerCenterComponent);
-    this.dropdown.onChange = function(value) {
-      let dataset = this.datasets.find(function(dataset) {
+    this.dropdown.onChange = function (value) {
+      let dataset = this.datasets.find(function (dataset) {
         if (!dataset.label) return false;
         return dataset.label.split(` `).join(`-`) === value;
       });
-      dataset = this.datasets.find(dataset => dataset.label === value);
+      dataset = this.datasets.find((dataset) => dataset.label === value);
       if (!dataset)
         return lotivis_log(`Can't find dataset with label ${value}`);
       this.setDataset(dataset);
@@ -76,8 +76,10 @@ export class ChartCard extends Card {
    */
   updateRadioGroup() {
     if (!this.datasets) return;
-    let names = this.datasets.map(dataset => dataset.label || "Unknown Label");
-    let options = names.map(name => new Option(name));
+    let names = this.datasets.map(
+      (dataset) => dataset.label || "Unknown Label"
+    );
+    let options = names.map((name) => new Option(name));
     this.dropdown.setOptions(options);
   }
 

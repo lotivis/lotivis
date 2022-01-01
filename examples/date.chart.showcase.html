@@ -19,9 +19,7 @@
     <div class="container mt-3">
       <div class="row">
         <div class="col-2">
-          <a href="../index.html">
-            Back
-          </a>
+          <a href="../index.html"> Back </a>
         </div>
         <div class="col-8 text-center">
           <h1>Date Chart Overview</h1>
@@ -68,45 +66,45 @@
           data: [
             {
               date: 2000,
-              value: 0.123456789123456789
+              value: 0.123456789123456789,
             },
             {
               date: 2000,
-              value: 2
+              value: 2,
             },
             {
               date: 2001,
-              value: 1
+              value: 1,
             },
             {
               date: 2001,
-              value: 3
+              value: 3,
             },
             {
               date: 2002,
-              value: 2
+              value: 2,
             },
             {
               date: 2002,
-              value: 4
+              value: 4,
             },
             {
               date: 2003,
-              value: 3
+              value: 3,
             },
             {
               date: 2003,
-              value: 5
+              value: 5,
             },
             {
               date: 2004,
-              value: 4
+              value: 4,
             },
             {
               date: 2004,
-              value: 6
-            }
-          ]
+              value: 6,
+            },
+          ],
         },
         {
           label: "dataset_2",
@@ -114,45 +112,45 @@
           data: [
             {
               date: 2000,
-              value: 5
+              value: 5,
             },
             {
               date: 2000,
-              value: 8
+              value: 8,
             },
             {
               date: 2001,
-              value: 5
+              value: 5,
             },
             {
               date: 2001,
-              value: 7
+              value: 7,
             },
             {
               date: 2002,
-              value: 5
+              value: 5,
             },
             {
               date: 2002,
-              value: 6
+              value: 6,
             },
             {
               date: 2003,
-              value: 5
+              value: 5,
             },
             {
               date: 2003,
-              value: 5
+              value: 5,
             },
             {
               date: 2004,
-              value: 5
+              value: 5,
             },
             {
               date: 2004,
-              value: 4
-            }
-          ]
+              value: 4,
+            },
+          ],
         },
         {
           label: "dataset_3",
@@ -160,69 +158,69 @@
           data: [
             {
               date: 2000,
-              value: 5
+              value: 5,
             },
             {
               date: 2000,
-              value: 5
+              value: 5,
             },
             {
               date: 2001,
-              value: 4
+              value: 4,
             },
             {
               date: 2001,
-              value: 6
+              value: 6,
             },
             {
               date: 2002,
-              value: 3
+              value: 3,
             },
             {
               date: 2002,
-              value: 7
+              value: 7,
             },
             {
               date: 2003,
-              value: 2
+              value: 2,
             },
             {
               date: 2003,
-              value: 8
+              value: 8,
             },
             {
               date: 2004,
-              value: 1
+              value: 1,
             },
             {
               date: 2004,
-              value: 9
-            }
-          ]
-        }
+              value: 9,
+            },
+          ],
+        },
       ];
 
       lotivis.debug(true);
 
       let datasetsCard = new lotivis.DatasetsJSONCard();
       let dateChartCard1 = new lotivis.DateChartCard("date-chart-card-1", {
-        title: "Standard"
+        title: "Standard",
       });
       let dateChartCard2 = new lotivis.DateChartCard("date-chart-card-2", {
         title: "Labels on",
-        showLabels: true
+        showLabels: true,
       });
       let dateChartCard3 = new lotivis.DateChartCard("date-chart-card-3", {
         title: "Combine Stacks",
-        combineStacks: true
+        combineStacks: true,
       });
 
-      let datasetsController = new lotivis.DatasetController(datasets);
+      let datasetsController = new lotivis.DatasetsController(datasets);
       datasetsController.register([
         dateChartCard1.chart,
         dateChartCard2.chart,
         dateChartCard3.chart,
-        datasetsCard
+        datasetsCard,
       ]);
     </script>
   </body>

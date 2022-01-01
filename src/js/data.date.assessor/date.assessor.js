@@ -5,7 +5,7 @@ import { lotivis_log_once } from "../shared/debug";
  * @param date
  * @constructor
  */
-export const DefaultDateAccess = date => date;
+export const DefaultDateAccess = (date) => date;
 
 /**
  *
@@ -13,7 +13,7 @@ export const DefaultDateAccess = date => date;
  * @returns {number}
  * @constructor
  */
-export const FormattedDateAccess = function(dateString) {
+export const FormattedDateAccess = function (dateString) {
   let value = Date.parse(dateString);
   if (isNaN(value)) {
     lotivis_log_once(`Received NaN for date "${dateString}"`);
@@ -29,7 +29,7 @@ export const FormattedDateAccess = function(dateString) {
  *
  * @constructor
  */
-export const DateGermanAssessor = function(dateString) {
+export const DateGermanAssessor = function (dateString) {
   let saveDateString = String(dateString);
   let components = saveDateString.split(".");
   let day = components[0];
@@ -45,7 +45,7 @@ export const DateGermanAssessor = function(dateString) {
  * @returns {number}
  * @constructor
  */
-export const DateWeekAssessor = function(weekday) {
+export const DateWeekAssessor = function (weekday) {
   let lowercase = weekday.toLowerCase();
   switch (lowercase) {
     case "sunday":

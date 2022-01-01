@@ -5,7 +5,7 @@ import { DatasetsController } from "../datasets.controller/datasets.controller";
  * Sets a new datasets controller.  The chart is updated automatically.
  * @param newController The new datasets controller.
  */
-Chart.prototype.setDatasetsController = function(newController) {
+Chart.prototype.setDatasetsController = function (newController) {
   if (this.datasetController) this.datasetController.removeListener(this);
   this.datasetController = newController;
   this.datasetController.addListener(this);
@@ -16,7 +16,7 @@ Chart.prototype.setDatasetsController = function(newController) {
  * Sets the datasets of this map.chart chart.
  * @param newDatasets The new dataset.
  */
-Chart.prototype.setDatasets = function(newDatasets) {
+Chart.prototype.setDatasets = function (newDatasets) {
   this.setDatasetsController(new DatasetsController(newDatasets));
 };
 
@@ -24,7 +24,7 @@ Chart.prototype.setDatasets = function(newDatasets) {
  * Returns the presented datasets.
  * @returns {[*]} The collection of datasets.
  */
-Chart.prototype.getDatasets = function() {
+Chart.prototype.getDatasets = function () {
   if (
     !this.datasetController ||
     !Array.isArray(this.datasetController.datasets)

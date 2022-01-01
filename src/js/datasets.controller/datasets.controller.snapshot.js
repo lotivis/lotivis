@@ -1,28 +1,32 @@
-import {DatasetsController} from "./datasets.controller";
-import {flatDatasets} from "../data.juggle/data.flat";
+import { DatasetsController } from "./datasets.controller";
+import { flatDatasets } from "../data.juggle/data.flat";
 import {
   extractDatesFromDatasets,
   extractDatesFromFlatData,
-  extractLabelsFromDatasets, extractLocationsFromDatasets,
+  extractLabelsFromDatasets,
+  extractLocationsFromDatasets,
   extractLocationsFromFlatData,
-  extractStacksFromDatasets
+  extractStacksFromDatasets,
 } from "../data.juggle/data.extract";
-import {copy} from "../shared/copy";
-import {DatasetsColorsController} from "./datasets.controller.colors";
-import {lotivis_log} from "../shared/debug";
+import { copy } from "../shared/copy";
+import { DatasetsColorsController } from "./datasets.controller.colors";
+import { lotivis_log } from "../shared/debug";
 
 /**
+ *
  */
 DatasetsController.prototype.calculateSnapshot = function () {
-  lotivis_log(`[lotivis]  calculateSnapshot`);
   this.snapshot = {};
   this.snapshot.datasets = this.filteredDatasets();
   this.snapshot.flatData = flatDatasets(this.snapshot.datasets);
   this.snapshot.labels = extractLabelsFromDatasets(this.snapshot.datasets);
   this.snapshot.stacks = extractStacksFromDatasets(this.snapshot.datasets);
-  this.snapshot.dates = extractDatesFromFlatData(this.snapshot.datasets)
-    .sort((left, right) => this.dateAccess(left) - this.dateAccess(right));
-  this.snapshot.locations = extractLocationsFromFlatData(this.snapshot.datasets);
+  this.snapshot.dates = extractDatesFromFlatData(this.snapshot.datasets).sort(
+    (left, right) => this.dateAccess(left) - this.dateAccess(right)
+  );
+  this.snapshot.locations = extractLocationsFromFlatData(
+    this.snapshot.datasets
+  );
 };
 
 /**
@@ -31,25 +35,31 @@ DatasetsController.prototype.calculateSnapshot = function () {
 DatasetsController.prototype.calculateAdditionalData = function () {
   let dateAccess = this.dateAccess;
 
-  this.datasets = copy(this.datasets)
-    .sort((left, right) => left.label > right.label);
+  this.datasets = copy(this.datasets).sort(
+    (left, right) => left.label > right.label
+  );
 
   this.datasets.forEach((dataset) => {
     dataset.data.forEach((item) => {
       item.dateNumeric = dateAccess(item.date);
     });
-    dataset.data = dataset.data
-      .sort((left, right) => left.dateNumeric - right.dateNumeric);
+    dataset.data = dataset.data.sort(
+      (left, right) => left.dateNumeric - right.dateNumeric
+    );
   });
 
   this.flatData = flatDatasets(this.datasets);
   this.labels = extractLabelsFromDatasets(this.datasets);
   this.stacks = extractStacksFromDatasets(this.datasets);
-  this.dates = extractDatesFromDatasets(this.datasets)
-    .sort((left, right) => dateAccess(left) - dateAccess(right));
+  this.dates = extractDatesFromDatasets(this.datasets).sort(
+    (left, right) => dateAccess(left) - dateAccess(right)
+  );
 
   this.locations = extractLocationsFromDatasets(this.datasets);
-  this.datasetsColorsController = new DatasetsColorsController(this.datasets, this.stacks);
+  this.datasetsColorsController = new DatasetsColorsController(
+    this.datasets,
+    this.stacks
+  );
 };
 
 /**
@@ -57,11 +67,11 @@ DatasetsController.prototype.calculateAdditionalData = function () {
  */
 DatasetsController.prototype.datasetsDidChange = function () {
   if (!this.datasets || !Array.isArray(this.datasets)) {
-    lotivis_log('[lotivis]  No datasets.');
+    lotivis_log("[lotivis]  No datasets.");
     return;
   }
 
   this.calculateAdditionalData();
   this.calculateSnapshot();
-  this.notifyListeners('datasets-update');
+  this.notifyListeners("datasets-update");
 };

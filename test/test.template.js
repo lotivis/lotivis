@@ -1,11 +1,9 @@
-const assert = require('assert');
-const samples = require('./sample.data');
-const lotivis = require('../dist/lotivis.tests');
+const assert = require("assert");
 
-describe('dataview.map.chart', function () {
+const lotivis = require("../dist/lotivis.tests");
 
-  it('does something', function () {
+describe("dataview.map.chart", function () {
+  it("does something", function () {
     assert.strictEqual(true, true);
   });
-
 });

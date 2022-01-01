@@ -1,4 +1,4 @@
-import {LotivisConfig} from "./config";
+import { LotivisConfig } from "./config";
 
 /**
  * A collection of messages which already hast been printed.
@@ -21,7 +21,7 @@ export var lotivis_log = () => null;
  */
 export function debug(enabled, printConfig = false) {
   lotivis_log = enabled ? console.log : () => null;
-  lotivis_log(`[lotivis]  ${enabled ? 'En' : 'Dis'}abled debug mode.`);
+  lotivis_log(`[lotivis]  ${enabled ? "En" : "Dis"}abled debug mode.`);
   if (!printConfig) return;
   lotivis_log(`LotivisConfig = ${JSON.stringify(LotivisConfig, null, 2)}`);
 }

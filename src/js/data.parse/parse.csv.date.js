@@ -16,12 +16,14 @@ export function parseCSVDate(text) {
   for (let index = 0; index < datasetLabels.length; index++) {
     datasets.push({
       label: datasetLabels[index],
-      data: []
+      data: [],
     });
   }
 
   for (let lineIndex = 0; lineIndex < arrays.length; lineIndex++) {
-    let lineArray = arrays[lineIndex].map(element => trimByChar(element, `"`));
+    let lineArray = arrays[lineIndex].map((element) =>
+      trimByChar(element, `"`)
+    );
     if (lineArray.length < minLineLength) continue;
 
     let date = lineArray.shift();
@@ -30,7 +32,7 @@ export function parseCSVDate(text) {
       let value = lineArray[columnIndex];
       datasets[columnIndex].data.push({
         date: date,
-        value: value
+        value: value,
       });
     }
   }
@@ -38,7 +40,7 @@ export function parseCSVDate(text) {
   datasets.csv = {
     content: text,
     headlines: datasetLabels.push(),
-    lines: arrays
+    lines: arrays,
   };
 
   return datasets;

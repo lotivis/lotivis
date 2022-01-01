@@ -1,5 +1,10 @@
-import {appendExtensionIfNeeded} from "./filename";
-import {getOriginalSizeOfSVG, getSVGString, svgString2Image} from "./screenshot";
+import { appendExtensionIfNeeded } from "./filename";
+import {
+  getOriginalSizeOfSVG,
+  getSVGString,
+  svgString2Image,
+} from "./screenshot";
+import * as d3 from "d3";
 
 /**
  * Creates and appends an anchor linked to the given samples which is then immediately clicked.
@@ -27,14 +32,14 @@ export function downloadBlob(blob, filename) {
  * if needed.
  */
 export function downloadJSON(jsonString, filename) {
-  let blob = new Blob([jsonString], {type: 'text/json'});
-  let saveFilename = appendExtensionIfNeeded(filename, 'json');
+  let blob = new Blob([jsonString], { type: "text/json" });
+  let saveFilename = appendExtensionIfNeeded(filename, "json");
   downloadBlob(blob, saveFilename);
 }
 
 export function downloadCSV(jsonString, filename) {
-  let blob = new Blob([jsonString], {type: 'text/csv'});
-  let saveFilename = appendExtensionIfNeeded(filename, 'csv');
+  let blob = new Blob([jsonString], { type: "text/csv" });
+  let saveFilename = appendExtensionIfNeeded(filename, "csv");
   downloadBlob(blob, saveFilename);
 }
 
@@ -47,7 +52,7 @@ export function downloadCSV(jsonString, filename) {
 export function downloadImage(selector, filename) {
   // console.log('selector:' + selector);
   // console.log('filename:' + filename);
-  let svgElement = d3.select('#' + selector);
+  let svgElement = d3.select("#" + selector);
   let node = svgElement.node();
   let size = getOriginalSizeOfSVG(node);
   let svgString = getSVGString(node);
@@ -55,9 +60,9 @@ export function downloadImage(selector, filename) {
   svgString2Image(svgString, 2 * size[0], 2 * size[1], function (dataURL) {
     // console.log('dataURL:' + dataURL);
     fetch(dataURL)
-      .then(res => res.blob())
+      .then((res) => res.blob())
       .then(function (dataBlob) {
-        let saveFilename = appendExtensionIfNeeded(filename, 'png');
+        let saveFilename = appendExtensionIfNeeded(filename, "png");
 
         // console.log('saveFilename:' + saveFilename);
 

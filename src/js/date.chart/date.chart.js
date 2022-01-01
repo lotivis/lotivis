@@ -73,9 +73,8 @@ export class DateChart extends Chart {
     let groupSize = this.config.groupSize || 1;
 
     if (this.config.combineStacks) {
-      this.dataview = this.datasetController.getDateDataviewCombinedStacks(
-        groupSize
-      );
+      this.dataview =
+        this.datasetController.getDateDataviewCombinedStacks(groupSize);
     } else {
       this.dataview = this.datasetController.getDateDataview(groupSize);
     }
@@ -95,6 +94,7 @@ export class DateChart extends Chart {
      * Prefer dates specified by configuration. Fallback to dates of datasets.
      */
     let dates = config.dateLabels || this.dataview.dates;
+    console.log("dates", dates);
 
     this.xChartScale = d3
       .scaleBand()
@@ -140,6 +140,8 @@ export class DateChart extends Chart {
     this.selectionRenderer.render();
     this.ghostBarsRenderer.renderGhostBars();
     this.legendRenderer.render();
+
+    console.log("this.dataview", this.dataview);
 
     for (
       let index = 0;

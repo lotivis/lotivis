@@ -1,6 +1,6 @@
 import { DatasetsController } from "../datasets.controller/datasets.controller";
 import { dateToItemsRelation } from "../data.juggle/data.relations";
-import { createStackModel } from "../data.juggle/data.stacks";
+import { createBarStackModel } from "../data.juggle/data.stacks";
 import { copy } from "../shared/copy";
 import { combineDatasetsByRatio } from "../data.juggle/data.combine.ratio";
 import { extractDatesFromDatasets } from "../data.juggle/data.extract";
@@ -13,7 +13,7 @@ import * as d3 from "d3";
 /**
  * Returns a new generated DateDataview for the current enabled samples of dataset of this controller.
  */
-DatasetsController.prototype.getDateDataviewCombinedStacks = function(
+DatasetsController.prototype.getDateDataviewCombinedStacks = function (
   groupSize
 ) {
   let dateAccess = this.dateAccess;
@@ -23,11 +23,11 @@ DatasetsController.prototype.getDateDataviewCombinedStacks = function(
   let dataView = {};
   let saveGroupSize = groupSize || 1;
 
-  datasets.forEach(function(dataset) {
+  datasets.forEach(function (dataset) {
     dataset.label = dataset.stack || dataset.label;
   });
 
-  enabledDatasets.forEach(function(dataset) {
+  enabledDatasets.forEach(function (dataset) {
     dataset.label = dataset.stack || dataset.label;
   });
 
@@ -49,20 +49,20 @@ DatasetsController.prototype.getDateDataviewCombinedStacks = function(
     enabledDatasets,
     dateAccess
   );
-  dataView.datasetStacks = createStackModel(
+  dataView.datasetStacks = createBarStackModel(
     this,
     datasets,
     dataView.dateToItemsRelation
   );
-  dataView.datasetStacksPresented = createStackModel(
+  dataView.datasetStacksPresented = createBarStackModel(
     this,
     enabledDatasets,
     dataView.dateToItemsRelationPresented
   );
 
-  dataView.max = d3.max(dataView.datasetStacksPresented, function(stack) {
-    return d3.max(stack, function(series) {
-      return d3.max(series.map(item => item["1"]));
+  dataView.max = d3.max(dataView.datasetStacksPresented, function (stack) {
+    return d3.max(stack.series, function (series) {
+      return d3.max(series.map((item) => item["1"]));
     });
   });
 

@@ -19,9 +19,7 @@
     <div class="container mt-3">
       <div class="row">
         <div class="col-2">
-          <a href="../index.html">
-            Back
-          </a>
+          <a href="../index.html"> Back </a>
         </div>
         <div class="col-8 text-center">
           <h1>Date Chart Grouped</h1>
@@ -56,8 +54,8 @@
             { location: 2, date: 2001, value: 3 },
             { location: 2, date: 2002, value: 4 },
             { location: 2, date: 2003, value: 5 },
-            { location: 2, date: 2004, value: 6 }
-          ]
+            { location: 2, date: 2004, value: 6 },
+          ],
         },
         {
           label: "dataset_2",
@@ -72,8 +70,8 @@
             { location: 2, date: 2001, value: 7 },
             { location: 2, date: 2002, value: 6 },
             { location: 2, date: 2003, value: 5 },
-            { location: 2, date: 2004, value: 4 }
-          ]
+            { location: 2, date: 2004, value: 4 },
+          ],
         },
         {
           label: "dataset_3",
@@ -88,8 +86,8 @@
             { location: 2, date: 2001, value: 6 },
             { location: 2, date: 2002, value: 7 },
             { location: 2, date: 2003, value: 8 },
-            { location: 2, date: 2004, value: 9 }
-          ]
+            { location: 2, date: 2004, value: 9 },
+          ],
         },
         {
           label: "dataset_4",
@@ -104,8 +102,8 @@
             { location: 2, date: 2001, value: 6 },
             { location: 2, date: 2002, value: 7 },
             { location: 2, date: 2003, value: 8 },
-            { location: 2, date: 2004, value: 9 }
-          ]
+            { location: 2, date: 2004, value: 9 },
+          ],
         },
         {
           label: "dataset_5",
@@ -120,8 +118,8 @@
             { location: 2, date: 2001, value: 3 },
             { location: 2, date: 2002, value: 4 },
             { location: 2, date: 2003, value: 5 },
-            { location: 2, date: 2004, value: 6 }
-          ]
+            { location: 2, date: 2004, value: 6 },
+          ],
         },
         {
           label: "dataset_6",
@@ -136,9 +134,9 @@
             { location: 2, date: 2001, value: 6 },
             { location: 2, date: 2002, value: 7 },
             { location: 2, date: 2003, value: 8 },
-            { location: 2, date: 2004, value: 9 }
-          ]
-        }
+            { location: 2, date: 2004, value: 9 },
+          ],
+        },
       ];
 
       // print debug messages
@@ -147,7 +145,7 @@
       let datasetJsonCard = new lotivis.DatasetsJSONCard();
       let dateChartCard = new lotivis.DateChartCard();
 
-      let datasetsController = new lotivis.DatasetController(datasets);
+      let datasetsController = new lotivis.DatasetsController(datasets);
       datasetsController.register([dateChartCard.chart, datasetJsonCard]);
 
       datasetsController.setDatasets(datasets);

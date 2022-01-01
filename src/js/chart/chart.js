@@ -52,18 +52,18 @@ export class Chart extends Component {
    * ```
    */
   update(datasetsController, reason) {
-    lotivis_log("[lotivis] ", this.constructor.name, "update", reason);
+    // lotivis_log("[lotivis] ", this.constructor.name, "update", reason);
     if (!this.updateSensible) return;
     if (datasetsController) {
       this.snapshot = datasetsController.snapshot;
     }
-    lotivis_log(
-      "[lotivis] ",
-      this.constructor.name,
-      "update",
-      datasetsController
-    );
-    lotivis_log("[lotivis] ", this.constructor.name, "update", this.snapshot);
+    // lotivis_log(
+    //   "[lotivis] ",
+    //   this.constructor.name,
+    //   "update",
+    //   datasetsController
+    // );
+    // lotivis_log("[lotivis] ", this.constructor.name, "update", this.snapshot);
     this.remove();
     this.precalculate();
     this.draw();

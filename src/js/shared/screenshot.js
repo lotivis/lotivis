@@ -6,8 +6,7 @@
  * @returns {string} The parsed String.
  */
 export function getSVGString(svgNode) {
-
-  svgNode.setAttribute('xlink', 'http://www.w3.org/1999/xlink');
+  svgNode.setAttribute("xlink", "http://www.w3.org/1999/xlink");
   let cssStyleText = getCSSStyles(svgNode);
   appendCSS(cssStyleText, svgNode);
 
@@ -15,16 +14,10 @@ export function getSVGString(svgNode) {
   let svgString = serializer.serializeToString(svgNode);
 
   // Fix root xlink without namespace
-  svgString = svgString.replace(
-    /(\w+)?:?xlink=/g,
-    'xmlns:xlink='
-  );
+  svgString = svgString.replace(/(\w+)?:?xlink=/g, "xmlns:xlink=");
 
   // Safari NS namespace fix
-  svgString = svgString.replace(
-    /NS\d+:href/g,
-    'xlink:href'
-  );
+  svgString = svgString.replace(/NS\d+:href/g, "xlink:href");
 
   return svgString;
 
@@ -32,10 +25,10 @@ export function getSVGString(svgNode) {
     let selectorTextArr = [];
 
     // Add Parent element Id and Classes to the list
-    selectorTextArr.push('#' + parentElement.id);
+    selectorTextArr.push("#" + parentElement.id);
     for (let c = 0; c < parentElement.classList.length; c++) {
-      if (!contains('.' + parentElement.classList[c], selectorTextArr)) {
-        selectorTextArr.push('.' + parentElement.classList[c]);
+      if (!contains("." + parentElement.classList[c], selectorTextArr)) {
+        selectorTextArr.push("." + parentElement.classList[c]);
       }
     }
 
@@ -43,14 +36,14 @@ export function getSVGString(svgNode) {
     let nodes = parentElement.getElementsByTagName("*");
     for (let i = 0; i < nodes.length; i++) {
       let id = nodes[i].id;
-      if (!contains('#' + id, selectorTextArr)) {
-        selectorTextArr.push('#' + id);
+      if (!contains("#" + id, selectorTextArr)) {
+        selectorTextArr.push("#" + id);
       }
 
       let classes = nodes[i].classList;
       for (let c = 0; c < classes.length; c++) {
-        if (!contains('.' + classes[c], selectorTextArr)) {
-          selectorTextArr.push('.' + classes[c]);
+        if (!contains("." + classes[c], selectorTextArr)) {
+          selectorTextArr.push("." + classes[c]);
         }
       }
     }
@@ -63,7 +56,7 @@ export function getSVGString(svgNode) {
       try {
         if (!s.cssRules) continue;
       } catch (e) {
-        if (e.name !== 'SecurityError') throw e; // for Firefox
+        if (e.name !== "SecurityError") throw e; // for Firefox
         continue;
       }
 
@@ -99,9 +92,10 @@ export function getSVGString(svgNode) {
  * @param callback
  */
 export function svgString2Image(svgString, width, height, callback) {
-
   // Convert SVG string to samples URL
-  let imageSource = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+  let imageSource =
+    "data:image/svg+xml;base64," +
+    btoa(unescape(encodeURIComponent(svgString)));
 
   let canvas = document.createElement("canvas");
   canvas.width = width;
@@ -129,14 +123,8 @@ export function svgString2Image(svgString, width, height, callback) {
 export function getOriginalSizeOfSVG(svgElement) {
   let viewBoxBaseValue = svgElement.viewBox.baseVal;
   if (viewBoxBaseValue.width !== 0 && viewBoxBaseValue.height !== 0) {
-    return [
-      viewBoxBaseValue.width,
-      viewBoxBaseValue.height
-    ];
+    return [viewBoxBaseValue.width, viewBoxBaseValue.height];
   } else {
-    return [
-      svgElement.width.baseVal.value,
-      svgElement.height.baseVal.value,
-    ];
+    return [svgElement.width.baseVal.value, svgElement.height.baseVal.value];
   }
 }

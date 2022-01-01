@@ -1,4 +1,4 @@
-import {hashCode} from "./hash";
+import { hashCode } from "./hash";
 
 /**
  * Creates and returns a unique ID.
@@ -7,9 +7,9 @@ export var createID;
 (function () {
   let uniquePrevious = 0;
   createID = function () {
-    return 'lotivis-id-' + uniquePrevious++;
+    return "lotivis-id-" + uniquePrevious++;
   };
-}());
+})();
 
 /**
  * Returns a 'save-to-use' id for a HTML element by replacing whitespace with dashes.
@@ -19,10 +19,7 @@ export var createID;
  * @returns {string} The save version of the given id.
  */
 export function toSaveID(theID) {
-  return theID
-    .split(` `).join(`-`)
-    .split(`/`).join(`-`)
-    .split(`.`).join(`-`);
+  return theID.split(` `).join(`-`).split(`/`).join(`-`).split(`.`).join(`-`);
 }
 
 /**
@@ -40,13 +37,15 @@ export function createIDFromDataset(dataset) {
 
 export function camel2title(camelCase) {
   // no side-effects
-  return camelCase
-    // inject space before the upper case letters
-    .replace(/([A-Z])/g, function (match) {
-      return " " + match;
-    })
-    // replace first char with upper case
-    .replace(/^./, function (match) {
-      return match.toUpperCase();
-    });
+  return (
+    camelCase
+      // inject space before the upper case letters
+      .replace(/([A-Z])/g, function (match) {
+        return " " + match;
+      })
+      // replace first char with upper case
+      .replace(/^./, function (match) {
+        return match.toUpperCase();
+      })
+  );
 }

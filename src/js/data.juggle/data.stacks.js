@@ -7,27 +7,52 @@ import * as d3 from "d3";
  * @param dateToItemsRelation
  * @returns {*[]}
  */
-export function createStackModel(controller, datasets, dateToItemsRelation) {
+export function createBarStackModel(controller, datasets, dateToItemsRelation) {
   let listOfStacks = extractStacksFromDatasets(datasets);
 
-  return listOfStacks.map(function(stackName) {
-    let stackCandidates = datasets.filter(function(dataset) {
+  console.log("listOfStacks", listOfStacks);
+  console.log("dateToItemsRelation", dateToItemsRelation);
+
+  return listOfStacks.map(function (stackName) {
+    let datasetsForStack = datasets.filter(function (dataset) {
       return dataset.stack === stackName || dataset.label === stackName;
     });
 
-    let candidatesNames = stackCandidates.map(
-      stackCandidate => stackCandidate.label
+    let candidatesNames = datasetsForStack.map(
+      (stackCandidate) => stackCandidate.label
     );
-    let candidatesColors = stackCandidates.map(stackCandidate =>
+    let candidatesColors = datasetsForStack.map((stackCandidate) =>
       controller.getColorForDataset(stackCandidate.label)
     );
 
-    let stack = d3.stack().keys(candidatesNames)(dateToItemsRelation);
+    console.log("candidatesNames", candidatesNames);
 
-    stack.label = stackName;
-    stack.stack = stackName;
-    stack.colors = candidatesColors;
+    let d3Stack = d3
+      .stack()
+      .keys(candidatesNames)
+      .order(d3.stackOrderNone)
+      .offset(d3.stackOffsetNone);
 
-    return stack;
+    let series = d3Stack(dateToItemsRelation);
+
+    console.log("d3Stack", typeof series);
+    console.log("d3Stack", Array.isArray(series));
+    console.log("d3Stack", series.length);
+
+    // d3Stack.forEach((entry) => {
+    //   entry.forEach((item, index) => {
+    //     // item.date = dateToItemsRelation[index].date;
+    //     console.log("item", index, item);
+    //   });
+    // });
+
+    let model = {
+      series: series,
+      label: stackName,
+      stack: stackName,
+      colors: candidatesColors,
+    };
+
+    return model;
   });
 }

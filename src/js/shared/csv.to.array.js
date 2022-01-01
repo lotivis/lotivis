@@ -5,7 +5,7 @@ https://gist.github.com/Jezternz/c8e9fafc2c114e079829974e3764db75
 We use this function to save parse a CSV file.
  */
 
-export const csvStringToArray = strData => {
+export const csvStringToArray = (strData) => {
   const objPattern = new RegExp(
     '(\\,|\\r?\\n|\\r|^)(?:"([^"]*(?:""[^"]*)*)"|([^\\,\\r\\n]*))',
     "gi"

@@ -8,7 +8,7 @@ import { toValue } from "../shared/value";
  * @returns {[]} The array containing the flat samples.
  */
 export function extractLabelsFromDatasets(datasets) {
-  return toSet(datasets.map(dataset => toValue(dataset.label)));
+  return toSet(datasets.map((dataset) => toValue(dataset.label)));
 }
 
 /**
@@ -20,7 +20,7 @@ export function extractLabelsFromDatasets(datasets) {
  */
 export function extractStacksFromDatasets(datasets) {
   return toSet(
-    datasets.map(dataset => toValue(dataset.stack || dataset.label))
+    datasets.map((dataset) => toValue(dataset.stack || dataset.label))
   );
 }
 
@@ -51,7 +51,7 @@ export function extractLocationsFromDatasets(datasets) {
  * @returns {[]} The array containing the flat samples.
  */
 export function extractLabelsFromFlatData(flatData) {
-  return toSet(flatData.map(item => toValue(item.dataset)));
+  return toSet(flatData.map((item) => toValue(item.dataset)));
 }
 
 /**
@@ -62,7 +62,7 @@ export function extractLabelsFromFlatData(flatData) {
  * @returns {[]} The array containing the flat samples.
  */
 export function extractStacksFromFlatData(flatData) {
-  return toSet(flatData.map(item => toValue(item.stack || item.dataset)));
+  return toSet(flatData.map((item) => toValue(item.stack || item.dataset)));
 }
 
 /**
@@ -72,7 +72,7 @@ export function extractStacksFromFlatData(flatData) {
  * @returns {[]} The set containing the dates.
  */
 export function extractDatesFromFlatData(flatData) {
-  return toSet(flatData.map(item => toValue(item.date)));
+  return toSet(flatData.map((item) => toValue(item.date)));
 }
 
 /**
@@ -82,7 +82,7 @@ export function extractDatesFromFlatData(flatData) {
  * @returns {[]} The set containing the locations.
  */
 export function extractLocationsFromFlatData(flatData) {
-  return toSet(flatData.map(item => toValue(item.location)));
+  return toSet(flatData.map((item) => toValue(item.location)));
 }
 
 /**
@@ -102,7 +102,7 @@ function toSet(array) {
  * @param dateAccess
  * @returns {*} The earliest date.chart.
  */
-export function extractEarliestDate(flatData, dateAccess = date => date) {
+export function extractEarliestDate(flatData, dateAccess = (date) => date) {
   return extractDatesFromFlatData(flatData)
     .sort((left, right) => dateAccess(left) - dateAccess(right))
     .shift();
@@ -117,7 +117,7 @@ export function extractEarliestDate(flatData, dateAccess = date => date) {
  */
 export function extractEarliestDateWithValue(
   flatData,
-  dateAccess = date => date
+  dateAccess = (date) => date
 ) {
   return extractEarliestDate(filterWithValue(flatData), dateAccess);
 }
@@ -129,7 +129,7 @@ export function extractEarliestDateWithValue(
  * @param dateAccess
  * @returns {*} The latest date.chart.
  */
-export function extractLatestDate(flatData, dateAccess = date => date) {
+export function extractLatestDate(flatData, dateAccess = (date) => date) {
   return extractDatesFromFlatData(flatData)
     .sort((left, right) => dateAccess(left) - dateAccess(right))
     .pop();
@@ -144,7 +144,7 @@ export function extractLatestDate(flatData, dateAccess = date => date) {
  */
 export function extractLatestDateWithValue(
   flatData,
-  dateAccess = date => date
+  dateAccess = (date) => date
 ) {
   return extractLatestDate(filterWithValue(flatData), dateAccess);
 }
@@ -156,5 +156,5 @@ export function extractLatestDateWithValue(
  * @returns {*} All items with a value greater 0.
  */
 export function filterWithValue(flatData) {
-  return flatData.filter(item => (item.value || 0) > 0);
+  return flatData.filter((item) => (item.value || 0) > 0);
 }

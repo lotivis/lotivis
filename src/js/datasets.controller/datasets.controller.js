@@ -1,7 +1,7 @@
 import {
   combineByDate,
   combineByLocation,
-  combineByStacks
+  combineByStacks,
 } from "../data.juggle/data.combine";
 import { sumOfDataset, sumOfLabel, sumOfStack } from "../data.juggle/data.sum";
 import { DefaultDateAccess } from "../data.date.assessor/date.assessor";
@@ -67,8 +67,8 @@ export class DatasetsController {
   }
 
   getMax() {
-    return d3.max(this.datasets, function(dataset) {
-      return d3.max(dataset.data, function(item) {
+    return d3.max(this.datasets, function (dataset) {
+      return d3.max(dataset.data, function (item) {
         return item.value;
       });
     });
@@ -93,7 +93,7 @@ export class DatasetsController {
    */
   getFilename() {
     if (!this.labels) return "Unknown";
-    let labels = this.labels.map(label => label.split(` `).join(`-`));
+    let labels = this.labels.map((label) => label.split(` `).join(`-`));
     if (labels.length > 10) {
       labels = labels.splice(0, 10);
     }

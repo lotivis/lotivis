@@ -3,8 +3,8 @@
  *
  * @type {Intl.NumberFormat}
  */
-const numberFormat = new Intl.NumberFormat('de-DE', {
-  maximumFractionDigits: 3
+const numberFormat = new Intl.NumberFormat("de-DE", {
+  maximumFractionDigits: 3,
 });
 
 /**
@@ -14,6 +14,6 @@ const numberFormat = new Intl.NumberFormat('de-DE', {
  * @returns {string} The formatted version of the number.
  */
 export function formatNumber(number) {
-  if (typeof number !== 'number') return number;
+  if (typeof number !== "number") return number;
   return numberFormat.format(number);
 }

@@ -15,11 +15,13 @@ export class Checkbox extends Component {
       .append("input")
       .attr("type", "checkbox")
       .attr("id", this.selector)
-      .on("click", function(event) {
-        if (!event.target) {
+      .on("click", function (event) {
+        if (!event || !event.target) {
           return;
         }
+
         let checkbox = event.target;
+
         if (thisReference.onClick) {
           thisReference.onClick(checkbox.checked);
         }

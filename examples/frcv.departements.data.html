@@ -19,9 +19,7 @@
     <div class="container mt-3">
       <div class="row">
         <div class="col-2">
-          <a href="../index.html">
-            Back
-          </a>
+          <a href="../index.html"> Back </a>
         </div>
         <div class="col-8 text-center">
           <h1>Map Data</h1>
@@ -47,18 +45,18 @@
 
       const mapChartCard = new lotivis.MapChartCard("map-chart-card", {
         excludedFeatureCodes: ["2A", "2B"],
-        featureIDAccessor: feature => {
+        featureIDAccessor: (feature) => {
           return feature.properties.code;
         },
-        featureNameAccessor: feature => {
+        featureNameAccessor: (feature) => {
           return feature.properties.nom;
-        }
+        },
       });
       const chart = mapChartCard.chart;
 
-      mapChartCard.onSelectedDatasetChanged = function(value) {
+      mapChartCard.onSelectedDatasetChanged = function (value) {
         let dataset = mapChartCard.datasets.find(
-          dataset => dataset.stack === value
+          (dataset) => dataset.stack === value
         );
         let string = JSON.stringify(dataset, null, 4);
         let element = document.getElementById("data");
@@ -66,13 +64,13 @@
       };
 
       Promise.all([
-        d3.json("./assets/tracks-per-departement.json"),
-        d3.json("./assets/words-per-departement.json"),
-        d3.json("./assets/words-per-departement-relative.json"),
-        d3.json("./assets/types-per-departement.json"),
-        d3.json("./assets/types-per-departement-relative.json"),
-        d3.json("./assets/departements.geojson")
-      ]).then(function(datasetsAndGeoJSON) {
+        lotivis.d3.json("./assets/tracks-per-departement.json"),
+        lotivis.d3.json("./assets/words-per-departement.json"),
+        lotivis.d3.json("./assets/words-per-departement-relative.json"),
+        lotivis.d3.json("./assets/types-per-departement.json"),
+        lotivis.d3.json("./assets/types-per-departement-relative.json"),
+        lotivis.d3.json("./assets/departements.geojson"),
+      ]).then(function (datasetsAndGeoJSON) {
         let rawGeoJSON = datasetsAndGeoJSON.pop();
         let onlyDatasets = datasetsAndGeoJSON;
         chart.setGeoJSON(rawGeoJSON);

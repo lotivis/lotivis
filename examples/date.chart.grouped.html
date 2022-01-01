@@ -19,9 +19,7 @@
     <div class="container mt-3">
       <div class="row">
         <div class="col-2">
-          <a href="../index.html">
-            Back
-          </a>
+          <a href="../index.html"> Back </a>
         </div>
         <div class="col-8 text-center">
           <h1>Date Chart Grouped</h1>
@@ -48,10 +46,10 @@
       let dateChartCard = new lotivis.DateChartCard();
 
       fetch("assets/example-datasets-location-time-grouped.json")
-        .then(response => response.text())
-        .then(text => JSON.parse(text))
-        .then(function(json) {
-          let datasetsController = new lotivis.DatasetController(json);
+        .then((response) => response.text())
+        .then((text) => JSON.parse(text))
+        .then(function (json) {
+          let datasetsController = new lotivis.DatasetsController(json);
           dateChartCard.chart.setDatasetsController(datasetsController);
           datasetsCard.setDatasetsController(datasetsController);
         });

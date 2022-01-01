@@ -1,4 +1,4 @@
-export const LotivisConfig = {
+export var LotivisConfig = {
   // The default margin to use for charts.
   defaultMargin: 60,
   // The default offset for the space between an object an the toolbar.
@@ -14,5 +14,5 @@ export const LotivisConfig = {
   // A string which is used as separator between shared.components when creating a file name.
   filenameSeparator: "_",
   // A string which is used for unknown values.
-  unknown: "LOTIVIS_UNKNOWN"
+  unknown: "LOTIVIS_UNKNOWN",
 };

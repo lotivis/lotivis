@@ -36,7 +36,7 @@ export class Dropdown extends Component {
     this.select = this.element
       .append("select")
       .attr("id", this.selectId)
-      .on("change", function(event) {
+      .on("change", function (event) {
         thisReference.onClick(event);
       });
   }
@@ -119,7 +119,7 @@ export class Dropdown extends Component {
 
   setSelectedOption(optionID) {
     if (
-      this.inputElements.find(function(item) {
+      this.inputElements.find(function (item) {
         return item.attr("value") === optionID;
       }) !== undefined
     ) {
@@ -137,7 +137,7 @@ export class Dropdown extends Component {
   }
 }
 
-Dropdown.create = function(selector, options, selectedOption, onChange) {
+Dropdown.create = function (selector, options, selectedOption, onChange) {
   let div = d3.select(`#${selector}`);
   let dropdown = new Dropdown(div);
   dropdown.setLabelText("Group Size");

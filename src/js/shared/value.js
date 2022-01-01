@@ -1,4 +1,4 @@
-import {LotivisConfig} from "./config";
+import { LotivisConfig } from "./config";
 
 /**
  * Returns `true` if the given value not evaluates to false and is not 0. false else.

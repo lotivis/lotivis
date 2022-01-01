@@ -2,7 +2,8 @@
 const resolve = require("@rollup/plugin-node-resolve").default;
 const execute = require("rollup-plugin-execute");
 const pkg = require("./package.json");
-import { babel } from "@rollup/plugin-babel";
+const babel = require("rollup-plugin-babel");
+const commonjs = require("rollup-plugin-commonjs");
 
 const banner = `/*!
  * lotivis.js v${pkg.version}
@@ -18,12 +19,15 @@ module.exports = [
   {
     input: "src/index.js",
     plugins: [
-      resolve({
-        jsnext: true,
+      babel({
+        exclude: "node_modules/**"
       }),
-      babel({ babelHelpers: "bundled" }),
+      resolve({
+        jsnext: true
+      }),
+      // commonjs(),
       execute("sass src/index.scss > dist/lotivis.css"),
-      execute("sass --style compressed src/index.scss > dist/lotivis.min.css"),
+      execute("sass --style compressed src/index.scss > dist/lotivis.min.css")
     ],
     output: {
       sourcemap: true,
@@ -31,6 +35,23 @@ module.exports = [
       file: "dist/lotivis.js",
       banner,
       format: "umd",
-    },
+      esModule: false,
+      exports: "named",
+      indent: false
+    }
   },
+  // Tests
+  {
+    input: "src/index.tests.js",
+    plugins: [resolve()],
+    output: {
+      sourcemap: true,
+      name: "lotivis",
+      file: "dist/lotivis.tests.js",
+      format: "umd",
+      esModule: false,
+      exports: "named",
+      indent: false
+    }
+  }
 ];

@@ -1,7 +1,7 @@
 import { combineByDate } from "./data.combine";
-import "../shared/extension.array";
 import { sumOfValues } from "./data.sum";
 import { copy } from "../shared/copy";
+import "../shared/extension.array";
 
 /**
  * Combines each `ratio` entries to one.

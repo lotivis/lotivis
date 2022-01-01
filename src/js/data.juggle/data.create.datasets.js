@@ -16,7 +16,7 @@ export function createDatasets(flatData) {
       dataset.data.push({
         date: item.date,
         location: item.location,
-        value: item.value
+        value: item.value,
       });
     } else {
       datasetsByLabel[label] = {
@@ -26,9 +26,9 @@ export function createDatasets(flatData) {
           {
             date: item.date,
             location: item.location,
-            value: item.value
-          }
-        ]
+            value: item.value,
+          },
+        ],
       };
     }
   }
