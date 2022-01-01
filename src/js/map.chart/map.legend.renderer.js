@@ -1,5 +1,6 @@
 import { Color } from "../shared/color";
 import { formatNumber } from "../shared/format";
+import * as d3 from "d3";
 
 /**
  *

@@ -8,6 +8,7 @@ import { TimeChartTooltipRenderer } from "./time.chart.tooltip.renderer";
 import { TimeChartGridRenderer } from "./time.chart.grid.renderer";
 import { TimeChartSelectionRenderer } from "./time.chart.selection.renderer";
 import { DATE_CHART_CONFIG } from "./date.chart.config";
+import * as d3 from "d3";
 
 /**
  *

@@ -1,19 +1,19 @@
+import * as d3 from "d3";
+
 /**
  * @class DateChartAxisRenderer
  */
 export class DateChartAxisRenderer {
-
   /**
    * Creates a new instance of DateChartAxisRenderer.
    *
    * @param dateChart The parental date.chart chart.
    */
   constructor(dateChart) {
-
     /**
      * Appends the `left` and `bottom` axis to the date.chart chart.
      */
-    this.render = function () {
+    this.render = function() {
       let height = dateChart.config.height;
       let margin = dateChart.config.margin;
 
@@ -28,7 +28,6 @@ export class DateChartAxisRenderer {
         .append("g")
         .call(d3.axisBottom(dateChart.xChartScale))
         .attr("transform", () => `translate(0,${height - margin.bottom})`);
-
     };
   }
 }

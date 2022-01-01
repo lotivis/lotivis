@@ -1,17 +1,18 @@
 import { Chart } from "../chart/chart";
-import { removeFeatures } from "../geojson/remove.features";
+import { removeFeatures } from "./geojson/remove.features";
 import { MapTooltipRenderer } from "./map.tooltip.renderer";
 import { MapLegendRenderer } from "./map.legend.renderer";
 import { MapLabelRenderer } from "./map.label.renderer";
 import { MapDatasetRenderer } from "./map.dataset.renderer";
 import { MapGeoJSONRenderer } from "./map.geojson.renderer";
 import { MapExteriorBorderRenderer } from "./map.exterior.border.renderer";
-import { createGeoJSON } from "../geojson/create.geojson";
+import { createGeoJSON } from "./geojson/create.geojson";
 import { MapChartConfig } from "./map.chart.config";
 import { MapBackgroundRenderer } from "./map.background.renderer";
-import { GeoJson } from "../geojson/geojson";
+import { GeoJson } from "./geojson/geojson";
 import { MapSelectionRenderer } from "./map.selection.renderer";
 import { lotivis_log } from "../shared/debug";
+import * as d3 from "d3";
 
 /**
  * A component which renders a GeoJSON with d3.

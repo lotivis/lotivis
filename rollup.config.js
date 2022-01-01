@@ -38,9 +38,6 @@ module.exports = [
       // esModule: false,
       exports: "named",
       indent: false
-      // globals: {
-      //   'd3': 'd3',
-      // }
     }
   },
   // Tests

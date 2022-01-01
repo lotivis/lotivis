@@ -1,5 +1,5 @@
 import { lotivis_log, lotivis_log_once } from "../shared/debug";
-import { joinFeatures } from "../geojson/join.features";
+import { joinFeatures } from "./geojson/join.features";
 
 /**
  *
@@ -12,11 +12,6 @@ export class MapSelectionRenderer {
    * @param mapChart The parental map.chart chart.
    */
   constructor(mapChart) {
-    if (!self.topojson)
-      lotivis_log_once(
-        "Can't find topojson lib.  Skip rendering of exterior border."
-      );
-
     /**
      * Returns the collection of selected features.
      *
@@ -52,13 +47,6 @@ export class MapSelectionRenderer {
      * Renders the exterior border of the presented geo json.
      */
     this.render = function() {
-      if (!self.topojson) {
-        lotivis_log("[lotivis]  Can't find topojson library.");
-        return;
-      }
-
-      // return;
-
       mapChart.selectedFeatures = getSelectedFeatures();
       mapChart.selectionBorderGeoJSON = joinFeatures(mapChart.selectedFeatures);
       if (!mapChart.selectionBorderGeoJSON) {

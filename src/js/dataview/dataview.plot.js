@@ -1,15 +1,16 @@
-import {DatasetsController} from "../datasets.controller/datasets.controller";
-import {copy} from "../shared/copy";
+import { DatasetsController } from "../datasets.controller/datasets.controller";
+import { copy } from "../shared/copy";
 import {
   extractDatesFromDatasets,
   extractEarliestDateWithValue,
   extractLabelsFromDatasets,
   extractLatestDateWithValue
 } from "../data.juggle/data.extract";
-import {combineByDate} from "../data.juggle/data.combine";
-import {sumOfValues} from "../data.juggle/data.sum";
-import {flatDataset} from "../data.juggle/data.flat";
+import { combineByDate } from "../data.juggle/data.combine";
+import { sumOfValues } from "../data.juggle/data.sum";
+import { flatDataset } from "../data.juggle/data.flat";
 import "../datasets.controller/datasets.controller.cache";
+import * as d3 from "d3";
 
 /**
  *
@@ -18,7 +19,6 @@ import "../datasets.controller/datasets.controller.cache";
  * @returns {{}}
  */
 function createPlotDataset(dataset, dateAccess) {
-
   let newDataset = {};
   let data = copy(dataset.data);
   let firstDate = extractEarliestDateWithValue(data, dateAccess) || 0;
@@ -49,16 +49,15 @@ function createPlotDataset(dataset, dateAccess) {
 /**
  * Returns a new generated date.chart.plot.chart samples view for the current enabled samples of dataset of this controller.
  */
-DatasetsController.prototype.getPlotDataview = function () {
-
-  let cachedDataView = this.getCached('date.chart.plot.chart');
+DatasetsController.prototype.getPlotDataview = function() {
+  let cachedDataView = this.getCached("date.chart.plot.chart");
   if (cachedDataView) {
     return cachedDataView;
   }
 
   let dateAccess = this.dateAccess;
   let enabledDatasets = this.filteredDatasets();
-  let dataview = {datasets: []};
+  let dataview = { datasets: [] };
 
   dataview.dates = extractDatesFromDatasets(enabledDatasets).sort();
   dataview.labels = extractLabelsFromDatasets(enabledDatasets);
@@ -66,7 +65,7 @@ DatasetsController.prototype.getPlotDataview = function () {
   dataview.firstDate = dataview.dates.first();
   dataview.lastDate = dataview.dates.last();
 
-  enabledDatasets.forEach(function (dataset) {
+  enabledDatasets.forEach(function(dataset) {
     let newDataset = createPlotDataset(dataset, dateAccess);
     let firstIndex = dataview.dates.indexOf(newDataset.firstDate);
     let lastIndex = dataview.dates.indexOf(newDataset.lastDate);
@@ -75,13 +74,13 @@ DatasetsController.prototype.getPlotDataview = function () {
   });
 
   dataview.labelsCount = dataview.datasets.length;
-  dataview.max = d3.max(dataview.datasets, function (dataset) {
-    return d3.max(dataset.data, function (item) {
+  dataview.max = d3.max(dataview.datasets, function(dataset) {
+    return d3.max(dataset.data, function(item) {
       return item.value;
     });
   });
 
-  this.setCached(dataview, 'plot');
+  this.setCached(dataview, "plot");
 
   return dataview;
 };

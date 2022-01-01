@@ -1,5 +1,4 @@
-import {copy} from "../shared/copy";
-import {lotivis_log} from "../shared/debug";
+import { lotivis_log } from "../shared/debug";
 
 /**
  * Returns a flat version of the given dataset collection.
@@ -10,7 +9,11 @@ import {lotivis_log} from "../shared/debug";
 export function flatDatasets(datasets) {
   let flatData = [];
   let datasetsCopy = datasets;
-  for (let datasetIndex = 0; datasetIndex < datasetsCopy.length; datasetIndex++) {
+  for (
+    let datasetIndex = 0;
+    datasetIndex < datasetsCopy.length;
+    datasetIndex++
+  ) {
     let dataset = datasetsCopy[datasetIndex];
     let flatDataChunk = flatDataset(dataset);
     flatData = flatData.concat(flatDataChunk);
@@ -27,7 +30,10 @@ export function flatDatasets(datasets) {
 export function flatDataset(dataset) {
   let flatData = [];
   if (!dataset.data) {
-    lotivis_log(`[lotivis]  INFO Flat samples for dataset without samples requested. Will return an empty array.`, dataset);
+    lotivis_log(
+      `[lotivis]  INFO Flat samples for dataset without samples requested. Will return an empty array.`,
+      dataset
+    );
     return flatData;
   }
   dataset.data.forEach(item => {

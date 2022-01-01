@@ -3,6 +3,7 @@ import { styleForCSSClass } from "../shared/style";
 import { formatNumber } from "../shared/format";
 import { equals } from "../shared/equal";
 import { LotivisConfig } from "../shared/config";
+import * as d3 from "d3";
 
 /**
  *

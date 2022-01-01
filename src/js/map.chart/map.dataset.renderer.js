@@ -2,6 +2,7 @@ import { equals } from "../shared/equal";
 import { Color } from "../shared/color";
 import { lotivis_log } from "../shared/debug";
 import { styleForCSSClass } from "../shared/style";
+import * as d3 from "d3";
 
 /**
  *

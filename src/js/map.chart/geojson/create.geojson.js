@@ -1,4 +1,4 @@
-import {extractLocationsFromDatasets} from "../data.juggle/data.extract";
+import { extractLocationsFromDatasets } from "../../data.juggle/data.extract";
 
 /**
  *
@@ -14,7 +14,6 @@ export function createGeoJSON(datasets) {
 
   loop1: for (let rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
     for (let itemIndex = 0; itemIndex < 5; itemIndex++) {
-
       if (locations.length === 0) break loop1;
 
       let location = locations.shift();
@@ -30,18 +29,16 @@ export function createGeoJSON(datasets) {
       coordinates.push([lat + latSpan, lng + lngSpan]);
 
       let feature = {
-        type: 'Feature',
+        type: "Feature",
         id: location,
         properties: {
           id: location,
           code: location,
-          location: location,
+          location: location
         },
         geometry: {
-          type: 'Polygon',
-          coordinates: [
-            coordinates
-          ]
+          type: "Polygon",
+          coordinates: [coordinates]
         }
       };
 

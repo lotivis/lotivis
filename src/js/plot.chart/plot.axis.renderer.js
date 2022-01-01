@@ -1,3 +1,5 @@
+import * as d3 from "d3";
+
 /**
  * Draws the axis on the timm plot chart.
  * @class PlotAxisRenderer

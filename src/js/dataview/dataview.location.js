@@ -1,5 +1,8 @@
-import {DatasetsController} from "../datasets.controller/datasets.controller";
-import {combineByLocation, combineByStacks} from "../data.juggle/data.combine";
+import { DatasetsController } from "../datasets.controller/datasets.controller";
+import {
+  combineByLocation,
+  combineByStacks
+} from "../data.juggle/data.combine";
 import "../datasets.controller/datasets.controller.cache";
 
 /**
@@ -20,10 +23,11 @@ import "../datasets.controller/datasets.controller.cache";
  * }
  * ```
  */
-DatasetsController.prototype.getLocationDataview = function () {
-
-  let cachedDataView = this.getCached('location');
-  if (cachedDataView) { return cachedDataView; }
+DatasetsController.prototype.getLocationDataview = function() {
+  let cachedDataView = this.getCached("location");
+  if (cachedDataView) {
+    return cachedDataView;
+  }
 
   let dataView = {};
 
@@ -38,7 +42,7 @@ DatasetsController.prototype.getLocationDataview = function () {
     item.stack = item.stack || item.label || item.dataset;
   });
 
-  this.setCached(dataView, 'location');
+  this.setCached(dataView, "location");
 
   return dataView;
 };

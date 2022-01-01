@@ -1,18 +1,21 @@
-import {DatasetsController} from "../datasets.controller/datasets.controller";
-import {dateToItemsRelation} from "../data.juggle/data.relations";
-import {createStackModel} from "../data.juggle/data.stacks";
-import {copy} from "../shared/copy";
-import {combineDatasetsByRatio} from "../data.juggle/data.combine.ratio";
-import {extractDatesFromDatasets} from "../data.juggle/data.extract";
-import {combine} from "../data.juggle/data.combine";
-import {flatDatasets} from "../data.juggle/data.flat";
-import {createDatasets} from "../data.juggle/data.create.datasets";
+import { DatasetsController } from "../datasets.controller/datasets.controller";
+import { dateToItemsRelation } from "../data.juggle/data.relations";
+import { createStackModel } from "../data.juggle/data.stacks";
+import { copy } from "../shared/copy";
+import { combineDatasetsByRatio } from "../data.juggle/data.combine.ratio";
+import { extractDatesFromDatasets } from "../data.juggle/data.extract";
+import { combine } from "../data.juggle/data.combine";
+import { flatDatasets } from "../data.juggle/data.flat";
+import { createDatasets } from "../data.juggle/data.create.datasets";
 import "../datasets.controller/datasets.controller.cache";
+import * as d3 from "d3";
 
 /**
  * Returns a new generated DateDataview for the current enabled samples of dataset of this controller.
  */
-DatasetsController.prototype.getDateDataviewCombinedStacks = function (groupSize) {
+DatasetsController.prototype.getDateDataviewCombinedStacks = function(
+  groupSize
+) {
   let dateAccess = this.dateAccess;
   let datasets = copy(this.datasets);
   let enabledDatasets = copy(this.filteredDatasets() || datasets);
@@ -20,11 +23,11 @@ DatasetsController.prototype.getDateDataviewCombinedStacks = function (groupSize
   let dataView = {};
   let saveGroupSize = groupSize || 1;
 
-  datasets.forEach(function (dataset) {
+  datasets.forEach(function(dataset) {
     dataset.label = dataset.stack || dataset.label;
   });
 
-  enabledDatasets.forEach(function (dataset) {
+  enabledDatasets.forEach(function(dataset) {
     dataset.label = dataset.stack || dataset.label;
   });
 
@@ -42,13 +45,24 @@ DatasetsController.prototype.getDateDataviewCombinedStacks = function (groupSize
   }
 
   dataView.dateToItemsRelation = dateToItemsRelation(datasets, dateAccess);
-  dataView.dateToItemsRelationPresented = dateToItemsRelation(enabledDatasets, dateAccess);
-  dataView.datasetStacks = createStackModel(this, datasets, dataView.dateToItemsRelation);
-  dataView.datasetStacksPresented = createStackModel(this, enabledDatasets, dataView.dateToItemsRelationPresented);
+  dataView.dateToItemsRelationPresented = dateToItemsRelation(
+    enabledDatasets,
+    dateAccess
+  );
+  dataView.datasetStacks = createStackModel(
+    this,
+    datasets,
+    dataView.dateToItemsRelation
+  );
+  dataView.datasetStacksPresented = createStackModel(
+    this,
+    enabledDatasets,
+    dataView.dateToItemsRelationPresented
+  );
 
-  dataView.max = d3.max(dataView.datasetStacksPresented, function (stack) {
-    return d3.max(stack, function (series) {
-      return d3.max(series.map(item => item['1']));
+  dataView.max = d3.max(dataView.datasetStacksPresented, function(stack) {
+    return d3.max(stack, function(series) {
+      return d3.max(series.map(item => item["1"]));
     });
   });
 

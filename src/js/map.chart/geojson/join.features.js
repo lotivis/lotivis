@@ -1,17 +1,20 @@
+import * as topojsonServer from "topojson-server";
+import * as topojsonClient from "topojson-client";
+
 /**
  * Returns a new created instance of Feature combining the given Features.
  * @param features
  */
 export function joinFeatures(features) {
-  let topology = topojson.topology(features);
+  let topology = topojsonServer.topology(features);
   let objects = extractObjects(topology);
 
   return {
-    "type": "FeatureCollection",
-    "features": [
+    type: "FeatureCollection",
+    features: [
       {
         type: "Feature",
-        geometry: topojson.merge(topology, objects),
+        geometry: topojsonClient.merge(topology, objects),
         properties: {
           code: 1,
           nom: "asdf"

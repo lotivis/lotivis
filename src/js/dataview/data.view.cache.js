@@ -2,7 +2,6 @@
  * @class DataViewCache
  */
 export class DataViewCache {
-
   /**
    * Creates a new instance of DataViewCache.
    */
@@ -29,7 +28,12 @@ export class DataViewCache {
      * @param datasetFilters The collection of filtered datasets.
      * @returns {*}
      */
-    this.getDataView = function (type, locationFilters, dateFilters, datasetFilters) {
+    this.getDataView = function(
+      type,
+      locationFilters,
+      dateFilters,
+      datasetFilters
+    ) {
       let name = createName(type, locationFilters, dateFilters, datasetFilters);
       return content[name];
     };
@@ -42,7 +46,13 @@ export class DataViewCache {
      * @param dateFilters The collection of filtered dates.
      * @param datasetFilters The collection of filtered datasets.
      */
-    this.setDataView = function (dataView, type, locationFilters, dateFilters, datasetFilters) {
+    this.setDataView = function(
+      dataView,
+      type,
+      locationFilters,
+      dateFilters,
+      datasetFilters
+    ) {
       let name = createName(type, locationFilters, dateFilters, datasetFilters);
       content[name] = dataView;
     };
@@ -50,7 +60,7 @@ export class DataViewCache {
     /**
      * Invalidates the cache.
      */
-    this.invalidate = function () {
+    this.invalidate = function() {
       content = {};
     };
   }

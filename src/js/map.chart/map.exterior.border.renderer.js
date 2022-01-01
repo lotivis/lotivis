@@ -1,5 +1,5 @@
-import { joinFeatures } from "../geojson/join.features";
-import { lotivis_log, lotivis_log_once } from "../shared/debug";
+import { joinFeatures } from "./geojson/join.features";
+import { lotivis_log } from "../shared/debug";
 import * as topojson from "topojson-client";
 
 /**

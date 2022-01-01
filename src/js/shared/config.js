@@ -10,9 +10,9 @@ export const LotivisConfig = {
   // A Boolean value indicating whether the debug logging is enabled.
   debug: true,
   // A string which is used as prefix for download.
-  downloadFilePrefix: 'lotivis',
+  downloadFilePrefix: "lotivis",
   // A string which is used as separator between shared.components when creating a file name.
-  filenameSeparator: '_',
+  filenameSeparator: "_",
   // A string which is used for unknown values.
-  unknown: 'LOTIVIS_UNKNOWN'
+  unknown: "LOTIVIS_UNKNOWN"
 };

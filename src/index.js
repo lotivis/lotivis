@@ -56,6 +56,8 @@ import {
 import { UrlParameters } from "./js/shared/url.parameters";
 import { createID } from "./js/shared/selector";
 
+import * as d3 from "d3";
+
 exports.createID = createID;
 
 // colors
@@ -119,6 +121,8 @@ exports.DateWeekAssessor = DateWeekAssessor;
 exports.URLParameters = UrlParameters;
 exports.version = "1.0.94";
 exports.versionShort = "1";
+
+exports.d3 = d3;
 
 export default exports;
 

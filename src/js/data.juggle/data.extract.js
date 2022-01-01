@@ -1,5 +1,5 @@
-import {flatDatasets} from "./data.flat";
-import {toValue} from "../shared/value";
+import { flatDatasets } from "./data.flat";
+import { toValue } from "../shared/value";
 
 /**
  * Returns the set of dataset names from the given dataset collection.
@@ -19,7 +19,9 @@ export function extractLabelsFromDatasets(datasets) {
  * @returns {[]} The array containing the flat samples.
  */
 export function extractStacksFromDatasets(datasets) {
-  return toSet(datasets.map(dataset => toValue(dataset.stack || dataset.label)));
+  return toSet(
+    datasets.map(dataset => toValue(dataset.stack || dataset.label))
+  );
 }
 
 /**
@@ -100,9 +102,10 @@ function toSet(array) {
  * @param dateAccess
  * @returns {*} The earliest date.chart.
  */
-export function extractEarliestDate(flatData, dateAccess = (date) => date) {
+export function extractEarliestDate(flatData, dateAccess = date => date) {
   return extractDatesFromFlatData(flatData)
-    .sort((left, right) => dateAccess(left) - dateAccess(right)).shift();
+    .sort((left, right) => dateAccess(left) - dateAccess(right))
+    .shift();
 }
 
 /**
@@ -112,7 +115,10 @@ export function extractEarliestDate(flatData, dateAccess = (date) => date) {
  * @param dateAccess
  * @returns {*} The earliest date.chart.
  */
-export function extractEarliestDateWithValue(flatData, dateAccess = (date) => date) {
+export function extractEarliestDateWithValue(
+  flatData,
+  dateAccess = date => date
+) {
   return extractEarliestDate(filterWithValue(flatData), dateAccess);
 }
 
@@ -123,9 +129,10 @@ export function extractEarliestDateWithValue(flatData, dateAccess = (date) => da
  * @param dateAccess
  * @returns {*} The latest date.chart.
  */
-export function extractLatestDate(flatData, dateAccess = (date) => date) {
+export function extractLatestDate(flatData, dateAccess = date => date) {
   return extractDatesFromFlatData(flatData)
-    .sort((left, right) => dateAccess(left) - dateAccess(right)).pop();
+    .sort((left, right) => dateAccess(left) - dateAccess(right))
+    .pop();
 }
 
 /**
@@ -135,7 +142,10 @@ export function extractLatestDate(flatData, dateAccess = (date) => date) {
  * @param dateAccess
  * @returns {*} The latest date.chart.
  */
-export function extractLatestDateWithValue(flatData, dateAccess = (date) => date) {
+export function extractLatestDateWithValue(
+  flatData,
+  dateAccess = date => date
+) {
   return extractLatestDate(filterWithValue(flatData), dateAccess);
 }
 

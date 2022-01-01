@@ -15,6 +15,7 @@ import { PlotBarsFractionsRenderer } from "./plot.bars.fractions.renderer";
 import { PlotBarsGradientRenderer } from "./plot.bars.gradient.renderer";
 import { PlotLabelsFractionsRenderer } from "./plot.labels.fractions.renderer";
 import { PlotChartSelectionRenderer } from "./plot.chart.selection.renderer";
+import * as d3 from "d3";
 
 /**
  * A lotivis date.chart.plot.chart chart.

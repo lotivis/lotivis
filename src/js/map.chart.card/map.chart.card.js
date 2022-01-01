@@ -3,6 +3,7 @@ import { MapChartSettingsPopup } from "./map.chart.settings.popup";
 import { ChartCard } from "../shared.components/chart.card";
 import { downloadImage } from "../shared/download";
 import { createDownloadFilename } from "../shared/filename";
+import * as d3 from "d3";
 
 /**
  * A lotivis card containing a location chart.

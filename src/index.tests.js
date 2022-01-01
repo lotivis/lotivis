@@ -1,6 +1,6 @@
 import { Color } from "./js/shared/color";
-import { GeoJson } from "./js/geojson/geojson";
-import { Feature } from "./js/geojson/feature";
+import { GeoJson } from "./js/map.chart/geojson/geojson";
+import { Feature } from "./js/map.chart/geojson/feature";
 import { flatDataset, flatDatasets } from "./js/data.juggle/data.flat";
 import {
   combine,
@@ -33,8 +33,8 @@ import "./js/dataview/dataview.date";
 import "./js/dataview/dataview.plot";
 import "./js/dataview/dataview.location";
 import { renderCSV } from "./js/data.render/render.csv";
-import { createGeoJSON } from "./js/geojson/create.geojson";
-import { joinFeatures } from "./js/geojson/join.features";
+import { createGeoJSON } from "./js/map.chart/geojson/create.geojson";
+import { joinFeatures } from "./js/map.chart/geojson/join.features";
 import {
   combineDatasetsByRatio,
   combineDataByGroupsize

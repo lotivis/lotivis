@@ -3,6 +3,7 @@ import {
   LotivisError,
   LotivisElementNotFoundError
 } from "../data.juggle/data.validate.error";
+import * as d3 from "d3";
 
 /**
  * A lotivis component.
@@ -46,7 +47,6 @@ export class Component {
         .trim()
         .split(` `)
         .join(`-`);
-
       this.initializeFromSelector(selector);
     }
   }

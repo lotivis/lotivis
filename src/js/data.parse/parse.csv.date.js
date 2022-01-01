@@ -1,5 +1,5 @@
-import {csvStringToArray} from "../shared/csv.to.array";
-import {trimByChar} from "../shared/trim";
+import { csvStringToArray } from "../shared/csv.to.array";
+import { trimByChar } from "../shared/trim";
 
 /**
  * Returns a collection of datasets parsed from the given CSV content.
@@ -38,7 +38,7 @@ export function parseCSVDate(text) {
   datasets.csv = {
     content: text,
     headlines: datasetLabels.push(),
-    lines: arrays,
+    lines: arrays
   };
 
   return datasets;

@@ -1,11 +1,11 @@
-import {lotivis_log_once} from "../shared/debug";
+import { lotivis_log_once } from "../shared/debug";
 
 /**
  *
  * @param date
  * @constructor
  */
-export const DefaultDateAccess = (date) => date;
+export const DefaultDateAccess = date => date;
 
 /**
  *
@@ -13,7 +13,7 @@ export const DefaultDateAccess = (date) => date;
  * @returns {number}
  * @constructor
  */
-export const FormattedDateAccess = function (dateString) {
+export const FormattedDateAccess = function(dateString) {
   let value = Date.parse(dateString);
   if (isNaN(value)) {
     lotivis_log_once(`Received NaN for date "${dateString}"`);
@@ -29,9 +29,9 @@ export const FormattedDateAccess = function (dateString) {
  *
  * @constructor
  */
-export const DateGermanAssessor = function (dateString) {
+export const DateGermanAssessor = function(dateString) {
   let saveDateString = String(dateString);
-  let components = saveDateString.split('.');
+  let components = saveDateString.split(".");
   let day = components[0];
   let month = components[1];
   let year = components[2];
@@ -45,29 +45,29 @@ export const DateGermanAssessor = function (dateString) {
  * @returns {number}
  * @constructor
  */
-export const DateWeekAssessor = function (weekday) {
+export const DateWeekAssessor = function(weekday) {
   let lowercase = weekday.toLowerCase();
   switch (lowercase) {
-    case 'sunday':
-    case 'sun':
+    case "sunday":
+    case "sun":
       return 0;
-    case 'monday':
-    case 'mon':
+    case "monday":
+    case "mon":
       return 1;
-    case 'tuesday':
-    case 'tue':
+    case "tuesday":
+    case "tue":
       return 2;
-    case 'wednesday':
-    case 'wed':
+    case "wednesday":
+    case "wed":
       return 3;
-    case 'thursday':
-    case 'thr':
+    case "thursday":
+    case "thr":
       return 4;
-    case 'friday':
-    case 'fri':
+    case "friday":
+    case "fri":
       return 5;
-    case 'saturday':
-    case 'sat':
+    case "saturday":
+    case "sat":
       return 6;
     default:
       return -1;

@@ -1,5 +1,6 @@
 /**
  * Returns a dataset collection created from the given flat samples collection.
+ *
  * @param flatData The flat samples collection.
  * @returns {[]} A collection of datasets.
  */
@@ -21,11 +22,13 @@ export function createDatasets(flatData) {
       datasetsByLabel[label] = {
         label: label,
         stack: item.stack,
-        data: [{
-          date: item.date,
-          location: item.location,
-          value: item.value
-        }]
+        data: [
+          {
+            date: item.date,
+            location: item.location,
+            value: item.value
+          }
+        ]
       };
     }
   }
