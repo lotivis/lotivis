@@ -33,9 +33,9 @@ export class PlotBarsGradientRenderer extends Renderer {
       .attr("class", "ltv-plot-bar")
       .attr("rx", radius)
       .attr("ry", radius)
-      .attr("x", (d) => {
-        return chart.xChart(d.duration < 0 ? d.lastDate : d.firstDate || 0);
-      })
+      .attr("x", (d) =>
+        chart.xChart(d.duration < 0 ? d.lastDate : d.firstDate || 0)
+      )
       .attr("y", (d) => chart.yChartPadding(d.label))
       .attr("height", chart.yChartPadding.bandwidth())
       .attr("id", (d) => "ltv-plot-rect-" + hash_str(d.label))

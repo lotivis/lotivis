@@ -106,7 +106,7 @@
 
 .ltv-plot-chart-selection-rect {
   border-radius: 10px;
-  fill: red;
+  fill: dodgerblue;
 }
 
 .ltv-plot-grid {
@@ -115,7 +115,7 @@
 }
 
 .ltv-plot-label {
-  fill: white;
+  fill: greenyellow;
   text-anchor: start;
   font-size: 12px;
   pointer-events: none;

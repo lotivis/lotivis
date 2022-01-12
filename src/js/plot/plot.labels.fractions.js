@@ -7,6 +7,7 @@ export class PlotLabelsFractionsRenderer extends Renderer {
     if (chart.config.type !== PLOT_CHART_TYPE.fraction) return;
     if (!chart.config.labels) return;
 
+    let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
     let xBandwidth = chart.yChart.bandwidth();
 
     chart.labels = chart.barsData
@@ -17,9 +18,6 @@ export class PlotLabelsFractionsRenderer extends Renderer {
       .attr("id", (d) => "rect-" + hash_str(d.label))
       .attr("x", (d) => chart.xChart(d.date) + 4)
       .attr("y", (d) => chart.yChart(d.label))
-      .text(function (dataset) {
-        if (dataset.sum === 0) return;
-        return chart.config.numberFormat.format(dataset.value);
-      });
+      .text((d) => (d.sum === 0 ? null : numberFormat.format(d.value)));
   }
 }

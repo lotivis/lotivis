@@ -7,21 +7,11 @@ export class PlotChartSelectionRenderer extends Renderer {
       return `ltv-plot-chart-selection-rect-id-${hash_str(dataset.label)}`;
     }
 
-    function hideAll() {
-      chart.svg.selectAll(`.ltv-plot-chart-selection-rect`).attr("opacity", 0);
-    }
-
     function update() {
-      let selectedLabels = getSelectedLabels();
+      let filter = chart.controller.filters.labels || [];
       chart.svg
         .selectAll(`.ltv-plot-chart-selection-rect`)
-        .attr(`opacity`, (dataset) =>
-          selectedLabels.includes(dataset.label) ? 0.3 : 0
-        );
-    }
-
-    function getSelectedLabels() {
-      return chart.controller.filters.labels || [];
+        .attr(`opacity`, (d) => (filter.includes(d.label) ? 0.3 : 0));
     }
 
     function _render() {

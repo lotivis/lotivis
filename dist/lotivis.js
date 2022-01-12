@@ -21527,7 +21527,7 @@
       /*
        * Prefer dates specified by configuration. Fallback to dates of datasets.
        */
-      let dates = config.dateLabels || this.dataView.dates;
+      let dates = config.dateLabels || config.dates || this.dataView.dates;
       let stacks = this.dataView.enabledStacks;
 
       this.xChartScale = band()
@@ -23772,25 +23772,26 @@
       if (chart.config.type !== PLOT_CHART_TYPE.gradient) return;
       if (!chart.config.labels) return;
 
+      let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
       let xBandwidth = chart.yChart.bandwidth();
       let xChart = chart.xChart;
 
       chart.labels = chart.barsData
-        .append("g")
-        .attr("transform", `translate(0,${xBandwidth / 2 + 4})`)
         .append("text")
+        .attr("transform", `translate(0,${xBandwidth / 2 + 4})`)
         .attr("class", "ltv-plot-label")
         .attr("id", (d) => "rect-" + hash_str(d.label))
         .attr("x", (d) => xChart(d.firstDate) + xBandwidth / 2)
         .attr("y", (d) => chart.yChart(d.label))
+        .attr("height", chart.yChartPadding.bandwidth())
         .attr(
           "width",
           (d) => xChart(d.lastDate) - xChart(d.firstDate) + xBandwidth
         )
         .text(function (dataset) {
           if (dataset.sum === 0) return;
-          let formatted = chart.config.numberFormat.format(dataset.sum);
-          return `${dataset.duration + 1} years, ${formatted} items`;
+          let formatted = numberFormat.format(dataset.sum);
+          return `${formatted} (${dataset.duration + 1} years)`;
         });
     }
   }
@@ -24002,9 +24003,9 @@
         .attr("class", "ltv-plot-bar")
         .attr("rx", radius)
         .attr("ry", radius)
-        .attr("x", (d) => {
-          return chart.xChart(d.duration < 0 ? d.lastDate : d.firstDate || 0);
-        })
+        .attr("x", (d) =>
+          chart.xChart(d.duration < 0 ? d.lastDate : d.firstDate || 0)
+        )
         .attr("y", (d) => chart.yChartPadding(d.label))
         .attr("height", chart.yChartPadding.bandwidth())
         .attr("id", (d) => "ltv-plot-rect-" + hash_str(d.label))
@@ -24027,6 +24028,7 @@
       if (chart.config.type !== PLOT_CHART_TYPE.fraction) return;
       if (!chart.config.labels) return;
 
+      let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
       let xBandwidth = chart.yChart.bandwidth();
 
       chart.labels = chart.barsData
@@ -24037,10 +24039,7 @@
         .attr("id", (d) => "rect-" + hash_str(d.label))
         .attr("x", (d) => chart.xChart(d.date) + 4)
         .attr("y", (d) => chart.yChart(d.label))
-        .text(function (dataset) {
-          if (dataset.sum === 0) return;
-          return chart.config.numberFormat.format(dataset.value);
-        });
+        .text((d) => (d.sum === 0 ? null : numberFormat.format(d.value)));
     }
   }
 
@@ -24051,16 +24050,10 @@
       }
 
       function update() {
-        let selectedLabels = getSelectedLabels();
+        let filter = chart.controller.filters.labels || [];
         chart.svg
           .selectAll(`.ltv-plot-chart-selection-rect`)
-          .attr(`opacity`, (dataset) =>
-            selectedLabels.includes(dataset.label) ? 0.3 : 0
-          );
-      }
-
-      function getSelectedLabels() {
-        return chart.controller.filters.labels || [];
+          .attr(`opacity`, (d) => (filter.includes(d.label) ? 0.3 : 0));
       }
 
       function _render() {
@@ -24192,8 +24185,9 @@
     }
 
     createScales() {
-      const dates = this.dataView.dates || [];
-      const labels = this.dataView.labels || [];
+      let dates =
+        this.config.dateLabels || this.config.dates || this.dataView.dates;
+      let labels = this.dataView.labels || [];
 
       this.xChart = band()
         .domain(dates)

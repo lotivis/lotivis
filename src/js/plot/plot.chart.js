@@ -74,8 +74,9 @@ export class PlotChart extends Chart {
   }
 
   createScales() {
-    const dates = this.dataView.dates || [];
-    const labels = this.dataView.labels || [];
+    let dates =
+      this.config.dateLabels || this.config.dates || this.dataView.dates;
+    let labels = this.dataView.labels || [];
 
     this.xChart = d3
       .scaleBand()
