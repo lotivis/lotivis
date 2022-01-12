@@ -21,8 +21,8 @@ visualizing location and time specific data using [D3](https://github.com/d3/d3)
 
 ```html
 <!-- lotivis.js stylesheet -->
-<link
-  rel="stylesheet"
+<linkrel
+  ="stylesheet"
   href="https://cdn.jsdelivr.net/npm/lotivis@1/dist/lotivis.css"
 />
 

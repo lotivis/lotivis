@@ -1,0 +1,45 @@
+// .ltv-bar-chart
+// .ltv-bar-chart-svg
+// .ltv-bar-chart-tooltip
+
+.ltv-bar-chart-background {
+  pointer-events: none;
+}
+
+.ltv-bar-chart-grid {
+  color: lightgrey;
+  stroke-width: 1;
+}
+
+// .ltv-bar-chart-grid-x
+// .ltv-bar-chart-grid-y
+
+.ltv-bar-chart-label {
+  pointer-events: none;
+  font-size: 20px;
+}
+
+.ltv-bar-chart-legend-label {
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.ltv-bar-chart-legend-circle {
+  cursor: pointer;
+  stroke-width: 2;
+}
+
+.ltv-bar-chart-bar {
+  pointer-events: none;
+  border-radius: 10px;
+}
+
+.ltv-bar-chart-hover-bar {
+  border-radius: 10px;
+  fill: $tint-color;
+}
+
+.ltv-bar-chart-selection-rect {
+  fill: red;
+  border-radius: 10px;
+}

@@ -24,8 +24,17 @@
         <div class="col-8 text-center">
           <h1>Map Data</h1>
         </div>
+        <div class="col-2">
+          <select id="dataSelection" onchange="dataChange()">
+            <option>Tracks</option>
+            <option>Words</option>
+            <option>Words (Relative)</option>
+            <option>Types</option>
+            <option>Types (Relative)</option>
+          </select>
+        </div>
         <div class="col-12">
-          <div id="map-chart-card">
+          <div id="map-chart">
             <!-- Map Chart Here -->
           </div>
           <div class="col-12">
@@ -43,18 +52,18 @@
       // print debug messages
       lotivis.debug(true);
 
-      const mapChartCard = new lotivis.MapChartCard("map-chart-card");
-      const chart = mapChartCard.chart;
-      chart.config.excludedFeatureCodes = ["2A", "2B"];
+      let datasets = [];
+      let chart = new lotivis.MapChart("map-chart", {
+        excludedFeatureCodes: ["2A", "2B"],
+      });
+      // chart.config.excludedFeatureCodes = ["2A", "2B"];
 
-      mapChartCard.onSelectedDatasetChanged = function (value) {
-        let dataset = mapChartCard.datasets.find(
-          (dataset) => dataset.stack === value
-        );
-        let string = JSON.stringify(dataset, null, 4);
-        let element = document.getElementById("data");
-        element.innerHTML = string;
-      };
+      function dataChange() {
+        let dropdown = document.getElementById("dataSelection");
+        let label = dropdown.options[dropdown.selectedIndex].text;
+        chart.config.label = label;
+        chart.redraw();
+      }
 
       const d3 = lotivis.d3;
 
@@ -66,10 +75,12 @@
         d3.json("./assets/types-per-departement-relative.json"),
         d3.json("./assets/departements.geojson"),
       ]).then(function (datasetsAndGeoJSON) {
-        let rawGeoJSON = datasetsAndGeoJSON.pop();
-        let onlyDatasets = datasetsAndGeoJSON;
-        chart.setGeoJSON(rawGeoJSON);
-        mapChartCard.setDatasets(onlyDatasets);
+        let geoJSON = datasetsAndGeoJSON.pop();
+        chart.setGeoJSON(geoJSON);
+
+        datasets = datasetsAndGeoJSON;
+        let dataController = lotivis.parseDatasets(datasets);
+        chart.setController(dataController);
       });
     </script>
   </body>

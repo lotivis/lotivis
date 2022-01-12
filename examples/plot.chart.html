@@ -25,17 +25,17 @@
           <h1>Plot Chart</h1>
         </div>
         <div class="col-8">
-          <div id="plot-chart-card-gradient">
+          <div id="plot-chart-gradient">
             <!-- Plot Chart Card (type: gradient) Here -->
           </div>
-          <div id="plot-chart-card-fraction">
+          <div id="plot-chart-fraction">
             <!-- Plot Chart Card (type: fraction) Here -->
           </div>
         </div>
         <div class="col-4">
-          <div id="datasets-json-card">
-            <!-- Datasets JSON Card Here -->
-          </div>
+          <pre id="ltv-data-preview">
+            <!-- Data Here -->
+          </pre>
         </div>
       </div>
     </div>
@@ -43,7 +43,7 @@
     <script src="../dist/lotivis.js"></script>
 
     <script>
-      let data = [
+      let datasets = [
         {
           label: "dataset_1",
           data: [
@@ -160,22 +160,19 @@
         },
       ];
 
+      // enable debug messages
       lotivis.debug(true);
 
-      let plotChartCard = new lotivis.PlotChartCard(
-        "plot-chart-card-gradient",
-        { title: "Gradient" }
-      );
-      let plotChartCard2 = new lotivis.PlotChartCard(
-        "plot-chart-card-fraction",
-        { title: "Fraction", type: "fraction" }
-      );
-      let datasetJSONCard = new lotivis.DatasetsJSONCard("datasets-json-card");
+      let dataController = lotivis.parseDatasets(datasets);
 
-      let controller = new lotivis.DatasetsController(data);
-      plotChartCard.chart.setDatasetsController(controller);
-      plotChartCard2.chart.setDatasetsController(controller);
-      datasetJSONCard.setDatasetsController(controller);
+      let ploatChartGradient = new lotivis.PlotChart("plot-chart-gradient", {
+        dataController,
+      });
+
+      let ploatChartFraction = new lotivis.PlotChart("plot-chart-fraction", {
+        dataController,
+        type: "fraction",
+      });
     </script>
   </body>
 </html>

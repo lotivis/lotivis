@@ -8,7 +8,5 @@ function readJSON(name) {
   return JSON.parse(read(name) || "");
 }
 
-// export default read;
-
 exports.read = read;
 exports.readJSON = readJSON;

@@ -26,49 +26,51 @@
         </div>
         <div class="col-2"></div>
         <div class="col-6">
-          <div id="card-gradient">
+          Type: gradient
+          <div id="gradient">
             <!-- Plot Chart (type: gradient) Here -->
           </div>
-          <div id="card-gradient-hide-labels">
+          <div id="grad-hide-labels">
             <!-- Plot Chart (type: gradient, hide labels) Here -->
           </div>
-          <div id="card-gradient-sort-alphabetically">
+          <div id="grad-sort-alpha">
             <!-- Plot Chart (type: gradient, sort: alphabetically) Here -->
           </div>
-          <div id="card-gradient-sort-duration">
+          <div id="grad-sort-duration">
             <!-- Plot Chart (type: gradient, sort: duration) Here -->
           </div>
-          <div id="card-gradient-sort-itensity">
+          <div id="grad-sort-itensity">
             <!-- Plot Chart (type: gradient, sort: itensity) Here -->
           </div>
-          <div id="card-gradient-sort-first-date">
+          <div id="grad-sort-first-date">
             <!-- Plot Chart (type: gradient, sort: first date) Here -->
           </div>
         </div>
         <div class="col-6">
-          <div id="card-fraction">
+          Type: fraction
+          <div id="fraction">
             <!-- Plot Chart (type: fraction) Here -->
           </div>
-          <div id="card-fraction-hide-labels">
+          <div id="frac-hide-labels">
             <!-- Plot Chart (type: fraction, hide labels) Here -->
           </div>
-          <div id="card-fraction-sort-alphabetically">
+          <div id="frac-sort-alpha">
             <!-- Plot Chart (type: fraction, sort: alphabetically) Here -->
           </div>
-          <div id="card-fraction-sort-duration">
+          <div id="frac-sort-duration">
             <!-- Plot Chart (type: fraction, sort: duration) Here -->
           </div>
-          <div id="card-fraction-sort-itensity">
+          <div id="frac-sort-itensity">
             <!-- Plot Chart (type: fraction, sort: itensity) Here -->
           </div>
-          <div id="card-fraction-sort-first-date">
+          <div id="frac-sort-first-date">
             <!-- Plot Chart (type: fraction, sort: first date) Here -->
           </div>
         </div>
         <div class="col-6">
-          <div id="datasets-json-card">
+          <pre id="ltv-data-preview">
             <!-- Datasets JSON Card Here -->
-          </div>
+          </pre>
         </div>
       </div>
     </div>
@@ -76,7 +78,7 @@
     <script src="../dist/lotivis.js"></script>
 
     <script>
-      let data = [
+      let datasets = [
         {
           label: "dataset_1",
           data: [
@@ -193,110 +195,65 @@
         },
       ];
 
+      // enable debug messages
       lotivis.debug(true);
 
-      let plotChartCard1 = new lotivis.PlotChartCard("card-gradient", {
-        title: "Gradient",
-      });
-      let plotChartCard2 = new lotivis.PlotChartCard(
-        "card-gradient-hide-labels",
-        {
-          title: "Hide Labels",
-          showLabels: false,
-        }
-      );
-      let plotChartCard3 = new lotivis.PlotChartCard(
-        "card-gradient-sort-alphabetically",
-        {
-          title: "Sort alphabetically",
-          sort: "alphabetically",
-        }
-      );
-      let plotChartCard4 = new lotivis.PlotChartCard(
-        "card-gradient-sort-duration",
-        {
-          title: "Sort duration",
-          sort: "duration",
-        }
-      );
-      let plotChartCard5 = new lotivis.PlotChartCard(
-        "card-gradient-sort-itensity",
-        {
-          title: "Sort itensity",
-          sort: "itensity",
-        }
-      );
-      let plotChartCard6 = new lotivis.PlotChartCard(
-        "card-gradient-sort-first-date",
-        {
-          title: "Sort first date",
-          sort: "firstDate",
-        }
-      );
+      let dataController = lotivis.parseDatasets(datasets);
 
-      let plotChartCard7 = new lotivis.PlotChartCard("card-fraction", {
-        title: "Fraction",
+      let plotChart1 = new lotivis.PlotChart("gradient", {
+        dataController,
+      });
+      let plotChart2 = new lotivis.PlotChart("grad-hide-labels", {
+        dataController,
+        labels: false,
+      });
+      let plotChart3 = new lotivis.PlotChart("grad-sort-alpha", {
+        dataController,
+        sort: "alphabetically",
+      });
+      let plotChart4 = new lotivis.PlotChart("grad-sort-duration", {
+        dataController,
+        sort: "duration",
+      });
+      let plotChart5 = new lotivis.PlotChart("grad-sort-itensity", {
+        dataController,
+        sort: "itensity",
+      });
+      let plotChart6 = new lotivis.PlotChart("grad-sort-first-date", {
+        dataController,
+        sort: "firstDate",
+      });
+
+      let plotChart7 = new lotivis.PlotChart("fraction", {
+        dataController,
         type: "fraction",
       });
-      let plotChartCard8 = new lotivis.PlotChartCard(
-        "card-fraction-hide-labels",
-        {
-          title: "Hide Labels",
-          type: "fraction",
-          showLabels: false,
-        }
-      );
-      let plotChartCard9 = new lotivis.PlotChartCard(
-        "card-fraction-sort-alphabetically",
-        {
-          title: "Sort alphabetically",
-          type: "fraction",
-          sort: "alphabetically",
-        }
-      );
-      let plotChartCard10 = new lotivis.PlotChartCard(
-        "card-fraction-sort-duration",
-        {
-          title: "Sort duration",
-          type: "fraction",
-          sort: "duration",
-        }
-      );
-      let plotChartCard11 = new lotivis.PlotChartCard(
-        "card-fraction-sort-itensity",
-        {
-          title: "Sort itensity",
-          type: "fraction",
-          sort: "itensity",
-        }
-      );
-      let plotChartCard12 = new lotivis.PlotChartCard(
-        "card-fraction-sort-first-date",
-        {
-          title: "Sort first date",
-          type: "fraction",
-          sort: "firstDate",
-        }
-      );
+      let plotChart8 = new lotivis.PlotChart("frac-hide-labels", {
+        dataController,
+        type: "fraction",
+        labels: false,
+      });
 
-      let datasetJSONCard = new lotivis.DatasetsJSONCard("datasets-json-card");
-
-      let controller = new lotivis.DatasetsController(data);
-      controller.register([
-        plotChartCard1.chart,
-        plotChartCard2.chart,
-        plotChartCard3.chart,
-        plotChartCard4.chart,
-        plotChartCard5.chart,
-        plotChartCard6.chart,
-        plotChartCard7.chart,
-        plotChartCard8.chart,
-        plotChartCard9.chart,
-        plotChartCard10.chart,
-        plotChartCard11.chart,
-        plotChartCard12.chart,
-        datasetJSONCard,
-      ]);
+      let plotChart9 = new lotivis.PlotChart("frac-sort-alpha", {
+        dataController,
+        type: "fraction",
+        sort: "alphabetically",
+      });
+      let plotChart10 = new lotivis.PlotChart("frac-sort-duration", {
+        dataController,
+        type: "fraction",
+        sort: "duration",
+      });
+      let plotChart11 = new lotivis.PlotChart("frac-sort-itensity", {
+        dataController,
+        type: "fraction",
+        sort: "itensity",
+      });
+      let plotChart12 = new lotivis.PlotChart("frac-sort-first-date", {
+        dataController,
+        type: "fraction",
+        sort: "firstDate",
+      });
     </script>
   </body>
 </html>

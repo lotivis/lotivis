@@ -29,22 +29,22 @@
           </h1>
         </div>
         <div class="col-6">
-          <div id="date-chart-card">
-            <!-- Date Chart Card Here -->
+          <div id="bar-chart">
+            <!-- Bar Chart Here -->
           </div>
-          <div id="plot-chart-card">
-            <!-- Plot Chart Card Here -->
+          <div id="plot-chart">
+            <!-- Plot Chart Here -->
           </div>
         </div>
         <div class="col-6">
-          <div id="map-chart-card">
-            <!-- Map Chart Card Here -->
+          <div id="map-chart">
+            <!-- Map Chart Here -->
           </div>
         </div>
         <div class="col-12">
-          <div id="datasets-json-card">
-            <!-- Datasets JSON Card Here -->
-          </div>
+          <pre id="ltv-data-preview">
+            <!-- Data Here -->
+          </pre>
         </div>
       </div>
     </div>
@@ -54,38 +54,29 @@
     <script>
       lotivis.debug(true);
 
-      let datasetsJSONCard = new lotivis.DatasetsJSONCard();
-      let dateChartCard = new lotivis.DateChartCard();
-      let plotChartCard = new lotivis.PlotChartCard();
-      let mapChartCard = new lotivis.MapChartCard("map-chart-card", {
-        excludedFeatureCodes: ["2A", "2B"],
-        featureIDAccessor: (feature) => {
-          return feature.properties.code;
-        },
-        featureNameAccessor: (feature) => {
-          return feature.properties.nom;
-        },
+      let barChart = new lotivis.BarChart("bar-chart", {
+        dateLabels: Array.from(Array(26).keys()).map((number) => number + 1995),
       });
 
-      dateChartCard.chart.config.dateLabels = Array.from(Array(26).keys()).map(
-        (number) => String(number + 1995)
-      );
+      let plotChart = new lotivis.PlotChart("plot-chart");
 
-      lotivis.d3
-        .json("assets/departements.geojson")
-        .then(function (json) {
-          mapChartCard.chart.setGeoJSON(json);
-          return lotivis.d3.json("assets/miff.json");
-        })
-        .then(function (json) {
-          let controller = new lotivis.DatasetsController(json);
-          controller.register([
-            dateChartCard.chart,
-            mapChartCard.chart,
-            plotChartCard.chart,
-            datasetsJSONCard,
-          ]);
-        });
+      let mapChart = new lotivis.MapChart("map-chart", {
+        labels: true,
+        excludedFeatureCodes: ["2A", "2B"],
+        featureIDAccessor: (f) => +f.properties.code,
+        featureNameAccessor: (f) => f.properties.nom,
+      });
+
+      lotivis.d3.json("assets/departements.geojson").then((json) => {
+        mapChart.setGeoJSON(json);
+      });
+
+      lotivis.d3.json("assets/miff.json").then((json) => {
+        let dataController = lotivis.parseDatasets(json);
+        barChart.setController(dataController);
+        plotChart.setController(dataController);
+        mapChart.setController(dataController);
+      });
     </script>
   </body>
 </html>

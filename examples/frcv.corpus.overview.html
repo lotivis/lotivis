@@ -27,24 +27,16 @@
           <h1>Corpus Data</h1>
           <br />
         </div>
-        <div class="col-2"></div>
-        <div class="col-12" id="loading">
-          <div class="lotivis-card">
-            <div class="frc-loading-card-body text-center">
-              <h1>Loading...</h1>
-            </div>
-          </div>
-        </div>
         <div class="col-6">
-          <div id="date-chart-card">
-            <!-- Date Chart Here -->
+          <div id="bar-chart">
+            <!-- Bar Chart Here -->
           </div>
-          <div id="plot-chart-card">
+          <div id="plot-chart">
             <!-- Plot Chart Here -->
           </div>
         </div>
         <div class="col-6">
-          <div id="map-chart-card">
+          <div id="map-chart">
             <!-- Map Chart Here -->
           </div>
         </div>
@@ -59,61 +51,35 @@
       // enable debug mode
       lotivis.debug(true);
 
-      if (!location.hash) {
-        location.hash = "#reloading";
-        location.reload(true);
-      } else {
-        location.hash = "#reloaded";
-      }
+      let barChart = new lotivis.BarChart("bar-chart");
 
-      //
-      let dateChartCard = new lotivis.DateChartCard("date-chart-card");
-      let mapChartCard = new lotivis.MapChartCard("map-chart-card", {
-        title: "Map Chart",
+      let mapChart = new lotivis.MapChart("map-chart", {
         excludedFeatureCodes: ["2A", "2B"],
-        featureIDAccessor: (feature) => {
-          return feature.properties.code;
-        },
-        featureNameAccessor: (feature) => {
-          return feature.properties.nom;
-        },
+        featureIDAccessor: (f) => "" + f.properties.code,
+        featureNameAccessor: (f) => f.properties.nom,
       });
-      let plotChartCard = new lotivis.PlotChartCard("plot-chart-card");
-      let loadingCard = lotivis.d3.select("#loading");
+
+      let plotChart = new lotivis.PlotChart("plot-chart");
 
       Promise.all([
-        lotivis.d3.json("/examples/assets/departements.geojson"),
-        lotivis.d3.json("/examples/assets/frcv.corpus.datasets.json"),
+        lotivis.d3.json("./assets/departements.geojson"),
+        lotivis.d3.json("./assets/corpus.overview.tracks.json"),
       ]).then(function (results) {
-        // let corpus = new frc(results[2]);
         let geoJSON = results[0];
         let datasets = results[1];
-        let controller = new lotivis.DatasetsController(datasets);
-        let updater = {
-          update: function (controller, reason) {
-            if (reason === "location-filter") {
-              let locations = controller.locationFilters;
-              plotChartCard.chart.datasets =
-                corpus.getArtistsForLocations(locations);
-              plotChartCard.chart.update();
-            } else {
-              plotChartCard.chart.datasets = [];
-              plotChartCard.chart.update();
-            }
+        let dataController = lotivis.parseDataset(datasets);
+
+        mapChart.setGeoJSON(geoJSON);
+
+        barChart.setController(dataController);
+        mapChart.setController(dataController);
+        plotChart.setController(dataController);
+
+        dataController.addListener({
+          update: (controller, reason) => {
+            console.log("reason", reason);
           },
-        };
-
-        mapChartCard.chart.excludedFeatureCodes = ["2A", "2B"];
-        mapChartCard.chart.setGeoJSON(geoJSON);
-
-        controller.addListener(updater);
-        controller.register([
-          mapChartCard.chart,
-          dateChartCard.chart,
-          plotChartCard.chart,
-        ]);
-
-        loadingCard.style("display", "none");
+        });
       });
     </script>
   </body>

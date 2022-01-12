@@ -1,39 +1,12 @@
-// MARK: - Font
-$primary-font-size: 14px;
-$primary-title-font-size: 15px;
-$button-font-size: 12px;
-$primary-font-family: sans-serif;
-
-$monospace-font-size: 13px;
-$monospace-font-family: "Lucida Console", "Courier New", monospace;
-
-// MARK: - Border / Spacing
-$small-border: 10px;
-$border: 20px;
-$hugh-border: 30px;
-$spacing: 5px;
+/* sized */
 $radius: 8px;
 $padding: 8px;
 
-// MARK: - Colors
-$primary-text-color: #333;
-$secondary-text-color: #888;
+/* colors */
 $tint-color: dodgerblue;
-$background: #f0f0f1;
-$darkGray: #464845;
-$lightGray: #919191;
 
-body {
-  text-decoration: none;
-  font-style: normal;
-  font-family: sans-serif;
-}
-
-@import "scss/card";
-@import "scss/button";
-@import "scss/data.card";
-@import "scss/date.chart";
-@import "scss/map.chart";
-@import "scss/plot.chart";
-@import "scss/popup";
-@import "scss/svg";
+@import "scss/bar.chart.scss";
+@import "scss/map.chart.scss";
+@import "scss/plot.chart.scss";
+@import "scss/tooltip.scss";
+@import "scss/svg.scss";

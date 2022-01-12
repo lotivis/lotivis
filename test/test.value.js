@@ -1,5 +1,5 @@
 const assert = require("assert");
-const lotivis = require("../dist/lotivis.tests");
+const lotivis = require("../dist/lotivis.test");
 
 describe("isValue", function () {
   it("evaluates a number greater 0", function () {

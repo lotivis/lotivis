@@ -19,15 +19,13 @@
     <div class="container mt-3">
       <div class="row">
         <div class="col-2">
-          <a href="../index.html">
-            Back
-          </a>
+          <a href="../index.html"> Back </a>
         </div>
         <div class="col-8 text-center">
           <h1>Map Chart Berlin</h1>
         </div>
         <div class="col-12">
-          <div id="map-chart-card">
+          <div id="map-chart">
             <!-- Map Chart Here -->
           </div>
           <div class="col-12">
@@ -39,36 +37,20 @@
       </div>
     </div>
 
-    <!-- <script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script> -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js"></script> -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/topojson-server@3.0.1/dist/topojson-server.min.js"></script> -->
     <script src="../dist/lotivis.js"></script>
 
     <script>
       // print debug messages
       lotivis.debug(true);
 
-      const mapChartCard = new lotivis.MapChartCard("map-chart-card");
-      const chart = mapChartCard.chart;
-
-      chart.config.featureIDAccessor = function(feature) {
-        return feature.properties.cartodb_id;
-      };
-
-      mapChartCard.onSelectedDatasetChanged = function(value) {
-        let dataset = mapChartCard.datasets.find(
-          dataset => dataset.stack === value
-        );
-        let string = JSON.stringify(dataset, null, 4);
-        let element = document.getElementById("data");
-        element.innerHTML = string;
+      let chart = new lotivis.MapChart("map-chart");
+      chart.config.featureIDAccessor = function (f) {
+        return f.properties.cartodb_id;
       };
 
       fetch("./assets/berlin.geojson")
-        .then(raw => raw.json())
-        .then(rawGeoJSON => {
-          chart.setGeoJSON(rawGeoJSON);
-        });
+        .then((raw) => raw.json())
+        .then((geoJSON) => chart.setGeoJSON(geoJSON));
     </script>
   </body>
 </html>

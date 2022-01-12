@@ -20,9 +20,7 @@
       <div class="row">
         <div class="col-12">
           <div class="mb-3">
-            <h1>
-              lotivis.js Examples
-            </h1>
+            <h1>lotivis.js Examples</h1>
             <span>Version:</span>
             <span id="label-version"></span>
           </div>
@@ -31,34 +29,26 @@
           <h2>Chart</h2>
           <ul>
             <li>
-              <a href="examples/date.chart.html">
-                Chart
-              </a>
+              <a href="examples/bar.chart.html"> Chart </a>
             </li>
             <li>
-              <a href="examples/date.chart.stacked.html">
-                Chart Stacked
-              </a>
+              <a href="examples/bar.chart.stacked.html"> Chart Stacked </a>
             </li>
             <li>
-              <a href="examples/date.chart.grouped.html">
-                Chart Grouped
-              </a>
+              <a href="examples/bar.chart.grouped.html"> Chart Grouped </a>
             </li>
             <li>
-              <a href="examples/date.chart.grouped.stacked.html">
+              <a href="examples/bar.chart.grouped.stacked.html">
                 Chart Grouped Stacked
               </a>
             </li>
             <li>
-              <a href="examples/date.chart.interpolate.html">
+              <a href="examples/bar.chart.interpolate.html">
                 Chart Interpolate
               </a>
             </li>
             <li>
-              <a href="examples/date.chart.showcase.html">
-                Date (Showcase)
-              </a>
+              <a href="examples/bar.chart.showcase.html"> Date (Showcase) </a>
             </li>
           </ul>
         </div>
@@ -76,19 +66,13 @@
               </a>
             </li>
             <li>
-              <a href="examples/map.chart.berlin.html">
-                Berlin
-              </a>
+              <a href="examples/map.chart.berlin.html"> Berlin </a>
             </li>
             <li>
-              <a href="examples/map.chart.empty.html">
-                Map Empty
-              </a>
+              <a href="examples/map.chart.empty.html"> Map Empty </a>
             </li>
             <li>
-              <a href="examples/map.chart.showcase.html">
-                Map (Showcase)
-              </a>
+              <a href="examples/map.chart.showcase.html"> Map (Showcase) </a>
             </li>
           </ul>
         </div>
@@ -96,9 +80,7 @@
           <h2>Plot</h2>
           <ul>
             <li>
-              <a href="examples/plot.chart.html">
-                Plot Chart
-              </a>
+              <a href="examples/plot.chart.html"> Plot Chart </a>
             </li>
             <li>
               <a href="examples/plot.chart.showcase.html">
@@ -111,9 +93,7 @@
           <h2>French Rap Corpus Visualization</h2>
           <ul>
             <li>
-              <a href="examples/frcv.corpus.overview.html">
-                Corpus Overview
-              </a>
+              <a href="examples/frcv.corpus.overview.html"> Corpus Overview </a>
             </li>
             <li>
               <a href="examples/frcv.departements.data.html">
@@ -145,8 +125,8 @@
       let versionLabel = document.getElementById("label-version");
 
       fetch("./package.json")
-        .then(response => response.json())
-        .then(data => (versionLabel.innerText = data.version));
+        .then((response) => response.json())
+        .then((data) => (versionLabel.innerText = data.version));
     </script>
   </body>
 </html>

@@ -21,7 +21,7 @@ module.exports = [
       resolve({
         jsnext: true,
       }),
-      babel({ babelHelpers: "bundled" }),
+      // babel({ babelHelpers: "bundled" }),
       execute("sass src/index.scss > dist/lotivis.css"),
       execute("sass --style compressed src/index.scss > dist/lotivis.min.css"),
     ],
@@ -30,6 +30,20 @@ module.exports = [
       name: "lotivis",
       file: "dist/lotivis.js",
       banner,
+      format: "umd",
+    },
+  },
+  {
+    input: "src/index.test.js",
+    plugins: [
+      resolve({
+        jsnext: true,
+      }),
+    ],
+    output: {
+      sourcemap: true,
+      name: "lotivis.test",
+      file: "dist/lotivis.test.js",
       format: "umd",
     },
   },
