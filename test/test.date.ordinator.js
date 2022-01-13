@@ -13,16 +13,18 @@ describe("DATE_TO_NUMBER_ORDINATOR", function () {
 describe("GERMAN_DATE_ORDINATOR", function () {
   it("returns the correct numeric value", function () {
     let GERMAN_DATE_ORDINATOR = lotivis.DateOrdinator.GERMAN_DATE_ORDINATOR;
-    assert.strictEqual(GERMAN_DATE_ORDINATOR("1.1.2022"), 1640991600000);
-    assert.strictEqual(GERMAN_DATE_ORDINATOR("01.01.2022"), 1640991600000);
+    let correctDates = [1640991600000, 1640995200000];
+    assert.ok(correctDates.includes(GERMAN_DATE_ORDINATOR("1.1.2022")));
+    assert.ok(correctDates.includes(GERMAN_DATE_ORDINATOR("01.01.2022")));
   });
 });
 
 describe("ISO_DATE_ORDINATOR", function () {
   it("returns the correct numeric value", function () {
     let ISO_DATE_ORDINATOR = lotivis.DateOrdinator.ISO_DATE_ORDINATOR;
-    assert.strictEqual(ISO_DATE_ORDINATOR("2022-1-1"), 1640991600000);
-    assert.strictEqual(ISO_DATE_ORDINATOR("2022-01-01"), 1640991600000);
+    let correctDates = [1640991600000, 1640995200000];
+    assert.ok(correctDates.includes(ISO_DATE_ORDINATOR("2022-1-1")));
+    assert.ok(correctDates.includes(ISO_DATE_ORDINATOR("2022-01-01")));
   });
 });
 
