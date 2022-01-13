@@ -65,11 +65,11 @@ export default function (input) {
   };
 
   data.earliestValidDate = function () {
-    return d3.least(data.filterValid(), (a, b) => a.date - b.date)?.date;
+    return d3.least(data.filterValid(), (a, b) => a.date - b.date).date;
   };
 
   data.latestValidDate = function () {
-    return d3.least(data.filterValid(), (a, b) => b.date - a.date)?.date;
+    return d3.least(data.filterValid(), (a, b) => b.date - a.date).date;
   };
 
   data.max = function () {
