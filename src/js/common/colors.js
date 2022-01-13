@@ -49,11 +49,11 @@ export class ColorGenerator {
     }
 
     this.stack = function (stack) {
-      return stackToColor.get(stack) ?? tintColor;
+      return stackToColor.get(stack) || tintColor;
     };
 
     this.label = function (label) {
-      return labelToColor.get(label) ?? tintColor;
+      return labelToColor.get(label) || tintColor;
     };
 
     this.stackColors = function (stack) {
