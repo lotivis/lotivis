@@ -2,7 +2,7 @@
 const resolve = require("@rollup/plugin-node-resolve").default;
 const execute = require("rollup-plugin-execute");
 const pkg = require("./package.json");
-import { babel } from "@rollup/plugin-babel";
+// import { babel } from "@rollup/plugin-babel";
 
 const banner = `/*!
  * lotivis.js v${pkg.version}

@@ -20267,7 +20267,7 @@
       let stacks = Array.from(stacksToLabels.keys());
 
       function stackLabels(stack) {
-        return Array.from(stacksToLabels.get(stack)?.keys() ?? []);
+        return Array.from(stacksToLabels.get(stack).keys() ?? []);
       }
 
       function stackColor(stack) {
