@@ -1,52 +1,40 @@
-import * as d3 from "d3";
-import flat from "../data/flat";
-import { FeatureCollection } from "./geojson";
+import { Data } from "../data/flat.data";
+import { Feature, FeatureCollection, Geometry, GeoJSON } from "./geojson";
 
 export function createGeoJSON(data) {
-  let flatData = data; // flat(datasets);
-  let locations = flatData.locations();
-  let rowsCount = Math.ceil(locations.length / 5);
-  let latSpan = 0.1;
-  let lngSpan = 0.1;
+  // console.log("data", data);
+  // console.log("typeof data", typeof data);
+  // console.log("data instanceof Data", data instanceof Data);
+  // if (!(data instanceof Data)) throw new Error("no data object given");
+  let locations = data.locations();
+  let columns = 5;
+  let rows = Math.ceil(locations.length / columns);
+  let span = 0.1;
   let features = [];
 
-  loop1: for (let rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
-    for (let itemIndex = 0; itemIndex < 5; itemIndex++) {
+  loop1: for (let row = 0; row < rows; row++) {
+    for (let column = 0; column < columns; column++) {
       if (locations.length === 0) break loop1;
 
       let location = locations.shift();
-      let lat = (itemIndex + 1) * latSpan;
-      let lng = (rowIndex + 1) * -lngSpan;
+      let lat = (column + 1) * span;
+      let lng = (row + 1) * -span;
 
       // start down left, counterclockwise
-      let coordinates = [];
-      coordinates.push([lat + latSpan, lng + lngSpan]);
-      coordinates.push([lat + latSpan, lng]);
-      coordinates.push([lat, lng]);
-      coordinates.push([lat, lng + lngSpan]);
-      coordinates.push([lat + latSpan, lng + lngSpan]);
+      let coord = [
+        [lat + span, lng + span],
+        [lat + span, lng],
+        [lat, lng],
+        [lat, lng + span],
+        [lat + span, lng + span],
+      ];
 
-      let feature = {
-        type: "Feature",
-        id: location,
-        properties: {
-          id: location,
-          code: location,
-          location: location,
-        },
-        geometry: {
-          type: "Polygon",
-          coordinates: [coordinates],
-        },
-      };
-
+      let geometry = Geometry("Polygon", [coord]);
+      let feature = Feature(geometry, { id: location, name: location });
+      feature.id = location;
       features.push(feature);
     }
   }
 
-  let result = FeatureCollection(features);
-
-  console.log("geoJSON", result);
-
-  return result;
+  return GeoJSON(FeatureCollection(features));
 }

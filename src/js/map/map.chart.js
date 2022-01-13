@@ -44,6 +44,7 @@ export class MapChart extends Chart {
     this.svg
       .classed("ltv-map-chart-svg", true)
       .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`);
+
     if (this.geoJSON) return;
     let geoJSON = createGeoJSON(this.controller.data);
     this.setGeoJSON(geoJSON);
@@ -54,10 +55,11 @@ export class MapChart extends Chart {
   }
 
   zoomTo(geoJSON) {
-    this.projection.fitSize([this.config.width, this.config.height], geoJSON);
+    this.projection.fitSize(
+      [this.config.width - 20, this.config.height - 20],
+      geoJSON
+    );
   }
-
-  onSelectFeature(event, feature) {}
 
   setGeoJSON(newGeoJSON) {
     if (typeof newGeoJSON === "object" && newGeoJSON.prototype === "GeoJSON") {

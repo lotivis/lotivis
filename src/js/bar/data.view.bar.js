@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { toDataset } from "../data/to.datasets";
+import { toDataset } from "../data/data.to.datasets";
 
 export function createBarStackModel(data) {
   let stacks = data.stacks();

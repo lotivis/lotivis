@@ -26,17 +26,14 @@
 
 .ltv-bar-chart-bar {
   pointer-events: none;
-  border-radius: 10px;
 }
 
 .ltv-bar-chart-hover-bar {
-  border-radius: 10px;
   fill: dodgerblue;
 }
 
 .ltv-bar-chart-selection-rect {
-  fill: red;
-  border-radius: 10px;
+  fill: dodgerblue;
 }
 
 .ltv-map-chart-background {

@@ -12,7 +12,7 @@ import * as d3 from "d3";
  * @param blob The samples to be downloaded.
  * @param filename The name of the file.
  */
-export function downloadBlob(blob, filename) {
+function downloadBlob(blob, filename) {
   if (window.navigator.msSaveOrOpenBlob) {
     window.navigator.msSaveBlob(blob, filename);
   } else {
@@ -23,6 +23,18 @@ export function downloadBlob(blob, filename) {
     anchor.click();
     document.body.removeChild(anchor);
   }
+}
+
+export function downloadJSON(jsonString, filename) {
+  let blob = new Blob([jsonString], { type: "text/json" });
+  let saveFilename = appendExtensionIfNeeded(filename, "json");
+  downloadBlob(blob, saveFilename);
+}
+
+export function downloadCSV(jsonString, filename) {
+  let blob = new Blob([jsonString], { type: "text/csv" });
+  let saveFilename = appendExtensionIfNeeded(filename, "csv");
+  downloadBlob(blob, saveFilename);
 }
 
 /**

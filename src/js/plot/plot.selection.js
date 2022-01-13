@@ -33,6 +33,8 @@ export class PlotChartSelectionRenderer extends Renderer {
         .attr("y", (d) => chart.yChart(d.label))
         .attr("height", chart.yChart.bandwidth())
         .attr("width", graphWidth);
+
+      update();
     }
 
     chart.addListener("click", update);

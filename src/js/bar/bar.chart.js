@@ -78,8 +78,11 @@ export class BarChart extends Chart {
     /*
      * Prefer dates specified by configuration. Fallback to dates of datasets.
      */
-    let dates = config.dateLabels || config.dates || this.dataView.dates;
+    let dates = config.dates || this.dataView.dates;
     let stacks = this.dataView.enabledStacks;
+
+    let dateAccess = config.dateAccess;
+    dates = dates.sort((a, b) => dateAccess(a) - dateAccess(b));
 
     this.xChartScale = d3
       .scaleBand()

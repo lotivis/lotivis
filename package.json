@@ -38,7 +38,7 @@
     "build": "rollup -c",
     "scss": "sass src/index.scss > dist/lotivis.css && sass --style compressed src/index.scss > dist/lotivis.min.css",
     "test": "mocha 'test/**/test.*.js'",
-    "copy:to:frcv": "cp dist/lotivis.js ../frc-visualization/public/js/lib && cp dist/lotivis.js.map ../frc-visualization/public/js/lib && cp dist/lotivis.css ../frc-visualization/public/css"
+    "copy": "cp dist/lotivis.js ../frc-visualization/public/js/lib && cp dist/lotivis.js.map ../frc-visualization/public/js/lib && cp dist/lotivis.css ../frc-visualization/public/css"
   },
   "bugs": {
     "url": "https://github.com/lukasdanckwerth/lotivis/issues"

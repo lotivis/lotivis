@@ -42,13 +42,164 @@
     <script>
       lotivis.debug(true);
 
+      let datasets = [
+        {
+          label: "dataset_1",
+          data: [
+            { location: 1, date: 2000 },
+            { location: 1, date: 2001, value: 1 },
+            { location: 1, date: 2002, value: 2 },
+            {
+              location: 1,
+              date: 2003,
+              value: 3,
+            },
+            {
+              location: 1,
+              date: 2004,
+              value: 4,
+            },
+            {
+              location: 2,
+              date: 2000,
+              value: 2,
+            },
+            {
+              location: 2,
+              date: 2001,
+              value: 3,
+            },
+            {
+              location: 2,
+              date: 2002,
+              value: 4,
+            },
+            {
+              location: 2,
+              date: 2003,
+              value: 5,
+            },
+            {
+              location: 2,
+              date: 2004,
+              value: 6,
+            },
+          ],
+        },
+        {
+          label: "dataset_2",
+          data: [
+            {
+              location: 1,
+              date: 2000,
+              value: 5,
+            },
+            {
+              location: 1,
+              date: 2001,
+              value: 5,
+            },
+            {
+              location: 1,
+              date: 2002,
+              value: 5,
+            },
+            {
+              location: 1,
+              date: 2003,
+              value: 5,
+            },
+            {
+              location: 1,
+              date: 2004,
+              value: 5,
+            },
+            {
+              location: 2,
+              date: 2000,
+              value: 8,
+            },
+            {
+              location: 2,
+              date: 2001,
+              value: 7,
+            },
+            {
+              location: 2,
+              date: 2002,
+              value: 6,
+            },
+            {
+              location: 2,
+              date: 2003,
+              value: 5,
+            },
+            {
+              location: 2,
+              date: 2004,
+              value: 4,
+            },
+          ],
+        },
+        {
+          label: "dataset_3",
+          data: [
+            {
+              location: 1,
+              date: 2000,
+              value: 4,
+            },
+            {
+              location: 1,
+              date: 2001,
+              value: 3,
+            },
+            {
+              location: 1,
+              date: 2002,
+              value: 2,
+            },
+            {
+              location: 1,
+              date: 2003,
+              value: 1,
+            },
+            {
+              location: 1,
+              date: 2004,
+            },
+            {
+              location: 2,
+              date: 2000,
+              value: 5,
+            },
+            {
+              location: 2,
+              date: 2001,
+              value: 6,
+            },
+            {
+              location: 2,
+              date: 2002,
+              value: 7,
+            },
+            {
+              location: 2,
+              date: 2003,
+              value: 8,
+            },
+            {
+              location: 2,
+              date: 2004,
+              value: 9,
+            },
+          ],
+        },
+      ];
+
+      let dc = lotivis.parseDatasets(datasets);
       let chart = new lotivis.BarChart("bar-chart");
-      lotivis
-        .json("assets/example-datasets-location-time-grouped.json")
-        .then((dc) => {
-          chart.setController(dc);
-        })
-        .catch((e) => console.error(e));
+      chart.setController(dc);
     </script>
   </body>
 </html>

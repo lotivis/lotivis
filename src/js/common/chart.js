@@ -1,5 +1,5 @@
 import { Component } from "./component.js";
-import { create_id } from "./create.js";
+import { create_id } from "./create.id.js";
 import { DataController } from "../data/controller";
 
 export class Chart extends Component {
@@ -23,7 +23,7 @@ export class Chart extends Component {
     };
 
     this.update = function (controller, reason) {
-      // console.log("[Chart] update", this, reason, controller);
+      // console.log("[Chart] update", this.constructor.name, reason, controller);
       if (!updateSensible) return;
       if (!this.controller) this.controller = new DataController([]);
       this.dataView = this.createDataView();
@@ -86,7 +86,8 @@ export class Chart extends Component {
 
   setController(dc) {
     this.controller = dc;
-    this.redraw();
+    this.controller.addListener(this);
+    // this.redraw();
   }
 
   fromConfig(name, fallback) {

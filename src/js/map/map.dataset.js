@@ -41,7 +41,6 @@ export class MapDatasetRenderer extends Renderer {
     resetAreas();
 
     let stackNames = chart.dataView.stacks;
-    let label = chart.config.label || stackNames[0];
     let locationToSum = dataView.locationToSum;
     let locations = Array.from(locationToSum.keys());
     let max = d3.max(locationToSum, (item) => item[1]);
@@ -54,9 +53,9 @@ export class MapDatasetRenderer extends Renderer {
 
       chart.svg
         .selectAll(".ltv-map-chart-area")
-        // .filter((item) => chart.config.featureIDAccessor(item) === location)
         .filter((item) => item.lotivisId === location)
-        .style("fill", () => color);
+        .style("fill", () => color)
+        .raise();
     }
 
     for (let index = 0; index < stackNames.length; index++) {

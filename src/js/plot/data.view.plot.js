@@ -1,5 +1,6 @@
 import * as d3 from "d3";
-import flat from "../data/flat";
+import { Data } from "../data/flat.data";
+import { flatDatasets } from "../data/parse.datasets";
 
 export function dataViewPlot(data) {
   let dates = data.dates();
@@ -36,7 +37,7 @@ export function dataViewPlot(data) {
 
   return {
     datasets,
-    data: flat(datasets),
+    data: Data(flatDatasets(datasets)),
     dates,
     firstDate: dates[0],
     lastDate: dates[dates.length - 1],

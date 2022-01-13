@@ -29,7 +29,7 @@ export class MapGeojsonRenderer extends Renderer {
     }
 
     chart.areas = chart.svg
-      .selectAll("path")
+      .selectAll(".ltv-map-chart-area")
       .append("path")
       .data(geoJSON.features)
       .enter()
@@ -37,11 +37,12 @@ export class MapGeojsonRenderer extends Renderer {
       .attr("d", chart.path)
       .classed("ltv-map-chart-area", true)
       .attr("id", (f) => `ltv-map-chart-area-id-${f.lotivisId}`)
-      .style("stroke-dasharray", (f) => (f.departementsData ? "0" : "1,4"))
+      .style("stroke-dasharray", "1,4")
       .style("fill", "white")
       .style("fill-opacity", 1)
       .on("click", mouseClick)
       .on("mouseenter", mouseEnter)
-      .on("mouseout", mouseOut);
+      .on("mouseout", mouseOut)
+      .raise();
   }
 }

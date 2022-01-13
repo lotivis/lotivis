@@ -31,8 +31,7 @@ export class MapLabelsRenderer extends Renderer {
         let labels = Array.from(data.keys());
         let values = labels.map((label) => data.get(label));
         let sum = d3.sum(values);
-        if (sum === 0) return "";
-        return numberFormat(sum);
+        return sum === 0 ? "" : numberFormat(sum);
       })
       .attr("x", (f) => chart.projection(f.center)[0])
       .attr("y", (f) => chart.projection(f.center)[1]);

@@ -1,45 +1,43 @@
-export function FilterCollection(listener) {
-  let c = [];
-  let l = listener;
-
-  function _nofify(reason, item, notify = true) {
-    if (notify) listener(reason, item);
+export class ObservableArray extends Array {
+  constructor(listener) {
+    super();
+    this.listener = listener;
   }
 
-  c.add = function (item, notify = true) {
-    if (c.indexOf(item) === -1) c.push(item), _nofify("add", item, notify);
-  };
+  notify(reason, item, notify = true) {
+    if (notify) this.listener(reason, item);
+  }
 
-  c.remove = function (item, notify = true) {
-    let i = c.indexOf(item);
-    if (i !== -1) c.splice(i, 1), _nofify("remove", item, notify);
-  };
+  add(item, notify = true) {
+    if (this.indexOf(item) === -1)
+      this.push(item), this.notify("add", item, notify);
+  }
 
-  c.toggle = function (item, notify = true) {
-    let i = c.indexOf(item);
-    i === -1 ? c.push(item) : c.splice(i, 1), _nofify("toggle", item, notify);
-  };
+  remove(item, notify = true) {
+    let i = this.indexOf(item);
+    if (i !== -1) this.splice(i, 1), this.notify("remove", item, notify);
+  }
 
-  c.contains = function (item) {
-    return c.indexOf(item) !== -1;
-  };
+  toggle(item, notify = true) {
+    let i = this.indexOf(item);
+    i === -1 ? this.push(item) : this.splice(i, 1),
+      this.notify("toggle", item, notify);
+  }
 
-  c.clear = function (notify = true) {
-    if (c.length !== 0) (c = []), _nofify("clear", null, notify);
-  };
+  contains(item) {
+    return this.indexOf(item) !== -1;
+  }
 
-  c.get = function () {
-    return c;
-  };
-
-  return c;
+  clear(notify = true) {
+    if (this.length !== 0) (c = []), this.notify("clear", null, notify);
+  }
 }
 
 export class Filters {
   constructor(listener) {
-    this.locations = new FilterCollection((r) => listener("location", r));
-    this.dates = new FilterCollection((r) => listener("dates", r));
-    this.labels = new FilterCollection((r) => listener("labels", r));
-    this.stacks = new FilterCollection((r) => listener("stacks", r));
+    this.locations = new ObservableArray((r) => listener("location", r));
+    this.dates = new ObservableArray((r) => listener("dates", r));
+    this.labels = new ObservableArray((r) => listener("labels", r));
+    this.stacks = new ObservableArray((r) => listener("stacks", r));
   }
 }

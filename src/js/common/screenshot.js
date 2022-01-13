@@ -106,9 +106,7 @@ export function svgString2Image(svgString, width, height, callback) {
   image.onload = function () {
     context.clearRect(0, 0, width, height);
     context.drawImage(image, 0, 0, width, height);
-
-    let data = canvas.toDataURL("image/png");
-    if (callback) callback(data);
+    if (callback) callback(canvas.toDataURL("image/png"));
   };
 
   image.src = imageSource;

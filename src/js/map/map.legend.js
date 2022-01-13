@@ -6,26 +6,6 @@ import { Renderer } from "../common/renderer";
 export class MapLegendRenderer extends Renderer {
   render(chart, controller, dataView) {
     if (!dataView) return;
-    let legend;
-
-    function appendLegend() {
-      legend = chart.svg
-        .append("svg")
-        .attr("class", "ltv-map-chart-legend")
-        .attr("width", chart.config.width)
-        .attr("height", 200)
-        .attr("x", 0)
-        .attr("y", 0);
-    }
-
-    function removeDatasetLegend() {
-      legend.selectAll("rect").remove();
-      legend.selectAll("text").remove();
-    }
-
-    appendLegend();
-    legend.raise();
-    removeDatasetLegend();
 
     let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
     let stackNames = chart.dataView.stacks;
@@ -39,6 +19,17 @@ export class MapLegendRenderer extends Renderer {
     let steps = 4;
     let data = [0, (1 / 4) * max, (1 / 2) * max, (3 / 4) * max, max];
     let generator = MapColors(max);
+
+    let legend = chart.svg
+      .append("svg")
+      .attr("class", "ltv-map-chart-legend")
+      .attr("width", chart.config.width)
+      .attr("height", 200)
+      .attr("x", 0)
+      .attr("y", 0);
+
+    chart.addListener("mouseenter", () => legend.raise());
+    chart.addListener("mouseout", () => legend.raise());
 
     legend
       .append("text")
