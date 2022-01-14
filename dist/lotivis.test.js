@@ -21153,7 +21153,7 @@
 
       let filter = controller.filters.dates;
       let margin = chart.config.margin;
-      let dates = chart.config.dateLabels || chart.dataView.dates;
+      let dates = chart.config.dates || chart.dataView.dates;
       chart.svg
         .append("g")
         .selectAll("rect")
@@ -21207,7 +21207,7 @@
 
       let config = chart.config;
       let margin = config.margin;
-      let dates = chart.config.dateLabels || chart.dataView.dates;
+      let dates = chart.config.dates || chart.dataView.dates;
 
       chart.svg
         .append("g")
@@ -23832,17 +23832,14 @@
         .attr("y", (d) => chart.yChartPadding(d.label))
         .attr("height", chart.yChartPadding.bandwidth())
         .attr("id", (d) => "ltv-plot-rect-" + hash_str(d.label))
-        .attr(
-          "width",
-          function (data) {
-            if (!data.firstDate || !data.lastDate) return 0;
-            return (
-              chart.xChart(data.lastDate) -
-              chart.xChart(data.firstDate) +
-              chart.xChart.bandwidth()
-            );
-          }.bind(this)
-        );
+        .attr("width", (d) => {
+          if (!d.firstDate || !d.lastDate) return 0;
+          return (
+            chart.xChart(d.lastDate) -
+            chart.xChart(d.firstDate) +
+            chart.xChart.bandwidth()
+          );
+        });
     }
   }
 
@@ -24010,8 +24007,7 @@
     }
 
     createScales() {
-      let dates =
-        this.config.dateLabels || this.config.dates || this.dataView.dates;
+      let dates = this.config.dates || this.config.dates || this.dataView.dates;
       let labels = this.dataView.labels || [];
 
       this.xChart = band()

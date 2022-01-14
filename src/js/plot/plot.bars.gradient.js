@@ -39,16 +39,13 @@ export class PlotBarsGradientRenderer extends Renderer {
       .attr("y", (d) => chart.yChartPadding(d.label))
       .attr("height", chart.yChartPadding.bandwidth())
       .attr("id", (d) => "ltv-plot-rect-" + hash_str(d.label))
-      .attr(
-        "width",
-        function (data) {
-          if (!data.firstDate || !data.lastDate) return 0;
-          return (
-            chart.xChart(data.lastDate) -
-            chart.xChart(data.firstDate) +
-            chart.xChart.bandwidth()
-          );
-        }.bind(this)
-      );
+      .attr("width", (d) => {
+        if (!d.firstDate || !d.lastDate) return 0;
+        return (
+          chart.xChart(d.lastDate) -
+          chart.xChart(d.firstDate) +
+          chart.xChart.bandwidth()
+        );
+      });
   }
 }

@@ -38,7 +38,7 @@ export class BarHoverRenderer extends Renderer {
 
     let config = chart.config;
     let margin = config.margin;
-    let dates = chart.config.dateLabels || chart.dataView.dates;
+    let dates = chart.config.dates || chart.dataView.dates;
 
     chart.svg
       .append("g")

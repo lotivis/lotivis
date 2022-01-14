@@ -18,7 +18,7 @@ export class BarSelectionRenderer extends Renderer {
 
     let filter = controller.filters.dates;
     let margin = chart.config.margin;
-    let dates = chart.config.dateLabels || chart.dataView.dates;
+    let dates = chart.config.dates || chart.dataView.dates;
     let selection = chart.svg
       .append("g")
       .selectAll("rect")
