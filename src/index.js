@@ -6,9 +6,10 @@ export * from "./js/data/parse.datasets.js";
 export * as DateOrdinator from "./js/data/date.ordinator";
 
 /* charts */
-export * from "./js/bar/bar.chart";
-export * from "./js/map/map.chart";
-export * from "./js/plot/plot.chart";
+export { BarChart } from "./js/bar/bar.chart.js";
+export { MapChart } from "./js/map/map.chart.js";
+export { PlotChart } from "./js/plot/plot.chart.js";
+export { LabelsChart } from "./js/labels/labels.chart.js";
 
 /* common */
 export * from "./js/common/url.parameters";

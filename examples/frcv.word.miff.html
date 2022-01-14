@@ -32,6 +32,9 @@
           <div id="bar-chart">
             <!-- Bar Chart Here -->
           </div>
+          <div id="labels-chart">
+            <!-- Labels Chart Here -->
+          </div>
           <div id="plot-chart">
             <!-- Plot Chart Here -->
           </div>
@@ -55,7 +58,8 @@
       lotivis.debug(true);
 
       let barChart = new lotivis.BarChart("bar-chart", {
-        dateLabels: Array.from(Array(26).keys()).map((number) => number + 1995),
+        labels: true,
+        dates: Array.from(Array(26).keys()).map((index) => index + 1995),
       });
 
       let plotChart = new lotivis.PlotChart("plot-chart");
@@ -67,6 +71,8 @@
         featureNameAccessor: (f) => f.properties.nom,
       });
 
+      let labelsChart = new lotivis.LabelsChart("labels-chart");
+
       lotivis.d3.json("assets/departements.geojson").then((json) => {
         mapChart.setGeoJSON(json);
       });
@@ -76,6 +82,7 @@
         barChart.setController(dataController);
         plotChart.setController(dataController);
         mapChart.setController(dataController);
+        labelsChart.setController(dataController);
       });
     </script>
   </body>

@@ -29,15 +29,13 @@ export class BarBarsRenderer extends Renderer {
         .attr("x", (item) => {
           let date = item.data[0];
           let stackName = stackedDataset.stack;
-
-          let xPos = chart.xChartScale(date);
-          let xWidth = chart.xStack(stackName);
-          // console.log("stack", stackName, date, item.data, xPos, xWidth);
           return chart.xChartScale(date) + chart.xStack(stackName);
         })
         .attr("y", (d) => chart.yChart(d[1]))
         .attr("width", chart.xStack.bandwidth())
-        .attr("height", (d) => chart.yChart(d[0]) - chart.yChart(d[1]));
+        .attr("height", (d) =>
+          !d[1] ? 0 : chart.yChart(d[0]) - chart.yChart(d[1])
+        );
     }
   }
 }

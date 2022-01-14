@@ -4,8 +4,6 @@ export class BarLabelsRenderer extends Renderer {
   render(chart, controller) {
     if (!chart.config.labels) return;
 
-    console.log("chart.dataView", chart.dataView);
-
     function translate(x, y) {
       return `translate(${x},${y})rotate(-60)`;
     }
@@ -32,7 +30,7 @@ export class BarLabelsRenderer extends Renderer {
       .attr("transform", (d) => {
         let stack = d[0];
         let value = d[1];
-        return translate(xStack(stack) + width, yChart(value) - 5);
+        return translate((xStack(stack) || 0) + width, yChart(value) - 5);
       })
       .text((d) => (d[1] === 0 ? "" : numberFormat.format(d[1])))
       .raise();

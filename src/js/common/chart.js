@@ -87,10 +87,5 @@ export class Chart extends Component {
   setController(dc) {
     this.controller = dc;
     this.controller.addListener(this);
-    // this.redraw();
-  }
-
-  fromConfig(name, fallback) {
-    return this.config[name] || LOTIVIS_CONFIG[name] || fallback;
   }
 }

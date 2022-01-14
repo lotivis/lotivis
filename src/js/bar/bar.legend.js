@@ -4,8 +4,9 @@ import { Renderer } from "../common/renderer";
 
 export class BarLegendRenderer extends Renderer {
   render(chart, controller, dataView) {
+    return;
     let config = chart.config || {};
-    let numberFormat = chart.fromConfig("numberFormat", DEFAULT_NUMBER_FORMAT);
+    let numberFormat = chart.config.numberFormat || DEFAULT_NUMBER_FORMAT;
     let datasets = dataView.datasets;
     let labels = controller.labels();
     let circleRadius = 6;

@@ -20894,11 +20894,6 @@
     setController(dc) {
       this.controller = dc;
       this.controller.addListener(this);
-      // this.redraw();
-    }
-
-    fromConfig(name, fallback) {
-      return this.config[name] || LOTIVIS_CONFIG[name] || fallback;
     }
   }
 
@@ -20949,8 +20944,6 @@
     render(chart, controller) {
       if (!chart.config.labels) return;
 
-      console.log("chart.dataView", chart.dataView);
-
       function translate(x, y) {
         return `translate(${x},${y})rotate(-60)`;
       }
@@ -20977,7 +20970,7 @@
         .attr("transform", (d) => {
           let stack = d[0];
           let value = d[1];
-          return translate(xStack(stack) + width, yChart(value) - 5);
+          return translate((xStack(stack) || 0) + width, yChart(value) - 5);
         })
         .text((d) => (d[1] === 0 ? "" : numberFormat.format(d[1])))
         .raise();
@@ -20986,67 +20979,7 @@
 
   class BarLegendRenderer extends Renderer {
     render(chart, controller, dataView) {
-      let config = chart.config || {};
-      let numberFormat = chart.fromConfig("numberFormat", DEFAULT_NUMBER_FORMAT);
-      let datasets = dataView.datasets;
-      let labels = controller.labels();
-      let circleRadius = 6;
-      let labelMargin = 50;
-      let colors = controller.colorGenerator;
-
-      function filter(label) {
-        return (
-          controller.filters.labels.length === 0 ||
-          controller.filters.labels.contains(label)
-        );
-      }
-
-      function fillColor(d) {
-        return filter(d.label) ? colors.label(d.label) : "white";
-      }
-
-      let xLegend = band()
-        .domain(labels)
-        .rangeRound([config.margin.left, config.width - config.margin.right]);
-
-      let legends = chart.graph
-        .selectAll(".legend")
-        .append("g")
-        .attr("class", "ltv-bar-chart-legend")
-        .data(datasets)
-        .enter();
-
-      legends
-        .append("text")
-        .attr("class", "ltv-bar-chart-legend-label")
-        .attr("x", (d) => xLegend(d.label) - 30)
-        .attr("y", chart.graphHeight + labelMargin)
-        .style("cursor", "pointer")
-        .style("fill", (d) => colors.label(d.label))
-        .text((d) => {
-          let value = controller.sumOfLabel(d.label);
-          let formatted = numberFormat.format(value);
-          return `${d.label} (${formatted})`;
-        })
-        .on("click", (e, d) => chart.fire("click-legend", e, d))
-        .raise();
-
-      let circles = legends
-        .append("circle")
-        .attr("class", "lotivis-bar-chart-legend-circle")
-        .attr("r", circleRadius)
-        .attr("cx", (d) => xLegend(d.label) - 40)
-        .attr("cy", chart.graphHeight + labelMargin - circleRadius + 2)
-        .style("stroke", (d) => colors.label(d.label))
-        .style("fill", (d) => fillColor(d))
-        .raise();
-
-      function click(e, d) {
-        controller.filters.labels.toggle(d.label);
-        circles.style("fill", (d) => fillColor(d));
-      }
-
-      chart.addListener("click-legend", click);
+      return;
     }
   }
 
@@ -21078,15 +21011,13 @@
           .attr("x", (item) => {
             let date = item.data[0];
             let stackName = stackedDataset.stack;
-
-            chart.xChartScale(date);
-            chart.xStack(stackName);
-            // console.log("stack", stackName, date, item.data, xPos, xWidth);
             return chart.xChartScale(date) + chart.xStack(stackName);
           })
           .attr("y", (d) => chart.yChart(d[1]))
           .attr("width", chart.xStack.bandwidth())
-          .attr("height", (d) => chart.yChart(d[0]) - chart.yChart(d[1]));
+          .attr("height", (d) =>
+            !d[1] ? 0 : chart.yChart(d[0]) - chart.yChart(d[1])
+          );
       }
     }
   }
