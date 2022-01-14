@@ -91,7 +91,7 @@ export class MapChart extends Chart {
       this.presentedGeoJSON.features[i].lotivisId = id;
     }
 
-    this.zoomTo(this.geoJSON);
+    this.zoomTo(this.presentedGeoJSON);
     this.update(this.controller, "geojson");
   }
 }

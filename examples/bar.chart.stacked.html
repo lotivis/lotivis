@@ -22,9 +22,10 @@
           <a href="../index.html"> Back </a>
         </div>
         <div class="col-8 text-center">
-          <h1>Date Data Stacked</h1>
+          <h1>Bar Chart Stacked</h1>
         </div>
         <div class="col-8">
+          <h5>BarChart</h5>
           <div id="bar-chart">
             <!-- Bar Chart Code Here -->
           </div>
@@ -244,7 +245,10 @@
       ];
 
       let dataController = lotivis.parseDatasets(datasets);
-      let chart = new lotivis.BarChart("bar-chart", { dataController });
+      let chart = new lotivis.BarChart("bar-chart", {
+        dataController,
+        labels: true,
+      });
     </script>
   </body>
 </html>

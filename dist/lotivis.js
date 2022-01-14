@@ -18970,7 +18970,7 @@
     return series;
   }
 
-  function stack$1() {
+  function stack() {
     var keys = constant$1([]),
         order = none,
         offset = none$1,
@@ -20103,7 +20103,7 @@
     curveStep: step,
     curveStepAfter: stepAfter,
     curveStepBefore: stepBefore,
-    stack: stack$1,
+    stack: stack,
     stackOffsetExpand: expand,
     stackOffsetDiverging: diverging,
     stackOffsetNone: none$1,
@@ -20273,7 +20273,7 @@
       let stacks = Array.from(stacksToLabels.keys());
 
       function stackLabels(stack) {
-        return Array.from(stacksToLabels.get(stack).keys() ?? []);
+        return Array.from(stacksToLabels.get(stack).keys() || []);
       }
 
       function stackColor(stack) {
@@ -20303,11 +20303,11 @@
       }
 
       this.stack = function (stack) {
-        return stackToColor.get(stack) ?? tintColor;
+        return stackToColor.get(stack) || tintColor;
       };
 
       this.label = function (label) {
-        return labelToColor.get(label) ?? tintColor;
+        return labelToColor.get(label) || tintColor;
       };
 
       this.stackColors = function (stack) {
@@ -20480,11 +20480,11 @@
     };
 
     data.earliestValidDate = function () {
-      return least(data.filterValid(), (a, b) => a.date - b.date)?.date;
+      return least(data.filterValid(), (a, b) => a.date - b.date).date;
     };
 
     data.latestValidDate = function () {
-      return least(data.filterValid(), (a, b) => b.date - a.date)?.date;
+      return least(data.filterValid(), (a, b) => b.date - a.date).date;
     };
 
     data.max = function () {
@@ -20953,45 +20953,40 @@
 
   class BarLabelsRenderer extends Renderer {
     render(chart, controller) {
-      let stackedDatasets = chart.dataView.stacked;
+      if (!chart.config.labels) return;
 
-      for (let i = 0; i < stackedDatasets.length; i++) {
-        let stackedDataset = stackedDatasets[i];
-        let xChartRef = chart.xChartScale;
-        let yChartRef = chart.yChart;
-        let xStackRef = chart.xStack;
-        let numberFormat = chart.config.numberFormat;
-        let labelColor = chart.config.labelColor;
-        let numberOfSeries = stackedDataset.series.length;
-        let seriesIndex = 0;
-        let bandwidth = xStackRef.bandwidth() / 2;
+      console.log("chart.dataView", chart.dataView);
 
-        chart.svg
-          .append("g")
-          .selectAll("g")
-          .data(stackedDataset)
-          .enter()
-          .append("g")
-          .attr("fill", labelColor)
-          .selectAll(".text")
-          .data((dataset) => dataset.series)
-          .enter()
-          .append("text")
-          .attr("class", "ltv-bar-chart-label")
-          .attr("transform", function (item) {
-            console.log("item", item);
-            let x =
-              xChartRef(item.data.date) + xStackRef(stack.label) + bandwidth;
-            let y = yChartRef(item[1]) - 5;
-            return `translate(${x},${y})rotate(-60)`;
-          })
-          .text(function (item, index) {
-            if (index === 0) seriesIndex += 1;
-            if (seriesIndex !== numberOfSeries) return;
-            let value = item[1];
-            return value === 0 ? "" : numberFormat.format(value);
-          });
+      function translate(x, y) {
+        return `translate(${x},${y})rotate(-60)`;
       }
+
+      let dates = chart.dataView.dates;
+      let byDateStack = chart.dataView.byDateStack;
+
+      let xChartScale = chart.xChartScale;
+      let yChart = chart.yChart;
+      let xStack = chart.xStack;
+      let numberFormat = chart.config.numberFormat;
+      let width = chart.xStack.bandwidth() / 2;
+
+      let labels = chart.svg.append("g").selectAll("g").data(dates).enter();
+
+      labels
+        .append("g")
+        .attr("transform", (date) => `translate(${xChartScale(date)},0)`)
+        .selectAll(".text")
+        .data((date) => byDateStack.get(date))
+        .enter()
+        .append("text")
+        .attr("class", "ltv-bar-chart-label")
+        .attr("transform", (d) => {
+          let stack = d[0];
+          let value = d[1];
+          return translate(xStack(stack) + width, yChart(value) - 5);
+        })
+        .text((d) => (d[1] === 0 ? "" : numberFormat.format(d[1])))
+        .raise();
     }
   }
 
@@ -21407,15 +21402,15 @@
 
     // console.log("byDate", byDate);
 
-    return stacks.map(function (stack) {
-      let stackData = data.filter((d) => d.stack === stack);
+    return stacks.map(function (stack$1) {
+      let stackData = data.filter((d) => d.stack === stack$1);
       let stackLabels = Array.from(group(stackData, (d) => d.label).keys());
-      let stackBuilder = stack$1()
+      let stackBuilder = stack()
         .value((d, key) => d[1].get(key))
         .keys(stackLabels);
       let series = stackBuilder(byDate);
 
-      let model = { series, stack, label: stack };
+      let model = { series, stack: stack$1, label: stack$1 };
 
       return model;
     });
@@ -21439,6 +21434,13 @@
       (d) => d.label
     );
 
+    let byDateStack = rollup(
+      data,
+      (v) => sum$2(v, (d) => d.value),
+      (d) => d.date,
+      (d) => d.stack || d.label
+    );
+
     // console.log("byDateLabel", byDateLabel);
 
     return {
@@ -21449,6 +21451,7 @@
       stacks,
       enabledStacks,
       byDateLabel,
+      byDateStack,
       labels,
       max,
     };
@@ -23506,7 +23509,7 @@
         this.presentedGeoJSON.features[i].lotivisId = id;
       }
 
-      this.zoomTo(this.geoJSON);
+      this.zoomTo(this.presentedGeoJSON);
       this.update(this.controller, "geojson");
     }
   }

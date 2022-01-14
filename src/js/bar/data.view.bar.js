@@ -33,11 +33,9 @@ export function dataViewBarStacked(data) {
   let stacks = data.stacks();
   let datasetStacks = createBarStackModel(this, data);
   let max = d3.max(datasets, (d) => d3.max(d.series, (d) => d[1]));
-  let max2 = d3.max(datasets, function (stack) {
-    return d3.max(stack.series, function (series) {
-      return d3.max(series.map((item) => item["1"]));
-    });
-  });
+  let max2 = d3.max(datasets, (stack) =>
+    d3.max(stack.series, (series) => d3.max(series.map((item) => item["1"])))
+  );
 
   console.log("max", max);
   console.log("max2", max2);
@@ -69,6 +67,13 @@ export function dataViewBar(data) {
     (d) => d.label
   );
 
+  let byDateStack = d3.rollup(
+    data,
+    (v) => d3.sum(v, (d) => d.value),
+    (d) => d.date,
+    (d) => d.stack || d.label
+  );
+
   // console.log("byDateLabel", byDateLabel);
 
   return {
@@ -79,6 +84,7 @@ export function dataViewBar(data) {
     stacks,
     enabledStacks,
     byDateLabel,
+    byDateStack,
     labels,
     max,
   };
