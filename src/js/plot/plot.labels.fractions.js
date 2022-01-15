@@ -8,16 +8,20 @@ export class PlotLabelsFractionsRenderer extends Renderer {
     if (!chart.config.labels) return;
 
     let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
-    let xBandwidth = chart.yChart.bandwidth();
+    let yBandwidth = chart.yChart.bandwidth() / 2;
 
     chart.labels = chart.barsData
       .append("g")
-      .attr("transform", `translate(0,${xBandwidth / 2 + 4})`)
+      .attr("transform", (d) => `translate(0,${chart.yChartPadding(d[0])})`)
+      .attr("id", (d) => "rect-" + hash_str(d[0]))
+      .selectAll(".text")
+      .data((d) => d[1]) // map to dates data
+      .enter()
+      .filter((d) => d[1] > 0)
       .append("text")
       .attr("class", "ltv-plot-label")
-      .attr("id", (d) => "rect-" + hash_str(d.label))
-      .attr("x", (d) => chart.xChart(d.date) + 4)
-      .attr("y", (d) => chart.yChart(d.label))
-      .text((d) => (d.sum === 0 ? null : numberFormat.format(d.value)));
+      .attr("y", (d) => yBandwidth)
+      .attr("x", (d) => chart.xChart(d[0]) + 4)
+      .text((d) => (d.sum === 0 ? null : numberFormat.format(d[1])));
   }
 }

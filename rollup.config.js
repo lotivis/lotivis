@@ -39,6 +39,7 @@ module.exports = [
       resolve({
         jsnext: true,
       }),
+      execute("npm run test"),
     ],
     output: {
       sourcemap: true,

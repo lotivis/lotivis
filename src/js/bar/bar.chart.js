@@ -37,7 +37,7 @@ export class BarChart extends Chart {
   }
 
   createDataView() {
-    return dataViewBar(this.controller.data);
+    return dataViewBar(this.controller);
   }
 
   prepare() {

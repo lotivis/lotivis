@@ -2,12 +2,25 @@ const assert = require("assert");
 const samples = require("./sample.data");
 const lotivis = require("../dist/lotivis.test");
 
-// describe("samples.parse csv", function () {
-//   it("parses a csv file", function () {
-//     let csvContent = samples.read("sample.csv.dataset.1.csv");
-//     let parsedDatasets = lotivis.parseCSV(csvContent);
-//     assert.strictEqual(parsedDatasets.length, 1);
-//     assert.strictEqual(parsedDatasets[0].label, "dataset_1");
-//     assert.strictEqual(parsedDatasets[0].data.length, 10);
-//   });
-// });
+describe("parse csv", function () {
+  let content = samples.read("sample.csv");
+  let dataController = lotivis.csvParse(content);
+
+  it("parses the data", function () {
+    assert.ok(dataController);
+  });
+
+  it("data has correct length", function () {
+    assert.strictEqual(dataController.data.length, 9);
+  });
+});
+
+describe("render csv", function () {
+  let content = samples.read("sample.csv");
+  let dataController = lotivis.csvParse(content);
+  let rendered = lotivis.csvRender(dataController);
+
+  it("renders correct csv", function () {
+    assert.equal(content, rendered);
+  });
+});

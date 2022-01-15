@@ -1,3 +1,4 @@
+import * as d3 from "d3";
 import { Chart } from "../common/chart.js";
 import {
   PLOT_CHART_CONFIG,
@@ -14,8 +15,7 @@ import { PlotBarsFractionsRenderer } from "./plot.bars.fraction";
 import { PlotBarsGradientRenderer } from "./plot.bars.gradient";
 import { PlotLabelsFractionsRenderer } from "./plot.labels.fractions";
 import { PlotChartSelectionRenderer } from "./plot.selection";
-import * as d3 from "d3";
-import { dataViewPlot } from "./data.view.plot.js";
+import { dataViewPlot } from "./plot.data.view.js";
 
 export class PlotChart extends Chart {
   static Type = PLOT_CHART_TYPE;
@@ -46,7 +46,7 @@ export class PlotChart extends Chart {
   }
 
   createDataView() {
-    return dataViewPlot(this.controller.data);
+    return dataViewPlot(this.controller);
   }
 
   prepare() {
@@ -58,7 +58,7 @@ export class PlotChart extends Chart {
     this.sortDatasets();
 
     let margin = this.config.margin;
-    let barsCount = this.dataView.labelsCount || 0;
+    let barsCount = this.dataView.labels.length || 0;
 
     this.graphWidth = this.config.width - margin.left - margin.right;
     this.graphHeight = barsCount * this.config.lineHeight;

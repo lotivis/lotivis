@@ -32,6 +32,7 @@ function isString(v) {
 
 export function set_data_preview(v) {
   if (!v || !LOTIVIS_CONFIG.debug) return;
+  if (typeof document === "undefined") return;
   let s = isString(v) ? v : JSON.stringify(v, null, 2);
   let e = document.getElementById("ltv-data-preview");
   if (e) e.textContent = s;

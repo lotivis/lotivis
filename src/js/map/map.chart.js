@@ -46,7 +46,7 @@ export class MapChart extends Chart {
       .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`);
 
     if (this.geoJSON) return;
-    let geoJSON = createGeoJSON(this.controller.data);
+    let geoJSON = createGeoJSON(this.controller.locations());
     this.setGeoJSON(geoJSON);
   }
 

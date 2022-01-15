@@ -1,12 +1,6 @@
-import { Data } from "../data/flat.data";
 import { Feature, FeatureCollection, Geometry, GeoJSON } from "./geojson";
 
-export function createGeoJSON(data) {
-  // console.log("data", data);
-  // console.log("typeof data", typeof data);
-  // console.log("data instanceof Data", data instanceof Data);
-  // if (!(data instanceof Data)) throw new Error("no data object given");
-  let locations = data.locations();
+export function createGeoJSON(locations) {
   let columns = 5;
   let rows = Math.ceil(locations.length / columns);
   let span = 0.1;

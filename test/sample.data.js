@@ -1,7 +1,7 @@
 const fs = require("fs");
 
 function read(name) {
-  return fs.readFileSync("./test/samples/" + name, { encoding: "utf8" });
+  return fs.readFileSync("./test/samples/" + name, { encoding: "utf8" }).trim();
 }
 
 function readJSON(name) {

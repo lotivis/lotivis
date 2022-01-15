@@ -1,9 +1,8 @@
 import * as d3 from "d3";
-import { Data } from "../data/flat.data";
-import { flatDatasets } from "../data/parse.datasets";
 
-export function dataViewPlot(data) {
-  let dates = data.dates();
+export function dataViewPlot(dataController) {
+  let dates = dataController.dates();
+  let data = dataController.data;
 
   let byLabelDate = d3.rollups(
     data,
@@ -15,34 +14,26 @@ export function dataViewPlot(data) {
   let datasets = byLabelDate.map((d) => {
     let label = d[0];
     let data = d[1]
+      .filter((d) => d[1] > 0)
       .map((d) => {
         return { date: d[0], value: d[1] };
-      })
-      .filter((d) => d.value > 0);
+      });
 
     let sum = d3.sum(data, (d) => d.value);
     let firstDate = data[0]?.date;
     let lastDate = data[data.length - 1]?.date;
     let duration = dates.indexOf(lastDate) - dates.indexOf(firstDate);
 
-    return {
-      label,
-      data,
-      sum,
-      firstDate,
-      lastDate,
-      duration,
-    };
+    return { label, data, sum, firstDate, lastDate, duration };
   });
 
   return {
     datasets,
-    data: Data(flatDatasets(datasets)),
     dates,
+    byLabelDate,
     firstDate: dates[0],
     lastDate: dates[dates.length - 1],
-    labels: data.labels(),
-    labelsCount: datasets.length,
+    labels: dataController.labels(),
     max: d3.max(datasets, (d) => d3.max(d.data, (i) => i.value)),
   };
 }

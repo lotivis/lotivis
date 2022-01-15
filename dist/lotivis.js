@@ -8061,7 +8061,7 @@
 
   var csv$2 = dsvFormat(",");
 
-  var csvParse = csv$2.parse;
+  var csvParse$1 = csv$2.parse;
   var csvParseRows = csv$2.parseRows;
   var csvFormat = csv$2.format;
   var csvFormatBody = csv$2.formatBody;
@@ -8144,7 +8144,7 @@
     });
   }
 
-  var csv$1 = dsvParse(csvParse);
+  var csv$1 = dsvParse(csvParse$1);
   var tsv = dsvParse(tsvParse);
 
   function image(input, init) {
@@ -19747,7 +19747,7 @@
     dragDisable: dragDisable,
     dragEnable: yesdrag,
     dsvFormat: dsvFormat,
-    csvParse: csvParse,
+    csvParse: csvParse$1,
     csvParseRows: csvParseRows,
     csvFormat: csvFormat,
     csvFormatBody: csvFormatBody,
@@ -20431,77 +20431,6 @@
     return filtered;
   }
 
-  function Data(flat) {
-    let data = Array.from(flat);
-    data = data.sort((a, b) => a.date - b.date);
-
-    data.filterValid = function () {
-      return data.filter((d) => d.value);
-    };
-
-    data.byLabel = function () {
-      return group(data, (d) => d.label);
-    };
-
-    data.byStack = function () {
-      return group(data, (d) => d.stack);
-    };
-
-    data.byLocation = function () {
-      return group(data, (d) => d.location);
-    };
-
-    data.byDate = function () {
-      return group(data, (d) => d.date);
-    };
-
-    data.labels = function () {
-      return Array.from(data.byLabel().keys());
-    };
-
-    data.stacks = function () {
-      return Array.from(data.byStack().keys());
-    };
-
-    data.locations = function () {
-      return Array.from(data.byLocation().keys());
-    };
-
-    data.dates = function () {
-      return Array.from(data.byDate().keys());
-    };
-
-    data.earliestDate = function () {
-      return least(data, (a, b) => a.date - b.date).date;
-    };
-
-    data.latestDate = function () {
-      return least(data, (a, b) => b.date - a.date).date;
-    };
-
-    data.earliestValidDate = function () {
-      return least(data.filterValid(), (a, b) => a.date - b.date).date;
-    };
-
-    data.latestValidDate = function () {
-      return least(data.filterValid(), (a, b) => b.date - a.date).date;
-    };
-
-    data.max = function () {
-      return max$3(data, (i) => i.value);
-    };
-
-    data.min = function () {
-      return min$2(data, (i) => i.value);
-    };
-
-    data.sum = function () {
-      return data.reduce((p, c) => p.value + c.value);
-    };
-
-    return data;
-  }
-
   const DEFAULT_NUMBER_FORMAT = new Intl.NumberFormat("en-EN", {
     maximumFractionDigits: 3,
   });
@@ -20554,6 +20483,7 @@
 
   function set_data_preview(v) {
     if (!v || !LOTIVIS_CONFIG$1.debug) return;
+    if (typeof document === "undefined") return;
     let s = isString(v) ? v : JSON.stringify(v, null, 2);
     let e = document.getElementById("ltv-data-preview");
     if (e) e.textContent = s;
@@ -20566,10 +20496,8 @@
       }
 
       this.config = config || {};
-      this.data = Data(flat);
+      this.data = flat;
       this.original = this.config.original || flat;
-
-      if (this.original) set_data_preview(this.original);
 
       this.dateAccess = this.config.dateAccess || DEFAULT_DATE_ORDINATOR;
       this.colorGenerator = new ColorGenerator(this.data);
@@ -20691,18 +20619,24 @@
       };
 
       console.log("DataController", this);
+      if (this.original) set_data_preview(this.original);
 
       return this;
     }
   }
 
-  function parseCSV(text) {
-    let parsed = csvParse(text, autoType);
-    let data = Data(parsed);
-    return data;
+  const DEFAULT_COLUMNS = ["label", "location", "date", "value", "stack"];
+
+  function csvParse(text) {
+    return new DataController(csvParse$1(text, autoType));
   }
 
-  function csv(path) {
+  async function csv(path) {
+    return fetch(path).then((csv) => csvParse(csv));
+  }
+
+  function csvRender(data, columns = DEFAULT_COLUMNS) {
+    return csvFormat(data.data ? data.data : data, columns);
   }
 
   class DataUnqualifiedError extends Error {
@@ -20992,38 +20926,73 @@
   class BarBarsRenderer extends Renderer {
     render(chart, controller) {
       let stackedDatasets = chart.dataView.stacked;
-      let config = chart.config || {};
-      let isCombineStacks = config.combineStacks || false;
-      let colorGenerator = controller.colorGenerator;
+      chart.config || {};
+      let radius = chart.config.barRadius || LOTIVIS_CONFIG$1.barRadius;
+      let isCombineStacks = chart.config.type === "combine" || false;
+      let colors = controller.colorGenerator;
+      let barWidth = chart.xStack.bandwidth();
+      let height = chart.yChart(0);
 
-      for (let i = 0; i < stackedDatasets.length; i++) {
-        let stackedDataset = stackedDatasets[i];
-        let colors = colorGenerator.stackColors(stackedDataset.stack);
-        let radius = LOTIVIS_CONFIG$1.barRadius;
+      function combined() {
         chart.svg
           .append("g")
           .selectAll("g")
-          .data(stackedDataset.series)
+          .data(chart.dataView.byDateStack)
           .enter()
           .append("g")
-          .attr("fill", (d, i) => (isCombineStacks ? colors[0] : colors[i]))
+          .attr("transform", (d) => `translate(${chart.xChartScale(d[0])},0)`)
           .selectAll("rect")
-          .data((serie) => serie)
+          .data((d) => d[1]) // map to by stack
           .enter()
           .append("rect")
           .attr("class", "ltv-bar-chart-bar")
-          .attr("rx", radius)
-          .attr("ry", radius)
-          .attr("x", (item) => {
-            let date = item.data[0];
-            let stackName = stackedDataset.stack;
-            return chart.xChartScale(date) + chart.xStack(stackName);
-          })
+          .attr("fill", (d) => colors.stack(d[0]))
+          .attr("x", (d) => chart.xStack(d[0]))
           .attr("y", (d) => chart.yChart(d[1]))
-          .attr("width", chart.xStack.bandwidth())
-          .attr("height", (d) =>
-            !d[1] ? 0 : chart.yChart(d[0]) - chart.yChart(d[1])
+          .attr("width", barWidth)
+          .attr("height", (d) => height - chart.yChart(d[1]))
+          .attr("rx", radius)
+          .attr("ry", radius);
+      }
+
+      function stacked() {
+        for (let i = 0; i < stackedDatasets.length; i++) {
+          let stackedDataset = stackedDatasets[i];
+          let colors = controller.colorGenerator.stackColors(
+            stackedDataset.stack
           );
+
+          chart.svg
+            .append("g")
+            .selectAll("g")
+            .data(stackedDataset.series)
+            .enter()
+            .append("g")
+            .attr("fill", (d, i) => (isCombineStacks ? colors[0] : colors[i]))
+            .selectAll("rect")
+            .data((serie) => serie)
+            .enter()
+            .append("rect")
+            .attr("class", "ltv-bar-chart-bar")
+            .attr("rx", radius)
+            .attr("ry", radius)
+            .attr("x", (item) => {
+              let date = item.data[0];
+              let stackName = stackedDataset.stack;
+              return chart.xChartScale(date) + chart.xStack(stackName);
+            })
+            .attr("y", (d) => chart.yChart(d[1]))
+            .attr("width", chart.xStack.bandwidth())
+            .attr("height", (d) =>
+              !d[1] ? 0 : chart.yChart(d[0]) - chart.yChart(d[1])
+            );
+        }
+      }
+
+      if (chart.config.type === BAR_CHART_TYPE.combine) {
+        combined();
+      } else {
+        stacked();
       }
     }
   }
@@ -21247,14 +21216,12 @@
         .ticks(20);
 
       let config = chart.config;
+      let marginBottom = config.height - config.margin.bottom;
 
       chart.svg
         .append("g")
         .attr("class", "ltv-bar-chart-grid ltv-bar-chart-grid-x")
-        .attr(
-          "transform",
-          "translate(0," + (config.height - config.margin.bottom) + ")"
-        )
+        .attr("transform", "translate(0," + marginBottom + ")")
         .call(xAxisGrid);
 
       chart.svg
@@ -21322,10 +21289,10 @@
     return datasets;
   }
 
-  function createBarStackModel(data) {
-    let stacks = data.stacks();
+  function createBarStackModel(dataController) {
+    let stacks = dataController.stacks();
     let byDate = rollup(
-      data,
+      dataController.data,
       (v) => sum$2(v, (d) => d.value),
       (d) => d.date,
       (d) => d.label
@@ -21334,7 +21301,7 @@
     // console.log("byDate", byDate);
 
     return stacks.map(function (stack$1) {
-      let stackData = data.filter((d) => d.stack === stack$1);
+      let stackData = dataController.data.filter((d) => d.stack === stack$1);
       let stackLabels = Array.from(group(stackData, (d) => d.label).keys());
       let stackBuilder = stack()
         .value((d, key) => d[1].get(key))
@@ -21347,26 +21314,48 @@
     });
   }
 
-  function dataViewBar(data) {
-    let dates = data.dates();
-    let stacks = data.stacks();
-    let labels = data.labels();
-    let enabledStacks = data.stacks();
-    let datasets = toDataset(data);
-    let stacked = createBarStackModel(data);
+  // export function dataViewBarStacked(data) {
+  //   let datasets = createDatasets(combine(data));
+  //   let dates = data.dates();
+  //   let stacks = data.stacks();
+  //   let datasetStacks = createBarStackModel(this, data);
+  //   let max = d3.max(datasets, (d) => d3.max(d.series, (d) => d[1]));
+  //   let max2 = d3.max(datasets, (stack) =>
+  //     d3.max(stack.series, (series) => d3.max(series.map((item) => item["1"])))
+  //   );
+
+  //   console.log("max", max);
+  //   console.log("max2", max2);
+
+  //   return {
+  //     datasets,
+  //     dates,
+  //     stacks,
+  //     datasetStacks,
+  //     max,
+  //   };
+  // }
+
+  function dataViewBar(dataController) {
+    let dates = dataController.dates();
+    let stacks = dataController.stacks();
+    let labels = dataController.labels();
+    let enabledStacks = dataController.stacks();
+    let datasets = toDataset(dataController);
+    let stacked = createBarStackModel(dataController);
     let max = max$3(stacked, (d) =>
       max$3(d.series, (s) => max$3(s.map((i) => i["1"])))
     );
 
     let byDateLabel = rollup(
-      data,
+      dataController.data,
       (v) => sum$2(v, (d) => d.value),
       (d) => d.date,
       (d) => d.label
     );
 
     let byDateStack = rollup(
-      data,
+      dataController.data,
       (v) => sum$2(v, (d) => d.value),
       (d) => d.date,
       (d) => d.stack || d.label
@@ -21377,7 +21366,7 @@
     return {
       datasets,
       stacked,
-      data,
+      data: dataController.data,
       dates,
       stacks,
       enabledStacks,
@@ -21413,7 +21402,7 @@
     }
 
     createDataView() {
-      return dataViewBar(this.controller.data);
+      return dataViewBar(this.controller);
     }
 
     prepare() {
@@ -21655,12 +21644,7 @@
     return geoJSON;
   }
 
-  function createGeoJSON(data) {
-    // console.log("data", data);
-    // console.log("typeof data", typeof data);
-    // console.log("data instanceof Data", data instanceof Data);
-    // if (!(data instanceof Data)) throw new Error("no data object given");
-    let locations = data.locations();
+  function createGeoJSON(locations) {
     let columns = 5;
     let rows = Math.ceil(locations.length / columns);
     let span = 0.1;
@@ -23395,7 +23379,7 @@
         .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`);
 
       if (this.geoJSON) return;
-      let geoJSON = createGeoJSON(this.controller.data);
+      let geoJSON = createGeoJSON(this.controller.locations());
       this.setGeoJSON(geoJSON);
     }
 
@@ -23729,22 +23713,26 @@
       if (chart.config.type !== PLOT_CHART_TYPE.fraction) return;
 
       let radius = LOTIVIS_CONFIG$1.barRadius;
-      let max = chart.dataView.data.max();
-      let data = chart.dataView.data.filter((d) => d.value > 0);
+      let max = chart.dataView.max;
+      let data = chart.dataView.byLabelDate;
       let colors = MapColors(max);
 
       chart.barsData = chart.svg.append("g").selectAll("g").data(data).enter();
 
       chart.bars = chart.barsData
+        .append("g")
+        .attr("transform", (d) => `translate(0,${chart.yChartPadding(d[0])})`)
+        .attr("id", (d) => "ltv-plot-rect-" + hash_str(d[0]))
+        .selectAll(".rect")
+        .data((d) => d[1]) // map to dates data
+        .enter()
+        .filter((d) => d[1] > 0)
         .append("rect")
-        .attr("id", (d) => `ltv-plot-bar-${hash_str(d.label)}`)
-        .attr("id", (d) => "ltv-plot-rect-" + hash_str(d.label))
         .attr("class", "ltv-plot-bar")
-        .attr(`fill`, (d) => colors(d.value))
+        .attr(`fill`, (d) => colors(d[1]))
         .attr("rx", radius)
         .attr("ry", radius)
-        .attr("x", (d) => chart.xChart(d.date))
-        .attr("y", (d) => chart.yChartPadding(d.label))
+        .attr("x", (d) => chart.xChart(d[0]))
         .attr("width", chart.xChart.bandwidth())
         .attr("height", chart.yChartPadding.bandwidth())
         .on("mouseenter", (e, d) => chart.fire("mouseenter", e, d))
@@ -23855,17 +23843,21 @@
       if (!chart.config.labels) return;
 
       let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
-      let xBandwidth = chart.yChart.bandwidth();
+      let yBandwidth = chart.yChart.bandwidth() / 2;
 
       chart.labels = chart.barsData
         .append("g")
-        .attr("transform", `translate(0,${xBandwidth / 2 + 4})`)
+        .attr("transform", (d) => `translate(0,${chart.yChartPadding(d[0])})`)
+        .attr("id", (d) => "rect-" + hash_str(d[0]))
+        .selectAll(".text")
+        .data((d) => d[1]) // map to dates data
+        .enter()
+        .filter((d) => d[1] > 0)
         .append("text")
         .attr("class", "ltv-plot-label")
-        .attr("id", (d) => "rect-" + hash_str(d.label))
-        .attr("x", (d) => chart.xChart(d.date) + 4)
-        .attr("y", (d) => chart.yChart(d.label))
-        .text((d) => (d.sum === 0 ? null : numberFormat.format(d.value)));
+        .attr("y", (d) => yBandwidth)
+        .attr("x", (d) => chart.xChart(d[0]) + 4)
+        .text((d) => (d.sum === 0 ? null : numberFormat.format(d[1])));
     }
   }
 
@@ -23911,8 +23903,9 @@
     }
   }
 
-  function dataViewPlot(data) {
-    let dates = data.dates();
+  function dataViewPlot(dataController) {
+    let dates = dataController.dates();
+    let data = dataController.data;
 
     let byLabelDate = rollups(
       data,
@@ -23924,34 +23917,26 @@
     let datasets = byLabelDate.map((d) => {
       let label = d[0];
       let data = d[1]
+        .filter((d) => d[1] > 0)
         .map((d) => {
           return { date: d[0], value: d[1] };
-        })
-        .filter((d) => d.value > 0);
+        });
 
       let sum = sum$2(data, (d) => d.value);
       let firstDate = data[0]?.date;
       let lastDate = data[data.length - 1]?.date;
       let duration = dates.indexOf(lastDate) - dates.indexOf(firstDate);
 
-      return {
-        label,
-        data,
-        sum,
-        firstDate,
-        lastDate,
-        duration,
-      };
+      return { label, data, sum, firstDate, lastDate, duration };
     });
 
     return {
       datasets,
-      data: Data(flatDatasets(datasets)),
       dates,
+      byLabelDate,
       firstDate: dates[0],
       lastDate: dates[dates.length - 1],
-      labels: data.labels(),
-      labelsCount: datasets.length,
+      labels: dataController.labels(),
       max: max$3(datasets, (d) => max$3(d.data, (i) => i.value)),
     };
   }
@@ -23985,7 +23970,7 @@
     }
 
     createDataView() {
-      return dataViewPlot(this.controller.data);
+      return dataViewPlot(this.controller);
     }
 
     prepare() {
@@ -23997,7 +23982,7 @@
       this.sortDatasets();
 
       let margin = this.config.margin;
-      let barsCount = this.dataView.labelsCount || 0;
+      let barsCount = this.dataView.labels.length || 0;
 
       this.graphWidth = this.config.width - margin.left - margin.right;
       this.graphHeight = barsCount * this.config.lineHeight;
@@ -24469,7 +24454,6 @@
   }
 
   exports.BarChart = BarChart;
-  exports.Data = Data;
   exports.DataController = DataController;
   exports.DateOrdinator = date_ordinator;
   exports.LabelsChart = LabelsChart;
@@ -24478,6 +24462,8 @@
   exports.UrlParameters = UrlParameters;
   exports.config = LOTIVIS_CONFIG$1;
   exports.csv = csv;
+  exports.csvParse = csvParse;
+  exports.csvRender = csvRender;
   exports.d3 = index;
   exports.debug = debug;
   exports.downloadCSV = downloadCSV;
@@ -24485,7 +24471,6 @@
   exports.flatDataset = flatDataset;
   exports.flatDatasets = flatDatasets;
   exports.json = json;
-  exports.parseCSV = parseCSV;
   exports.parseDataset = parseDataset;
   exports.parseDatasets = parseDatasets;
   exports.screenshot = downloadImage;

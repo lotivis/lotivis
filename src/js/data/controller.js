@@ -4,7 +4,6 @@ import { ColorGenerator } from "../common/colors";
 import { Listeners } from "./controller.listeners.js";
 import { Filters } from "./controller.filter";
 import { filter } from "./controller.snapshot";
-import { Data } from "./flat.data";
 import { set_data_preview } from "../common/debug";
 
 export class DataController {
@@ -14,10 +13,8 @@ export class DataController {
     }
 
     this.config = config || {};
-    this.data = Data(flat);
+    this.data = flat;
     this.original = this.config.original || flat;
-
-    if (this.original) set_data_preview(this.original);
 
     this.dateAccess = this.config.dateAccess || DEFAULT_DATE_ORDINATOR;
     this.colorGenerator = new ColorGenerator(this.data);
@@ -139,6 +136,7 @@ export class DataController {
     };
 
     console.log("DataController", this);
+    if (this.original) set_data_preview(this.original);
 
     return this;
   }

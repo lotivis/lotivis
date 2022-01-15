@@ -4,8 +4,8 @@ const lotivis = require("../dist/lotivis.test");
 
 describe("create geojson from data", function () {
   let json = samples.readJSON("sample.flat.json");
-  let data = lotivis.Data(json);
-  let geoJSON = lotivis.createGeoJSON(data);
+  let data = new lotivis.DataController(json);
+  let geoJSON = lotivis.createGeoJSON(data.locations());
 
   it("loads the data", function () {
     assert.ok(data);

@@ -15,14 +15,12 @@ export class BarGridRenderer extends Renderer {
       .ticks(20);
 
     let config = chart.config;
+    let marginBottom = config.height - config.margin.bottom;
 
     chart.svg
       .append("g")
       .attr("class", "ltv-bar-chart-grid ltv-bar-chart-grid-x")
-      .attr(
-        "transform",
-        "translate(0," + (config.height - config.margin.bottom) + ")"
-      )
+      .attr("transform", "translate(0," + marginBottom + ")")
       .call(xAxisGrid);
 
     chart.svg

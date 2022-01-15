@@ -25,18 +25,27 @@
           <h1>Bar Chart Overview</h1>
         </div>
         <div class="col-6">
+          Default
           <div id="bar-chart-1">
             <!-- Bar Chart 1 Code Here -->
           </div>
         </div>
         <div class="col-6">
+          Combine
           <div id="bar-chart-3">
             <!-- Bar Chart 3 Code Here -->
           </div>
         </div>
         <div class="col-6">
+          Labels
           <div id="bar-chart-2">
             <!-- Bar Chart 2 Code Here -->
+          </div>
+        </div>
+        <div class="col-6">
+          Combine Labels
+          <div id="bar-chart-4">
+            <!-- Bar Chart 4 Code Here -->
           </div>
         </div>
         <div class="col-12">
@@ -214,6 +223,12 @@
       });
 
       let barChartCard3 = new lotivis.BarChart("bar-chart-3", {
+        type: lotivis.BarChart.Type.combine,
+        dataController,
+      });
+
+      let barChartCard4 = new lotivis.BarChart("bar-chart-4", {
+        labels: true,
         type: lotivis.BarChart.Type.combine,
         dataController,
       });

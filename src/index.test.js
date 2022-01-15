@@ -1,9 +1,9 @@
 /* parse data */
 export { DataController } from "./js/data/controller.js";
-export { Data } from "./js/data/flat.data.js";
-export * from "./js/data/parse.csv";
-export * from "./js/data/parse.datasets.js";
 export * as DateOrdinator from "./js/data/date.ordinator";
+
+export { csv, csvParse, csvRender } from "./js/parse/parse.csv";
+export * from "./js/parse/parse.json.js";
 
 /* charts */
 export * from "./js/bar/bar.chart";

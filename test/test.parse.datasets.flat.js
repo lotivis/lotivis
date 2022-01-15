@@ -4,21 +4,21 @@ const lotivis = require("../dist/lotivis.test");
 
 describe("parse flat data", function () {
   let json = samples.readJSON("sample.flat.json");
-  let data = lotivis.Data(json);
+  let dataController = new lotivis.DataController(json);
 
   it("should have the right length", function () {
-    assert.strictEqual(data.length, 9);
+    assert.strictEqual(dataController.data.length, 9);
   });
 
   it("has the right labels", function () {
-    let labels = data.labels();
+    let labels = dataController.labels();
     assert.ok(labels.includes("label_1"));
     assert.ok(labels.includes("label_2"));
     assert.ok(labels.includes("label_3"));
   });
 
   it("has the right dates", function () {
-    let dates = data.dates();
+    let dates = dataController.dates();
     assert.ok(dates.includes(2001));
     assert.ok(dates.includes(2002));
     assert.ok(dates.includes(2003));

@@ -1,10 +1,10 @@
 import * as d3 from "d3";
-import { toDataset } from "../data/data.to.datasets";
+import { toDataset } from "../parse/data.to.datasets";
 
-export function createBarStackModel(data) {
-  let stacks = data.stacks();
+export function createBarStackModel(dataController) {
+  let stacks = dataController.stacks();
   let byDate = d3.rollup(
-    data,
+    dataController.data,
     (v) => d3.sum(v, (d) => d.value),
     (d) => d.date,
     (d) => d.label
@@ -13,7 +13,7 @@ export function createBarStackModel(data) {
   // console.log("byDate", byDate);
 
   return stacks.map(function (stack) {
-    let stackData = data.filter((d) => d.stack === stack);
+    let stackData = dataController.data.filter((d) => d.stack === stack);
     let stackLabels = Array.from(d3.group(stackData, (d) => d.label).keys());
     let stackBuilder = d3
       .stack()
@@ -27,48 +27,48 @@ export function createBarStackModel(data) {
   });
 }
 
-export function dataViewBarStacked(data) {
-  let datasets = createDatasets(combine(data));
-  let dates = data.dates();
-  let stacks = data.stacks();
-  let datasetStacks = createBarStackModel(this, data);
-  let max = d3.max(datasets, (d) => d3.max(d.series, (d) => d[1]));
-  let max2 = d3.max(datasets, (stack) =>
-    d3.max(stack.series, (series) => d3.max(series.map((item) => item["1"])))
-  );
+// export function dataViewBarStacked(data) {
+//   let datasets = createDatasets(combine(data));
+//   let dates = data.dates();
+//   let stacks = data.stacks();
+//   let datasetStacks = createBarStackModel(this, data);
+//   let max = d3.max(datasets, (d) => d3.max(d.series, (d) => d[1]));
+//   let max2 = d3.max(datasets, (stack) =>
+//     d3.max(stack.series, (series) => d3.max(series.map((item) => item["1"])))
+//   );
 
-  console.log("max", max);
-  console.log("max2", max2);
+//   console.log("max", max);
+//   console.log("max2", max2);
 
-  return {
-    datasets,
-    dates,
-    stacks,
-    datasetStacks,
-    max,
-  };
-}
+//   return {
+//     datasets,
+//     dates,
+//     stacks,
+//     datasetStacks,
+//     max,
+//   };
+// }
 
-export function dataViewBar(data) {
-  let dates = data.dates();
-  let stacks = data.stacks();
-  let labels = data.labels();
-  let enabledStacks = data.stacks();
-  let datasets = toDataset(data);
-  let stacked = createBarStackModel(data);
+export function dataViewBar(dataController) {
+  let dates = dataController.dates();
+  let stacks = dataController.stacks();
+  let labels = dataController.labels();
+  let enabledStacks = dataController.stacks();
+  let datasets = toDataset(dataController);
+  let stacked = createBarStackModel(dataController);
   let max = d3.max(stacked, (d) =>
     d3.max(d.series, (s) => d3.max(s.map((i) => i["1"])))
   );
 
   let byDateLabel = d3.rollup(
-    data,
+    dataController.data,
     (v) => d3.sum(v, (d) => d.value),
     (d) => d.date,
     (d) => d.label
   );
 
   let byDateStack = d3.rollup(
-    data,
+    dataController.data,
     (v) => d3.sum(v, (d) => d.value),
     (d) => d.date,
     (d) => d.stack || d.label
@@ -79,7 +79,7 @@ export function dataViewBar(data) {
   return {
     datasets,
     stacked,
-    data,
+    data: dataController.data,
     dates,
     stacks,
     enabledStacks,
