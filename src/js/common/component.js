@@ -1,8 +1,10 @@
 import * as d3 from "d3";
+import * as events from "events";
 
-export class Component {
+export class Component extends events.EventEmitter {
   constructor(selector) {
     if (!selector) throw new Error("no selector specified");
+    super();
     this.selector = selector;
     this.element = d3.select("#" + selector);
     if (this.element.empty())
@@ -14,17 +16,14 @@ export class Component {
 
   show() {
     if (this.element) this.element.style("display", "");
-    return this;
   }
 
   hide() {
     if (this.element) this.element.style("display", "none");
-    return this;
   }
 
   get isVisible() {
-    if (!this.element) return false;
-    return this.element.style("display") !== "none";
+    return !this.element ? this.element.style("display") !== "none" : false;
   }
 
   getElementEffectiveSize() {
@@ -44,13 +43,7 @@ export class Component {
   }
 
   toString() {
-    return (
-      "[" +
-      getClassname() +
-      "" +
-      (this.selector ? " " + this.selector : "") +
-      "]"
-    );
+    return "[" + getClassname() + ", id: " + this.selector + "]";
   }
 
   getClassname() {

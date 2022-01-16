@@ -4,13 +4,25 @@ import { BAR_CHART_TYPE } from "./bar.config.js";
 
 export class BarBarsRenderer extends Renderer {
   render(chart, controller) {
-    let stackedDatasets = chart.dataView.stacked;
-    let config = chart.config || {};
     let radius = chart.config.barRadius || LOTIVIS_CONFIG.barRadius;
-    let isCombineStacks = chart.config.type === "combine" || false;
     let colors = controller.colorGenerator;
     let barWidth = chart.xStack.bandwidth();
+    let yChart = chart.yChart;
     let height = chart.yChart(0);
+    let selectionOpacity = 0.3;
+
+    function opacity(date) {
+      return controller.filters.dates.contains(date) ? selectionOpacity : 1;
+    }
+
+    function redraw() {
+      chart.svg
+        .selectAll(`.ltv-bar-chart-dates-area`)
+        .attr(`opacity`, (d) => opacity(d[0]))
+        .raise();
+    }
+
+    chart.on("click-date", redraw);
 
     function combined() {
       chart.svg
@@ -20,6 +32,8 @@ export class BarBarsRenderer extends Renderer {
         .enter()
         .append("g")
         .attr("transform", (d) => `translate(${chart.xChartScale(d[0])},0)`)
+        .attr("opacity", (d) => opacity(d[0]))
+        .attr("class", "ltv-bar-chart-dates-area")
         .selectAll("rect")
         .data((d) => d[1]) // map to by stack
         .enter()
@@ -31,41 +45,37 @@ export class BarBarsRenderer extends Renderer {
         .attr("width", barWidth)
         .attr("height", (d) => height - chart.yChart(d[1]))
         .attr("rx", radius)
-        .attr("ry", radius);
+        .attr("ry", radius)
+        .raise();
     }
 
     function stacked() {
-      for (let i = 0; i < stackedDatasets.length; i++) {
-        let stackedDataset = stackedDatasets[i];
-        let colors = controller.colorGenerator.stackColors(
-          stackedDataset.stack
-        );
-
-        chart.svg
-          .append("g")
-          .selectAll("g")
-          .data(stackedDataset.series)
-          .enter()
-          .append("g")
-          .attr("fill", (d, i) => (isCombineStacks ? colors[0] : colors[i]))
-          .selectAll("rect")
-          .data((serie) => serie)
-          .enter()
-          .append("rect")
-          .attr("class", "ltv-bar-chart-bar")
-          .attr("rx", radius)
-          .attr("ry", radius)
-          .attr("x", (item) => {
-            let date = item.data[0];
-            let stackName = stackedDataset.stack;
-            return chart.xChartScale(date) + chart.xStack(stackName);
-          })
-          .attr("y", (d) => chart.yChart(d[1]))
-          .attr("width", chart.xStack.bandwidth())
-          .attr("height", (d) =>
-            !d[1] ? 0 : chart.yChart(d[0]) - chart.yChart(d[1])
-          );
-      }
+      chart.svg
+        .append("g")
+        .selectAll("g")
+        .data(chart.dataView.byDatesStackSeries)
+        .enter()
+        .append("g")
+        .attr("transform", (d) => `translate(${chart.xChartScale(d[0])},0)`)
+        .attr("opacity", (d) => opacity(d[0]))
+        .attr("class", "ltv-bar-chart-dates-area")
+        .selectAll("rect")
+        .data((d) => d[1]) // map to by stack
+        .enter()
+        .append("g")
+        .attr("transform", (d) => `translate(${chart.xStack(d[0])},0)`)
+        .selectAll("rect")
+        .data((d) => d[1]) // map to series
+        .enter()
+        .append("rect")
+        .attr("y", (d) => yChart(d[1]))
+        .attr("width", barWidth)
+        .attr("height", (d) => (!d[1] ? 0 : yChart(d[0]) - yChart(d[1])))
+        .attr("class", "ltv-bar-chart-bar")
+        .attr("fill", (d) => colors.label(d[2]))
+        .attr("rx", radius)
+        .attr("ry", radius)
+        .raise();
     }
 
     if (chart.config.type === BAR_CHART_TYPE.combine) {

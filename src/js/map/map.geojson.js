@@ -6,11 +6,11 @@ export class MapGeojsonRenderer extends Renderer {
     if (!geoJSON) return;
 
     function mouseEnter(event, feature) {
-      chart.fire("mouseenter", event, feature);
+      chart.emit("mouseenter", event, feature);
     }
 
     function mouseOut(event, feature) {
-      chart.fire("mouseout", event, feature);
+      chart.emit("mouseout", event, feature);
       // dragged
       if (event.buttons === 1) mouseClick(event, feature);
     }
@@ -25,7 +25,7 @@ export class MapGeojsonRenderer extends Renderer {
         controller.filters.locations.toggle(locationID);
         chart.makeUpdateSensible();
       }
-      chart.fire("click", event, feature);
+      chart.emit("click", event, feature);
     }
 
     chart.areas = chart.svg

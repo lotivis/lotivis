@@ -50,8 +50,8 @@ export class MapSelectionRenderer extends Renderer {
         .raise();
     }
 
-    chart.addListener("mouseout", raise);
-    chart.addListener("click", _render);
+    chart.on("mouseout", raise);
+    chart.on("click", _render);
 
     _render();
   }

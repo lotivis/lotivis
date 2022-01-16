@@ -48,7 +48,7 @@ export class BarLegendRenderer extends Renderer {
         let formatted = numberFormat.format(value);
         return `${d.label} (${formatted})`;
       })
-      .on("click", (e, d) => chart.fire("click-legend", e, d))
+      .on("click", (e, d) => chart.emit("click-legend", e, d))
       .raise();
 
     let circles = legends
@@ -66,6 +66,6 @@ export class BarLegendRenderer extends Renderer {
       circles.style("fill", (d) => fillColor(d));
     }
 
-    chart.addListener("click-legend", click);
+    chart.on("click-legend", click);
   }
 }

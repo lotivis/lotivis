@@ -34,9 +34,11 @@
 }
 
 .ltv-bar-chart-hover-bar {
+  cursor: pointer;
   fill: $tint-color;
 }
 
 .ltv-bar-chart-selection-rect {
-  fill: $tint-color;
+  cursor: pointer;
+  fill: gray;
 }

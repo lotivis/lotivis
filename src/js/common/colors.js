@@ -7,7 +7,7 @@ export class ColorGenerator {
   constructor(data) {
     let stacksToLabels = d3.group(
       data,
-      (d) => d.stack,
+      (d) => d.stack || d.label,
       (d) => d.label
     );
 
@@ -79,6 +79,10 @@ export function plotColors(till) {
     .scaleLinear()
     .domain([0, (1 / 3) * till, (2 / 3) * till, till])
     .range(["yellow", "orange", "red", "purple"]);
+}
+
+export function ColorRange(color, till) {
+  return d3.scaleLinear().domain([0, till]).range(["white", color]);
 }
 
 export default { ColorGenerator, MapColors: MapColors, plotColors };

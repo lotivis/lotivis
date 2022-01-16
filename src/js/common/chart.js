@@ -5,47 +5,18 @@ import { DataController } from "../data/controller";
 export class Chart extends Component {
   constructor(selector, config) {
     super(selector);
+    this.setMaxListeners(20);
 
     this.svgSelector = (this.selector || create_id()) + "-svg";
     this.config = config || {};
-
     this.renderers = [];
-    this.listeners = {};
-
-    let updateSensible = true;
-
-    this.makeUpdateInsensible = function () {
-      updateSensible = false;
-    };
-
-    this.makeUpdateSensible = function () {
-      updateSensible = true;
-    };
-
-    this.update = function (controller, reason) {
-      // console.log("[Chart] update", this.constructor.name, reason, controller);
-      if (!updateSensible) return;
-      if (!this.controller) this.controller = new DataController([]);
-      this.dataView = this.createDataView();
-      this.remove();
-      this.prepare();
-      this.draw();
-    };
-
-    // listeners
-    this.addListener = function (eventname, listener) {
-      if (!this.listeners[eventname]) this.listeners[eventname] = [];
-      this.listeners[eventname].push(listener);
-    };
-
-    this.fire = function (name, event, value) {
-      this.listeners[name]?.forEach((l) => l(event, value, this));
-    };
+    this.updateSensible = true;
 
     this.createSVG();
     this.initialize();
-    this.appendRenderers();
+    this.addRenderers();
 
+    // check for data controller in config
     if (this.config.dataController instanceof DataController) {
       this.setController(this.config.dataController);
       delete this.config.dataController;
@@ -54,7 +25,7 @@ export class Chart extends Component {
 
   initialize() {}
 
-  appendRenderers() {}
+  addRenderers() {}
 
   dataView() {}
 
@@ -66,7 +37,7 @@ export class Chart extends Component {
   }
 
   remove(c) {
-    this.listeners = {};
+    this.removeAllListeners();
     this.svg.selectAll("*").remove();
   }
 
@@ -84,8 +55,26 @@ export class Chart extends Component {
     if (this.controller) this.update(this.controller, "redraw");
   }
 
+  makeUpdateInsensible() {
+    this.updateSensible = false;
+  }
+
+  makeUpdateSensible() {
+    this.updateSensible = true;
+  }
+
+  update(controller, filter, reason) {
+    if (!this.updateSensible) return;
+    if (!this.controller) return;
+    this.dataView = this.createDataView();
+    this.remove();
+    this.prepare();
+    this.draw();
+  }
+
   setController(dc) {
     this.controller = dc;
-    this.controller.addListener(this);
+    this.controller.on("change", (d, f, r) => this.update(d, r, f));
+    this.update(dc, "registration");
   }
 }

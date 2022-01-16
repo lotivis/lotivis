@@ -6,12 +6,12 @@ import { DataViewLabels } from "./labels.data.view.js";
 export class LabelsChart extends Chart {
   initialize() {}
 
-  appendRenderers() {
+  addRenderers() {
     this.renderers.push(new LabelsLabelsRenderer());
   }
 
   createDataView() {
-    return DataViewLabels(this.controller.data);
+    return DataViewLabels(this.controller);
   }
 
   createSVG() {

@@ -1078,7 +1078,7 @@
     return false;
   }
 
-  function filter$2(values, test) {
+  function filter$1(values, test) {
     if (typeof test !== "function") throw new TypeError("test is not a function");
     const array = [];
     let index = -1;
@@ -1585,7 +1585,7 @@
         : childFind(typeof match === "function" ? match : childMatcher(match)));
   }
 
-  var filter$1 = Array.prototype.filter;
+  var filter = Array.prototype.filter;
 
   function children() {
     return Array.from(this.children);
@@ -1593,7 +1593,7 @@
 
   function childrenFilter(match) {
     return function() {
-      return filter$1.call(this.children, match);
+      return filter.call(this.children, match);
     };
   }
 
@@ -8844,12 +8844,12 @@
 
   // https://en.wikipedia.org/wiki/Linear_congruential_generator#Parameters_in_common_use
   const a$1 = 1664525;
-  const c$4 = 1013904223;
+  const c$3 = 1013904223;
   const m = 4294967296; // 2^32
 
   function lcg$1() {
     let s = 1;
-    return () => (s = (a$1 * s + c$4) % m) / m;
+    return () => (s = (a$1 * s + c$3) % m) / m;
   }
 
   function x$2(d) {
@@ -17129,28 +17129,28 @@
 
   var cool = cubehelixLong(cubehelix$3(260, 0.75, 0.35), cubehelix$3(80, 1.50, 0.8));
 
-  var c$3 = cubehelix$3();
+  var c$2 = cubehelix$3();
 
   function rainbow(t) {
     if (t < 0 || t > 1) t -= Math.floor(t);
     var ts = Math.abs(t - 0.5);
-    c$3.h = 360 * t - 100;
-    c$3.s = 1.5 - 1.5 * ts;
-    c$3.l = 0.8 - 0.9 * ts;
-    return c$3 + "";
+    c$2.h = 360 * t - 100;
+    c$2.s = 1.5 - 1.5 * ts;
+    c$2.l = 0.8 - 0.9 * ts;
+    return c$2 + "";
   }
 
-  var c$2 = rgb(),
+  var c$1 = rgb(),
       pi_1_3 = Math.PI / 3,
       pi_2_3 = Math.PI * 2 / 3;
 
   function sinebow(t) {
     var x;
     t = (0.5 - t) * Math.PI;
-    c$2.r = 255 * (x = Math.sin(t)) * x;
-    c$2.g = 255 * (x = Math.sin(t + pi_1_3)) * x;
-    c$2.b = 255 * (x = Math.sin(t + pi_2_3)) * x;
-    return c$2 + "";
+    c$1.r = 255 * (x = Math.sin(t)) * x;
+    c$1.g = 255 * (x = Math.sin(t + pi_1_3)) * x;
+    c$1.b = 255 * (x = Math.sin(t + pi_2_3)) * x;
+    return c$1 + "";
   }
 
   function turbo(t) {
@@ -17996,7 +17996,7 @@
     }
   };
 
-  var c$1 = -0.5,
+  var c = -0.5,
       s$1 = Math.sqrt(3) / 2,
       k = 1 / Math.sqrt(12),
       a = (k / 2 + 1) * 3;
@@ -18013,12 +18013,12 @@
       context.moveTo(x0, y0);
       context.lineTo(x1, y1);
       context.lineTo(x2, y2);
-      context.lineTo(c$1 * x0 - s$1 * y0, s$1 * x0 + c$1 * y0);
-      context.lineTo(c$1 * x1 - s$1 * y1, s$1 * x1 + c$1 * y1);
-      context.lineTo(c$1 * x2 - s$1 * y2, s$1 * x2 + c$1 * y2);
-      context.lineTo(c$1 * x0 + s$1 * y0, c$1 * y0 - s$1 * x0);
-      context.lineTo(c$1 * x1 + s$1 * y1, c$1 * y1 - s$1 * x1);
-      context.lineTo(c$1 * x2 + s$1 * y2, c$1 * y2 - s$1 * x2);
+      context.lineTo(c * x0 - s$1 * y0, s$1 * x0 + c * y0);
+      context.lineTo(c * x1 - s$1 * y1, s$1 * x1 + c * y1);
+      context.lineTo(c * x2 - s$1 * y2, s$1 * x2 + c * y2);
+      context.lineTo(c * x0 + s$1 * y0, c * y0 - s$1 * x0);
+      context.lineTo(c * x1 + s$1 * y1, c * y1 - s$1 * x1);
+      context.lineTo(c * x2 + s$1 * y2, c * y2 - s$1 * x2);
       context.closePath();
     }
   };
@@ -19698,7 +19698,7 @@
     zip: zip,
     every: every,
     some: some,
-    filter: filter$2,
+    filter: filter$1,
     map: map$1,
     reduce: reduce,
     reverse: reverse$3,
@@ -20196,6 +20196,478 @@
     ZoomTransform: Transform
   });
 
+  var domain;
+
+  // This constructor is used to store event handlers. Instantiating this is
+  // faster than explicitly calling `Object.create(null)` to get a "clean" empty
+  // object (tested with v8 v4.9).
+  function EventHandlers() {}
+  EventHandlers.prototype = Object.create(null);
+
+  function EventEmitter() {
+    EventEmitter.init.call(this);
+  }
+
+  // nodejs oddity
+  // require('events') === require('events').EventEmitter
+  EventEmitter.EventEmitter = EventEmitter;
+
+  EventEmitter.usingDomains = false;
+
+  EventEmitter.prototype.domain = undefined;
+  EventEmitter.prototype._events = undefined;
+  EventEmitter.prototype._maxListeners = undefined;
+
+  // By default EventEmitters will print a warning if more than 10 listeners are
+  // added to it. This is a useful default which helps finding memory leaks.
+  EventEmitter.defaultMaxListeners = 10;
+
+  EventEmitter.init = function() {
+    this.domain = null;
+    if (EventEmitter.usingDomains) {
+      // if there is an active domain, then attach to it.
+      if (domain.active ) ;
+    }
+
+    if (!this._events || this._events === Object.getPrototypeOf(this)._events) {
+      this._events = new EventHandlers();
+      this._eventsCount = 0;
+    }
+
+    this._maxListeners = this._maxListeners || undefined;
+  };
+
+  // Obviously not all Emitters should be limited to 10. This function allows
+  // that to be increased. Set to zero for unlimited.
+  EventEmitter.prototype.setMaxListeners = function setMaxListeners(n) {
+    if (typeof n !== 'number' || n < 0 || isNaN(n))
+      throw new TypeError('"n" argument must be a positive number');
+    this._maxListeners = n;
+    return this;
+  };
+
+  function $getMaxListeners(that) {
+    if (that._maxListeners === undefined)
+      return EventEmitter.defaultMaxListeners;
+    return that._maxListeners;
+  }
+
+  EventEmitter.prototype.getMaxListeners = function getMaxListeners() {
+    return $getMaxListeners(this);
+  };
+
+  // These standalone emit* functions are used to optimize calling of event
+  // handlers for fast cases because emit() itself often has a variable number of
+  // arguments and can be deoptimized because of that. These functions always have
+  // the same number of arguments and thus do not get deoptimized, so the code
+  // inside them can execute faster.
+  function emitNone(handler, isFn, self) {
+    if (isFn)
+      handler.call(self);
+    else {
+      var len = handler.length;
+      var listeners = arrayClone(handler, len);
+      for (var i = 0; i < len; ++i)
+        listeners[i].call(self);
+    }
+  }
+  function emitOne(handler, isFn, self, arg1) {
+    if (isFn)
+      handler.call(self, arg1);
+    else {
+      var len = handler.length;
+      var listeners = arrayClone(handler, len);
+      for (var i = 0; i < len; ++i)
+        listeners[i].call(self, arg1);
+    }
+  }
+  function emitTwo(handler, isFn, self, arg1, arg2) {
+    if (isFn)
+      handler.call(self, arg1, arg2);
+    else {
+      var len = handler.length;
+      var listeners = arrayClone(handler, len);
+      for (var i = 0; i < len; ++i)
+        listeners[i].call(self, arg1, arg2);
+    }
+  }
+  function emitThree(handler, isFn, self, arg1, arg2, arg3) {
+    if (isFn)
+      handler.call(self, arg1, arg2, arg3);
+    else {
+      var len = handler.length;
+      var listeners = arrayClone(handler, len);
+      for (var i = 0; i < len; ++i)
+        listeners[i].call(self, arg1, arg2, arg3);
+    }
+  }
+
+  function emitMany(handler, isFn, self, args) {
+    if (isFn)
+      handler.apply(self, args);
+    else {
+      var len = handler.length;
+      var listeners = arrayClone(handler, len);
+      for (var i = 0; i < len; ++i)
+        listeners[i].apply(self, args);
+    }
+  }
+
+  EventEmitter.prototype.emit = function emit(type) {
+    var er, handler, len, args, i, events, domain;
+    var doError = (type === 'error');
+
+    events = this._events;
+    if (events)
+      doError = (doError && events.error == null);
+    else if (!doError)
+      return false;
+
+    domain = this.domain;
+
+    // If there is no 'error' event listener then throw.
+    if (doError) {
+      er = arguments[1];
+      if (domain) {
+        if (!er)
+          er = new Error('Uncaught, unspecified "error" event');
+        er.domainEmitter = this;
+        er.domain = domain;
+        er.domainThrown = false;
+        domain.emit('error', er);
+      } else if (er instanceof Error) {
+        throw er; // Unhandled 'error' event
+      } else {
+        // At least give some kind of context to the user
+        var err = new Error('Uncaught, unspecified "error" event. (' + er + ')');
+        err.context = er;
+        throw err;
+      }
+      return false;
+    }
+
+    handler = events[type];
+
+    if (!handler)
+      return false;
+
+    var isFn = typeof handler === 'function';
+    len = arguments.length;
+    switch (len) {
+      // fast cases
+      case 1:
+        emitNone(handler, isFn, this);
+        break;
+      case 2:
+        emitOne(handler, isFn, this, arguments[1]);
+        break;
+      case 3:
+        emitTwo(handler, isFn, this, arguments[1], arguments[2]);
+        break;
+      case 4:
+        emitThree(handler, isFn, this, arguments[1], arguments[2], arguments[3]);
+        break;
+      // slower
+      default:
+        args = new Array(len - 1);
+        for (i = 1; i < len; i++)
+          args[i - 1] = arguments[i];
+        emitMany(handler, isFn, this, args);
+    }
+
+    return true;
+  };
+
+  function _addListener(target, type, listener, prepend) {
+    var m;
+    var events;
+    var existing;
+
+    if (typeof listener !== 'function')
+      throw new TypeError('"listener" argument must be a function');
+
+    events = target._events;
+    if (!events) {
+      events = target._events = new EventHandlers();
+      target._eventsCount = 0;
+    } else {
+      // To avoid recursion in the case that type === "newListener"! Before
+      // adding it to the listeners, first emit "newListener".
+      if (events.newListener) {
+        target.emit('newListener', type,
+                    listener.listener ? listener.listener : listener);
+
+        // Re-assign `events` because a newListener handler could have caused the
+        // this._events to be assigned to a new object
+        events = target._events;
+      }
+      existing = events[type];
+    }
+
+    if (!existing) {
+      // Optimize the case of one listener. Don't need the extra array object.
+      existing = events[type] = listener;
+      ++target._eventsCount;
+    } else {
+      if (typeof existing === 'function') {
+        // Adding the second element, need to change to array.
+        existing = events[type] = prepend ? [listener, existing] :
+                                            [existing, listener];
+      } else {
+        // If we've already got an array, just append.
+        if (prepend) {
+          existing.unshift(listener);
+        } else {
+          existing.push(listener);
+        }
+      }
+
+      // Check for listener leak
+      if (!existing.warned) {
+        m = $getMaxListeners(target);
+        if (m && m > 0 && existing.length > m) {
+          existing.warned = true;
+          var w = new Error('Possible EventEmitter memory leak detected. ' +
+                              existing.length + ' ' + type + ' listeners added. ' +
+                              'Use emitter.setMaxListeners() to increase limit');
+          w.name = 'MaxListenersExceededWarning';
+          w.emitter = target;
+          w.type = type;
+          w.count = existing.length;
+          emitWarning(w);
+        }
+      }
+    }
+
+    return target;
+  }
+  function emitWarning(e) {
+    typeof console.warn === 'function' ? console.warn(e) : console.log(e);
+  }
+  EventEmitter.prototype.addListener = function addListener(type, listener) {
+    return _addListener(this, type, listener, false);
+  };
+
+  EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+
+  EventEmitter.prototype.prependListener =
+      function prependListener(type, listener) {
+        return _addListener(this, type, listener, true);
+      };
+
+  function _onceWrap(target, type, listener) {
+    var fired = false;
+    function g() {
+      target.removeListener(type, g);
+      if (!fired) {
+        fired = true;
+        listener.apply(target, arguments);
+      }
+    }
+    g.listener = listener;
+    return g;
+  }
+
+  EventEmitter.prototype.once = function once(type, listener) {
+    if (typeof listener !== 'function')
+      throw new TypeError('"listener" argument must be a function');
+    this.on(type, _onceWrap(this, type, listener));
+    return this;
+  };
+
+  EventEmitter.prototype.prependOnceListener =
+      function prependOnceListener(type, listener) {
+        if (typeof listener !== 'function')
+          throw new TypeError('"listener" argument must be a function');
+        this.prependListener(type, _onceWrap(this, type, listener));
+        return this;
+      };
+
+  // emits a 'removeListener' event iff the listener was removed
+  EventEmitter.prototype.removeListener =
+      function removeListener(type, listener) {
+        var list, events, position, i, originalListener;
+
+        if (typeof listener !== 'function')
+          throw new TypeError('"listener" argument must be a function');
+
+        events = this._events;
+        if (!events)
+          return this;
+
+        list = events[type];
+        if (!list)
+          return this;
+
+        if (list === listener || (list.listener && list.listener === listener)) {
+          if (--this._eventsCount === 0)
+            this._events = new EventHandlers();
+          else {
+            delete events[type];
+            if (events.removeListener)
+              this.emit('removeListener', type, list.listener || listener);
+          }
+        } else if (typeof list !== 'function') {
+          position = -1;
+
+          for (i = list.length; i-- > 0;) {
+            if (list[i] === listener ||
+                (list[i].listener && list[i].listener === listener)) {
+              originalListener = list[i].listener;
+              position = i;
+              break;
+            }
+          }
+
+          if (position < 0)
+            return this;
+
+          if (list.length === 1) {
+            list[0] = undefined;
+            if (--this._eventsCount === 0) {
+              this._events = new EventHandlers();
+              return this;
+            } else {
+              delete events[type];
+            }
+          } else {
+            spliceOne(list, position);
+          }
+
+          if (events.removeListener)
+            this.emit('removeListener', type, originalListener || listener);
+        }
+
+        return this;
+      };
+      
+  // Alias for removeListener added in NodeJS 10.0
+  // https://nodejs.org/api/events.html#events_emitter_off_eventname_listener
+  EventEmitter.prototype.off = function(type, listener){
+      return this.removeListener(type, listener);
+  };
+
+  EventEmitter.prototype.removeAllListeners =
+      function removeAllListeners(type) {
+        var listeners, events;
+
+        events = this._events;
+        if (!events)
+          return this;
+
+        // not listening for removeListener, no need to emit
+        if (!events.removeListener) {
+          if (arguments.length === 0) {
+            this._events = new EventHandlers();
+            this._eventsCount = 0;
+          } else if (events[type]) {
+            if (--this._eventsCount === 0)
+              this._events = new EventHandlers();
+            else
+              delete events[type];
+          }
+          return this;
+        }
+
+        // emit removeListener for all listeners on all events
+        if (arguments.length === 0) {
+          var keys = Object.keys(events);
+          for (var i = 0, key; i < keys.length; ++i) {
+            key = keys[i];
+            if (key === 'removeListener') continue;
+            this.removeAllListeners(key);
+          }
+          this.removeAllListeners('removeListener');
+          this._events = new EventHandlers();
+          this._eventsCount = 0;
+          return this;
+        }
+
+        listeners = events[type];
+
+        if (typeof listeners === 'function') {
+          this.removeListener(type, listeners);
+        } else if (listeners) {
+          // LIFO order
+          do {
+            this.removeListener(type, listeners[listeners.length - 1]);
+          } while (listeners[0]);
+        }
+
+        return this;
+      };
+
+  EventEmitter.prototype.listeners = function listeners(type) {
+    var evlistener;
+    var ret;
+    var events = this._events;
+
+    if (!events)
+      ret = [];
+    else {
+      evlistener = events[type];
+      if (!evlistener)
+        ret = [];
+      else if (typeof evlistener === 'function')
+        ret = [evlistener.listener || evlistener];
+      else
+        ret = unwrapListeners(evlistener);
+    }
+
+    return ret;
+  };
+
+  EventEmitter.listenerCount = function(emitter, type) {
+    if (typeof emitter.listenerCount === 'function') {
+      return emitter.listenerCount(type);
+    } else {
+      return listenerCount.call(emitter, type);
+    }
+  };
+
+  EventEmitter.prototype.listenerCount = listenerCount;
+  function listenerCount(type) {
+    var events = this._events;
+
+    if (events) {
+      var evlistener = events[type];
+
+      if (typeof evlistener === 'function') {
+        return 1;
+      } else if (evlistener) {
+        return evlistener.length;
+      }
+    }
+
+    return 0;
+  }
+
+  EventEmitter.prototype.eventNames = function eventNames() {
+    return this._eventsCount > 0 ? Reflect.ownKeys(this._events) : [];
+  };
+
+  // About 1.5x faster than the two-arg version of Array#splice().
+  function spliceOne(list, index) {
+    for (var i = index, k = i + 1, n = list.length; k < n; i += 1, k += 1)
+      list[i] = list[k];
+    list.pop();
+  }
+
+  function arrayClone(arr, i) {
+    var copy = new Array(i);
+    while (i--)
+      copy[i] = arr[i];
+    return copy;
+  }
+
+  function unwrapListeners(arr) {
+    var ret = new Array(arr.length);
+    for (var i = 0; i < ret.length; ++i) {
+      ret[i] = arr[i].listener || arr[i];
+    }
+    return ret;
+  }
+
   const formatGerman = "%d.%m.%Y";
   const formatIso = "%Y-%m-%d";
 
@@ -20260,7 +20732,7 @@
     constructor(data) {
       let stacksToLabels = group(
         data,
-        (d) => d.stack,
+        (d) => d.stack || d.label,
         (d) => d.label
       );
 
@@ -20327,44 +20799,7 @@
       .range(["yellow", "orange", "red", "purple"]);
   }
 
-  class Listeners {
-    constructor() {
-      let ls = [];
-
-      function notify(listener, reason, controller) {
-        if (!listener.update) throw Error("missing update function of listener");
-        listener.update(controller, reason);
-      }
-
-      this.add = function (l, controller) {
-        if (!l.update) throw Error("missing update function of listener");
-        if (!(ls.indexOf(l) === -1 ? ls.push(l) > 0 : false)) return;
-        notify(l, "registration", controller);
-      };
-
-      this.remove = function (l) {
-        let i = ls.indexOf(l);
-        return i !== -1 ? ls.splice(i, 1) : false;
-      };
-
-      this.addAll = function (all, controller) {
-        if (!Array.isArray(all)) throw Error("expecting array");
-        all.forEach((l) => this.add(l, controller));
-      };
-
-      this.notify = function (reason = "none", controller) {
-        ls.forEach((l) => notify(l, reason, controller));
-      };
-
-      this.size = function () {
-        return ls.length;
-      };
-
-      return this;
-    }
-  }
-
-  class ObservableArray extends Array {
+  class FilterArray extends Array {
     constructor(listener) {
       super();
       this.listener = listener;
@@ -20379,6 +20814,11 @@
         this.push(item), this.notify("add", item, notify);
     }
 
+    addAll(source) {
+      if (!Array.isArray(source)) throw new Error("no array given");
+      this.push(...source), this.notify("add", item, notify);
+    }
+
     remove(item, notify = true) {
       let i = this.indexOf(item);
       if (i !== -1) this.splice(i, 1), this.notify("remove", item, notify);
@@ -20386,8 +20826,8 @@
 
     toggle(item, notify = true) {
       let i = this.indexOf(item);
-      i === -1 ? this.push(item) : this.splice(i, 1),
-        this.notify("toggle", item, notify);
+      i === -1 ? this.push(item) : this.splice(i, 1);
+      this.notify("toggle", item, notify);
     }
 
     contains(item) {
@@ -20395,34 +20835,11 @@
     }
 
     clear(notify = true) {
-      if (this.length !== 0) (c = []), this.notify("clear", null, notify);
+      if (this.length !== 0) {
+        this.splice(0, this.length);
+        this.notify("clear", null, notify);
+      }
     }
-  }
-
-  class Filters {
-    constructor(listener) {
-      this.locations = new ObservableArray((r) => listener("location", r));
-      this.dates = new ObservableArray((r) => listener("dates", r));
-      this.labels = new ObservableArray((r) => listener("labels", r));
-      this.stacks = new ObservableArray((r) => listener("stacks", r));
-    }
-  }
-
-  function filter(controller) {
-    let data = controller.data;
-    let filters = controller.filters;
-    let filtered = filter$2(data, (d) => {
-      return !(
-        (d.location && filters.locations.contains(d.location)) ||
-        (d.date && filters.dates.contains(d.date)) ||
-        (d.label && filters.labels.contains(d.label)) ||
-        (d.stack && filters.stacks.contains(d.stack))
-      );
-    });
-
-    // console.log("filtered", filtered);
-
-    return filtered;
   }
 
   const DEFAULT_NUMBER_FORMAT = new Intl.NumberFormat("en-EN", {
@@ -20483,8 +20900,22 @@
     if (e) e.textContent = s;
   }
 
-  class DataController {
+  function snapshot(controller) {
+    let f = controller.filters;
+    return filter$1(controller.data, (d) => {
+      return !(
+        (d.location && f.locations.contains(d.location)) ||
+        (d.date && f.dates.contains(d.date)) ||
+        (d.label && f.labels.contains(d.label)) ||
+        (d.stack && f.stacks.contains(d.stack))
+      );
+    });
+  }
+
+  class DataController extends EventEmitter {
     constructor(flat, config) {
+      super();
+
       if (!Array.isArray(flat)) {
         throw new Error("Datasets are not an array.");
       }
@@ -20496,126 +20927,117 @@
       this.dateAccess = this.config.dateAccess || DEFAULT_DATE_ORDINATOR;
       this.colorGenerator = new ColorGenerator(this.data);
 
-      this.filters = new Filters((name, reason) => {
-        // console.log("[lotivis]  ", name, reason);
-        this.snapshot = filter(this);
-        this.notifyListeners(name);
-      });
-
-      /** Returns entries with valid value. */
-      this.filterValid = function () {
-        return this.data.filter((d) => d.value);
+      this.filters = {
+        labels: new FilterArray((r) => this.filterChange("labels", r)),
+        locations: new FilterArray((r) => this.filterChange("locations", r)),
+        dates: new FilterArray((r) => this.filterChange("dates", r)),
+        stacks: new FilterArray((r) => this.filterChange("stacks", r)),
       };
 
-      this.byLabel = function () {
-        return group(this.data, (d) => d.label);
-      };
-
-      this.byStack = function () {
-        return group(this.data, (d) => d.stack);
-      };
-
-      this.byLocation = function () {
-        return group(this.data, (d) => d.location);
-      };
-
-      this.byDate = function () {
-        return group(this.data, (d) => d.date);
-      };
-
-      this.labels = function () {
-        return Array.from(this.byLabel().keys());
-      };
-
-      this.stacks = function () {
-        return Array.from(this.byStack().keys());
-      };
-
-      this.locations = function () {
-        return Array.from(this.byLocation().keys());
-      };
-
-      this.dates = function () {
-        return Array.from(this.byDate().keys());
-      };
-
-      this.dataStack = function (s) {
-        return this.data.filter((d) => d.stack === s);
-      };
-
-      this.dataLabel = function (l) {
-        return this.data.filter((d) => d.label === l);
-      };
-
-      this.dataLocation = function (l) {
-        return this.data.filter((d) => d.location === l);
-      };
-
-      this.dataDate = function (d) {
-        return this.data.filter((d) => d.date === d);
-      };
-
-      this.sumOfStack = function (s) {
-        return sum$2(this.dataStack(s), (d) => d.value);
-      };
-
-      this.sumOfLabel = function (l) {
-        return sum$2(this.dataLabel(l), (d) => d.value);
-      };
-
-      this.sumOfLocation = function (l) {
-        return sum$2(this.dataLocation(l), (d) => d.value);
-      };
-
-      this.sumOfDate = function (d) {
-        return sum$2(this.dataDate(s), (d) => d.value);
-      };
-
-      this.sum = function () {
-        return sum$2(this.data, (d) => d.value);
-      };
-
-      this.max = function () {
-        return max$3(this.data, (item) => item.value);
-      };
-
-      this.min = function () {
-        return min$2(this.data, (item) => item.value);
-      };
-
-      /** Returns a string that can be used as filename for downloads. */
-      this.getFilename = function () {
-        if (!this.labels) return "Unknown";
-        let labels = this.labels.map((label) => label.split(` `).join(`-`));
-        if (labels.length > 10) {
-          labels = labels.splice(0, 10);
-        }
-        return labels.join(",");
-      };
-
-      // listeners
-      let listeners = new Listeners();
-
-      this.addListener = function (l) {
-        listeners.add(l, this);
-      };
-
-      this.removeListener = function (l) {
-        listeners.remove(l, this);
-      };
-
-      this.notifyListeners = function (reason = "none") {
-        listeners.notify(reason, this);
-      };
-
-      this.register = function (l) {
-        Array.isArray(l) ? listeners.addAll(l, this) : listeners.add(l, this);
-      };
+      // this.filters.locations.push(...this.locations());
 
       console.log("DataController", this);
       if (this.original) set_data_preview(this.original);
 
       return this;
+    }
+
+    /** Returns entries with valid value. */
+    filterValid() {
+      return this.data.filter((d) => d.value);
+    }
+
+    byLabel() {
+      return group(this.data, (d) => d.label);
+    }
+
+    byStack() {
+      return group(this.data, (d) => d.stack || d.label);
+    }
+
+    byLocation() {
+      return group(this.data, (d) => d.location);
+    }
+
+    byDate() {
+      return group(this.data, (d) => d.date);
+    }
+
+    labels() {
+      return Array.from(this.byLabel().keys());
+    }
+
+    stacks() {
+      return Array.from(this.byStack().keys());
+    }
+
+    locations() {
+      return Array.from(this.byLocation().keys());
+    }
+
+    dates() {
+      return Array.from(this.byDate().keys());
+    }
+
+    dataStack(s) {
+      return this.data.filter((d) => d.stack === s);
+    }
+
+    dataLabel(l) {
+      return this.data.filter((d) => d.label === l);
+    }
+
+    dataLocation(l) {
+      return this.data.filter((d) => d.location === l);
+    }
+
+    dataDate(d) {
+      return this.data.filter((d) => d.date === d);
+    }
+
+    sumOfStack(s) {
+      return sum$2(this.dataStack(s), (d) => d.value);
+    }
+
+    sumOfLabel(l) {
+      return sum$2(this.dataLabel(l), (d) => d.value);
+    }
+
+    sumOfLocation(l) {
+      return sum$2(this.dataLocation(l), (d) => d.value);
+    }
+
+    sumOfDate(d) {
+      return sum$2(this.dataDate(s), (d) => d.value);
+    }
+
+    sum() {
+      return sum$2(this.data, (d) => d.value);
+    }
+
+    max() {
+      return max$3(this.data, (item) => item.value);
+    }
+
+    min() {
+      return min$2(this.data, (item) => item.value);
+    }
+
+    /** Returns a string that can be used as filename for downloads. */
+    getFilename() {
+      if (!this.labels) return "Unknown";
+      let labels = this.labels.map((label) => label.split(` `).join(`-`));
+      if (labels.length > 10) {
+        labels = labels.splice(0, 10);
+      }
+      return labels.join(",");
+    }
+
+    // filters
+
+    filterChange(name, reason) {
+      this.snapshot = snapshot(this);
+      this.emit("change", this, name, reason);
     }
   }
 
@@ -20673,9 +21095,10 @@
     });
   }
 
-  class Component {
+  class Component extends EventEmitter {
     constructor(selector) {
       if (!selector) throw new Error("no selector specified");
+      super();
       this.selector = selector;
       this.element = select("#" + selector);
       if (this.element.empty())
@@ -20687,17 +21110,14 @@
 
     show() {
       if (this.element) this.element.style("display", "");
-      return this;
     }
 
     hide() {
       if (this.element) this.element.style("display", "none");
-      return this;
     }
 
     get isVisible() {
-      if (!this.element) return false;
-      return this.element.style("display") !== "none";
+      return !this.element ? this.element.style("display") !== "none" : false;
     }
 
     getElementEffectiveSize() {
@@ -20717,13 +21137,7 @@
     }
 
     toString() {
-      return (
-        "[" +
-        getClassname() +
-        "" +
-        (this.selector ? " " + this.selector : "") +
-        "]"
-      );
+      return "[" + getClassname() + ", id: " + this.selector + "]";
     }
 
     getClassname() {
@@ -20746,47 +21160,18 @@
   class Chart extends Component {
     constructor(selector, config) {
       super(selector);
+      this.setMaxListeners(20);
 
       this.svgSelector = (this.selector || create_id()) + "-svg";
       this.config = config || {};
-
       this.renderers = [];
-      this.listeners = {};
-
-      let updateSensible = true;
-
-      this.makeUpdateInsensible = function () {
-        updateSensible = false;
-      };
-
-      this.makeUpdateSensible = function () {
-        updateSensible = true;
-      };
-
-      this.update = function (controller, reason) {
-        // console.log("[Chart] update", this.constructor.name, reason, controller);
-        if (!updateSensible) return;
-        if (!this.controller) this.controller = new DataController([]);
-        this.dataView = this.createDataView();
-        this.remove();
-        this.prepare();
-        this.draw();
-      };
-
-      // listeners
-      this.addListener = function (eventname, listener) {
-        if (!this.listeners[eventname]) this.listeners[eventname] = [];
-        this.listeners[eventname].push(listener);
-      };
-
-      this.fire = function (name, event, value) {
-        this.listeners[name]?.forEach((l) => l(event, value, this));
-      };
+      this.updateSensible = true;
 
       this.createSVG();
       this.initialize();
-      this.appendRenderers();
+      this.addRenderers();
 
+      // check for data controller in config
       if (this.config.dataController instanceof DataController) {
         this.setController(this.config.dataController);
         delete this.config.dataController;
@@ -20795,7 +21180,7 @@
 
     initialize() {}
 
-    appendRenderers() {}
+    addRenderers() {}
 
     dataView() {}
 
@@ -20807,7 +21192,7 @@
     }
 
     remove(c) {
-      this.listeners = {};
+      this.removeAllListeners();
       this.svg.selectAll("*").remove();
     }
 
@@ -20825,9 +21210,27 @@
       if (this.controller) this.update(this.controller, "redraw");
     }
 
+    makeUpdateInsensible() {
+      this.updateSensible = false;
+    }
+
+    makeUpdateSensible() {
+      this.updateSensible = true;
+    }
+
+    update(controller, filter, reason) {
+      if (!this.updateSensible) return;
+      if (!this.controller) return;
+      this.dataView = this.createDataView();
+      this.remove();
+      this.prepare();
+      this.draw();
+    }
+
     setController(dc) {
       this.controller = dc;
-      this.controller.addListener(this);
+      this.controller.on("change", (d, f, r) => this.update(d, r, f));
+      this.update(dc, "registration");
     }
   }
 
@@ -20919,13 +21322,25 @@
 
   class BarBarsRenderer extends Renderer {
     render(chart, controller) {
-      let stackedDatasets = chart.dataView.stacked;
-      chart.config || {};
       let radius = chart.config.barRadius || LOTIVIS_CONFIG$1.barRadius;
-      let isCombineStacks = chart.config.type === "combine" || false;
       let colors = controller.colorGenerator;
       let barWidth = chart.xStack.bandwidth();
+      let yChart = chart.yChart;
       let height = chart.yChart(0);
+      let selectionOpacity = 0.3;
+
+      function opacity(date) {
+        return controller.filters.dates.contains(date) ? selectionOpacity : 1;
+      }
+
+      function redraw() {
+        chart.svg
+          .selectAll(`.ltv-bar-chart-dates-area`)
+          .attr(`opacity`, (d) => opacity(d[0]))
+          .raise();
+      }
+
+      chart.on("click-date", redraw);
 
       function combined() {
         chart.svg
@@ -20935,6 +21350,8 @@
           .enter()
           .append("g")
           .attr("transform", (d) => `translate(${chart.xChartScale(d[0])},0)`)
+          .attr("opacity", (d) => opacity(d[0]))
+          .attr("class", "ltv-bar-chart-dates-area")
           .selectAll("rect")
           .data((d) => d[1]) // map to by stack
           .enter()
@@ -20946,41 +21363,37 @@
           .attr("width", barWidth)
           .attr("height", (d) => height - chart.yChart(d[1]))
           .attr("rx", radius)
-          .attr("ry", radius);
+          .attr("ry", radius)
+          .raise();
       }
 
       function stacked() {
-        for (let i = 0; i < stackedDatasets.length; i++) {
-          let stackedDataset = stackedDatasets[i];
-          let colors = controller.colorGenerator.stackColors(
-            stackedDataset.stack
-          );
-
-          chart.svg
-            .append("g")
-            .selectAll("g")
-            .data(stackedDataset.series)
-            .enter()
-            .append("g")
-            .attr("fill", (d, i) => (isCombineStacks ? colors[0] : colors[i]))
-            .selectAll("rect")
-            .data((serie) => serie)
-            .enter()
-            .append("rect")
-            .attr("class", "ltv-bar-chart-bar")
-            .attr("rx", radius)
-            .attr("ry", radius)
-            .attr("x", (item) => {
-              let date = item.data[0];
-              let stackName = stackedDataset.stack;
-              return chart.xChartScale(date) + chart.xStack(stackName);
-            })
-            .attr("y", (d) => chart.yChart(d[1]))
-            .attr("width", chart.xStack.bandwidth())
-            .attr("height", (d) =>
-              !d[1] ? 0 : chart.yChart(d[0]) - chart.yChart(d[1])
-            );
-        }
+        chart.svg
+          .append("g")
+          .selectAll("g")
+          .data(chart.dataView.byDatesStackSeries)
+          .enter()
+          .append("g")
+          .attr("transform", (d) => `translate(${chart.xChartScale(d[0])},0)`)
+          .attr("opacity", (d) => opacity(d[0]))
+          .attr("class", "ltv-bar-chart-dates-area")
+          .selectAll("rect")
+          .data((d) => d[1]) // map to by stack
+          .enter()
+          .append("g")
+          .attr("transform", (d) => `translate(${chart.xStack(d[0])},0)`)
+          .selectAll("rect")
+          .data((d) => d[1]) // map to series
+          .enter()
+          .append("rect")
+          .attr("y", (d) => yChart(d[1]))
+          .attr("width", barWidth)
+          .attr("height", (d) => (!d[1] ? 0 : yChart(d[0]) - yChart(d[1])))
+          .attr("class", "ltv-bar-chart-bar")
+          .attr("fill", (d) => colors.label(d[2]))
+          .attr("rx", radius)
+          .attr("ry", radius)
+          .raise();
       }
 
       if (chart.config.type === BAR_CHART_TYPE.combine) {
@@ -21084,8 +21497,8 @@
         tooltip.style("opacity", 0);
       }
 
-      chart.addListener("mouseenter", showTooltip);
-      chart.addListener("mouseout", hideTooltip);
+      chart.on("mouseenter", showTooltip);
+      chart.on("mouseout", hideTooltip);
     }
   }
 
@@ -21107,20 +21520,25 @@
 
   class BarSelectionRenderer extends Renderer {
     render(chart, controller) {
+      let selectionOpacity = 0.1;
+
+      function opacity(date) {
+        return controller.filters.dates.contains(date) ? selectionOpacity : 0;
+      }
+
       function createID(date) {
         return `ltv-bar-chart-selection-rect-id-${safeId(String(date))}`;
       }
 
       function redraw() {
-        let filter = controller.filters.dates;
         chart.svg
           .selectAll(`.ltv-bar-chart-selection-rect`)
-          .attr(`opacity`, (date) => (filter.contains(date) ? 0.15 : 0));
+          .attr(`opacity`, (date) => opacity(date))
+          .raise();
       }
 
-      chart.addListener("click-date", redraw);
+      chart.on("click-date", redraw);
 
-      let filter = controller.filters.dates;
       let margin = chart.config.margin;
       let dates = chart.config.dates || chart.dataView.dates;
       chart.svg
@@ -21133,31 +21551,37 @@
         .attr("id", (date) => createID(date))
         .attr("x", (date) => chart.xChartScale(date))
         .attr("y", margin.top)
-        .attr("opacity", (date) => (filter.includes(String(date)) ? 0.15 : 0))
+        .attr("opacity", (date) => opacity(date))
         .attr("width", chart.xChartScale.bandwidth())
-        .attr("height", chart.config.height - margin.bottom - margin.top);
+        .attr("height", chart.config.height - margin.bottom - margin.top)
+        .raise();
     }
   }
 
   class BarHoverRenderer extends Renderer {
     render(chart, controller) {
+      let selectionOpacity = 0.3;
+
       function createID(date) {
-        return `ltv-date-chart-hover-bar-id-${safeId(String(date))}`;
+        return `ltv-bar-chart-hover-bar-id-${safeId(String(date))}`;
       }
 
       function hideAll() {
-        chart.svg.selectAll(`.ltv-date-chart-hover-bar`).attr(`opacity`, 0);
+        chart.svg
+          .selectAll(`.ltv-bar-chart-hover-bar`)
+          .attr("opacity", 0)
+          .raise();
       }
 
       function onMouseEnter(event, date) {
         hideAll();
-        chart.svg.select(`#${createID(date)}`).attr("opacity", 0.3);
-        chart.fire("mouseenter", event, date);
+        chart.svg.select(`#${createID(date)}`).attr("opacity", selectionOpacity);
+        chart.emit("mouseenter", event, date);
       }
 
       function onMouserOut(event, date) {
         hideAll();
-        chart.fire("mouseout", event, date);
+        chart.emit("mouseout", event, date);
 
         // check for mouse down
         if (event.buttons === 1) {
@@ -21171,7 +21595,7 @@
           controller.filters.dates.toggle(date);
           chart.makeUpdateSensible();
         }
-        chart.fire("click-date", event, date);
+        chart.emit("click-date", event, date);
       }
 
       let config = chart.config;
@@ -21184,17 +21608,18 @@
         .data(dates)
         .enter()
         .append("rect")
-        .attr("class", "ltv-date-chart-hover-bar")
+        .attr("class", "ltv-bar-chart-hover-bar")
         .attr("id", (date) => createID(date))
         .attr("opacity", 0)
-        .attr("x", (date) => chart.xChartScale(date))
+        .attr("x", (d) => chart.xChartScale(d))
         .attr("y", margin.top)
         .attr("width", chart.xChartScale.bandwidth())
         .attr("height", config.height - margin.bottom - margin.top)
         .on("mouseenter", onMouseEnter)
         .on("mouseout", onMouserOut)
         .on("mousedrag", onMouserOut)
-        .on("click", onMouseClick);
+        .on("click", onMouseClick)
+        .raise();
     }
   }
 
@@ -21229,19 +21654,20 @@
   class BarBackgroundRenderer extends Renderer {
     render(chart, controller) {
       function click(e, b) {
-        if (controller) controller.filters.dates.clear;
+        if (controller) controller.filters.dates.clear();
       }
 
-      chart.addListener("click-date", click);
+      chart.on("click-background", click);
 
-      // let background = chart.svg
-      //   .append("rect")
-      //   .attr("width", chart.config.width)
-      //   .attr("height", chart.config.height)
-      //   .attr("fill", "white")
-      //   .attr("opacity", 0);
-      // .attr("cursor", "pointer");
-      // .on("click", (e, b) => chart.fire("click-date", e, b));
+      chart.svg
+        .append("g")
+        .append("rect")
+        .attr("width", chart.config.width)
+        .attr("height", chart.config.height)
+        .attr("fill", "white")
+        .attr("opacity", 0)
+        .attr("cursor", "pointer")
+        .on("click", (e, b) => chart.emit("click-background", e, b));
     }
   }
 
@@ -21254,118 +21680,65 @@
     return Boolean(value || value === 0);
   }
 
-  function DataItem(item) {
-    return { date: item.date, location: item.location, value: item.value };
-  }
-
-  function Dataset(item) {
-    let set = { label: item.label, data: [DataItem(item)] };
-    if (isValue(item.stack)) set.stack = item.stack;
-    return set;
-  }
-
-  function toDataset(data) {
-    let datasets = [],
-      item,
-      set;
-
-    for (let i = 0; i < data.length; i++) {
-      item = data[i];
-      set = datasets.find((d) => d.label === item.label);
-
-      if (set) {
-        set.data.push(DataItem(item));
-      } else {
-        datasets.push(Dataset(item));
-      }
-    }
-
-    return datasets;
-  }
-
-  function createBarStackModel(dataController) {
-    let stacks = dataController.stacks();
-    let byDate = rollup(
-      dataController.data,
-      (v) => sum$2(v, (d) => d.value),
-      (d) => d.date,
-      (d) => d.label
-    );
-
-    // console.log("byDate", byDate);
-
-    return stacks.map(function (stack$1) {
-      let stackData = dataController.data.filter((d) => d.stack === stack$1);
-      let stackLabels = Array.from(group(stackData, (d) => d.label).keys());
-      let stackBuilder = stack()
-        .value((d, key) => d[1].get(key))
-        .keys(stackLabels);
-      let series = stackBuilder(byDate);
-
-      let model = { series, stack: stack$1, label: stack$1 };
-
-      return model;
-    });
-  }
-
-  // export function dataViewBarStacked(data) {
-  //   let datasets = createDatasets(combine(data));
-  //   let dates = data.dates();
-  //   let stacks = data.stacks();
-  //   let datasetStacks = createBarStackModel(this, data);
-  //   let max = d3.max(datasets, (d) => d3.max(d.series, (d) => d[1]));
-  //   let max2 = d3.max(datasets, (stack) =>
-  //     d3.max(stack.series, (series) => d3.max(series.map((item) => item["1"])))
-  //   );
-
-  //   console.log("max", max);
-  //   console.log("max2", max2);
-
-  //   return {
-  //     datasets,
-  //     dates,
-  //     stacks,
-  //     datasetStacks,
-  //     max,
-  //   };
-  // }
-
   function dataViewBar(dataController) {
+    let snapshot = dataController.snapshot;
+    let data = snapshot || dataController.data;
+    console.log("data", data);
+    console.log("snapshot", snapshot);
+
     let dates = dataController.dates();
     let stacks = dataController.stacks();
     let labels = dataController.labels();
     let enabledStacks = dataController.stacks();
-    let datasets = toDataset(dataController);
-    let stacked = createBarStackModel(dataController);
-    let max = max$3(stacked, (d) =>
-      max$3(d.series, (s) => max$3(s.map((i) => i["1"])))
-    );
 
     let byDateLabel = rollup(
-      dataController.data,
+      data,
       (v) => sum$2(v, (d) => d.value),
       (d) => d.date,
       (d) => d.label
     );
 
     let byDateStack = rollup(
-      dataController.data,
+      data,
       (v) => sum$2(v, (d) => d.value),
       (d) => d.date,
       (d) => d.stack || d.label
     );
 
-    // console.log("byDateLabel", byDateLabel);
+    let byDateStackLabel = rollup(
+      data,
+      (v) => sum$2(v, (d) => d.value),
+      (d) => d.date,
+      (d) => d.stack || d.label,
+      (d) => d.label
+    );
+
+    let byDatesStackSeries = new InternMap();
+    dates.forEach((date) => {
+      let byStackLabel = byDateStackLabel.get(date);
+      if (!byStackLabel) return;
+      byDatesStackSeries.set(date, new InternMap());
+
+      stacks.forEach((stack) => {
+        let byLabel = byStackLabel.get(stack);
+        if (!byLabel) return;
+        let value = 0;
+        let series = Array.from(byLabel)
+          .reverse()
+          .map((item) => [value, (value += item[1]), item[0]]);
+        byDatesStackSeries.get(date).set(stack, series);
+      });
+    });
+
+    let max = max$3(byDateStack, (d) => max$3(d[1], (d) => d[1]));
 
     return {
-      datasets,
-      stacked,
-      data: dataController.data,
       dates,
       stacks,
       enabledStacks,
       byDateLabel,
       byDateStack,
+      byDatesStackSeries,
       labels,
       max,
     };
@@ -21383,7 +21756,7 @@
       this.config.margin = margin;
     }
 
-    appendRenderers() {
+    addRenderers() {
       this.renderers.push(new BarBackgroundRenderer());
       this.renderers.push(new BarAxisRender());
       this.renderers.push(new BarGridRenderer());
@@ -21683,7 +22056,7 @@
           chart.makeUpdateInsensible();
           controller.filters.locations.clear();
           chart.makeUpdateSensible();
-          chart.fire("click", event, null);
+          chart.emit("click", event, null);
         });
     }
   }
@@ -21694,11 +22067,11 @@
       if (!geoJSON) return;
 
       function mouseEnter(event, feature) {
-        chart.fire("mouseenter", event, feature);
+        chart.emit("mouseenter", event, feature);
       }
 
       function mouseOut(event, feature) {
-        chart.fire("mouseout", event, feature);
+        chart.emit("mouseout", event, feature);
         // dragged
         if (event.buttons === 1) mouseClick(event, feature);
       }
@@ -21713,7 +22086,7 @@
           controller.filters.locations.toggle(locationID);
           chart.makeUpdateSensible();
         }
-        chart.fire("click", event, feature);
+        chart.emit("click", event, feature);
       }
 
       chart.areas = chart.svg
@@ -22875,8 +23248,8 @@
         .attr("x", 0)
         .attr("y", 0);
 
-      chart.addListener("mouseenter", () => legend.raise());
-      chart.addListener("mouseout", () => legend.raise());
+      chart.on("mouseenter", () => legend.raise());
+      chart.on("mouseout", () => legend.raise());
 
       legend
         .append("text")
@@ -22980,11 +23353,19 @@
   class MapDatasetRenderer extends Renderer {
     render(chart, controller, dataView) {
       let generator = MapColors(1);
+      let selectionOpacity = 0.1;
+
+      function opacity(location) {
+        return controller.filters.locations.contains(location)
+          ? selectionOpacity
+          : 1;
+      }
 
       function resetAreas() {
         chart.svg
           .selectAll(".ltv-map-chart-area")
-          .classed("ltv-map-chart-area-hover", false);
+          .classed("ltv-map-chart-area-hover", false)
+          .attr("opacity", (item) => opacity(item.lotivisId));
       }
 
       function featureMapID(feature) {
@@ -23005,9 +23386,9 @@
         chart.svg.selectAll(".ltv-location-chart-label").raise();
       }
 
-      chart.addListener("mouseenter", mouseEnter);
-      chart.addListener("mouseout", resetAreas);
-      chart.addListener("click", mouseEnter);
+      chart.on("mouseenter", mouseEnter);
+      chart.on("mouseout", resetAreas);
+      chart.on("click", mouseEnter);
 
       if (!chart.geoJSON) return lotivis_log("[lotivis]  No GeoJSON to render.");
       if (!chart.dataView) return;
@@ -23050,7 +23431,8 @@
         chart.svg.selectAll(".ltv-map-chart-label").raise();
       }
 
-      chart.addListener("mouseenter", raise);
+      chart.on("mouseenter", raise);
+      chart.on("click", raise);
 
       chart.svg.selectAll(".ltv-map-chart-label").remove();
       chart.svg
@@ -23224,9 +23606,9 @@
         tooltip.style("opacity", 0);
       }
 
-      chart.addListener("mouseenter", mouseEnter);
-      chart.addListener("mouseout", mouseOut);
-      chart.addListener("click", mouseEnter);
+      chart.on("mouseenter", mouseEnter);
+      chart.on("mouseout", mouseOut);
+      chart.on("click", mouseEnter);
     }
   }
 
@@ -23278,8 +23660,8 @@
           .raise();
       }
 
-      chart.addListener("mouseout", raise);
-      chart.addListener("click", _render);
+      chart.on("mouseout", raise);
+      chart.on("click", _render);
 
       _render();
     }
@@ -23303,7 +23685,10 @@
    * }
    * ```
    */
-  function dataViewMap(data) {
+  function dataViewMap(dataController) {
+    let data = dataController.snapshot || dataController.data;
+    // console.log("data", data);
+
     let byLocationLabel = rollup(
       data,
       (v) => sum$2(v, (d) => d.value),
@@ -23329,9 +23714,9 @@
     let maxStack = max$3(byLocationStack, (i) => max$3(i[1], (d) => d[1]));
 
     return {
-      labels: data.labels(),
-      stacks: data.stacks(),
-      locations: data.locations(),
+      labels: dataController.labels(),
+      stacks: dataController.stacks(),
+      locations: dataController.locations(),
       max: max,
       maxLabel,
       maxStack,
@@ -23356,7 +23741,7 @@
       this.path = index$3().projection(this.projection);
     }
 
-    appendRenderers() {
+    addRenderers() {
       this.renderers.push(new MapBackgroundRenderer());
       this.renderers.push(new MapExteriorBorderRenderer());
       this.renderers.push(new MapGeojsonRenderer());
@@ -23378,7 +23763,7 @@
     }
 
     createDataView() {
-      return dataViewMap(this.controller.data);
+      return dataViewMap(this.controller);
     }
 
     zoomTo(geoJSON) {
@@ -23569,8 +23954,8 @@
         tooltip.style("opacity", 0);
       }
 
-      chart.addListener("mouseenter", showTooltip);
-      chart.addListener("mouseout", hideTooltip);
+      chart.on("mouseenter", showTooltip);
+      chart.on("mouseout", hideTooltip);
     }
   }
 
@@ -23636,7 +24021,7 @@
         .attr("class", `ltv-plot-chart-background`)
         .on("click", (e, b) => {
           chart.controller.filters.labels.clear();
-          chart.fire("click", e, null);
+          chart.emit("click", e, null);
         });
     }
   }
@@ -23657,7 +24042,7 @@
         let id = createID(dataset);
         chart.svg.select(`#${id}`).attr("opacity", 0.3);
 
-        chart.fire("mouseenter", event, dataset);
+        chart.emit("mouseenter", event, dataset);
       }
 
       function mouseOut(event, dataset) {
@@ -23666,7 +24051,7 @@
         if (event.buttons === 1) {
           mouseClick(event, dataset);
         }
-        chart.fire("mouseout", event, dataset);
+        chart.emit("mouseout", event, dataset);
       }
 
       function mouseClick(event, dataset) {
@@ -23675,7 +24060,7 @@
           chart.controller.filters.labels.toggle(dataset.label);
           chart.makeUpdateSensible();
         }
-        chart.fire("click", event, dataset);
+        chart.emit("click", event, dataset);
       }
 
       let datasets = chart.dataView.datasets;
@@ -23708,8 +24093,12 @@
 
       let radius = LOTIVIS_CONFIG$1.barRadius;
       let max = chart.dataView.max;
+      let brush = max / 2;
       let data = chart.dataView.byLabelDate;
-      let colors = MapColors(max);
+      MapColors(max);
+      let colorGenerator = controller.colorGenerator;
+
+      console.log("max", max);
 
       chart.barsData = chart.svg.append("g").selectAll("g").data(data).enter();
 
@@ -23717,20 +24106,24 @@
         .append("g")
         .attr("transform", (d) => `translate(0,${chart.yChartPadding(d[0])})`)
         .attr("id", (d) => "ltv-plot-rect-" + hash_str(d[0]))
+        .attr(`fill`, (d) =>
+          colorGenerator.label(d[0]) 
+        )
         .selectAll(".rect")
         .data((d) => d[1]) // map to dates data
         .enter()
         .filter((d) => d[1] > 0)
         .append("rect")
         .attr("class", "ltv-plot-bar")
-        .attr(`fill`, (d) => colors(d[1]))
+        .attr(`fill`, (d) => (null ))
+        .attr("opacity", (d) =>
+          (d[1] + brush) / (max + brush) 
+        )
         .attr("rx", radius)
         .attr("ry", radius)
         .attr("x", (d) => chart.xChart(d[0]))
         .attr("width", chart.xChart.bandwidth())
-        .attr("height", chart.yChartPadding.bandwidth())
-        .on("mouseenter", (e, d) => chart.fire("mouseenter", e, d))
-        .on("mouseout", (e, d) => chart.fire("mouseout", e, d));
+        .attr("height", chart.yChartPadding.bandwidth());
     }
   }
 
@@ -23810,6 +24203,7 @@
 
       chart.bars = chart.barsData
         .append("rect")
+        .attr("transform", (d) => `translate(0,${chart.yChartPadding(d.label)})`)
         .attr("fill", (d) => `url(#ltv-plot-gradient-${hash_str(d.label)})`)
         .attr("class", "ltv-plot-bar")
         .attr("rx", radius)
@@ -23817,7 +24211,7 @@
         .attr("x", (d) =>
           chart.xChart(d.duration < 0 ? d.lastDate : d.firstDate || 0)
         )
-        .attr("y", (d) => chart.yChartPadding(d.label))
+        // .attr("y", (d) => chart.yChartPadding(d.label))
         .attr("height", chart.yChartPadding.bandwidth())
         .attr("id", (d) => "ltv-plot-rect-" + hash_str(d.label))
         .attr("width", (d) => {
@@ -23891,7 +24285,7 @@
         update();
       }
 
-      chart.addListener("click", update);
+      chart.on("click", update);
 
       _render();
     }
@@ -23899,7 +24293,9 @@
 
   function dataViewPlot(dataController) {
     let dates = dataController.dates();
-    let data = dataController.data;
+    let data = dataController.snapshot || dataController.data;
+
+    console.log("data", data);
 
     let byLabelDate = rollups(
       data,
@@ -23914,7 +24310,8 @@
         .filter((d) => d[1] > 0)
         .map((d) => {
           return { date: d[0], value: d[1] };
-        });
+        })
+        .sort((a, b) => a.date - b.date);
 
       let sum = sum$2(data, (d) => d.value);
       let firstDate = data[0]?.date;
@@ -23950,7 +24347,7 @@
       this.config.margin = margin;
     }
 
-    appendRenderers() {
+    addRenderers() {
       this.renderers.push(new PlotBackgroundRenderer());
       this.renderers.push(new PlotAxisRenderer());
       this.renderers.push(new PlotGridRenderer());

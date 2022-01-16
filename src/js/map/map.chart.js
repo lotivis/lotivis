@@ -12,7 +12,7 @@ import { MapDatasetRenderer } from "./map.dataset";
 import { MapLabelsRenderer } from "./map.labels";
 import { MapTooltipRenderer } from "./map.tooltip";
 import { MapSelectionRenderer } from "./map.selection";
-import { dataViewMap } from "./data.view.map.js";
+import { dataViewMap } from "./map.data.view.js";
 
 export class MapChart extends Chart {
   initialize() {
@@ -29,7 +29,7 @@ export class MapChart extends Chart {
     this.path = d3.geoPath().projection(this.projection);
   }
 
-  appendRenderers() {
+  addRenderers() {
     this.renderers.push(new MapBackgroundRenderer());
     this.renderers.push(new MapExteriorBorderRenderer());
     this.renderers.push(new MapGeojsonRenderer());
@@ -51,7 +51,7 @@ export class MapChart extends Chart {
   }
 
   createDataView() {
-    return dataViewMap(this.controller.data);
+    return dataViewMap(this.controller);
   }
 
   zoomTo(geoJSON) {

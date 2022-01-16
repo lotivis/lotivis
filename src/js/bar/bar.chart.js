@@ -10,7 +10,7 @@ import { BarSelectionRenderer } from "./bar.selection";
 import { BarHoverRenderer } from "./bar.bars.hover";
 import { BarGridRenderer } from "./bar.grid.js";
 import { BarBackgroundRenderer } from "./bar.background.js";
-import { dataViewBar } from "./data.view.bar.js";
+import { dataViewBar } from "./bar.data.view.js";
 
 export class BarChart extends Chart {
   static Type = BAR_CHART_TYPE;
@@ -24,7 +24,7 @@ export class BarChart extends Chart {
     this.config.margin = margin;
   }
 
-  appendRenderers() {
+  addRenderers() {
     this.renderers.push(new BarBackgroundRenderer());
     this.renderers.push(new BarAxisRender());
     this.renderers.push(new BarGridRenderer());

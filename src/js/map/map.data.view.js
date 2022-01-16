@@ -18,7 +18,10 @@ import * as d3 from "d3";
  * }
  * ```
  */
-export function dataViewMap(data) {
+export function dataViewMap(dataController) {
+  let data = dataController.snapshot || dataController.data;
+  // console.log("data", data);
+
   let byLocationLabel = d3.rollup(
     data,
     (v) => d3.sum(v, (d) => d.value),
@@ -44,9 +47,9 @@ export function dataViewMap(data) {
   let maxStack = d3.max(byLocationStack, (i) => d3.max(i[1], (d) => d[1]));
 
   return {
-    labels: data.labels(),
-    stacks: data.stacks(),
-    locations: data.locations(),
+    labels: dataController.labels(),
+    stacks: dataController.stacks(),
+    locations: dataController.locations(),
     max: max,
     maxLabel,
     maxStack,

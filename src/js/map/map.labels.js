@@ -15,7 +15,8 @@ export class MapLabelsRenderer extends Renderer {
       chart.svg.selectAll(".ltv-map-chart-label").raise();
     }
 
-    chart.addListener("mouseenter", raise);
+    chart.on("mouseenter", raise);
+    chart.on("click", raise);
 
     chart.svg.selectAll(".ltv-map-chart-label").remove();
     chart.svg

@@ -32,7 +32,7 @@ export class PlotChart extends Chart {
     this.config.margin = margin;
   }
 
-  appendRenderers() {
+  addRenderers() {
     this.renderers.push(new PlotBackgroundRenderer());
     this.renderers.push(new PlotAxisRenderer());
     this.renderers.push(new PlotGridRenderer());

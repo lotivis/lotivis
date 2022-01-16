@@ -4,7 +4,6 @@ import { safeId } from "../common/safe.id.js";
 export class LabelsLabelsRenderer extends Renderer {
   render(chart, controller, dataView) {
     // let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
-    let checkboxSize = "13px";
     let stacks = dataView.stacks;
     let colors = controller.colorGenerator;
 
@@ -32,31 +31,34 @@ export class LabelsLabelsRenderer extends Renderer {
       .enter()
       .append("div")
       .attr("id", (s) => stackId(s))
-      .style("display", "block");
+      .attr("class", "ltv-stack-labels-container")
+      .style("color", (s) => colors.stack(s))
+      .html((d, i) => "Stack " + (i + 1) + "<br/>");
 
     let divs = stackDivs
-      .selectAll(".div")
+      .selectAll(".label")
       .data((d) => dataView.byStackLabel.get(d))
       .enter()
-      .append("div")
-      .style("display", "inline-block")
-      .style("margin-right", "10px")
-      .style("color", (d) => colors.label(d[0]));
+      .append("label")
+      .attr("class", "ltv-pill-checkbox");
 
     let checkboxes = divs
       .append("input")
       .attr("type", "checkbox")
       .attr("checked", (d) => (filter(d[0]) ? null : true))
       .attr("id", (d) => labelId(d[0]))
-      .attr("name", (d) => labelId(d[0]))
-      .style("width", checkboxSize)
-      .style("height", checkboxSize)
       .on("change", (e, d) => toggle(d[0]));
 
-    let labelsOfCheckboxes = divs
-      .append("label")
-      .style("margin-left", "5px")
-      .attr("for", (d) => labelId(d[0]))
-      .text((d) => "" + d[0]);
+    let spans = divs
+      .append("span")
+      .attr("class", "ltv-pill-checkbox-span")
+      .style("background-color", (d) => colors.label(d[0]))
+      .text((d) => "" + d[0] + "(" + dataView.byLabel.get(d[0]) + ")");
+
+    // let labelsOfCheckboxes = divs
+    //   .append("label")
+    //   .style("margin-left", "5px")
+    //   .attr("for", (d) => labelId(d[0]))
+    //   .text((d) => "" + d[0]);
   }
 }

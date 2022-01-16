@@ -37,7 +37,7 @@ export class PlotChartSelectionRenderer extends Renderer {
       update();
     }
 
-    chart.addListener("click", update);
+    chart.on("click", update);
 
     _render();
   }

@@ -17,7 +17,7 @@ export class PlotHoverBarsRenderer extends Renderer {
       let id = createID(dataset);
       chart.svg.select(`#${id}`).attr("opacity", 0.3);
 
-      chart.fire("mouseenter", event, dataset);
+      chart.emit("mouseenter", event, dataset);
     }
 
     function mouseOut(event, dataset) {
@@ -26,7 +26,7 @@ export class PlotHoverBarsRenderer extends Renderer {
       if (event.buttons === 1) {
         mouseClick(event, dataset);
       }
-      chart.fire("mouseout", event, dataset);
+      chart.emit("mouseout", event, dataset);
     }
 
     function mouseClick(event, dataset) {
@@ -35,7 +35,7 @@ export class PlotHoverBarsRenderer extends Renderer {
         chart.controller.filters.labels.toggle(dataset.label);
         chart.makeUpdateSensible();
       }
-      chart.fire("click", event, dataset);
+      chart.emit("click", event, dataset);
     }
 
     let datasets = chart.dataView.datasets;

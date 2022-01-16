@@ -6,11 +6,19 @@ import { Renderer } from "../common/renderer";
 export class MapDatasetRenderer extends Renderer {
   render(chart, controller, dataView) {
     let generator = MapColors(1);
+    let selectionOpacity = 0.1;
+
+    function opacity(location) {
+      return controller.filters.locations.contains(location)
+        ? selectionOpacity
+        : 1;
+    }
 
     function resetAreas() {
       chart.svg
         .selectAll(".ltv-map-chart-area")
-        .classed("ltv-map-chart-area-hover", false);
+        .classed("ltv-map-chart-area-hover", false)
+        .attr("opacity", (item) => opacity(item.lotivisId));
     }
 
     function featureMapID(feature) {
@@ -31,9 +39,9 @@ export class MapDatasetRenderer extends Renderer {
       chart.svg.selectAll(".ltv-location-chart-label").raise();
     }
 
-    chart.addListener("mouseenter", mouseEnter);
-    chart.addListener("mouseout", resetAreas);
-    chart.addListener("click", mouseEnter);
+    chart.on("mouseenter", mouseEnter);
+    chart.on("mouseout", resetAreas);
+    chart.on("click", mouseEnter);
 
     if (!chart.geoJSON) return lotivis_log("[lotivis]  No GeoJSON to render.");
     if (!chart.dataView) return;

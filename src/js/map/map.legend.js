@@ -28,8 +28,8 @@ export class MapLegendRenderer extends Renderer {
       .attr("x", 0)
       .attr("y", 0);
 
-    chart.addListener("mouseenter", () => legend.raise());
-    chart.addListener("mouseout", () => legend.raise());
+    chart.on("mouseenter", () => legend.raise());
+    chart.on("mouseout", () => legend.raise());
 
     legend
       .append("text")

@@ -1,18 +1,13 @@
 import * as d3 from "d3";
 
-export function filter(controller) {
-  let data = controller.data;
-  let filters = controller.filters;
-  let filtered = d3.filter(data, (d) => {
+export function snapshot(controller) {
+  let f = controller.filters;
+  return d3.filter(controller.data, (d) => {
     return !(
-      (d.location && filters.locations.contains(d.location)) ||
-      (d.date && filters.dates.contains(d.date)) ||
-      (d.label && filters.labels.contains(d.label)) ||
-      (d.stack && filters.stacks.contains(d.stack))
+      (d.location && f.locations.contains(d.location)) ||
+      (d.date && f.dates.contains(d.date)) ||
+      (d.label && f.labels.contains(d.label)) ||
+      (d.stack && f.stacks.contains(d.stack))
     );
   });
-
-  // console.log("filtered", filtered);
-
-  return filtered;
 }

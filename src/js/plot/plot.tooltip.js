@@ -88,7 +88,7 @@ export class PlotTooltipRenderer extends Renderer {
       tooltip.style("opacity", 0);
     }
 
-    chart.addListener("mouseenter", showTooltip);
-    chart.addListener("mouseout", hideTooltip);
+    chart.on("mouseenter", showTooltip);
+    chart.on("mouseout", hideTooltip);
   }
 }

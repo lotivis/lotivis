@@ -12,7 +12,7 @@ export class MapBackgroundRenderer extends Renderer {
         chart.makeUpdateInsensible();
         controller.filters.locations.clear();
         chart.makeUpdateSensible();
-        chart.fire("click", event, null);
+        chart.emit("click", event, null);
       });
   }
 }

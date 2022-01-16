@@ -2,7 +2,9 @@ import * as d3 from "d3";
 
 export function dataViewPlot(dataController) {
   let dates = dataController.dates();
-  let data = dataController.data;
+  let data = dataController.snapshot || dataController.data;
+
+  console.log("data", data);
 
   let byLabelDate = d3.rollups(
     data,
@@ -17,7 +19,8 @@ export function dataViewPlot(dataController) {
       .filter((d) => d[1] > 0)
       .map((d) => {
         return { date: d[0], value: d[1] };
-      });
+      })
+      .sort((a, b) => a.date - b.date);
 
     let sum = d3.sum(data, (d) => d.value);
     let firstDate = data[0]?.date;

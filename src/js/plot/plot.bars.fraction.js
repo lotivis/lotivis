@@ -1,5 +1,5 @@
 import hash_str from "../common/hash";
-import { MapColors } from "../common/colors";
+import { ColorRange, MapColors } from "../common/colors";
 import { Renderer } from "../common/renderer";
 import { PLOT_CHART_TYPE } from "./plot.config";
 import { LOTIVIS_CONFIG } from "../common/config";
@@ -10,8 +10,14 @@ export class PlotBarsFractionsRenderer extends Renderer {
 
     let radius = LOTIVIS_CONFIG.barRadius;
     let max = chart.dataView.max;
+    let brush = max / 2;
     let data = chart.dataView.byLabelDate;
     let colors = MapColors(max);
+    let colorGenerator = controller.colorGenerator;
+
+    let colorMode = "differ"; // "differ", "same"
+
+    console.log("max", max);
 
     chart.barsData = chart.svg.append("g").selectAll("g").data(data).enter();
 
@@ -19,19 +25,23 @@ export class PlotBarsFractionsRenderer extends Renderer {
       .append("g")
       .attr("transform", (d) => `translate(0,${chart.yChartPadding(d[0])})`)
       .attr("id", (d) => "ltv-plot-rect-" + hash_str(d[0]))
+      .attr(`fill`, (d) =>
+        colorMode === "differ" ? colorGenerator.label(d[0]) : null
+      )
       .selectAll(".rect")
       .data((d) => d[1]) // map to dates data
       .enter()
       .filter((d) => d[1] > 0)
       .append("rect")
       .attr("class", "ltv-plot-bar")
-      .attr(`fill`, (d) => colors(d[1]))
+      .attr(`fill`, (d) => (colorMode === "differ" ? null : colors(d[1])))
+      .attr("opacity", (d) =>
+        colorMode === "differ" ? (d[1] + brush) / (max + brush) : 1
+      )
       .attr("rx", radius)
       .attr("ry", radius)
       .attr("x", (d) => chart.xChart(d[0]))
       .attr("width", chart.xChart.bandwidth())
-      .attr("height", chart.yChartPadding.bandwidth())
-      .on("mouseenter", (e, d) => chart.fire("mouseenter", e, d))
-      .on("mouseout", (e, d) => chart.fire("mouseout", e, d));
+      .attr("height", chart.yChartPadding.bandwidth());
   }
 }

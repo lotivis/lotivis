@@ -9,7 +9,7 @@ export class PlotBackgroundRenderer extends Renderer {
       .attr("class", `ltv-plot-chart-background`)
       .on("click", (e, b) => {
         chart.controller.filters.labels.clear();
-        chart.fire("click", e, null);
+        chart.emit("click", e, null);
       });
   }
 }

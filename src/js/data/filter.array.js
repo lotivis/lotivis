@@ -1,4 +1,4 @@
-export class ObservableArray extends Array {
+export class FilterArray extends Array {
   constructor(listener) {
     super();
     this.listener = listener;
@@ -13,6 +13,11 @@ export class ObservableArray extends Array {
       this.push(item), this.notify("add", item, notify);
   }
 
+  addAll(source) {
+    if (!Array.isArray(source)) throw new Error("no array given");
+    this.push(...source), this.notify("add", item, notify);
+  }
+
   remove(item, notify = true) {
     let i = this.indexOf(item);
     if (i !== -1) this.splice(i, 1), this.notify("remove", item, notify);
@@ -20,8 +25,8 @@ export class ObservableArray extends Array {
 
   toggle(item, notify = true) {
     let i = this.indexOf(item);
-    i === -1 ? this.push(item) : this.splice(i, 1),
-      this.notify("toggle", item, notify);
+    i === -1 ? this.push(item) : this.splice(i, 1);
+    this.notify("toggle", item, notify);
   }
 
   contains(item) {
@@ -29,15 +34,9 @@ export class ObservableArray extends Array {
   }
 
   clear(notify = true) {
-    if (this.length !== 0) (c = []), this.notify("clear", null, notify);
-  }
-}
-
-export class Filters {
-  constructor(listener) {
-    this.locations = new ObservableArray((r) => listener("location", r));
-    this.dates = new ObservableArray((r) => listener("dates", r));
-    this.labels = new ObservableArray((r) => listener("labels", r));
-    this.stacks = new ObservableArray((r) => listener("stacks", r));
+    if (this.length !== 0) {
+      this.splice(0, this.length);
+      this.notify("clear", null, notify);
+    }
   }
 }

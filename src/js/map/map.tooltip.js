@@ -153,8 +153,8 @@ export class MapTooltipRenderer extends Renderer {
       tooltip.style("opacity", 0);
     }
 
-    chart.addListener("mouseenter", mouseEnter);
-    chart.addListener("mouseout", mouseOut);
-    chart.addListener("click", mouseEnter);
+    chart.on("mouseenter", mouseEnter);
+    chart.on("mouseout", mouseOut);
+    chart.on("click", mouseEnter);
   }
 }

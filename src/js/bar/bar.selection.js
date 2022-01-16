@@ -3,20 +3,25 @@ import { Renderer } from "../common/renderer";
 
 export class BarSelectionRenderer extends Renderer {
   render(chart, controller) {
+    let selectionOpacity = 0.1;
+
+    function opacity(date) {
+      return controller.filters.dates.contains(date) ? selectionOpacity : 0;
+    }
+
     function createID(date) {
       return `ltv-bar-chart-selection-rect-id-${safeId(String(date))}`;
     }
 
     function redraw() {
-      let filter = controller.filters.dates;
       chart.svg
         .selectAll(`.ltv-bar-chart-selection-rect`)
-        .attr(`opacity`, (date) => (filter.contains(date) ? 0.15 : 0));
+        .attr(`opacity`, (date) => opacity(date))
+        .raise();
     }
 
-    chart.addListener("click-date", redraw);
+    chart.on("click-date", redraw);
 
-    let filter = controller.filters.dates;
     let margin = chart.config.margin;
     let dates = chart.config.dates || chart.dataView.dates;
     let selection = chart.svg
@@ -29,8 +34,9 @@ export class BarSelectionRenderer extends Renderer {
       .attr("id", (date) => createID(date))
       .attr("x", (date) => chart.xChartScale(date))
       .attr("y", margin.top)
-      .attr("opacity", (date) => (filter.includes(String(date)) ? 0.15 : 0))
+      .attr("opacity", (date) => opacity(date))
       .attr("width", chart.xChartScale.bandwidth())
-      .attr("height", chart.config.height - margin.bottom - margin.top);
+      .attr("height", chart.config.height - margin.bottom - margin.top)
+      .raise();
   }
 }
