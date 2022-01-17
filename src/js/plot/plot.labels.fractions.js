@@ -22,6 +22,6 @@ export class PlotLabelsFractionsRenderer extends Renderer {
       .attr("class", "ltv-plot-label")
       .attr("y", (d) => yBandwidth)
       .attr("x", (d) => chart.xChart(d[0]) + 4)
-      .text((d) => (d.sum === 0 ? null : numberFormat.format(d[1])));
+      .text((d) => (d.sum === 0 ? null : numberFormat(d[1])));
   }
 }

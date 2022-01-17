@@ -3,6 +3,8 @@ import { Renderer } from "../common/renderer";
 
 export class BarTooltipRenderer extends Renderer {
   render(chart, controller, dataView) {
+    let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
+
     chart.element.select(".ltv-tooltip").remove();
     const tooltip = chart.element
       .append("div")
@@ -51,14 +53,14 @@ export class BarTooltipRenderer extends Renderer {
           let colorGenerator = chart.controller.colorGenerator;
           let color = colorGenerator.label(label);
           let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
-          let valueFormatted = chart.config.numberFormat.format(value);
+          let valueFormatted = numberFormat(value);
           sum += value;
           return `${divHTML} ${label}: <b>${valueFormatted}</b>`;
         })
         .filter((d) => d)
         .join("<br>");
 
-      let sumFormatted = chart.config.numberFormat.format(sum);
+      let sumFormatted = numberFormat(sum);
       return `<b>${title}</b><br>${dataHTML}<br><br>Sum: <b>${sumFormatted}</b>`;
     }
 

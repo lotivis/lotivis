@@ -25,8 +25,7 @@ export class PlotLabelRenderer extends Renderer {
       )
       .text(function (dataset) {
         if (dataset.sum === 0) return;
-        let formatted = numberFormat.format(dataset.sum);
-        return `${formatted} (${dataset.duration + 1} years)`;
+        return `${numberFormat(dataset.sum)} (${dataset.duration + 1} years)`;
       });
   }
 }

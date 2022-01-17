@@ -1,10 +1,10 @@
 export const DEFAULT_NUMBER_FORMAT = new Intl.NumberFormat("en-EN", {
   maximumFractionDigits: 3,
-});
+}).format;
 
 export const GERMAN_NUMBER_FORMAT = new Intl.NumberFormat("de-DE", {
   maximumFractionDigits: 3,
-});
+}).format;
 
 export var LOTIVIS_CONFIG = {
   // The default margin to use for charts.
@@ -24,7 +24,7 @@ export var LOTIVIS_CONFIG = {
   // A string which is used for unknown values.
   unknown: "LOTIVIS_UNKNOWN",
   // The default number formatter used by all charts.
-  numberFormat: GERMAN_NUMBER_FORMAT.format,
+  numberFormat: GERMAN_NUMBER_FORMAT,
 };
 
 export const DEFAULT_MARGIN = {

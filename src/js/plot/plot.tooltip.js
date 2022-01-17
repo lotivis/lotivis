@@ -3,6 +3,7 @@ import { Renderer } from "../common/renderer";
 
 export class PlotTooltipRenderer extends Renderer {
   render(chart, controller) {
+    let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
     chart.element.select(".ltv-tooltip").remove();
     const tooltip = chart.element
       .append("div")
@@ -19,7 +20,7 @@ export class PlotTooltipRenderer extends Renderer {
       let sum = dataset.data
         .map((item) => item.value)
         .reduce((acc, next) => +acc + +next, 0);
-      let formatted = chart.config.numberFormat.format(sum);
+      let formatted = numberFormat(sum);
 
       components.push("Label: " + dataset.label);
       components.push("");
@@ -32,7 +33,7 @@ export class PlotTooltipRenderer extends Renderer {
       let filtered = dataset.data.filter((item) => item.value !== 0);
       for (let index = 0; index < filtered.length; index++) {
         let entry = filtered[index];
-        let formatted = chart.config.numberFormat.format(entry.value);
+        let formatted = numberFormat(entry.value);
         components.push(`${entry.date}: ${formatted}`);
       }
 

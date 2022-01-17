@@ -6,7 +6,7 @@ export class BarLegendRenderer extends Renderer {
   render(chart, controller, dataView) {
     return;
     let config = chart.config || {};
-    let numberFormat = chart.config.numberFormat || DEFAULT_NUMBER_FORMAT;
+    let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
     let datasets = dataView.datasets;
     let labels = controller.labels();
     let circleRadius = 6;
@@ -45,8 +45,7 @@ export class BarLegendRenderer extends Renderer {
       .style("fill", (d) => colors.label(d.label))
       .text((d) => {
         let value = controller.sumOfLabel(d.label);
-        let formatted = numberFormat.format(value);
-        return `${d.label} (${formatted})`;
+        return `${d.label} (${numberFormat(value)})`;
       })
       .on("click", (e, d) => chart.emit("click-legend", e, d))
       .raise();
