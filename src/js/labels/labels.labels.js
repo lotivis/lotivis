@@ -53,7 +53,7 @@ export class LabelsLabelsRenderer extends Renderer {
       .append("span")
       .attr("class", "ltv-pill-checkbox-span")
       .style("background-color", (d) => colors.label(d[0]))
-      .text((d) => "" + d[0] + "(" + dataView.byLabel.get(d[0]) + ")");
+      .text((d) => "" + d[0] + " (" + dataView.byLabel.get(d[0]) + ")");
 
     // let labelsOfCheckboxes = divs
     //   .append("label")

@@ -1,15 +1,6 @@
 import * as d3 from "d3";
 
-/**
- *
- * @class UrlParameters
- */
 export class UrlParameters {
-  /**
-   * Returns the singleton instance.
-   *
-   * @returns {UrlParameters}
-   */
   static getInstance() {
     if (!UrlParameters.instance) {
       UrlParameters.instance = new UrlParameters();
@@ -17,10 +8,6 @@ export class UrlParameters {
     return UrlParameters.instance;
   }
 
-  /**
-   * Return the current window URL.
-   * @returns {URL}
-   */
   getURL() {
     return new URL(window.location.href);
   }

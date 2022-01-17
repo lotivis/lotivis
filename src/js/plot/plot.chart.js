@@ -55,8 +55,6 @@ export class PlotChart extends Chart {
       .attr("preserveAspectRatio", "xMidYMid meet")
       .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`);
 
-    this.sortDatasets();
-
     let margin = this.config.margin;
     let barsCount = this.dataView.labels.length || 0;
 
@@ -70,11 +68,13 @@ export class PlotChart extends Chart {
       `0 0 ${this.config.width} ${this.preferredHeight}`
     );
 
+    this.sortDatasets();
     this.createScales();
   }
 
   createScales() {
     let dates = this.config.dates || this.config.dates || this.dataView.dates;
+    dates = dates.sort();
     let labels = this.dataView.labels || [];
 
     this.xChart = d3

@@ -1,7 +1,7 @@
 import * as d3 from "d3";
 
 export function dataViewPlot(dataController) {
-  let dates = dataController.dates();
+  let dates = dataController.dates().sort();
   let data = dataController.snapshot || dataController.data;
 
   console.log("data", data);

@@ -24292,7 +24292,7 @@
   }
 
   function dataViewPlot(dataController) {
-    let dates = dataController.dates();
+    let dates = dataController.dates().sort();
     let data = dataController.snapshot || dataController.data;
 
     console.log("data", data);
@@ -24370,8 +24370,6 @@
         .attr("preserveAspectRatio", "xMidYMid meet")
         .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`);
 
-      this.sortDatasets();
-
       let margin = this.config.margin;
       let barsCount = this.dataView.labels.length || 0;
 
@@ -24385,11 +24383,13 @@
         `0 0 ${this.config.width} ${this.preferredHeight}`
       );
 
+      this.sortDatasets();
       this.createScales();
     }
 
     createScales() {
       let dates = this.config.dates || this.config.dates || this.dataView.dates;
+      dates = dates.sort();
       let labels = this.dataView.labels || [];
 
       this.xChart = band()
@@ -24457,16 +24457,7 @@
     }
   }
 
-  /**
-   *
-   * @class UrlParameters
-   */
   class UrlParameters {
-    /**
-     * Returns the singleton instance.
-     *
-     * @returns {UrlParameters}
-     */
     static getInstance() {
       if (!UrlParameters.instance) {
         UrlParameters.instance = new UrlParameters();
@@ -24474,10 +24465,6 @@
       return UrlParameters.instance;
     }
 
-    /**
-     * Return the current window URL.
-     * @returns {URL}
-     */
     getURL() {
       return new URL(window.location.href);
     }

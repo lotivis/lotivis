@@ -13,14 +13,21 @@ export function Dataset(item) {
 export function toDataset(data) {
   let datasets = [],
     item,
-    set;
-
+    set,
+    datum;
   for (let i = 0; i < data.length; i++) {
     item = data[i];
     set = datasets.find((d) => d.label === item.label);
 
     if (set) {
-      set.data.push(DataItem(item));
+      datum = set.data.find(
+        (d) => d.date === item.date && d.location === item.location
+      );
+      if (datum) {
+        datum.value += item.value;
+      } else {
+        set.data.push(DataItem(item));
+      }
     } else {
       datasets.push(Dataset(item));
     }
