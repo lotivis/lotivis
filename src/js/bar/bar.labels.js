@@ -1,4 +1,5 @@
 import { Renderer } from "../common/renderer";
+import { LOTIVIS_CONFIG } from "../common/config.js";
 
 export class BarLabelsRenderer extends Renderer {
   render(chart, controller) {
@@ -14,7 +15,7 @@ export class BarLabelsRenderer extends Renderer {
     let xChartScale = chart.xChartScale;
     let yChart = chart.yChart;
     let xStack = chart.xStack;
-    let numberFormat = chart.config.numberFormat;
+    let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
     let width = chart.xStack.bandwidth() / 2;
 
     let labels = chart.svg.append("g").selectAll("g").data(dates).enter();
@@ -32,7 +33,7 @@ export class BarLabelsRenderer extends Renderer {
         let value = d[1];
         return translate((xStack(stack) || 0) + width, yChart(value) - 5);
       })
-      .text((d) => (d[1] === 0 ? "" : numberFormat.format(d[1])))
+      .text((d) => (d[1] === 0 ? "" : numberFormat(d[1])))
       .raise();
   }
 }

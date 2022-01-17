@@ -24,7 +24,7 @@ export var LOTIVIS_CONFIG = {
   // A string which is used for unknown values.
   unknown: "LOTIVIS_UNKNOWN",
   // The default number formatter used by all charts.
-  numberFormat: DEFAULT_NUMBER_FORMAT.format,
+  numberFormat: GERMAN_NUMBER_FORMAT.format,
 };
 
 export const DEFAULT_MARGIN = {

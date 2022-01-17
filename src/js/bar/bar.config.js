@@ -17,6 +17,5 @@ export const BAR_CHART_CONFIG = {
   type: "stacks",
   labels: false,
   selectable: true,
-  numberFormat: DEFAULT_NUMBER_FORMAT,
   dateAccess: DATE_ACCESS,
 };
