@@ -20646,7 +20646,7 @@
   const DEFAULT_COLUMNS = ["label", "location", "date", "value", "stack"];
 
   function csvParse(text) {
-    return new DataController(csvParse$1(text, d3.autoType));
+    return new DataController(csvParse$1(text, autoType));
   }
 
   async function csv(path) {
