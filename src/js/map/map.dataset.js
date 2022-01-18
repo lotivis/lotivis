@@ -1,6 +1,6 @@
+import { max as d3max } from "d3";
 import { lotivis_log } from "../common/debug";
 import { MapColors } from "../common/colors";
-import * as d3 from "d3";
 import { Renderer } from "../common/renderer";
 
 export class MapDatasetRenderer extends Renderer {
@@ -51,7 +51,7 @@ export class MapDatasetRenderer extends Renderer {
     let stackNames = chart.dataView.stacks;
     let locationToSum = dataView.locationToSum;
     let locations = Array.from(locationToSum.keys());
-    let max = d3.max(locationToSum, (item) => item[1]);
+    let max = d3max(locationToSum, (item) => item[1]);
 
     for (let i = 0; i < locations.length; i++) {
       let location = locations[i];

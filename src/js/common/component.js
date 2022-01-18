@@ -1,7 +1,7 @@
 import * as d3 from "d3";
-import * as events from "events";
+import { EventEmitter } from "./event.emitter.js";
 
-export class Component extends events.EventEmitter {
+export class Component extends EventEmitter {
   constructor(selector) {
     if (!selector) throw new Error("no selector specified");
     super();

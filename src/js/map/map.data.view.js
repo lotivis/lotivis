@@ -1,4 +1,4 @@
-import * as d3 from "d3";
+import { rollup, sum, max } from "d3";
 
 /**
  * Returns a new generated location data view for the current selected datasets.controller of datasets of this controller.
@@ -22,35 +22,35 @@ export function dataViewMap(dataController) {
   let data = dataController.snapshot || dataController.data;
   // console.log("data", data);
 
-  let byLocationLabel = d3.rollup(
+  let byLocationLabel = rollup(
     data,
-    (v) => d3.sum(v, (d) => d.value),
+    (v) => sum(v, (d) => d.value),
     (d) => d.location,
     (d) => d.label
   );
 
-  let byLocationStack = d3.rollup(
+  let byLocationStack = rollup(
     data,
-    (v) => d3.sum(v, (d) => d.value),
+    (v) => sum(v, (d) => d.value),
     (d) => d.location,
     (d) => d.stack
   );
 
-  let locationToSum = d3.rollup(
+  let locationToSum = rollup(
     data,
-    (v) => d3.sum(v, (d) => d.value),
+    (v) => sum(v, (d) => d.value),
     (d) => d.location
   );
 
-  let max = d3.max(locationToSum, (item) => item[1]);
-  let maxLabel = d3.max(byLocationLabel, (i) => d3.max(i[1], (d) => d[1]));
-  let maxStack = d3.max(byLocationStack, (i) => d3.max(i[1], (d) => d[1]));
+  let maxLocation = max(locationToSum, (item) => item[1]);
+  let maxLabel = max(byLocationLabel, (i) => max(i[1], (d) => d[1]));
+  let maxStack = max(byLocationStack, (i) => max(i[1], (d) => d[1]));
 
   return {
     labels: dataController.labels(),
     stacks: dataController.stacks(),
     locations: dataController.locations(),
-    max: max,
+    max: maxLocation,
     maxLabel,
     maxStack,
     byLocationLabel,

@@ -1,7 +1,8 @@
-'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
+/*!
+ * lotivis.js 1.0.94 <https://github.com/lukasdanckwerth/lotivis#readme>
+ * Copyright (c) 2022 Lukas Danckwerth
+ * Released under MIT License
+ */
 function ascending$3(a, b) {
   return a == null || b == null ? NaN : a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
 }
@@ -20690,6 +20691,51 @@ function json(path) {
   });
 }
 
+/**
+ * Returns `true` if the given value not evaluates to false and is not 0. false else.
+ * @param value The value to check.
+ * @returns {boolean} A Boolean value indicating whether the given value is valid.
+ */
+function isValue(value) {
+  return Boolean(value || value === 0);
+}
+
+function DataItem(item) {
+  return { date: item.date, location: item.location, value: item.value };
+}
+
+function Dataset(item) {
+  let set = { label: item.label, data: [DataItem(item)] };
+  if (isValue(item.stack)) set.stack = item.stack;
+  return set;
+}
+
+function toDataset(data) {
+  let datasets = [],
+    item,
+    set,
+    datum;
+  for (let i = 0; i < data.length; i++) {
+    item = data[i];
+    set = datasets.find((d) => d.label === item.label);
+
+    if (set) {
+      datum = set.data.find(
+        (d) => d.date === item.date && d.location === item.location
+      );
+      if (datum) {
+        datum.value += item.value;
+      } else {
+        set.data.push(DataItem(item));
+      }
+    } else {
+      datasets.push(Dataset(item));
+    }
+  }
+
+  return datasets;
+}
+
 class Component extends EventEmitter {
   constructor(selector) {
     if (!selector) throw new Error("no selector specified");
@@ -21264,15 +21310,6 @@ class BarBackgroundRenderer extends Renderer {
       .attr("cursor", "pointer")
       .on("click", (e, b) => chart.emit("click-background", e, b));
   }
-}
-
-/**
- * Returns `true` if the given value not evaluates to false and is not 0. false else.
- * @param value The value to check.
- * @returns {boolean} A Boolean value indicating whether the given value is valid.
- */
-function isValue(value) {
-  return Boolean(value || value === 0);
 }
 
 function dataViewBar(dataController) {
@@ -24052,6 +24089,111 @@ class PlotChart extends Chart {
   }
 }
 
+class LabelsLabelsRenderer extends Renderer {
+  render(chart, controller, dataView) {
+    // let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
+    let stacks = dataView.stacks;
+    let colors = controller.colorGenerator;
+
+    function stackId(stack) {
+      return `ltv-legend-stack-id-${safeId(stack)}`;
+    }
+
+    function labelId(label) {
+      return `ltv-legend-stack-id-${safeId(label)}`;
+    }
+
+    function toggle(label) {
+      chart.makeUpdateInsensible();
+      controller.filters.labels.toggle(label);
+      chart.makeUpdateSensible();
+    }
+
+    function filter(label) {
+      return controller.filters.labels.contains(label);
+    }
+
+    let stackDivs = chart.div
+      .selectAll(".div")
+      .data(stacks)
+      .enter()
+      .append("div")
+      .attr("id", (s) => stackId(s))
+      .attr("class", "ltv-stack-labels-container")
+      .style("color", (s) => colors.stack(s))
+      .html((d, i) => "Stack " + (i + 1) + "<br/>");
+
+    let divs = stackDivs
+      .selectAll(".label")
+      .data((d) => dataView.byStackLabel.get(d))
+      .enter()
+      .append("label")
+      .attr("class", "ltv-pill-checkbox");
+
+    divs
+      .append("input")
+      .attr("type", "checkbox")
+      .attr("checked", (d) => (filter(d[0]) ? null : true))
+      .attr("id", (d) => labelId(d[0]))
+      .on("change", (e, d) => toggle(d[0]));
+
+    divs
+      .append("span")
+      .attr("class", "ltv-pill-checkbox-span")
+      .style("background-color", (d) => colors.label(d[0]))
+      .text((d) => "" + d[0] + " (" + dataView.byLabel.get(d[0]) + ")");
+
+    // let labelsOfCheckboxes = divs
+    //   .append("label")
+    //   .style("margin-left", "5px")
+    //   .attr("for", (d) => labelId(d[0]))
+    //   .text((d) => "" + d[0]);
+  }
+}
+
+function DataViewLabels(dataController) {
+  return {
+    labels: dataController.labels(),
+    stacks: dataController.stacks(),
+    locations: dataController.locations(),
+    byLabel: rollup(
+      dataController.data,
+      (v) => sum$2(v, (d) => d.value),
+      (d) => d.label
+    ),
+    byStackLabel: rollup(
+      dataController.data,
+      (v) => sum$2(v, (d) => d.value),
+      (d) => d.stack || d.label,
+      (d) => d.label
+    ),
+  };
+}
+
+class LabelsChart extends Chart {
+  initialize() {}
+
+  addRenderers() {
+    this.renderers.push(new LabelsLabelsRenderer());
+  }
+
+  createDataView() {
+    return DataViewLabels(this.controller);
+  }
+
+  createSVG() {
+    this.div = this.element
+      .append("div")
+      .attr("id", this.svgSelector)
+      .attr("class", "ltv-chart-div");
+  }
+
+  remove() {
+    this.listeners = {};
+    this.div.selectAll("*").remove();
+  }
+}
+
 class UrlParameters {
   static getInstance() {
     if (!UrlParameters.instance) {
@@ -24122,38 +24264,5 @@ UrlParameters.startYear = "start-year";
 UrlParameters.endYear = "end-year";
 UrlParameters.showTestData = "show-samples";
 
-/**
- * Returns the value if it evaluates to true or is 0.  Returns `LOTIVIS_CONFIG.unknown` else.
- *
- * @param value The value to check.
- * @returns The value or `LOTIVIS_CONFIG.unknown`.
- */
-function toValue(value) {
-  return value || (value === 0 ? 0 : LOTIVIS_CONFIG$1.unknown);
-}
-
-exports.BarChart = BarChart;
-exports.DataController = DataController;
-exports.DateOrdinator = date_ordinator;
-exports.MapChart = MapChart;
-exports.PlotChart = PlotChart;
-exports.UrlParameters = UrlParameters;
-exports.config = LOTIVIS_CONFIG$1;
-exports.createGeoJSON = createGeoJSON;
-exports.csv = csv;
-exports.csvParse = csvParse;
-exports.csvRender = csvRender;
-exports.d3 = index;
-exports.debug = debug;
-exports.extractObjects = extractObjects;
-exports.flatDataset = flatDataset;
-exports.flatDatasets = flatDatasets;
-exports.isValue = isValue;
-exports.joinFeatures = joinFeatures;
-exports.json = json;
-exports.parseDataset = parseDataset;
-exports.parseDatasets = parseDatasets;
-exports.removeFeatures = removeFeatures;
-exports.safeId = safeId;
-exports.toValue = toValue;
-//# sourceMappingURL=lotivis.test.js.map
+export { BarChart, DataController, DataItem, Dataset, date_ordinator as DateOrdinator, LabelsChart, MapChart, PlotChart, UrlParameters, LOTIVIS_CONFIG$1 as config, csv, csvParse, csvRender, index as d3, debug, flatDataset, flatDatasets, json, parseDataset, parseDatasets, toDataset };
+//# sourceMappingURL=lotivis.esm.js.map

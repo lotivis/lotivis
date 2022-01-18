@@ -1,32 +1,26 @@
 {
-  "name": "lotivis",
+  "name": "lotivis.js",
   "version": "1.0.94",
   "description": "Location and time data visualization",
-  "homepage": "https://github.com/lukasdanckwerth/lotivis#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lukasdanckwerth/lotivis.git"
-  },
+  "license": "MIT",
+  "author": "Lukas Danckwerth",
   "keywords": [
     "location",
     "time",
     "data",
     "visualization"
   ],
-  "license": "MIT",
-  "author": "Lukas Danckwerth",
-  "type-bu": "module",
-  "module": "index",
-  "jsdelivr": [
-    "dist/lotivis.css",
-    "dist/lotivis.min.css",
-    "dist/lotivis.js",
-    "dist/lotivis.js.map"
-  ],
-  "unpkg": "dist/lotivis.js",
+  "homepage": "https://github.com/lukasdanckwerth/lotivis#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lukasdanckwerth/lotivis.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lukasdanckwerth/lotivis/issues"
+  },
   "main": "dist/lotivis.js",
-  "file": "dist/lotivis.js",
-  "files": [
+  "module": "dist/lotivis.esm.js",
+  "jsdelivr": [
     "dist/lotivis.css",
     "dist/lotivis.min.css",
     "dist/lotivis.js",
@@ -39,9 +33,6 @@
     "scss": "sass src/index.scss > dist/lotivis.css && sass --style compressed src/index.scss > dist/lotivis.min.css",
     "test": "mocha 'test/**/test.*.js'",
     "copy": "cp dist/lotivis.js ../frc-visualization/public/js/lib && cp dist/lotivis.js.map ../frc-visualization/public/js/lib && cp dist/lotivis.css ../frc-visualization/public/css"
-  },
-  "bugs": {
-    "url": "https://github.com/lukasdanckwerth/lotivis/issues"
   },
   "devDependencies": {
     "@babel/core": "^7.16.7",
@@ -57,8 +48,6 @@
   },
   "dependencies": {
     "d3": "7.1.0",
-    "events": "^3.3.0",
-    "rollup-plugin-polyfill-node": "^0.8.0",
     "topojson-client": "^3.1.0",
     "topojson-server": "^3.0.1",
     "topojson-simplify": "^3.0.3"

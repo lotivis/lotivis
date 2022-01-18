@@ -1,10 +1,10 @@
 import * as d3 from "d3";
-import { EventEmitter } from "events";
 import { DEFAULT_DATE_ORDINATOR } from "./date.ordinator";
 import { ColorGenerator } from "../common/colors";
 import { FilterArray } from "./filter.array";
 import { set_data_preview } from "../common/debug";
 import { snapshot } from "./controller.snapshot.js";
+import { EventEmitter } from "../common/event.emitter";
 
 export class DataController extends EventEmitter {
   constructor(flat, config) {

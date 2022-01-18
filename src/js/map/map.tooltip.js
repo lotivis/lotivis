@@ -1,5 +1,5 @@
 import { LOTIVIS_CONFIG } from "../common/config";
-import * as d3 from "d3";
+import { geoBounds } from "d3";
 import { Renderer } from "../common/renderer";
 
 export class MapTooltipRenderer extends Renderer {
@@ -78,7 +78,7 @@ export class MapTooltipRenderer extends Renderer {
       // position tooltip
       let tooltipSize = getTooltipSize();
       let projection = chart.projection;
-      let featureBounds = d3.geoBounds(feature);
+      let featureBounds = geoBounds(feature);
       let featureLowerLeft = projection(featureBounds[0]);
       let featureUpperRight = projection(featureBounds[1]);
       let featureBoundsWidth = featureUpperRight[0] - featureLowerLeft[0];

@@ -1,4 +1,4 @@
-import * as d3 from "d3";
+import { max as d3max } from "d3";
 import { LOTIVIS_CONFIG } from "../common/config";
 import { MapColors } from "../common/colors";
 import { Renderer } from "../common/renderer";
@@ -11,7 +11,7 @@ export class MapLegendRenderer extends Renderer {
     let stackNames = chart.dataView.stacks;
     let label = chart.config.label || stackNames[0];
     let locationToSum = dataView.locationToSum;
-    let max = d3.max(locationToSum, (item) => item[1]);
+    let max = d3max(locationToSum, (item) => item[1]);
 
     let offset = 0 * 80;
     let labelColor = chart.controller.colorGenerator.stack(label);

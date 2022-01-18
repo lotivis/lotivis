@@ -1,5 +1,3 @@
-import * as d3 from "d3";
-
 export class UrlParameters {
   static getInstance() {
     if (!UrlParameters.instance) {
@@ -50,10 +48,9 @@ export class UrlParameters {
   }
 
   updateCurrentPageFooter() {
-    // console.log('window.lotivisApplication: ' + window.lotivisApplication);
-    // window.lotivisApplication.currentPage.updateFooter();
-    const url = this.getURL();
-    d3.select("#lotivis-url-container").text(url);
+    if (typeof document === "undefined") return;
+    let urlContainer = document.getElementById("lotivis-url-container");
+    if (urlContainer) urlContainer.innerText = this.getURL();
   }
 }
 
@@ -69,5 +66,4 @@ UrlParameters.valueType = "value-type";
 UrlParameters.searchSensitivity = "search-sensitivity";
 UrlParameters.startYear = "start-year";
 UrlParameters.endYear = "end-year";
-
 UrlParameters.showTestData = "show-samples";

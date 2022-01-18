@@ -1,4 +1,4 @@
-import * as d3 from "d3";
+import { json as d3json } from "d3";
 import { DataController } from "../data/controller";
 import { DataUnqualifiedError } from "../data/data.unqalified.error.js";
 
@@ -27,7 +27,7 @@ export function flatDatasets(ds) {
 }
 
 export function json(path) {
-  return d3.json(path).then((json) => {
+  return d3json(path).then((json) => {
     if (!Array.isArray(json)) throw new DataUnqualifiedError();
     let flat = flatDatasets(json);
     let controller = new DataController(flat, { original: json });

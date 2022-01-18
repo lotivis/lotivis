@@ -1,4 +1,4 @@
-import * as d3 from "d3";
+import { geoMercator, geoPath, geoCentroid } from "d3";
 import { Chart } from "../common/chart.js";
 import { MAP_CHART_CONFIG } from "./map.chart.config";
 import { removeFeatures } from "../geojson/remove.features";
@@ -25,8 +25,8 @@ export class MapChart extends Chart {
     this.config = Object.assign(config, this.config);
     this.config.margin = margin;
 
-    this.projection = d3.geoMercator();
-    this.path = d3.geoPath().projection(this.projection);
+    this.projection = geoMercator();
+    this.path = geoPath().projection(this.projection);
   }
 
   addRenderers() {
@@ -74,7 +74,7 @@ export class MapChart extends Chart {
   geoJSONDidChange() {
     if (!this.geoJSON) return;
     // precalculate the center of each feature
-    this.geoJSON.features.forEach((f) => (f.center = d3.geoCentroid(f)));
+    this.geoJSON.features.forEach((f) => (f.center = geoCentroid(f)));
 
     if (this.config.excludedFeatureCodes) {
       this.presentedGeoJSON = removeFeatures(

@@ -1,4 +1,3 @@
-import * as d3 from "d3";
 import { Chart } from "../common/chart.js";
 import { LabelsLabelsRenderer } from "./labels.labels.js";
 import { DataViewLabels } from "./labels.data.view.js";

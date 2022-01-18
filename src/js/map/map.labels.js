@@ -1,4 +1,4 @@
-import * as d3 from "d3";
+import { sum as d3sum } from "d3";
 import { LOTIVIS_CONFIG } from "../common/config";
 import { lotivis_log } from "../common/debug";
 import { Renderer } from "../common/renderer";
@@ -31,7 +31,7 @@ export class MapLabelsRenderer extends Renderer {
         if (!data) return "";
         let labels = Array.from(data.keys());
         let values = labels.map((label) => data.get(label));
-        let sum = d3.sum(values);
+        let sum = d3sum(values);
         return sum === 0 ? "" : numberFormat(sum);
       })
       .attr("x", (f) => chart.projection(f.center)[0])

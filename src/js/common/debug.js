@@ -37,3 +37,6 @@ export function set_data_preview(v) {
   let e = document.getElementById("ltv-data-preview");
   if (e) e.textContent = s;
 }
+export function runsInBrowser() {
+  return !(typeof document === "undefined");
+}

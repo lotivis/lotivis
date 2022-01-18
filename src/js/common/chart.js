@@ -5,7 +5,6 @@ import { DataController } from "../data/controller";
 export class Chart extends Component {
   constructor(selector, config) {
     super(selector);
-    this.setMaxListeners(20);
 
     this.svgSelector = (this.selector || create_id()) + "-svg";
     this.config = config || {};

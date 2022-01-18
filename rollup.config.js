@@ -1,55 +1,49 @@
-/* eslint-env es6 */
-const resolve = require("@rollup/plugin-node-resolve").default;
-const execute = require("rollup-plugin-execute");
-const polyfill = require("rollup-plugin-polyfill-node");
-const pkg = require("./package.json");
-// import { babel } from "@rollup/plugin-babel";
+import resolve from "@rollup/plugin-node-resolve";
+import execute from "rollup-plugin-execute";
+import * as pkg from "./package.json";
 
 const banner = `/*!
- * lotivis.js v${pkg.version}
- * ${pkg.homepage}
- * (c) ${new Date(
-   new Date().getTime()
- ).getFullYear()} lotivis.js Lukas Danckwerth
- * Released under the MIT License
+ * ${pkg.name} ${pkg.version} <${pkg.homepage}>
+ * Copyright (c) ${new Date(new Date().getTime()).getFullYear()} ${pkg.author}
+ * Released under ${pkg.license} License
  */`;
 
-module.exports = [
+export default [
   // UMD builds
   {
     input: "src/index.js",
-    plugins: [
-      polyfill(),
-      resolve({
-        jsnext: true,
-      }),
-      // babel({ babelHelpers: "bundled" }),
-      execute("sass src/index.scss > dist/lotivis.css"),
-      execute("sass --style compressed src/index.scss > dist/lotivis.min.css"),
-      execute("npm run copy"),
+    plugins: [resolve(), execute("npm run scss"), execute("npm run copy")],
+    output: [
+      {
+        sourcemap: true,
+        name: "lotivis",
+        file: "dist/lotivis.js",
+        banner,
+        format: "umd",
+      },
+      {
+        sourcemap: true,
+        name: pkg.name,
+        file: pkg.module,
+        banner,
+        format: "esm",
+      },
     ],
-    output: {
-      sourcemap: true,
-      name: "lotivis",
-      file: "dist/lotivis.js",
-      banner,
-      format: "umd",
-    },
   },
+  // CJS for tests
   {
     input: "src/index.test.js",
     plugins: [
-      polyfill(),
       resolve({
         jsnext: true,
       }),
       // execute("npm run test"),
     ],
     output: {
-      sourcemap: true,
       name: "lotivis.test",
       file: "dist/lotivis.test.js",
-      format: "umd",
+      format: "cjs",
+      sourcemap: true,
     },
   },
 ];

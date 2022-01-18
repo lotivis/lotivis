@@ -14,7 +14,7 @@ export { PlotChart } from "./js/plot/plot.chart.js";
 export { LabelsChart } from "./js/labels/labels.chart.js";
 
 /* common */
-// export * from "./js/common/url.parameters";
+export * from "./js/common/url.parameters";
 export { debug } from "./js/common/debug";
 export { LOTIVIS_CONFIG as config } from "./js/common/config.js";
 
