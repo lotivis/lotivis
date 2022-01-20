@@ -1,11 +1,12 @@
 import { sum as d3sum } from "d3";
 import { LOTIVIS_CONFIG } from "../common/config";
-import { lotivis_log } from "../common/debug";
+import { D_LOG } from "../common/debug";
 import { Renderer } from "../common/renderer";
 
 export class MapLabelsRenderer extends Renderer {
   render(chart, controller, dataView) {
-    if (!chart.geoJSON) return lotivis_log(`[lotivis]  No GeoJSON to render.`);
+    if (!chart.geoJSON)
+      return D_LOG ? console.log("[ltv]  No GeoJSON to render.") : null;
     if (!dataView) return;
     if (!chart.config.labels) return;
 

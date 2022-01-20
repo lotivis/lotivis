@@ -4,8 +4,6 @@ export function dataViewPlot(dataController) {
   let dates = dataController.dates().sort();
   let data = dataController.snapshot || dataController.data;
 
-  console.log("data", data);
-
   let byLabelDate = d3.rollups(
     data,
     (v) => d3.sum(v, (d) => d.value),

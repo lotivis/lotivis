@@ -1,14 +1,16 @@
 import { joinFeatures } from "../geojson/join.features";
-import { lotivis_log } from "../common/debug";
+import { D_LOG } from "../common/debug";
 import { Renderer } from "../common/renderer";
 
 export class MapExteriorBorderRenderer extends Renderer {
   render(chart, controller) {
     let geoJSON = chart.presentedGeoJSON;
-    if (!geoJSON) return lotivis_log("[lotivis]  No GeoJSON to render.");
+    if (!geoJSON)
+      return D_LOG ? console.log("[ltv]  No GeoJSON to render.") : null;
 
     let bordersGeoJSON = joinFeatures(geoJSON.features);
-    if (!bordersGeoJSON) return lotivis_log("[lotivis]  No borders to render.");
+    if (!bordersGeoJSON)
+      return D_LOG ? console.log("[ltv]  No borders to render.") : null;
 
     let borders = chart.svg
       .selectAll(".ltv-map-chart-exterior-borders")

@@ -1,10 +1,14 @@
-import { plotColors } from "../common/colors";
-import hash_str from "../common/hash.js";
+import { PlotColors } from "../common/colors";
+import { PLOT_COLOR_MODE } from "./plot.config";
+import { hash_str } from "../common/hash.js";
+import { lab } from "d3";
 
 export class PlotBarsGradientCreator {
-  constructor(chart) {
+  constructor(chart, controller, dataView) {
     this.chart = chart;
-    this.colorGenerator = plotColors(1);
+    this.controller = controller;
+    this.dataView = dataView;
+    this.plotColors = PlotColors(dataView.max);
   }
 
   createGradient(dataset) {
@@ -18,35 +22,42 @@ export class PlotBarsGradientCreator {
       .attr("y2", "0%");
 
     let data = dataset.data;
-    let count = data.length;
-    let latestDate = dataset.lastDate;
-    let duration = dataset.duration;
-
     if (!data || data.length === 0) return;
 
-    if (duration === 0) {
-      let item = data[0];
-      let value = item.value;
-      let opacity = value / max;
+    let count = data.length;
+    let latestDate = dataset.lastDate;
 
+    let plotColors = this.plotColors;
+    let brush = max / 2;
+    let colorGenerator = this.controller.colorGenerator;
+    let colorMode = this.chart.config.colorMode;
+
+    function append(value, percent) {
       gradient
         .append("stop")
-        .attr("offset", `100%`)
-        .attr("stop-color", this.colorGenerator(opacity));
+        .attr("offset", percent + "%")
+        .attr(
+          "stop-color",
+          colorMode === PLOT_COLOR_MODE.single
+            ? colorGenerator.label(dataset.label)
+            : plotColors(value)
+        )
+        .attr(
+          "stop-opacity",
+          colorMode === PLOT_COLOR_MODE.single
+            ? (value + brush) / (max + brush)
+            : 1
+        );
+    }
+
+    if (dataset.duration === 0) {
+      append(data[0].value, 100);
     } else {
-      for (let index = 0; index < count; index++) {
-        let item = data[index];
-        let date = item.date;
-        let opacity = item.value / max;
-
-        let dateDifference = latestDate - date;
-        let value = dateDifference / duration;
-        let datePercentage = (1 - value) * 100;
-
-        gradient
-          .append("stop")
-          .attr("offset", `${datePercentage}%`)
-          .attr("stop-color", this.colorGenerator(opacity));
+      for (let i = 0; i < count; i++) {
+        let diff = latestDate - data[i].date;
+        let opacity = diff / dataset.duration;
+        let percent = (1 - opacity) * 100;
+        append(data[i].value, percent);
       }
     }
   }

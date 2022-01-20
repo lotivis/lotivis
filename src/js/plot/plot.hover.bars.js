@@ -1,4 +1,4 @@
-import hash_str from "../common/hash";
+import { hash_str } from "../common/hash";
 import { Renderer } from "../common/renderer";
 
 export class PlotHoverBarsRenderer extends Renderer {

@@ -9,7 +9,7 @@ export const PLOT_CHART_TYPE = {
 };
 
 /**
- * Enumeration of sorts available in the bar.chart.plot.chart chart.
+ * Enumeration of sorts available in the plot chart.
  */
 export const PLOT_CHART_SORT = {
   none: "none",
@@ -17,6 +17,14 @@ export const PLOT_CHART_SORT = {
   duration: "duration",
   intensity: "intensity",
   firstDate: "firstDate",
+};
+
+/**
+ * Enumeration of color modes of a plot chart.
+ */
+export const PLOT_COLOR_MODE = {
+  multiple: "multiple",
+  single: "single",
 };
 
 export const PLOT_CHART_CONFIG = {
@@ -30,6 +38,7 @@ export const PLOT_CHART_CONFIG = {
   drawGrid: true,
   showTooltip: true,
   selectable: true,
+  colorMode: PLOT_COLOR_MODE.multiple,
   sort: PLOT_CHART_SORT.none,
   type: PLOT_CHART_TYPE.gradient,
   numberFormat: DEFAULT_NUMBER_FORMAT,

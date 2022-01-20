@@ -1,4 +1,4 @@
-import hash_str from "../common/hash";
+import { hash_str } from "../common/hash";
 import { Renderer } from "../common/renderer";
 import { PLOT_CHART_TYPE } from "./plot.config";
 

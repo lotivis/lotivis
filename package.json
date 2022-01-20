@@ -27,11 +27,11 @@
     "dist/lotivis.js.map"
   ],
   "scripts": {
-    "develop": "rollup -c -w",
-    "serve": "http-server",
-    "build": "rollup -c",
+    "build:watch": "rollup --config --watch",
+    "build": "rollup --config",
     "scss": "sass src/index.scss > dist/lotivis.css && sass --style compressed src/index.scss > dist/lotivis.min.css",
     "test": "mocha 'test/**/test.*.js'",
+    "serve": "http-server",
     "copy": "cp dist/lotivis.js ../frc-visualization/public/js/lib && cp dist/lotivis.js.map ../frc-visualization/public/js/lib && cp dist/lotivis.css ../frc-visualization/public/css"
   },
   "devDependencies": {

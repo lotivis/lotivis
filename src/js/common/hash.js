@@ -3,7 +3,7 @@
  * @param aString The string to create the hash of.
  * @returns {number} The hash of the given string.
  */
-export default function hash_str(s) {
+export function hash_str(s) {
   let hash = 0,
     i,
     chr;

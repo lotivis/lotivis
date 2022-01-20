@@ -1,5 +1,5 @@
 import { max as d3max } from "d3";
-import { lotivis_log } from "../common/debug";
+import { D_LOG } from "../common/debug";
 import { MapColors } from "../common/colors";
 import { Renderer } from "../common/renderer";
 
@@ -43,7 +43,8 @@ export class MapDatasetRenderer extends Renderer {
     chart.on("mouseout", resetAreas);
     chart.on("click", mouseEnter);
 
-    if (!chart.geoJSON) return lotivis_log("[lotivis]  No GeoJSON to render.");
+    if (!chart.geoJSON)
+      return D_LOG ? console.log("[ltv]  No GeoJSON to render.") : null;
     if (!chart.dataView) return;
 
     resetAreas();

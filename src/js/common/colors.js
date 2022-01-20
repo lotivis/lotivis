@@ -74,7 +74,7 @@ export function MapColors(till) {
     .range(["yellow", "orange", "red", "purple"]);
 }
 
-export function plotColors(till) {
+export function PlotColors(till) {
   return d3
     .scaleLinear()
     .domain([0, (1 / 3) * till, (2 / 3) * till, till])
@@ -85,4 +85,4 @@ export function ColorRange(color, till) {
   return d3.scaleLinear().domain([0, till]).range(["white", color]);
 }
 
-export default { ColorGenerator, MapColors: MapColors, plotColors };
+export default { ColorGenerator, MapColors: MapColors, PlotColors };

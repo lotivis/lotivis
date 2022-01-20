@@ -5,6 +5,7 @@ import { FilterArray } from "./filter.array";
 import { set_data_preview } from "../common/debug";
 import { snapshot } from "./controller.snapshot.js";
 import { EventEmitter } from "../common/event.emitter";
+import { LOTIVIS_CONFIG } from "../common/config";
 
 export class DataController extends EventEmitter {
   constructor(flat, config) {
@@ -30,7 +31,7 @@ export class DataController extends EventEmitter {
 
     // this.filters.locations.push(...this.locations());
 
-    console.log("DataController", this);
+    if (LOTIVIS_CONFIG.debug) console.log("[ltv] ", this);
     if (this.original) set_data_preview(this.original);
 
     return this;

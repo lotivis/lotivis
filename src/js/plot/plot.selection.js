@@ -1,4 +1,4 @@
-import hash_str from "../common/hash.js";
+import { hash_str } from "../common/hash.js";
 import { Renderer } from "../common/renderer.js";
 
 export class PlotChartSelectionRenderer extends Renderer {

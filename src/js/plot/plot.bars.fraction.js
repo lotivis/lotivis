@@ -1,7 +1,7 @@
-import hash_str from "../common/hash";
-import { ColorRange, MapColors } from "../common/colors";
+import { hash_str } from "../common/hash";
+import { PlotColors } from "../common/colors";
 import { Renderer } from "../common/renderer";
-import { PLOT_CHART_TYPE } from "./plot.config";
+import { PLOT_CHART_TYPE, PLOT_COLOR_MODE } from "./plot.config";
 import { LOTIVIS_CONFIG } from "../common/config";
 
 export class PlotBarsFractionsRenderer extends Renderer {
@@ -10,14 +10,12 @@ export class PlotBarsFractionsRenderer extends Renderer {
 
     let radius = LOTIVIS_CONFIG.barRadius;
     let max = chart.dataView.max;
-    let brush = max / 2;
     let data = chart.dataView.byLabelDate;
-    let colors = MapColors(max);
+
+    let colors = PlotColors(max);
+    let brush = max / 2;
     let colorGenerator = controller.colorGenerator;
-
-    let colorMode = "differ"; // "differ", "same"
-
-    console.log("max", max);
+    let colorMode = chart.config.colorMode;
 
     chart.barsData = chart.svg.append("g").selectAll("g").data(data).enter();
 
@@ -26,7 +24,7 @@ export class PlotBarsFractionsRenderer extends Renderer {
       .attr("transform", (d) => `translate(0,${chart.yChartPadding(d[0])})`)
       .attr("id", (d) => "ltv-plot-rect-" + hash_str(d[0]))
       .attr(`fill`, (d) =>
-        colorMode === "differ" ? colorGenerator.label(d[0]) : null
+        colorMode === PLOT_COLOR_MODE.single ? colorGenerator.label(d[0]) : null
       )
       .selectAll(".rect")
       .data((d) => d[1]) // map to dates data
@@ -34,9 +32,13 @@ export class PlotBarsFractionsRenderer extends Renderer {
       .filter((d) => d[1] > 0)
       .append("rect")
       .attr("class", "ltv-plot-bar")
-      .attr(`fill`, (d) => (colorMode === "differ" ? null : colors(d[1])))
+      .attr(`fill`, (d) =>
+        colorMode === PLOT_COLOR_MODE.single ? null : colors(d[1])
+      )
       .attr("opacity", (d) =>
-        colorMode === "differ" ? (d[1] + brush) / (max + brush) : 1
+        colorMode === PLOT_COLOR_MODE.single
+          ? (d[1] + brush) / (max + brush)
+          : 1
       )
       .attr("rx", radius)
       .attr("ry", radius)

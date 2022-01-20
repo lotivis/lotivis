@@ -1,5 +1,5 @@
 import { PlotBarsGradientCreator } from "./plot.gradient.creator";
-import hash_str from "../common/hash.js";
+import { hash_str } from "../common/hash.js";
 import { Renderer } from "../common/renderer";
 import { PLOT_CHART_TYPE } from "./plot.config";
 import { LOTIVIS_CONFIG } from "../common/config";
@@ -11,8 +11,11 @@ export class PlotBarsGradientRenderer extends Renderer {
     // constant for the radius of the drawn bars.
     let radius = LOTIVIS_CONFIG.barRadius;
 
-    this.gradientCreator = new PlotBarsGradientCreator(chart);
-    chart.definitions = chart.svg.append("defs");
+    this.gradientCreator = new PlotBarsGradientCreator(
+      chart,
+      controller,
+      dataView
+    );
 
     let datasets = chart.dataView.datasets;
     chart.definitions = chart.svg.append("defs");

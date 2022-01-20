@@ -1,4 +1,4 @@
-import { lotivis_log } from "../common/debug";
+import { D_LOG } from "../common/debug";
 import { Renderer } from "../common/renderer";
 import { joinFeatures } from "../geojson/join.features";
 
@@ -35,7 +35,9 @@ export class MapSelectionRenderer extends Renderer {
       chart.selectedFeatures = getSelectedFeatures();
       chart.selectionBorderGeoJSON = joinFeatures(chart.selectedFeatures);
       if (!chart.selectionBorderGeoJSON) {
-        return lotivis_log("[lotivis]  No selected features to render.");
+        return D_LOG
+          ? console.log("[ltv]  No selected features to render.")
+          : null;
       }
       chart.svg.selectAll(".ltv-map-chart-selection-border").remove();
       chart.svg

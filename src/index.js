@@ -11,6 +11,7 @@ export * from "./js/parse/data.to.datasets.js";
 export { BarChart } from "./js/bar/bar.chart.js";
 export { MapChart } from "./js/map/map.chart.js";
 export { PlotChart } from "./js/plot/plot.chart.js";
+export * from "./js/plot/plot.config.js";
 export { LabelsChart } from "./js/labels/labels.chart.js";
 
 /* common */

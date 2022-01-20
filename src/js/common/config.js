@@ -14,8 +14,6 @@ export var LOTIVIS_CONFIG = {
   // The default radius to use for bars drawn on a chart.
   barRadius: 5,
   // A Boolean value indicating whether the debug logging is enabled.
-  debugLog: false,
-  // A Boolean value indicating whether the debug logging is enabled.
   debug: true,
   // A string which is used as prefix for download.
   downloadFilePrefix: "lotivis",

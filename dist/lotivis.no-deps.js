@@ -4,22 +4,45 @@
  * Released under MIT License
  */
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('d3'), require('topojson-server'), require('topojson-client')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'd3', 'topojson-server', 'topojson-client'], factory) :
-  (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.lotivis = {}, global.d3$1, global.topojsonServer, global.topojsonClient));
-})(this, (function (exports, d3$1, topojsonServer, topojsonClient) { 'use strict';
+  typeof exports === "object" && typeof module !== "undefined"
+    ? factory(
+        exports,
+        require("d3"),
+        require("topojson-server"),
+        require("topojson-client")
+      )
+    : typeof define === "function" && define.amd
+    ? define(["exports", "d3", "topojson-server", "topojson-client"], factory)
+    : ((global =
+        typeof globalThis !== "undefined" ? globalThis : global || self),
+      factory(
+        (global.lotivis = {}),
+        global.d3$1,
+        global.topojsonServer,
+        global.topojsonClient
+      ));
+})(this, function (exports, d3$1, topojsonServer, topojsonClient) {
+  "use strict";
 
   function _interopNamespace(e) {
     if (e && e.__esModule) return e;
     var n = Object.create(null);
     if (e) {
       Object.keys(e).forEach(function (k) {
-        if (k !== 'default') {
+        if (k !== "default") {
           var d = Object.getOwnPropertyDescriptor(e, k);
-          Object.defineProperty(n, k, d.get ? d : {
-            enumerable: true,
-            get: function () { return e[k]; }
-          });
+          Object.defineProperty(
+            n,
+            k,
+            d.get
+              ? d
+              : {
+                  enumerable: true,
+                  get: function () {
+                    return e[k];
+                  },
+                }
+          );
         }
       });
     }
@@ -27,9 +50,11 @@
     return Object.freeze(n);
   }
 
-  var d3__namespace = /*#__PURE__*/_interopNamespace(d3$1);
-  var topojsonServer__namespace = /*#__PURE__*/_interopNamespace(topojsonServer);
-  var topojsonClient__namespace = /*#__PURE__*/_interopNamespace(topojsonClient);
+  var d3__namespace = /*#__PURE__*/ _interopNamespace(d3$1);
+  var topojsonServer__namespace =
+    /*#__PURE__*/ _interopNamespace(topojsonServer);
+  var topojsonClient__namespace =
+    /*#__PURE__*/ _interopNamespace(topojsonClient);
 
   const formatGerman = "%d.%m.%Y";
   const formatIso = "%Y-%m-%d";
@@ -79,13 +104,13 @@
     }
   }
 
-  var date_ordinator = /*#__PURE__*/Object.freeze({
+  var date_ordinator = /*#__PURE__*/ Object.freeze({
     __proto__: null,
     DEFAULT_DATE_ORDINATOR: DEFAULT_DATE_ORDINATOR,
     DATE_TO_NUMBER_ORDINATOR: DATE_TO_NUMBER_ORDINATOR,
     GERMAN_DATE_ORDINATOR: GERMAN_DATE_ORDINATOR,
     ISO_DATE_ORDINATOR: ISO_DATE_ORDINATOR,
-    WEEKDAY_ORDINATOR: WEEKDAY_ORDINATOR
+    WEEKDAY_ORDINATOR: WEEKDAY_ORDINATOR,
   });
 
   const colorScheme = d3__namespace.schemeCategory10;
@@ -144,7 +169,10 @@
         let c1 = d3__namespace.color(this.stack(stack));
         let c2 = c1.darker().darker();
         let size = stacksToLabels.get(stack).size;
-        let generator = d3__namespace.scaleLinear().domain([0, size]).range([c1, c2]);
+        let generator = d3__namespace
+          .scaleLinear()
+          .domain([0, size])
+          .range([c1, c2]);
         let colors = d3__namespace.range(0, size).map(generator);
         return colors;
       };
@@ -158,7 +186,7 @@
       .range(["yellow", "orange", "red", "purple"]);
   }
 
-  function plotColors(till) {
+  function PlotColors(till) {
     return d3__namespace
       .scaleLinear()
       .domain([0, (1 / 3) * till, (2 / 3) * till, till])
@@ -253,9 +281,11 @@
    */
   function debug(enabled, printConfig = false) {
     lotivis_log = enabled ? console.log : () => null;
-    lotivis_log(`[lotivis]  ${enabled ? "En" : "Dis"}abled debug mode.`);
+    lotivis_log(`[ltv]  ${enabled ? "En" : "Dis"}abled debug mode.`);
     if (!printConfig) return;
-    lotivis_log(`LOTIVIS_CONFIG = ${JSON.stringify(LOTIVIS_CONFIG$1, null, 2)}`);
+    lotivis_log(
+      `LOTIVIS_CONFIG = ${JSON.stringify(LOTIVIS_CONFIG$1, null, 2)}`
+    );
   }
 
   function isString(v) {
@@ -769,7 +799,8 @@
       let xChartScale = chart.xChartScale;
       let yChart = chart.yChart;
       let xStack = chart.xStack;
-      let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
+      let numberFormat =
+        chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
       let width = chart.xStack.bandwidth() / 2;
 
       let labels = chart.svg.append("g").selectAll("g").data(dates).enter();
@@ -884,7 +915,8 @@
 
   class BarTooltipRenderer extends Renderer {
     render(chart, controller, dataView) {
-      let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
+      let numberFormat =
+        chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
 
       chart.element.select(".ltv-tooltip").remove();
       const tooltip = chart.element
@@ -909,7 +941,9 @@
 
       function getXLeft(date, factor, offset, tooltipSize) {
         let x = chart.xChartScalePadding(date) * factor;
-        return x + offset[0] - tooltipSize[0] - 22 - LOTIVIS_CONFIG$1.tooltipOffset;
+        return (
+          x + offset[0] - tooltipSize[0] - 22 - LOTIVIS_CONFIG$1.tooltipOffset
+        );
       }
 
       function getXRight(date, factor, offset) {
@@ -1055,7 +1089,9 @@
 
       function onMouseEnter(event, date) {
         hideAll();
-        chart.svg.select(`#${createID(date)}`).attr("opacity", selectionOpacity);
+        chart.svg
+          .select(`#${createID(date)}`)
+          .attr("opacity", selectionOpacity);
         chart.emit("mouseenter", event, date);
       }
 
@@ -1203,7 +1239,9 @@
       });
     });
 
-    let max = d3__namespace.max(byDateStack, (d) => d3__namespace.max(d[1], (d) => d[1]));
+    let max = d3__namespace.max(byDateStack, (d) =>
+      d3__namespace.max(d[1], (d) => d[1])
+    );
 
     return {
       dates,
@@ -1427,7 +1465,9 @@
           geometryCollection.push(feature.geometry)
         );
       } else if (this.type === "GeometryCollection") {
-        this.geometries.forEach((geometry) => geometryCollection.push(geometry));
+        this.geometries.forEach((geometry) =>
+          geometryCollection.push(geometry)
+        );
       } else {
         throw new Error("The geoJSON is not valid.");
       }
@@ -1605,10 +1645,10 @@
   class MapExteriorBorderRenderer extends Renderer {
     render(chart, controller) {
       let geoJSON = chart.presentedGeoJSON;
-      if (!geoJSON) return lotivis_log("[lotivis]  No GeoJSON to render.");
+      if (!geoJSON) return lotivis_log("[ltv]  No GeoJSON to render.");
 
       let bordersGeoJSON = joinFeatures(geoJSON.features);
-      if (!bordersGeoJSON) return lotivis_log("[lotivis]  No borders to render.");
+      if (!bordersGeoJSON) return lotivis_log("[ltv]  No borders to render.");
 
       chart.svg
         .selectAll(".ltv-map-chart-exterior-borders")
@@ -1625,7 +1665,8 @@
     render(chart, controller, dataView) {
       if (!dataView) return;
 
-      let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
+      let numberFormat =
+        chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
       let stackNames = chart.dataView.stacks;
       let label = chart.config.label || stackNames[0];
       let locationToSum = dataView.locationToSum;
@@ -1788,7 +1829,7 @@
       chart.on("mouseout", resetAreas);
       chart.on("click", mouseEnter);
 
-      if (!chart.geoJSON) return lotivis_log("[lotivis]  No GeoJSON to render.");
+      if (!chart.geoJSON) return lotivis_log("[ltv]  No GeoJSON to render.");
       if (!chart.dataView) return;
 
       resetAreas();
@@ -1819,11 +1860,12 @@
 
   class MapLabelsRenderer extends Renderer {
     render(chart, controller, dataView) {
-      if (!chart.geoJSON) return lotivis_log(`[lotivis]  No GeoJSON to render.`);
+      if (!chart.geoJSON) return lotivis_log(`[ltv]  No GeoJSON to render.`);
       if (!dataView) return;
       if (!chart.config.labels) return;
 
-      let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
+      let numberFormat =
+        chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
 
       function raise() {
         chart.svg.selectAll(".ltv-map-chart-label").raise();
@@ -1861,7 +1903,8 @@
         .attr("class", "ltv-tooltip")
         .style("opacity", 0);
 
-      let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
+      let numberFormat =
+        chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
 
       function htmlTitle(features) {
         if (features.length > 3) {
@@ -1875,7 +1918,9 @@
           let moreCount = features.length - 3;
           return `IDs: ${ids} (+${moreCount})<br>Names: ${names} (+${moreCount})`;
         } else {
-          let ids = features.map((feature) => `${feature.lotivisId}`).join(", ");
+          let ids = features
+            .map((feature) => `${feature.lotivisId}`)
+            .join(", ");
           let names = features.map(chart.config.featureNameAccessor).join(", ");
           return `IDs: ${ids}<br>Names: ${names}`;
         }
@@ -2043,7 +2088,7 @@
         chart.selectedFeatures = getSelectedFeatures();
         chart.selectionBorderGeoJSON = joinFeatures(chart.selectedFeatures);
         if (!chart.selectionBorderGeoJSON) {
-          return lotivis_log("[lotivis]  No selected features to render.");
+          return lotivis_log("[ltv]  No selected features to render.");
         }
         chart.svg.selectAll(".ltv-map-chart-selection-border").remove();
         chart.svg
@@ -2108,8 +2153,12 @@
     );
 
     let maxLocation = d3$1.max(locationToSum, (item) => item[1]);
-    let maxLabel = d3$1.max(byLocationLabel, (i) => d3$1.max(i[1], (d) => d[1]));
-    let maxStack = d3$1.max(byLocationStack, (i) => d3$1.max(i[1], (d) => d[1]));
+    let maxLabel = d3$1.max(byLocationLabel, (i) =>
+      d3$1.max(i[1], (d) => d[1])
+    );
+    let maxStack = d3$1.max(byLocationStack, (i) =>
+      d3$1.max(i[1], (d) => d[1])
+    );
 
     return {
       labels: dataController.labels(),
@@ -2172,7 +2221,10 @@
     }
 
     setGeoJSON(newGeoJSON) {
-      if (typeof newGeoJSON === "object" && newGeoJSON.prototype === "GeoJSON") {
+      if (
+        typeof newGeoJSON === "object" &&
+        newGeoJSON.prototype === "GeoJSON"
+      ) {
         this.geoJSON = newGeoJSON;
       } else {
         this.geoJSON = new GeoJSON(newGeoJSON);
@@ -2261,13 +2313,17 @@
       chart.svg
         .append("g")
         .call(d3$1.axisBottom(chart.xChart))
-        .attr("transform", () => `translate(0,${chart.height - margin.bottom})`);
+        .attr(
+          "transform",
+          () => `translate(0,${chart.height - margin.bottom})`
+        );
     }
   }
 
   class PlotTooltipRenderer extends Renderer {
     render(chart, controller) {
-      let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
+      let numberFormat =
+        chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
       chart.element.select(".ltv-tooltip").remove();
       const tooltip = chart.element
         .append("div")
@@ -2327,7 +2383,8 @@
           chart.yChart(dataset.label) - chart.config.margin.top <=
           chart.graphHeight / 2
         ) {
-          top += chart.config.lineHeight * factor + LOTIVIS_CONFIG$1.tooltipOffset;
+          top +=
+            chart.config.lineHeight * factor + LOTIVIS_CONFIG$1.tooltipOffset;
         } else {
           top -= tooltipHeight + 20; // subtract padding
           top -= LOTIVIS_CONFIG$1.tooltipOffset;
@@ -2363,7 +2420,8 @@
       if (chart.config.type !== PLOT_CHART_TYPE.gradient) return;
       if (!chart.config.labels) return;
 
-      let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
+      let numberFormat =
+        chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
       let xBandwidth = chart.yChart.bandwidth();
       let xChart = chart.xChart;
 
@@ -2504,19 +2562,15 @@
         .append("g")
         .attr("transform", (d) => `translate(0,${chart.yChartPadding(d[0])})`)
         .attr("id", (d) => "ltv-plot-rect-" + hash_str(d[0]))
-        .attr(`fill`, (d) =>
-          colorGenerator.label(d[0]) 
-        )
+        .attr(`fill`, (d) => colorGenerator.label(d[0]))
         .selectAll(".rect")
         .data((d) => d[1]) // map to dates data
         .enter()
         .filter((d) => d[1] > 0)
         .append("rect")
         .attr("class", "ltv-plot-bar")
-        .attr(`fill`, (d) => (null ))
-        .attr("opacity", (d) =>
-          (d[1] + brush) / (max + brush) 
-        )
+        .attr(`fill`, (d) => null)
+        .attr("opacity", (d) => (d[1] + brush) / (max + brush))
         .attr("rx", radius)
         .attr("ry", radius)
         .attr("x", (d) => chart.xChart(d[0]))
@@ -2528,7 +2582,7 @@
   class PlotBarsGradientCreator {
     constructor(chart) {
       this.chart = chart;
-      this.colorGenerator = plotColors(1);
+      this.colorGenerator = PlotColors(1);
     }
 
     createGradient(dataset) {
@@ -2601,7 +2655,10 @@
 
       chart.bars = chart.barsData
         .append("rect")
-        .attr("transform", (d) => `translate(0,${chart.yChartPadding(d.label)})`)
+        .attr(
+          "transform",
+          (d) => `translate(0,${chart.yChartPadding(d.label)})`
+        )
         .attr("fill", (d) => `url(#ltv-plot-gradient-${hash_str(d.label)})`)
         .attr("class", "ltv-plot-bar")
         .attr("rx", radius)
@@ -2628,7 +2685,8 @@
       if (chart.config.type !== PLOT_CHART_TYPE.fraction) return;
       if (!chart.config.labels) return;
 
-      let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
+      let numberFormat =
+        chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
       let yBandwidth = chart.yChart.bandwidth() / 2;
 
       chart.labels = chart.barsData
@@ -2790,7 +2848,8 @@
       dates = dates.sort();
       let labels = this.dataView.labels || [];
 
-      this.xChart = d3$1.scaleBand()
+      this.xChart = d3$1
+        .scaleBand()
         .domain(dates)
         .rangeRound([
           this.config.margin.left,
@@ -2798,7 +2857,8 @@
         ])
         .paddingInner(0.1);
 
-      this.yChartPadding = d3$1.scaleBand()
+      this.yChartPadding = d3$1
+        .scaleBand()
         .domain(labels)
         .rangeRound([
           this.height - this.config.margin.bottom,
@@ -2806,18 +2866,21 @@
         ])
         .paddingInner(0.1);
 
-      this.yChart = d3$1.scaleBand()
+      this.yChart = d3$1
+        .scaleBand()
         .domain(labels)
         .rangeRound([
           this.height - this.config.margin.bottom,
           this.config.margin.top,
         ]);
 
-      this.xAxisGrid = d3$1.axisBottom(this.xChart)
+      this.xAxisGrid = d3$1
+        .axisBottom(this.xChart)
         .tickSize(-this.graphHeight)
         .tickFormat("");
 
-      this.yAxisGrid = d3$1.axisLeft(this.yChart)
+      this.yAxisGrid = d3$1
+        .axisLeft(this.yChart)
         .tickSize(-this.graphWidth)
         .tickFormat("");
     }
@@ -2828,7 +2891,9 @@
       let sortedDatasets = [];
       switch (this.config.sort) {
         case PLOT_CHART_SORT.alphabetically:
-          sortedDatasets = datasets.sort((set1, set2) => set1.label > set2.label);
+          sortedDatasets = datasets.sort(
+            (set1, set2) => set1.label > set2.label
+          );
           break;
         case PLOT_CHART_SORT.duration:
           sortedDatasets = datasets.sort(
@@ -3052,7 +3117,6 @@
   exports.parseDatasets = parseDatasets;
   exports.toDataset = toDataset;
 
-  Object.defineProperty(exports, '__esModule', { value: true });
-
-}));
+  Object.defineProperty(exports, "__esModule", { value: true });
+});
 //# sourceMappingURL=lotivis.no-deps.js.map

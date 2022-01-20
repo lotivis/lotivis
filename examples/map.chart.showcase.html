@@ -95,7 +95,7 @@
         featureNameAccessor: (f) => f.properties.nom,
       });
 
-      fetch("assets/departements.geojson")
+      fetch("./assets/departements.geojson")
         .then((response) => response.text())
         .then((text) => JSON.parse(text))
         .then((geoJSON) => {
