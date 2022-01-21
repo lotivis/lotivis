@@ -19,5 +19,8 @@ export * from "./js/common/url.parameters";
 export { debug } from "./js/common/debug";
 export { LOTIVIS_CONFIG as config } from "./js/common/config.js";
 
+export { downloadImage as svgDownload } from "./js/common/download.js";
+
 import * as d3 from "d3";
+import { format } from "d3";
 export { d3 };

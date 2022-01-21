@@ -37,7 +37,7 @@ export default [
       resolve({
         jsnext: true,
       }),
-      // execute("npm run test"),
+      execute("npm run test"),
     ],
     output: {
       name: "lotivis.test",

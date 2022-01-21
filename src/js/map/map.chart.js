@@ -2,6 +2,7 @@ import { geoMercator, geoPath, geoCentroid } from "d3";
 import { Chart } from "../common/chart.js";
 import { MAP_CHART_CONFIG } from "./map.chart.config";
 import { removeFeatures } from "../geojson/remove.features";
+import { filterFeatures } from "../geojson/filter.features.js";
 import { createGeoJSON } from "../geojson/from.data";
 import { GeoJSON } from "../geojson/geojson";
 import { MapBackgroundRenderer } from "./map.background";
@@ -81,6 +82,10 @@ export class MapChart extends Chart {
         this.geoJSON,
         this.config.excludedFeatureCodes
       );
+    }
+
+    if (this.config.filter) {
+      this.presentedGeoJSON = filterFeatures(this.geoJSON, this.config.filter);
     }
 
     // precalculate lotivis feature ids

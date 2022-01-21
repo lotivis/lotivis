@@ -5,7 +5,7 @@ import { Renderer } from "../common/renderer";
 
 export class MapLabelsRenderer extends Renderer {
   render(chart, controller, dataView) {
-    if (!chart.geoJSON)
+    if (!chart.presentedGeoJSON)
       return D_LOG ? console.log("[ltv]  No GeoJSON to render.") : null;
     if (!dataView) return;
     if (!chart.config.labels) return;
@@ -22,7 +22,7 @@ export class MapLabelsRenderer extends Renderer {
     chart.svg.selectAll(".ltv-map-chart-label").remove();
     chart.svg
       .selectAll("text")
-      .data(chart.geoJSON.features)
+      .data(chart.presentedGeoJSON.features)
       .enter()
       .append("text")
       .attr("class", "ltv-map-chart-label")

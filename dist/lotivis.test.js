@@ -21506,6 +21506,16 @@ function removeFeatures(json, ids, idValue = FEATURE_ID_ACCESSOR) {
   return _json;
 }
 
+/* returns a new generated GeoJSON without the feature specified */
+function filterFeatures(json, ids, idValue = FEATURE_ID_ACCESSOR) {
+  if (!Array.isArray(ids)) throw new Error("invalid ids. not an array");
+  if (!Array.isArray(json.features))
+    throw new Error("invalid geojson. no features");
+  let _json = copy(json);
+  _json.features = _json.features.filter((f) => ids.includes(idValue(f)));
+  return _json;
+}
+
 /* returns a GeoJSON FeatureCollection object */
 function FeatureCollection(features) {
   return { type: "FeatureCollection", features };
@@ -22787,7 +22797,17 @@ function mergeArcs(topology, objects) {
   };
 }
 
-function joinFeatures(features) {
+/**
+ * Return a newly created GeoJSON with one Feature merging
+ * the border of all containing features of the given
+ * collection of features.
+ *
+ * @param {*} input GeoJSON or array of features
+ *
+ * @returns A new created GeoJSON
+ */
+function joinFeatures(input) {
+  let features = Array.isArray(input) ? input : input.features;
   let topology$1 = topology(features);
   let objects = extractObjects(topology$1);
   let geometry = merge(topology$1, objects);
@@ -22828,6 +22848,7 @@ class MapExteriorBorderRenderer extends Renderer {
 class MapLegendRenderer extends Renderer {
   render(chart, controller, dataView) {
     if (!dataView) return;
+    if (!chart.config.legend) return;
 
     let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
     let stackNames = chart.dataView.stacks;
@@ -22998,14 +23019,17 @@ class MapDatasetRenderer extends Renderer {
 
     resetAreas();
 
-    let stackNames = chart.dataView.stacks;
     let locationToSum = dataView.locationToSum;
     let locations = Array.from(locationToSum.keys());
     let max = max$3(locationToSum, (item) => item[1]);
 
+    console.log("locationToSum", locationToSum);
+
     for (let i = 0; i < locations.length; i++) {
       let location = locations[i];
       let value = locationToSum.get(location);
+      // console.log("value", value);
+
       let opacity = Number(value / max);
       let color = opacity === 0 ? "WhiteSmoke" : generator(opacity);
 
@@ -23015,16 +23039,12 @@ class MapDatasetRenderer extends Renderer {
         .style("fill", () => color)
         .raise();
     }
-
-    for (let index = 0; index < stackNames.length; index++) {
-      return;
-    }
   }
 }
 
 class MapLabelsRenderer extends Renderer {
   render(chart, controller, dataView) {
-    if (!chart.geoJSON)
+    if (!chart.presentedGeoJSON)
       return D_LOG ? console.log("[ltv]  No GeoJSON to render.") : null;
     if (!dataView) return;
     if (!chart.config.labels) return;
@@ -23041,7 +23061,7 @@ class MapLabelsRenderer extends Renderer {
     chart.svg.selectAll(".ltv-map-chart-label").remove();
     chart.svg
       .selectAll("text")
-      .data(chart.geoJSON.features)
+      .data(chart.presentedGeoJSON.features)
       .enter()
       .append("text")
       .attr("class", "ltv-map-chart-label")
@@ -23399,6 +23419,10 @@ class MapChart extends Chart {
         this.geoJSON,
         this.config.excludedFeatureCodes
       );
+    }
+
+    if (this.config.filter) {
+      this.presentedGeoJSON = filterFeatures(this.geoJSON, this.config.filter);
     }
 
     // precalculate lotivis feature ids

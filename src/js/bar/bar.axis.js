@@ -1,4 +1,4 @@
-import { axisLeft, axisBottom } from "d3";
+import * as d3 from "d3";
 import { Renderer } from "../common/renderer.js";
 
 export class BarAxisRender extends Renderer {
@@ -9,13 +9,13 @@ export class BarAxisRender extends Renderer {
     // left axis
     chart.svg
       .append("g")
-      .call(axisLeft(chart.yChart))
+      .call(d3.axisLeft(chart.yChart))
       .attr("transform", () => `translate(${margin.left},0)`);
 
     // bottom axis
     chart.svg
       .append("g")
-      .call(axisBottom(chart.xChartScale))
+      .call(d3.axisBottom(chart.xChartScale))
       .attr("transform", () => `translate(0,${height - margin.bottom})`);
   }
 }

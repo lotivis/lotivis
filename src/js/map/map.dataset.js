@@ -49,14 +49,17 @@ export class MapDatasetRenderer extends Renderer {
 
     resetAreas();
 
-    let stackNames = chart.dataView.stacks;
     let locationToSum = dataView.locationToSum;
     let locations = Array.from(locationToSum.keys());
     let max = d3max(locationToSum, (item) => item[1]);
 
+    console.log("locationToSum", locationToSum);
+
     for (let i = 0; i < locations.length; i++) {
       let location = locations[i];
       let value = locationToSum.get(location);
+      // console.log("value", value);
+
       let opacity = Number(value / max);
       let color = opacity === 0 ? "WhiteSmoke" : generator(opacity);
 
@@ -65,10 +68,6 @@ export class MapDatasetRenderer extends Renderer {
         .filter((item) => item.lotivisId === location)
         .style("fill", () => color)
         .raise();
-    }
-
-    for (let index = 0; index < stackNames.length; index++) {
-      return;
     }
   }
 }

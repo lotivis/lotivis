@@ -6,6 +6,7 @@ import { Renderer } from "../common/renderer";
 export class MapLegendRenderer extends Renderer {
   render(chart, controller, dataView) {
     if (!dataView) return;
+    if (!chart.config.legend) return;
 
     let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
     let stackNames = chart.dataView.stacks;

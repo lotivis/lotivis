@@ -24,11 +24,17 @@
           <a href="../index.html"> Back </a>
         </div>
         <div class="col-8 text-center">
-          <h1>
+          <h5>
             mif, mif', miff, miff', miffs, mifs, mille-f, mi-f, mi-f', 'mif'
-          </h1>
+          </h5>
         </div>
         <div class="col-6">
+          <button type="button" onclick="screenshot('bar-chart')">
+            html2canvas
+          </button>
+          <button type="button" onclick="lotivisDownload('bar-chart-svg')">
+            svg download
+          </button>
           <div id="bar-chart">
             <!-- Bar Chart Here -->
           </div>
@@ -43,6 +49,11 @@
           <div id="map-chart">
             <!-- Map Chart Here -->
           </div>
+          <div class="col-4">
+            <div id="map-chart-metropole">
+              <!-- Map Chart Metropole Here -->
+            </div>
+          </div>
         </div>
         <div class="col-12">
           <pre id="ltv-data-preview">
@@ -52,10 +63,36 @@
       </div>
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.0/html2canvas.min.js"></script>
     <script src="../dist/lotivis.js"></script>
 
     <script>
       lotivis.debug(true);
+
+      function element(id) {
+        return document.getElementById(id).selectedIndex;
+      }
+
+      function screenshot(id) {
+        let element = document.querySelector("#" + id);
+        html2canvas(element, { scale: 5 }).then((canvas) => {
+          // document.body.appendChild(canvas);
+          var t = canvas.toDataURL().replace("data:image/png;base64,", "");
+          downloadBase64File("image/png", t, "image");
+        });
+      }
+
+      function downloadBase64File(contentType, base64Data, fileName) {
+        const linkSource = `data:${contentType};base64,${base64Data}`;
+        const downloadLink = document.createElement("a");
+        downloadLink.href = linkSource;
+        downloadLink.download = fileName;
+        downloadLink.click();
+      }
+
+      function lotivisDownload(id) {
+        lotivis.svgDownload(id);
+      }
 
       let barChart = new lotivis.BarChart("bar-chart", {
         labels: true,
@@ -71,10 +108,21 @@
         featureNameAccessor: (f) => f.properties.nom,
       });
 
+      let mapChartMetropole = new lotivis.MapChart("map-chart-metropole", {
+        width: 300,
+        height: 300,
+        labels: true,
+        filter: ["75", "92", "93", "94"],
+        legend: false,
+        featureIDAccessor: (f) => +f.properties.code,
+        featureNameAccessor: (f) => f.properties.nom,
+      });
+
       let labelsChart = new lotivis.LabelsChart("labels-chart");
 
       lotivis.d3.json("./assets/departements.geojson").then((json) => {
         mapChart.setGeoJSON(json);
+        mapChartMetropole.setGeoJSON(json);
       });
 
       lotivis.d3.json("./assets/miff.json").then((json) => {
@@ -82,6 +130,7 @@
         barChart.setController(dataController);
         plotChart.setController(dataController);
         mapChart.setController(dataController);
+        mapChartMetropole.setController(dataController);
         labelsChart.setController(dataController);
       });
     </script>
