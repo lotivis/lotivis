@@ -24,7 +24,7 @@ export class BarLabelsRenderer extends Renderer {
       .append("g")
       .attr("transform", (date) => `translate(${xChartScale(date)},0)`)
       .selectAll(".text")
-      .data((date) => byDateStack.get(date))
+      .data((date) => byDateStack.get(date) || [])
       .enter()
       .append("text")
       .attr("class", "ltv-bar-chart-label")

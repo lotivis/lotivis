@@ -1,15 +1,16 @@
 import { LOTIVIS_CONFIG } from "../common/config.js";
+import { LABELS_CHART_STYLE } from "./labels.chart.config.js";
 import { Renderer } from "../common/renderer.js";
 import { safeId } from "../common/safe.id.js";
 
-export class LabelsLabelsRenderer extends Renderer {
+export class LabelsGroupedRenderer extends Renderer {
   render(chart, controller, dataView) {
+    if (chart.config.style !== LABELS_CHART_STYLE.grouped) return;
+
     let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
     let stacks = dataView.stacks;
     let colors = controller.colorGenerator;
     let config = chart.config;
-
-    console.log("config", config);
 
     function toggle(label) {
       chart.makeUpdateInsensible();
@@ -20,10 +21,6 @@ export class LabelsLabelsRenderer extends Renderer {
     function filter(label) {
       return controller.filters.labels.contains(label);
     }
-
-    function flowing() {}
-
-    function lines() {}
 
     // <label class="ltv-pill-checkbox">
     //   <input type="checkbox" id="ltv-legend-stack-id-{{LABEL}}"></input>

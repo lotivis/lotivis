@@ -103,7 +103,7 @@ export class BarChart extends Chart {
 
     this.yChart = d3
       .scaleLinear()
-      .domain([0, this.dataView.max])
+      .domain([0, this.dataView.maxTotal])
       .nice()
       .rangeRound([config.height - margin.bottom, margin.top]);
   }

@@ -4,9 +4,15 @@ import { toDataset } from "../parse/data.to.datasets";
 export function dataViewBar(dataController) {
   let snapshot = dataController.snapshot;
   let data = snapshot || dataController.data;
-  console.log("data", data);
-  console.log("snapshot", snapshot);
 
+  let byDateStackOriginal = d3.rollup(
+    dataController.data,
+    (v) => d3.sum(v, (d) => d.value),
+    (d) => d.date,
+    (d) => d.stack || d.label
+  );
+
+  let maxTotal = d3.max(byDateStackOriginal, (d) => d3.max(d[1], (d) => d[1]));
   let dates = dataController.dates();
   let stacks = dataController.stacks();
   let labels = dataController.labels();
@@ -62,5 +68,6 @@ export function dataViewBar(dataController) {
     byDatesStackSeries,
     labels,
     max,
+    maxTotal,
   };
 }

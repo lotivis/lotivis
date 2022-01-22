@@ -20898,7 +20898,7 @@ class BarLabelsRenderer extends Renderer {
       .append("g")
       .attr("transform", (date) => `translate(${xChartScale(date)},0)`)
       .selectAll(".text")
-      .data((date) => byDateStack.get(date))
+      .data((date) => byDateStack.get(date) || [])
       .enter()
       .append("text")
       .attr("class", "ltv-bar-chart-label")
@@ -21283,9 +21283,15 @@ function isValue(value) {
 function dataViewBar(dataController) {
   let snapshot = dataController.snapshot;
   let data = snapshot || dataController.data;
-  console.log("data", data);
-  console.log("snapshot", snapshot);
 
+  let byDateStackOriginal = rollup(
+    dataController.data,
+    (v) => sum$2(v, (d) => d.value),
+    (d) => d.date,
+    (d) => d.stack || d.label
+  );
+
+  let maxTotal = max$3(byDateStackOriginal, (d) => max$3(d[1], (d) => d[1]));
   let dates = dataController.dates();
   let stacks = dataController.stacks();
   let labels = dataController.labels();
@@ -21341,6 +21347,7 @@ function dataViewBar(dataController) {
     byDatesStackSeries,
     labels,
     max,
+    maxTotal,
   };
 }
 
@@ -21431,7 +21438,7 @@ class BarChart extends Chart {
       .padding(0.05);
 
     this.yChart = linear()
-      .domain([0, this.dataView.max])
+      .domain([0, this.dataView.maxTotal])
       .nice()
       .rangeRound([config.height - margin.bottom, margin.top]);
   }
@@ -22853,8 +22860,8 @@ class MapLegendRenderer extends Renderer {
     let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
     let stackNames = chart.dataView.stacks;
     let label = chart.config.label || stackNames[0];
-    let locationToSum = dataView.locationToSum;
-    let max = max$3(locationToSum, (item) => item[1]);
+    let locationToSum = dataView.locationToSum || [];
+    let max = max$3(locationToSum, (item) => item[1]) || 0;
 
     let offset = 0 * 80;
     let labelColor = chart.controller.colorGenerator.stack(label);

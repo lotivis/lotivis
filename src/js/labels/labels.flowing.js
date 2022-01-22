@@ -1,15 +1,19 @@
 import { LOTIVIS_CONFIG } from "../common/config.js";
+import { LABELS_CHART_STYLE } from "./labels.chart.config.js";
 import { Renderer } from "../common/renderer.js";
 import { safeId } from "../common/safe.id.js";
 
-export class LabelsLabelsRenderer extends Renderer {
+export class LabelsFlowingRenderer extends Renderer {
   render(chart, controller, dataView) {
+    if (chart.config.style !== LABELS_CHART_STYLE.flowing) return;
+
+    console.log("chart.config.style", chart.config.style);
+
     let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
     let stacks = dataView.stacks;
+    let labels = dataView.labels;
     let colors = controller.colorGenerator;
     let config = chart.config;
-
-    console.log("config", config);
 
     function toggle(label) {
       chart.makeUpdateInsensible();
@@ -20,10 +24,6 @@ export class LabelsLabelsRenderer extends Renderer {
     function filter(label) {
       return controller.filters.labels.contains(label);
     }
-
-    function flowing() {}
-
-    function lines() {}
 
     // <label class="ltv-pill-checkbox">
     //   <input type="checkbox" id="ltv-legend-stack-id-{{LABEL}}"></input>
@@ -38,20 +38,9 @@ export class LabelsLabelsRenderer extends Renderer {
       .style("padding-right", config.margin.right + "px")
       .style("padding-bottom", config.margin.bottom + "px");
 
-    let stackContainers = chart.div
-      .selectAll(".div")
-      .data(stacks)
-      .enter()
-      .append("div")
-      .attr("id", (s) => `ltv-legend-stack-id-${safeId(s)}`)
-      .attr("class", "ltv-stack-labels-container")
-      .style("display", "inline-block")
-      .style("color", (s) => colors.stack(s))
-      .html((d, i) => (config.headlines ? "Stack " + (i + 1) + "<br/>" : null));
-
-    let labelContainers = stackContainers
+    let labelContainers = chart.div
       .selectAll(".label")
-      .data((d) => dataView.byStackLabel.get(d))
+      .data(labels)
       .enter()
       .append("label")
       .attr("class", "ltv-pill-checkbox");
@@ -59,16 +48,14 @@ export class LabelsLabelsRenderer extends Renderer {
     let checkboxes = labelContainers
       .append("input")
       .attr("type", "checkbox")
-      .attr("checked", (d) => (filter(d[0]) ? null : true))
-      .attr("id", (d) => `ltv-legend-stack-id-${safeId(d[0])}`)
-      .on("change", (e, d) => toggle(d[0]));
+      .attr("checked", (l) => (filter(l) ? null : true))
+      .attr("id", (l) => `ltv-legend-label-id-${safeId(l)}`)
+      .on("change", (e, l) => toggle(l));
 
     let spans = labelContainers
       .append("span")
       .attr("class", "ltv-pill-checkbox-span")
-      .style("background-color", (d) => colors.label(d[0]))
-      .text(
-        (d) => "" + d[0] + " (" + numberFormat(dataView.byLabel.get(d[0])) + ")"
-      );
+      .style("background-color", (l) => colors.label(l))
+      .text((l) => "" + l + " (" + numberFormat(dataView.byLabel.get(l)) + ")");
   }
 }

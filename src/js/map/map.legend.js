@@ -11,8 +11,8 @@ export class MapLegendRenderer extends Renderer {
     let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
     let stackNames = chart.dataView.stacks;
     let label = chart.config.label || stackNames[0];
-    let locationToSum = dataView.locationToSum;
-    let max = d3max(locationToSum, (item) => item[1]);
+    let locationToSum = dataView.locationToSum || [];
+    let max = d3max(locationToSum, (item) => item[1]) || 0;
 
     let offset = 0 * 80;
     let labelColor = chart.controller.colorGenerator.stack(label);
