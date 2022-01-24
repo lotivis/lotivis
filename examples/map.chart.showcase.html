@@ -28,17 +28,21 @@
           <!-- Placeholder -->
         </div>
         <div class="col-6">
+          <p>Default</p>
           <div id="map-chart-1">
             <!-- Map Chart 1 Code Here -->
           </div>
-          <div id="map-chart-3">
+          <p>Labels</p>
+          <div id="map-chart-2">
             <!-- Map Chart 3 Code Here -->
           </div>
         </div>
         <div class="col-6">
-          <div id="map-chart-2">
+          <p>Include</p>
+          <div id="map-chart-3">
             <!-- Map Chart 2 Code Here -->
           </div>
+          <p>Exclude</p>
           <div id="map-chart-4">
             <!-- Map Chart 4 Code Here -->
           </div>
@@ -61,10 +65,10 @@
           label: "dataset_1",
           stack: "dataset_1",
           data: [
-            { map: 45, date: 2000, value: 2 },
-            { map: 45, date: 2001, value: 1 },
-            { map: 45, date: 2002, value: 4 },
-            { map: 45, date: 2003, value: 3 },
+            { location: "45", date: 2000, value: 2 },
+            { location: "45", date: 2001, value: 1 },
+            { location: "45", date: 2002, value: 4 },
+            { location: "45", date: 2003, value: 3 },
           ],
         },
       ];
@@ -85,12 +89,15 @@
       let mapChart3 = new lotivis.MapChart("map-chart-3", {
         dataController,
         selectable: false,
+        include: ["2A", "2B"],
+        featureIDAccessor: (f) => "" + f.properties.code,
+        featureNameAccessor: (f) => f.properties.nom,
       });
 
       let mapChart4 = new lotivis.MapChart("map-chart-4", {
         selectable: false,
         dataController,
-        excludedFeatureCodes: ["2A", "2B"],
+        exclude: ["2A", "2B"],
         featureIDAccessor: (f) => "" + f.properties.code,
         featureNameAccessor: (f) => f.properties.nom,
       });

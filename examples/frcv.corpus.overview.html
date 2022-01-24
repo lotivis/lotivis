@@ -54,7 +54,7 @@
       let barChart = new lotivis.BarChart("bar-chart");
 
       let mapChart = new lotivis.MapChart("map-chart", {
-        excludedFeatureCodes: ["2A", "2B"],
+        exclude: ["2A", "2B"],
         featureIDAccessor: (f) => "" + f.properties.code,
         featureNameAccessor: (f) => f.properties.nom,
       });

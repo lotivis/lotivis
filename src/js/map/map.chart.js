@@ -77,15 +77,12 @@ export class MapChart extends Chart {
     // precalculate the center of each feature
     this.geoJSON.features.forEach((f) => (f.center = geoCentroid(f)));
 
-    if (this.config.excludedFeatureCodes) {
-      this.presentedGeoJSON = removeFeatures(
-        this.geoJSON,
-        this.config.excludedFeatureCodes
-      );
+    if (this.config.exclude) {
+      this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.exclude);
     }
 
-    if (this.config.filter) {
-      this.presentedGeoJSON = filterFeatures(this.geoJSON, this.config.filter);
+    if (this.config.include) {
+      this.presentedGeoJSON = filterFeatures(this.geoJSON, this.config.include);
     }
 
     // precalculate lotivis feature ids

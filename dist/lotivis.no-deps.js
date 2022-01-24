@@ -1394,7 +1394,7 @@
     isShowLabels: true,
     geoJSON: null,
     departementsData: [],
-    excludedFeatureCodes: [],
+    exclude: [],
     drawRectangleAroundSelection: true,
     selectable: true,
     featureIDAccessor: FEATURE_ID_ACCESSOR,
@@ -2238,10 +2238,10 @@
       // precalculate the center of each feature
       this.geoJSON.features.forEach((f) => (f.center = d3$1.geoCentroid(f)));
 
-      if (this.config.excludedFeatureCodes) {
+      if (this.config.exclude) {
         this.presentedGeoJSON = removeFeatures(
           this.geoJSON,
-          this.config.excludedFeatureCodes
+          this.config.exclude
         );
       }
 

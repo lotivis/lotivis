@@ -53,8 +53,6 @@ export class MapDatasetRenderer extends Renderer {
     let locations = Array.from(locationToSum.keys());
     let max = d3max(locationToSum, (item) => item[1]);
 
-    console.log("locationToSum", locationToSum);
-
     for (let i = 0; i < locations.length; i++) {
       let location = locations[i];
       let value = locationToSum.get(location);

@@ -21529,7 +21529,9 @@
     isShowLabels: true,
     geoJSON: null,
     departementsData: [],
-    excludedFeatureCodes: [],
+    exclude: [],
+    // exclude: [],
+    // include: [], || filter: []
     drawRectangleAroundSelection: true,
     selectable: true,
     featureIDAccessor: FEATURE_ID_ACCESSOR,
@@ -23073,8 +23075,6 @@
       let locations = Array.from(locationToSum.keys());
       let max = max$3(locationToSum, (item) => item[1]);
 
-      console.log("locationToSum", locationToSum);
-
       for (let i = 0; i < locations.length; i++) {
         let location = locations[i];
         let value = locationToSum.get(location);
@@ -23464,15 +23464,12 @@
       // precalculate the center of each feature
       this.geoJSON.features.forEach((f) => (f.center = geoCentroid(f)));
 
-      if (this.config.excludedFeatureCodes) {
-        this.presentedGeoJSON = removeFeatures(
-          this.geoJSON,
-          this.config.excludedFeatureCodes
-        );
+      if (this.config.exclude) {
+        this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.exclude);
       }
 
-      if (this.config.filter) {
-        this.presentedGeoJSON = filterFeatures(this.geoJSON, this.config.filter);
+      if (this.config.include) {
+        this.presentedGeoJSON = filterFeatures(this.geoJSON, this.config.include);
       }
 
       // precalculate lotivis feature ids

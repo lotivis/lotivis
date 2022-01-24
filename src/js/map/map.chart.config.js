@@ -23,7 +23,9 @@ export const MAP_CHART_CONFIG = {
   isShowLabels: true,
   geoJSON: null,
   departementsData: [],
-  excludedFeatureCodes: [],
+  exclude: [],
+  // exclude: [],
+  // include: [], || filter: []
   drawRectangleAroundSelection: true,
   selectable: true,
   featureIDAccessor: FEATURE_ID_ACCESSOR,
