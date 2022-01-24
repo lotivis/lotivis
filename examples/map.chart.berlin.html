@@ -43,10 +43,9 @@
       // print debug messages
       lotivis.debug(true);
 
-      let chart = new lotivis.MapChart("map-chart");
-      chart.config.featureIDAccessor = function (f) {
-        return f.properties.cartodb_id;
-      };
+      let chart = new lotivis.MapChart("map-chart", {
+        featureIDAccessor: (f) => f.properties.cartodb_id,
+      });
 
       fetch("./assets/berlin.geojson")
         .then((raw) => raw.json())

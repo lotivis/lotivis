@@ -23421,6 +23421,11 @@ class MapChart extends Chart {
     // precalculate the center of each feature
     this.geoJSON.features.forEach((f) => (f.center = geoCentroid(f)));
 
+    console.log("this.controller", this.controller);
+    if (!this.controller) {
+      this.controller = new DataController([]);
+    }
+
     if (this.config.exclude) {
       this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.exclude);
     }
@@ -23439,6 +23444,7 @@ class MapChart extends Chart {
 
     this.zoomTo(this.presentedGeoJSON);
     this.update(this.controller, "geojson");
+    this.redraw();
   }
 }
 

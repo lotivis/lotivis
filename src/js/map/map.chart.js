@@ -14,6 +14,7 @@ import { MapLabelsRenderer } from "./map.labels";
 import { MapTooltipRenderer } from "./map.tooltip";
 import { MapSelectionRenderer } from "./map.selection";
 import { dataViewMap } from "./map.data.view.js";
+import { DataController } from "../data/controller.js";
 
 export class MapChart extends Chart {
   initialize() {
@@ -77,6 +78,11 @@ export class MapChart extends Chart {
     // precalculate the center of each feature
     this.geoJSON.features.forEach((f) => (f.center = geoCentroid(f)));
 
+    console.log("this.controller", this.controller);
+    if (!this.controller) {
+      this.controller = new DataController([]);
+    }
+
     if (this.config.exclude) {
       this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.exclude);
     }
@@ -95,5 +101,6 @@ export class MapChart extends Chart {
 
     this.zoomTo(this.presentedGeoJSON);
     this.update(this.controller, "geojson");
+    this.redraw();
   }
 }
