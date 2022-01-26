@@ -4,6 +4,8 @@ import { Renderer } from "../common/renderer";
 
 export class MapTooltipRenderer extends Renderer {
   render(chart, controller, dataView) {
+    var colors = controller.colorGenerator();
+
     chart.element.select(".ltv-tooltip").remove();
     let tooltip = chart.element
       .append("div")
@@ -53,7 +55,7 @@ export class MapTooltipRenderer extends Renderer {
       let components = [""];
       let sum = 0;
       for (const label in combinedByLabel) {
-        let color = controller.colorGenerator.label(label);
+        let color = colors.label(label);
         let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
         sum += combinedByLabel[label];
         let value = numberFormat(combinedByLabel[label]);

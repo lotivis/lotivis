@@ -1,42 +1,53 @@
 export class FilterArray extends Array {
-  constructor(listener) {
+  constructor(name, listener) {
     super();
+    this.name = name;
     this.listener = listener;
   }
 
-  notify(reason, item, notify = true) {
-    if (notify) this.listener(reason, item);
+  validate(item, sender) {
+    if (!item) throw new Error("no item.");
+    if (!sender) throw new Error("no sender.");
   }
 
-  add(item, notify = true) {
+  notify(reason, item, sender, notify = true) {
+    if (notify) this.listener(this.name, reason, item, sender);
+  }
+
+  add(item, sender, notify = true) {
+    this.validate(item, sender);
     if (this.indexOf(item) === -1)
-      this.push(item), this.notify("add", item, notify);
+      this.push(item), this.notify("add", item, sender, notify);
   }
 
   addAll(source) {
     if (!Array.isArray(source)) throw new Error("no array given");
-    this.push(...source), this.notify("add", item, notify);
+    this.push(...source), this.notify("add", item, sender, notify);
   }
 
-  remove(item, notify = true) {
+  remove(item, sender, notify = true) {
+    this.validate(item, sender);
     let i = this.indexOf(item);
-    if (i !== -1) this.splice(i, 1), this.notify("remove", item, notify);
+    if (i !== -1)
+      this.splice(i, 1), this.notify("remove", item, sender, notify);
   }
 
-  toggle(item, notify = true) {
+  toggle(item, sender, notify = true) {
+    this.validate(item, sender);
     let i = this.indexOf(item);
     i === -1 ? this.push(item) : this.splice(i, 1);
-    this.notify("toggle", item, notify);
+    this.notify("toggle", item, sender, notify);
   }
 
   contains(item) {
     return this.indexOf(item) !== -1;
   }
 
-  clear(notify = true) {
+  clear(sender, notify = true) {
+    this.validate(true, sender);
     if (this.length !== 0) {
       this.splice(0, this.length);
-      this.notify("clear", null, notify);
+      this.notify("clear", null, sender, notify);
     }
   }
 }

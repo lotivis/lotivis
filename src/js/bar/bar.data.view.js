@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { toDataset } from "../parse/data.to.datasets";
 
 export function dataViewBar(dataController) {
-  let snapshot = dataController.snapshot;
+  let snapshot = dataController.snapshot();
   let data = snapshot || dataController.data;
 
   let byDateStackOriginal = d3.rollup(

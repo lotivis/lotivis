@@ -15,7 +15,7 @@ export class PlotBarsGradientCreator {
     let max = this.chart.dataView.max;
     let gradient = this.chart.definitions
       .append("linearGradient")
-      .attr("id", "ltv-plot-gradient-" + hash_str(dataset.label))
+      .attr("id", this.chart.selector + "-" + hash_str(dataset.label))
       .attr("x1", "0%")
       .attr("x2", "100%")
       .attr("y1", "0%")
@@ -29,7 +29,7 @@ export class PlotBarsGradientCreator {
 
     let plotColors = this.plotColors;
     let brush = max / 2;
-    let colorGenerator = this.controller.colorGenerator;
+    let colorGenerator = this.controller.colorGenerator();
     let colorMode = this.chart.config.colorMode;
 
     function append(value, percent) {

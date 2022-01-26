@@ -832,7 +832,7 @@
   class BarBarsRenderer extends Renderer {
     render(chart, controller) {
       let radius = chart.config.barRadius || LOTIVIS_CONFIG$1.barRadius;
-      let colors = controller.colorGenerator;
+      let colors = controller.colorGenerator();
       let barWidth = chart.xStack.bandwidth();
       let yChart = chart.yChart;
       let height = chart.yChart(0);
@@ -965,7 +965,7 @@
           .map(function (label) {
             let value = filtered.get(label);
             if (!value) return undefined;
-            let colorGenerator = chart.controller.colorGenerator;
+            let colorGenerator = chart.controller.colorGenerator();
             let color = colorGenerator.label(label);
             let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
             let valueFormatted = numberFormat(value);
@@ -1190,7 +1190,7 @@
   }
 
   function dataViewBar(dataController) {
-    let snapshot = dataController.snapshot;
+    let snapshot = dataController.snapshot();
     let data = snapshot || dataController.data;
     console.log("data", data);
     console.log("snapshot", snapshot);
@@ -2552,7 +2552,7 @@
       let brush = max / 2;
       let data = chart.dataView.byLabelDate;
       MapColors(max);
-      let colorGenerator = controller.colorGenerator;
+      let colorGenerator = controller.colorGenerator();
 
       console.log("max", max);
 
@@ -2924,7 +2924,7 @@
     render(chart, controller, dataView) {
       // let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
       let stacks = dataView.stacks;
-      let colors = controller.colorGenerator;
+      let colors = controller.colorGenerator();
 
       function stackId(stack) {
         return `ltv-legend-stack-id-${safeId(stack)}`;

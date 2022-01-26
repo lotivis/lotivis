@@ -14,7 +14,7 @@ export class PlotBarsFractionsRenderer extends Renderer {
 
     let colors = PlotColors(max);
     let brush = max / 2;
-    let colorGenerator = controller.colorGenerator;
+    let colorGenerator = controller.colorGenerator();
     let colorMode = chart.config.colorMode;
 
     chart.barsData = chart.svg.append("g").selectAll("g").data(data).enter();

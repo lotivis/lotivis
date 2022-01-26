@@ -62,7 +62,8 @@ export class Chart extends Component {
     this.updateSensible = true;
   }
 
-  update(controller, filter, reason) {
+  update(controller, filter, reason, sender) {
+    // console.log("update", filter, reason, sender);
     if (!this.updateSensible) return;
     if (!this.controller) return;
     this.dataView = this.createDataView();
@@ -73,7 +74,7 @@ export class Chart extends Component {
 
   setController(dc) {
     this.controller = dc;
-    this.controller.on("change", (d, f, r) => this.update(d, r, f));
+    this.controller.on("change", (d, f, r, s) => this.update(d, r, f, s));
     this.update(dc, "registration");
   }
 }

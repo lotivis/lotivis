@@ -118,7 +118,8 @@
         featureNameAccessor: (f) => f.properties.nom,
       });
 
-      let labelsChart = new lotivis.LabelsChart("labels-chart");
+      // let labelsChart = new lotivis.LabelsChart("labels-chart");
+      let legend = new lotivis.Legend().title(null).container("#labels-chart");
 
       lotivis.d3.json("./assets/departements.geojson").then((json) => {
         mapChart.setGeoJSON(json);
@@ -131,7 +132,7 @@
         plotChart.setController(dataController);
         mapChart.setController(dataController);
         mapChartMetropole.setController(dataController);
-        labelsChart.setController(dataController);
+        legend.dataController(dataController).run();
       });
     </script>
   </body>

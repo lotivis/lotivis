@@ -374,14 +374,14 @@ function rollups(values, reduce, ...keys) {
 }
 
 function index$4(values, ...keys) {
-  return nest(values, identity$a, unique$1, keys);
+  return nest(values, identity$a, unique, keys);
 }
 
 function indexes(values, ...keys) {
-  return nest(values, Array.from, unique$1, keys);
+  return nest(values, Array.from, unique, keys);
 }
 
-function unique$1(values) {
+function unique(values) {
   if (values.length !== 1) throw new Error("duplicate key");
   return values[0];
 }
@@ -20327,44 +20327,55 @@ function PlotColors(till) {
 }
 
 class FilterArray extends Array {
-  constructor(listener) {
+  constructor(name, listener) {
     super();
+    this.name = name;
     this.listener = listener;
   }
 
-  notify(reason, item, notify = true) {
-    if (notify) this.listener(reason, item);
+  validate(item, sender) {
+    if (!item) throw new Error("no item.");
+    if (!sender) throw new Error("no sender.");
   }
 
-  add(item, notify = true) {
+  notify(reason, item, sender, notify = true) {
+    if (notify) this.listener(this.name, reason, item, sender);
+  }
+
+  add(item, sender, notify = true) {
+    this.validate(item, sender);
     if (this.indexOf(item) === -1)
-      this.push(item), this.notify("add", item, notify);
+      this.push(item), this.notify("add", item, sender, notify);
   }
 
   addAll(source) {
     if (!Array.isArray(source)) throw new Error("no array given");
-    this.push(...source), this.notify("add", item, notify);
+    this.push(...source), this.notify("add", item, sender, notify);
   }
 
-  remove(item, notify = true) {
+  remove(item, sender, notify = true) {
+    this.validate(item, sender);
     let i = this.indexOf(item);
-    if (i !== -1) this.splice(i, 1), this.notify("remove", item, notify);
+    if (i !== -1)
+      this.splice(i, 1), this.notify("remove", item, sender, notify);
   }
 
-  toggle(item, notify = true) {
+  toggle(item, sender, notify = true) {
+    this.validate(item, sender);
     let i = this.indexOf(item);
     i === -1 ? this.push(item) : this.splice(i, 1);
-    this.notify("toggle", item, notify);
+    this.notify("toggle", item, sender, notify);
   }
 
   contains(item) {
     return this.indexOf(item) !== -1;
   }
 
-  clear(notify = true) {
+  clear(sender, notify = true) {
+    this.validate(true, sender);
     if (this.length !== 0) {
       this.splice(0, this.length);
-      this.notify("clear", null, notify);
+      this.notify("clear", null, sender, notify);
     }
   }
 }
@@ -20436,18 +20447,6 @@ function set_data_preview(v) {
   if (e) e.textContent = s;
 }
 
-function snapshot(controller) {
-  let f = controller.filters;
-  return filter$1(controller.data, (d) => {
-    return !(
-      (d.location && f.locations.contains(d.location)) ||
-      (d.date && f.dates.contains(d.date)) ||
-      (d.label && f.labels.contains(d.label)) ||
-      (d.stack && f.stacks.contains(d.stack))
-    );
-  });
-}
-
 // Code from:
 // https://www.freecodecamp.org/news/how-to-code-your-own-event-emitter-in-node-js-a-step-by-step-guide-e13b7e7908e1/
 
@@ -20513,34 +20512,104 @@ class EventEmitter {
   }
 }
 
-class DataController extends EventEmitter {
-  constructor(flat, config) {
-    super();
+function isFunction(value) {
+  return value && typeof value === "function";
+}
 
-    if (!Array.isArray(flat)) {
-      throw new Error("Datasets are not an array.");
-    }
+class State {
+  constructor(state, config) {
+    if (!state) throw new Error("no state passed");
 
-    this.config = config || {};
-    this.data = flat;
-    this.original = this.config.original || flat;
+    // private
+    // Declare initial chart state attributes
+    const _state = state;
 
-    this.dateAccess = this.config.dateAccess || DEFAULT_DATE_ORDINATOR;
-    this.colorGenerator = new ColorGenerator(this.data);
+    Object.keys(_state).forEach((key) => {
+      // do not override (custom) existing functions
+      if (isFunction(this[key])) return;
+      this[key] = function (_) {
+        return arguments.length ? ((_state[key] = _), this) : _state[key];
+      };
+    });
 
-    this.filters = {
-      labels: new FilterArray((r) => this.filterChange("labels", r)),
-      locations: new FilterArray((r) => this.filterChange("locations", r)),
-      dates: new FilterArray((r) => this.filterChange("dates", r)),
-      stacks: new FilterArray((r) => this.filterChange("stacks", r)),
+    // if exists overwrite state from passed config
+    Object.keys(_state).forEach((key) => {
+      if (config && config[key]) _state[key] = config[key];
+    });
+
+    // public
+
+    // Define state getter and setter function
+    this.state = function (_) {
+      return arguments.length ? (Object.assign(_state, _), this) : _state;
     };
 
-    // this.filters.locations.push(...this.locations());
+    this.stateItem = function (name, fb) {
+      return _state.hasOwnProperty(name) ? _state[name] || fb : fb;
+    };
+
+    if (isFunction(this.didConstruct)) this.didConstruct();
+  }
+}
+
+class DataController extends State {
+  constructor(data, config) {
+    if (!Array.isArray(data)) throw new Error("data not an array.");
+
+    super(
+      // public state
+      {
+        data: data,
+        original: data,
+        dateAccess: DEFAULT_DATE_ORDINATOR,
+        colorGenerator: new ColorGenerator(data),
+      },
+      config
+    );
+
+    // private properties
+    var _events = new EventEmitter();
+
+    this.data = data;
+
+    // private sate
+    this.state({ calc: {}, cache: {} });
+
+    // filters
+    var change = this.filtersDidChange.bind(this);
+    this.filters = {
+      labels: new FilterArray("labels", change),
+      locations: new FilterArray("locations", change),
+      dates: new FilterArray("dates", change),
+      stacks: new FilterArray("stacks", change),
+    };
+
+    // events
+    this.on = function (eventName, fn) {
+      return _events.on(eventName, fn), this;
+    };
+
+    this.off = function (eventName, fn) {
+      return _events.off(eventName, fn), this;
+    };
+
+    this.emit = function (eventName, ...args) {
+      return _events.emit(eventName, args), this;
+    };
+
+    this.removeAllListeners = function () {
+      return _events.removeAllListeners(), this;
+    };
 
     if (LOTIVIS_CONFIG$1.debug) console.log("[ltv] ", this);
-    if (this.original) set_data_preview(this.original);
+    if (this.original && this.original()) set_data_preview(this.original());
 
     return this;
+  }
+
+  filtersDidChange(name, reason, item, sender) {
+    this.calculateSnapshot();
+    this.emit("change", this, name, reason, sender, item);
   }
 
   /** Returns entries with valid value. */
@@ -20565,7 +20634,7 @@ class DataController extends EventEmitter {
   }
 
   labels() {
-    return Array.from(this.byLabel().keys());
+    return this.cache("labels", () => Array.from(this.byLabel().keys()));
   }
 
   stacks() {
@@ -20624,7 +20693,7 @@ class DataController extends EventEmitter {
     return min$2(this.data, (item) => item.value);
   }
 
-  /** Returns a string that can be used as filename for downloads. */
+  /** Returns a string _this can be used as filename for downloads. */
   getFilename() {
     if (!this.labels) return "Unknown";
     let labels = this.labels.map((label) => label.split(` `).join(`-`));
@@ -20633,14 +20702,119 @@ class DataController extends EventEmitter {
     }
     return labels.join(",");
   }
-
-  // filters
-
-  filterChange(name, reason) {
-    this.snapshot = snapshot(this);
-    this.emit("change", this, name, reason);
-  }
 }
+
+DataController.prototype.calculateSnapshot = function () {
+  let f = this.filters;
+  let snapshot = filter$1(this.data, (d) => {
+    return !(
+      (d.location && f.locations.contains(d.location)) ||
+      (d.date && f.dates.contains(d.date)) ||
+      (d.label && f.labels.contains(d.label)) ||
+      (d.stack && f.stacks.contains(d.stack))
+    );
+  });
+  return this.state({ snapshot });
+};
+
+DataController.prototype.snapshot = function () {
+  return this.stateItem("snapshot", null);
+};
+
+DataController.prototype.snapshotOrData = function () {
+  return this.stateItem("snapshot", this.stateItem("data", null));
+};
+
+DataController.prototype.cache = function (key, valueFn) {
+  var cached = this.getCached(key);
+  if (cached) return cached;
+  var value = valueFn();
+  this.setCached(key, value);
+  return value;
+};
+
+DataController.prototype.getCached = function (key) {
+  var cache = this.stateItem("cache");
+  return cache && cache[key] ? cache[key] : null;
+};
+
+DataController.prototype.setCached = function (key, value) {
+  var { cache } = this.state();
+  cache[key] = value;
+  return this;
+};
+
+DataController.prototype.clearFilters = function (sender) {
+  this.filters.dates.clear(sender, false);
+  this.filters.locations.clear(sender, false);
+  this.filters.labels.clear(sender, false);
+  this.filters.stacks.clear(sender, false);
+  this.filtersDidChange("all", "clear", null, sender);
+};
+
+DataController.prototype.addLocationFilter = function (location, sender) {
+  return this.filters.locations.add(location, sender);
+};
+
+DataController.prototype.removeLocationFilter = function (location, sender) {
+  return this.filters.locations.remove(location, sender);
+};
+
+DataController.prototype.addDateFilter = function (location, sender) {
+  return this.filters.dates.add(location, sender);
+};
+
+DataController.prototype.removeDateFilter = function (location, sender) {
+  return this.filters.dates.remove(location, sender);
+};
+
+DataController.prototype.addLabelFilter = function (location, sender) {
+  return this.filters.labels.add(location, sender);
+};
+
+DataController.prototype.removeLabelFilter = function (location, sender) {
+  return this.filters.labels.remove(location, sender);
+};
+
+DataController.prototype.addStackFilter = function (location, sender) {
+  return this.filters.stacks.add(location, sender);
+};
+
+DataController.prototype.removeStackFilter = function (location, sender) {
+  return this.filters.stacks.remove(location, sender);
+};
+
+DataController.prototype.locationFilters = function () {
+  return this.filters.locations;
+};
+
+DataController.prototype.dateFilters = function () {
+  return this.filters.dates;
+};
+
+DataController.prototype.labelFilters = function () {
+  return this.filters.labels;
+};
+
+DataController.prototype.stackFilters = function () {
+  return this.filters.stacks;
+};
+
+DataController.prototype.isFilterLocation = function (loc) {
+  return this.filters.locations.contains(loc);
+};
+
+DataController.prototype.isFilterDate = function (date) {
+  return this.filters.dates.contains(date);
+};
+
+DataController.prototype.isFilterLabel = function (label) {
+  return this.filters.labels.contains(label);
+};
+
+DataController.prototype.isFilterStack = function (stack) {
+  return this.filters.stacks.contains(stack);
+};
 
 const DEFAULT_COLUMNS = ["label", "location", "date", "value", "stack"];
 
@@ -20793,15 +20967,22 @@ class Component extends EventEmitter {
   }
 }
 
-let unique = 0;
+const genId = (function () {
+  var prefix = "ltv";
+  var unique = 0;
 
-function next() {
-  return "ltv-id-" + unique++;
-}
+  function random() {
+    return Math.random().toString(36).substring(2, 8);
+  }
 
-function create_id() {
-  return next();
-}
+  return function (type = "id") {
+    return [prefix, type, "" + unique++, random()].join("-");
+  };
+})();
+
+const create_id = genId;
+
+const uniqueId = genId;
 
 class Chart extends Component {
   constructor(selector, config) {
@@ -20863,7 +21044,8 @@ class Chart extends Component {
     this.updateSensible = true;
   }
 
-  update(controller, filter, reason) {
+  update(controller, filter, reason, sender) {
+    // console.log("update", filter, reason, sender);
     if (!this.updateSensible) return;
     if (!this.controller) return;
     this.dataView = this.createDataView();
@@ -20874,7 +21056,7 @@ class Chart extends Component {
 
   setController(dc) {
     this.controller = dc;
-    this.controller.on("change", (d, f, r) => this.update(d, r, f));
+    this.controller.on("change", (d, f, r, s) => this.update(d, r, f, s));
     this.update(dc, "registration");
   }
 }
@@ -20967,7 +21149,7 @@ class BarLegendRenderer extends Renderer {
 class BarBarsRenderer extends Renderer {
   render(chart, controller) {
     let radius = chart.config.barRadius || LOTIVIS_CONFIG$1.barRadius;
-    let colors = controller.colorGenerator;
+    let colors = controller.colorGenerator();
     let barWidth = chart.xStack.bandwidth();
     let yChart = chart.yChart;
     let height = chart.yChart(0);
@@ -21097,7 +21279,7 @@ class BarTooltipRenderer extends Renderer {
         .map(function (label) {
           let value = filtered.get(label);
           if (!value) return undefined;
-          let colorGenerator = chart.controller.colorGenerator;
+          let colorGenerator = chart.controller.colorGenerator();
           let color = colorGenerator.label(label);
           let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
           let valueFormatted = numberFormat(value);
@@ -21318,7 +21500,7 @@ class BarBackgroundRenderer extends Renderer {
 }
 
 function dataViewBar(dataController) {
-  let snapshot = dataController.snapshot;
+  let snapshot = dataController.snapshot();
   let data = snapshot || dataController.data;
 
   let byDateStackOriginal = rollup(
@@ -23125,6 +23307,8 @@ class MapLabelsRenderer extends Renderer {
 
 class MapTooltipRenderer extends Renderer {
   render(chart, controller, dataView) {
+    var colors = controller.colorGenerator();
+
     chart.element.select(".ltv-tooltip").remove();
     let tooltip = chart.element
       .append("div")
@@ -23174,7 +23358,7 @@ class MapTooltipRenderer extends Renderer {
       let components = [""];
       let sum = 0;
       for (const label in combinedByLabel) {
-        let color = controller.colorGenerator.label(label);
+        let color = colors.label(label);
         let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
         sum += combinedByLabel[label];
         let value = numberFormat(combinedByLabel[label]);
@@ -23356,7 +23540,7 @@ class MapSelectionRenderer extends Renderer {
  * ```
  */
 function dataViewMap(dataController) {
-  let data = dataController.snapshot || dataController.data;
+  let data = dataController.snapshotOrData();
   // console.log("data", data);
 
   let byLocationLabel = rollup(
@@ -23783,7 +23967,7 @@ class PlotBarsFractionsRenderer extends Renderer {
 
     let colors = PlotColors(max);
     let brush = max / 2;
-    let colorGenerator = controller.colorGenerator;
+    let colorGenerator = controller.colorGenerator();
     let colorMode = chart.config.colorMode;
 
     chart.barsData = chart.svg.append("g").selectAll("g").data(data).enter();
@@ -23829,7 +24013,7 @@ class PlotBarsGradientCreator {
     let max = this.chart.dataView.max;
     let gradient = this.chart.definitions
       .append("linearGradient")
-      .attr("id", "ltv-plot-gradient-" + hash_str(dataset.label))
+      .attr("id", this.chart.selector + "-" + hash_str(dataset.label))
       .attr("x1", "0%")
       .attr("x2", "100%")
       .attr("y1", "0%")
@@ -23843,7 +24027,7 @@ class PlotBarsGradientCreator {
 
     let plotColors = this.plotColors;
     let brush = max / 2;
-    let colorGenerator = this.controller.colorGenerator;
+    let colorGenerator = this.controller.colorGenerator();
     let colorMode = this.chart.config.colorMode;
 
     function append(value, percent) {
@@ -23906,7 +24090,7 @@ class PlotBarsGradientRenderer extends Renderer {
     chart.bars = chart.barsData
       .append("rect")
       .attr("transform", (d) => `translate(0,${chart.yChartPadding(d.label)})`)
-      .attr("fill", (d) => `url(#ltv-plot-gradient-${hash_str(d.label)})`)
+      .attr("fill", (d) => `url(#${chart.selector}-${hash_str(d.label)})`)
       .attr("class", "ltv-plot-bar")
       .attr("rx", radius)
       .attr("ry", radius)
@@ -23995,7 +24179,7 @@ class PlotChartSelectionRenderer extends Renderer {
 
 function dataViewPlot(dataController) {
   let dates = dataController.dates().sort();
-  let data = dataController.snapshot || dataController.data;
+  let data = dataController.snapshotOrData();
 
   let byLabelDate = rollups(
     data,
@@ -24157,197 +24341,456 @@ class PlotChart extends Chart {
   }
 }
 
-function DataViewLabels(dataController) {
-  return {
-    labels: dataController.labels(),
-    stacks: dataController.stacks(),
-    locations: dataController.locations(),
-    byLabel: rollup(
-      dataController.data,
+class LotivisChart extends State {
+  constructor(state, config) {
+    super(state, config);
+
+    // private
+    var _updateSensible = true;
+    var _events = new EventEmitter();
+
+    // functions
+    this.on = function (eventName, fn) {
+      return _events.on(eventName, fn), this;
+    };
+
+    this.off = function (eventName, fn) {
+      return _events.off(eventName, fn), this;
+    };
+
+    this.emit = function (eventName, ...args) {
+      return _events.emit(eventName, args), this;
+    };
+
+    this.removeAllListeners = function () {
+      return _events.removeAllListeners(), this;
+    };
+
+    this.updateSensible = function (_) {
+      return arguments.length ? ((_updateSensible = _), this) : _updateSensible;
+    };
+  }
+
+  init(config = {}) {}
+
+  show() {
+    if (this.element) this.element.style("display", "");
+  }
+
+  hide() {
+    if (this.element) this.element.style("display", "none");
+  }
+
+  get isVisible() {
+    return !this.element ? this.element.style("display") !== "none" : false;
+  }
+
+  getElementEffectiveSize() {
+    if (!this.element) return [0, 0];
+    let width = this.element.style("width").replace("px", "");
+    let height = this.element.style("height").replace("px", "");
+    return [Number(width), Number(height)];
+  }
+
+  getElementPosition() {
+    let element = document.getElementById(this.selector);
+    if (!element) return [0, 0];
+    let rect = element.getBoundingClientRect();
+    let xPosition = rect.x + window.scrollX;
+    let yPosition = rect.y + window.scrollY;
+    return [xPosition, yPosition];
+  }
+
+  toString() {
+    return "[" + getClassname() + ", id: " + this.selector + "]";
+  }
+
+  getClassname() {
+    return !this.constructor || !this.constructor.name
+      ? typeof this
+      : this.constructor.name;
+  }
+
+  name() {
+    return this.getClassname();
+  }
+
+  // lifecycle
+
+  // Default implementation removes everything inside the selection.
+  clear(selection) {
+    return selection.selectAll("*").remove(), this;
+  }
+
+  prepare(selection) {
+    return this;
+  }
+
+  render(selection) {
+    var chart = this;
+    selection.each(function scope() {
+      chart.renderContainer(select(this), chart);
+    });
+    return this;
+  }
+
+  renderContainer(container, chart) {
+    return this;
+  }
+
+  run() {
+    if (!this.container || typeof this.container !== "function")
+      throw new Error("no container function");
+
+    var container = this.container();
+    if (!container) return console.log("[ltv]  no container value"), this;
+
+    selectAll(container)
+      .call(this.clear.bind(this))
+      .call(this.prepare.bind(this))
+      .call(this.render.bind(this));
+
+    return this;
+  }
+
+  // functions
+
+  dataController(_) {
+    // if (arguments.length) this.state({ controller });
+    if (!arguments.length) return this._dataController;
+
+    var chart = this;
+    function onChange(controller, filter, reason, sender) {
+      // console.log("onChange", filter, reason, sender, chart.id(), chart.name());
+      if (chart === sender) return;
+      if (!chart.updateSensible) return;
+      if (!chart._dataController) return;
+      // this.dataView = chart.createDataView();
+      chart.update();
+      // chart.run();
+    }
+
+    this._dataController = _;
+    this._dataController.on("change", (d, f, r, s) => onChange(d, f, r, s));
+
+    return this;
+  }
+
+  /**
+   * @deprecated
+   */
+  setController(dc) {
+    this._dataController = dc;
+    this._dataController.on("change", (d, f, r, s) => this.update(d, r, f, s));
+    this.update(dc, "registration");
+  }
+
+  // syntatic sugar
+
+  margin(_) {
+    if (!arguments.length) {
+      const { marginLeft, marginTop, marginRight, marginBottom } = this.state();
+      return { marginLeft, marginTop, marginRight, marginBottom };
+    }
+    if (_ && _["left"]) this.state({ marginLeft: _["left"] });
+    if (_ && _["top"]) this.state({ marginTop: _["top"] });
+    if (_ && _["right"]) this.state({ marginRight: _["right"] });
+    if (_ && _["bottom"]) this.state({ marginBottom: _["bottom"] });
+    return this;
+  }
+
+  classFor(postfix) {
+    return ["ltv", this.name().toLowerCase(), postfix].join("-");
+  }
+
+  className(postfix) {
+    return ["ltv", this.name().toLowerCase(), postfix].join("-");
+  }
+}
+
+//----------- PROTOTYEPE FUNCTIONS  ----------------------
+
+selection.prototype.removeAll = function (selector) {
+  return this.selectAll(selector).remove(), this;
+};
+
+selection.prototype.element = function (params) {
+  return params.tag
+    ? this.append(params.tag).attr("class", params.class).attr("id", params.id)
+    : this;
+};
+
+selection.prototype.bindData = function (data, tag, aClass) {
+  return this.selectAll("." + tag)
+    .data(data)
+    .enter()
+    .element({ tag: tag, class: aClass });
+};
+
+function debug_log(text) {
+  if (LOTIVIS_CONFIG$1.debug) console.log("[ltv]  " + text);
+}
+
+class Legend extends LotivisChart {
+  // Define types of a legend.
+  static Type = {
+    flowing: "flowing",
+    grouped: "grouped",
+    stacks: "stacks",
+  };
+
+  // (label, value, index) => String
+  static LabelFormat = {
+    /**
+     * Returns a string in the form of "<LABEL> (<VALUE>)".
+     *
+     * @param {*} l the label
+     * @param {*} v the (already formatted) value
+     * @param {*} i the index of the label
+     *
+     * @returns a string
+     */
+    default: (l, v, i) => `${l} (${v})`,
+  };
+
+  // (stack, value, labels, index) => String
+  static StackFormat = {
+    default: (s, v, ls, i) => `Stack ${i + 1} (${v})`,
+    full: (s, v, ls, i) => `${s} (Labels: ${ls.length}, Sum: ${v})`,
+  };
+
+  constructor(config) {
+    super(
+      {
+        container: "body",
+        selector: "body",
+        ltvId: uniqueId("legend"),
+        // "flowing" or "grouped"
+        style: Legend.Type.flowing, // "flowing",
+        marginLeft: 40,
+        marginTop: 0,
+        marginRight: 40,
+        marginBottom: 0,
+        selectable: true,
+        numberFormat: LOTIVIS_CONFIG$1.numberFormat,
+        labelFormat: Legend.LabelFormat.default,
+        stackFormat: Legend.StackFormat.full,
+        title: "Legend",
+      },
+
+      null
+    );
+
+    // private inner states
+    // super.state({ div: null, calc: {}, debug: false });
+    // this.state({ div: null, calc: {}, debug: false });
+  }
+
+  update() {
+    var { selectable, style, nodes } = this.state();
+    if (!nodes || !nodes.checkboxes || !nodes.spans)
+      return console.log("[ltv]  no components found");
+    var disabled = selectable ? null : true;
+    var dataController = this.dataController();
+    var labelOf = style === "grouped" ? (d) => d[0] : (l) => l;
+    var filter = (label) => dataController.filters.labels.contains(label);
+
+    nodes.checkboxes
+      .attr("disabled", disabled)
+      .attr("checked", (d) => (filter(labelOf(d)) ? null : true));
+
+    nodes.spans.attr("disabled", disabled);
+  }
+
+  renderContainer(container, chart) {
+    var nodes = {};
+    var {
+      marginLeft,
+      marginTop,
+      marginRight,
+      marginBottom,
+      calc,
+      selectable,
+      style,
+      labelFormat,
+      stackFormat,
+      numberFormat,
+      title,
+      ltvId,
+    } = this.state();
+
+    var div = container
+      .element({ tag: "div", class: "ltv-legend", id: ltvId })
+      .style("padding-left", marginLeft + "px")
+      .style("padding-top", marginTop + "px")
+      .style("padding-right", marginRight + "px")
+      .style("padding-bottom", marginBottom + "px");
+
+    div
+      .element({ tag: "div", class: "ltv-legend-title" })
+      .text(title);
+
+    this.state({ div });
+
+    var dataController = this.dataController();
+    if (!dataController) return debug_log("no controller found");
+
+    var colors = dataController.colorGenerator();
+
+    function toggleLabel(label, event) {
+      dataController.filters.labels.toggle(label, chart);
+    }
+
+    function toggleStack(stack, event) {
+      dataController.filters.stacks.toggle(stack, chart);
+    }
+
+    function labelChecked(label) {
+      return dataController.isFilterLabel(label) ? null : true;
+    }
+
+    function stackChecked(stack) {
+      return dataController.isFilterStack(stack) ? null : true;
+    }
+
+    function labelText(label, index) {
+      return labelFormat(label, numberFormat(calc.byLabel.get(label)), index);
+    }
+
+    function stackTitle(stack, index) {
+      var value = numberFormat(calc.byStack.get(stack));
+      var labels = Array.from(calc.byStackLabel.get(stack).keys());
+      return stackFormat(stack, value, labels, index);
+    }
+
+    function pills(selection, data) {
+      // <label class="ltv-legend-pill">
+      //   <input type="checkbox" id="ltv-legend-stack-id-{{LABEL}}"></input>
+      //   <span class="ltv-legend-pill-span">
+      //     {{LABEL}}
+      //   </span>
+      // </label>
+      return selection
+        .bindData(data, "label")
+        .attr("class", chart.className("pill"));
+    }
+
+    function appendCheckboxes(selection, checked, change) {
+      return selection
+        .append("input")
+        .attr("type", "checkbox")
+        .attr("disabled", selectable ? null : true)
+        .attr("checked", checked)
+        .on("change", change);
+    }
+
+    function appendSpans(selection, colorFn, text) {
+      return selection
+        .element({ tag: "span", class: chart.className("pill-span") })
+        .attr("disabled", selectable ? null : true)
+        .style("background-color", (d) => colorFn(d))
+        .text(text);
+    }
+
+    function renderSingle() {
+      nodes.pills = pills(div, calc.labels);
+      nodes.checkboxes = appendCheckboxes(
+        nodes.pills,
+        (l) => labelChecked(l),
+        (e, l) => toggleLabel(l)
+      );
+
+      nodes.spans = appendSpans(nodes.pills, colors.label, labelText);
+    }
+
+    function renderStacks(div) {
+      nodes.pills = pills(div, calc.stacks);
+      nodes.checkboxes = appendCheckboxes(
+        nodes.pills,
+        (s) => stackChecked(s),
+        (e, s) => toggleStack(s)
+      );
+
+      nodes.spans = appendSpans(nodes.pills, colors.stack, stackTitle);
+    }
+
+    function renderGrouped(div) {
+      nodes.groups = div
+        .bindData(calc.stacks, "div")
+        .attr("class", chart.className("group"))
+        .style("color", (s) => colors.stack(s));
+
+      nodes.titles = nodes.groups.append("div").text(stackTitle);
+
+      var data = (s) => calc.byStackLabel.get(s);
+      nodes.pills = pills(nodes.groups, data).datum((d) => d[0]);
+
+      nodes.checkboxes = appendCheckboxes(
+        nodes.pills,
+        (l) => labelChecked(l),
+        (e, l) => toggleLabel(l)
+      );
+
+      nodes.spans = appendSpans(nodes.pills, colors.label, labelText);
+    }
+
+    switch (style) {
+      case "grouped":
+        renderGrouped(div);
+        break;
+      case "stacks":
+        renderStacks(div);
+        break;
+      default:
+        renderSingle();
+        break;
+    }
+
+    // nodes.pills
+    //   .transition()
+    //   .duration((_, i) => (animate ? 100 + i * 50 : 0))
+    //   .style("opacity", 1);
+
+    if (LOTIVIS_CONFIG$1.debug) console.log(this);
+
+    return this.state({ div, nodes });
+  }
+
+  // Calculate some properties
+  prepare(selection) {
+    var dc = this.state().dataController || this.dataController();
+    if (!dc) return console.log("[ltv]  no data controller"), this;
+
+    var calc = {};
+    calc.labels = dc.labels();
+    calc.stacks = dc.stacks();
+    calc.locations = dc.locations();
+    calc.dates = dc.dates();
+
+    calc.byLabel = rollup(
+      dc.data,
       (v) => sum$2(v, (d) => d.value),
       (d) => d.label
-    ),
-    byStackLabel: rollup(
-      dataController.data,
+    );
+
+    calc.byStack = rollup(
+      dc.data,
+      (v) => sum$2(v, (d) => d.value),
+      (d) => d.stack || d.label
+    );
+
+    calc.byStackLabel = rollup(
+      dc.data,
       (v) => sum$2(v, (d) => d.value),
       (d) => d.stack || d.label,
       (d) => d.label
-    ),
-  };
-}
+    );
 
-const LABELS_CHART_STYLE = {
-  flowing: "flowing",
-  grouped: "grouped",
-};
-
-const LABELS_CHART_CONFIG = {
-  margin: {
-    top: 0,
-    right: LOTIVIS_CONFIG$1.defaultMargin,
-    bottom: 0,
-    left: LOTIVIS_CONFIG$1.defaultMargin,
-  },
-  selectable: true,
-  headlines: false,
-  style: LABELS_CHART_STYLE.flowing,
-};
-
-class LabelsFlowingRenderer extends Renderer {
-  render(chart, controller, dataView) {
-    if (chart.config.style !== LABELS_CHART_STYLE.flowing) return;
-
-    console.log("chart.config.style", chart.config.style);
-
-    let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
-    dataView.stacks;
-    let labels = dataView.labels;
-    let colors = controller.colorGenerator;
-    let config = chart.config;
-
-    function toggle(label) {
-      chart.makeUpdateInsensible();
-      controller.filters.labels.toggle(label);
-      chart.makeUpdateSensible();
-    }
-
-    function filter(label) {
-      return controller.filters.labels.contains(label);
-    }
-
-    // <label class="ltv-pill-checkbox">
-    //   <input type="checkbox" id="ltv-legend-stack-id-{{LABEL}}"></input>
-    //   <span class="ltv-pill-checkbox-span">
-    //     {{LABEL}}
-    //   </span>
-    // </label>
-
-    chart.div
-      .style("padding-left", config.margin.left + "px")
-      .style("padding-top", config.margin.top + "px")
-      .style("padding-right", config.margin.right + "px")
-      .style("padding-bottom", config.margin.bottom + "px");
-
-    let labelContainers = chart.div
-      .selectAll(".label")
-      .data(labels)
-      .enter()
-      .append("label")
-      .attr("class", "ltv-pill-checkbox");
-
-    labelContainers
-      .append("input")
-      .attr("type", "checkbox")
-      .attr("checked", (l) => (filter(l) ? null : true))
-      .attr("id", (l) => `ltv-legend-label-id-${safeId(l)}`)
-      .on("change", (e, l) => toggle(l));
-
-    labelContainers
-      .append("span")
-      .attr("class", "ltv-pill-checkbox-span")
-      .style("background-color", (l) => colors.label(l))
-      .text((l) => "" + l + " (" + numberFormat(dataView.byLabel.get(l)) + ")");
-  }
-}
-
-class LabelsGroupedRenderer extends Renderer {
-  render(chart, controller, dataView) {
-    if (chart.config.style !== LABELS_CHART_STYLE.grouped) return;
-
-    let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
-    let stacks = dataView.stacks;
-    let colors = controller.colorGenerator;
-    let config = chart.config;
-
-    function toggle(label) {
-      chart.makeUpdateInsensible();
-      controller.filters.labels.toggle(label);
-      chart.makeUpdateSensible();
-    }
-
-    function filter(label) {
-      return controller.filters.labels.contains(label);
-    }
-
-    // <label class="ltv-pill-checkbox">
-    //   <input type="checkbox" id="ltv-legend-stack-id-{{LABEL}}"></input>
-    //   <span class="ltv-pill-checkbox-span">
-    //     {{LABEL}}
-    //   </span>
-    // </label>
-
-    chart.div
-      .style("padding-left", config.margin.left + "px")
-      .style("padding-top", config.margin.top + "px")
-      .style("padding-right", config.margin.right + "px")
-      .style("padding-bottom", config.margin.bottom + "px");
-
-    let stackContainers = chart.div
-      .selectAll(".div")
-      .data(stacks)
-      .enter()
-      .append("div")
-      .attr("id", (s) => `ltv-legend-stack-id-${safeId(s)}`)
-      .attr("class", "ltv-stack-labels-container")
-      .style("display", "inline-block")
-      .style("color", (s) => colors.stack(s))
-      .html((d, i) => (config.headlines ? "Stack " + (i + 1) + "<br/>" : null));
-
-    let labelContainers = stackContainers
-      .selectAll(".label")
-      .data((d) => dataView.byStackLabel.get(d))
-      .enter()
-      .append("label")
-      .attr("class", "ltv-pill-checkbox");
-
-    labelContainers
-      .append("input")
-      .attr("type", "checkbox")
-      .attr("checked", (d) => (filter(d[0]) ? null : true))
-      .attr("id", (d) => `ltv-legend-stack-id-${safeId(d[0])}`)
-      .on("change", (e, d) => toggle(d[0]));
-
-    labelContainers
-      .append("span")
-      .attr("class", "ltv-pill-checkbox-span")
-      .style("background-color", (d) => colors.label(d[0]))
-      .text(
-        (d) => "" + d[0] + " (" + numberFormat(dataView.byLabel.get(d[0])) + ")"
-      );
-  }
-}
-
-class LabelsChart extends Chart {
-  initialize() {
-    let theConfig = this.config;
-    let margin;
-    margin = Object.assign({}, LABELS_CHART_CONFIG.margin);
-    margin = Object.assign(margin, theConfig.margin || {});
-
-    let config = Object.assign({}, LABELS_CHART_CONFIG);
-    this.config = Object.assign(config, this.config);
-    this.config.margin = margin;
+    return this.state({ calc });
   }
 
-  addRenderers() {
-    this.renderers.push(new LabelsFlowingRenderer());
-    this.renderers.push(new LabelsGroupedRenderer());
-  }
-
-  createDataView() {
-    return DataViewLabels(this.controller);
-  }
-
-  createSVG() {
-    this.div = this.element
-      .append("div")
-      .attr("id", this.svgSelector)
-      .attr("class", "ltv-chart-div");
-  }
-
-  remove() {
-    this.listeners = {};
-    this.div.selectAll("*").remove();
+  debug(_) {
+    return arguments.length ? this.state({ debug: _ }) : this.state()["debug"];
   }
 }
 
@@ -24612,5 +25055,5 @@ function downloadImage(selector, filename) {
   });
 }
 
-export { BarChart, DataController, DataItem, Dataset, date_ordinator as DateOrdinator, LabelsChart, MapChart, PLOT_CHART_CONFIG, PLOT_CHART_SORT, PLOT_CHART_TYPE, PLOT_COLOR_MODE, PlotChart, UrlParameters, LOTIVIS_CONFIG$1 as config, csv, csvParse, csvRender, index as d3, debug, flatDataset, flatDatasets, json, parseDataset, parseDatasets, downloadImage as svgDownload, toDataset };
+export { BarChart, DataController, DataItem, Dataset, date_ordinator as DateOrdinator, Legend, MapChart, PLOT_CHART_CONFIG, PLOT_CHART_SORT, PLOT_CHART_TYPE, PLOT_COLOR_MODE, PlotChart, UrlParameters, LOTIVIS_CONFIG$1 as config, csv, csvParse, csvRender, index as d3, debug, flatDataset, flatDatasets, json, parseDataset, parseDatasets, downloadImage as svgDownload, toDataset };
 //# sourceMappingURL=lotivis.esm.js.map

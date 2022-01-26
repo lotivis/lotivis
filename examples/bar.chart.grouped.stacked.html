@@ -31,6 +31,10 @@
           <div id="labels-chart">
             <!-- Labels Chart Here -->
           </div>
+
+          <div id="legend-1">
+            <!-- Legend here -->
+          </div>
         </div>
         <div class="col-4">
           <pre id="ltv-data-preview">
@@ -152,11 +156,12 @@
         labels: true,
       });
 
-      let labelsChart = new lotivis.LabelsChart("labels-chart", {
-        dataController,
-        margin: { left: 40, rigth: 40 },
-        headlines: true,
-      });
+      let legend1 = new lotivis.Legend()
+        .debug(true)
+        .container("#legend-1")
+        .margin({ left: 40, right: 40 })
+        .dataController(dataController)
+        .run();
     </script>
   </body>
 </html>

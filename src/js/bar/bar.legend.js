@@ -11,7 +11,7 @@ export class BarLegendRenderer extends Renderer {
     let labels = controller.labels();
     let circleRadius = 6;
     let labelMargin = 50;
-    let colors = controller.colorGenerator;
+    let colors = controller.colorGenerator();
 
     function filter(label) {
       return (

@@ -5,7 +5,7 @@ import { BAR_CHART_TYPE } from "./bar.config.js";
 export class BarBarsRenderer extends Renderer {
   render(chart, controller) {
     let radius = chart.config.barRadius || LOTIVIS_CONFIG.barRadius;
-    let colors = controller.colorGenerator;
+    let colors = controller.colorGenerator();
     let barWidth = chart.xStack.bandwidth();
     let yChart = chart.yChart;
     let height = chart.yChart(0);

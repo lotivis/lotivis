@@ -50,7 +50,7 @@ export class BarTooltipRenderer extends Renderer {
         .map(function (label) {
           let value = filtered.get(label);
           if (!value) return undefined;
-          let colorGenerator = chart.controller.colorGenerator;
+          let colorGenerator = chart.controller.colorGenerator();
           let color = colorGenerator.label(label);
           let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
           let valueFormatted = numberFormat(value);

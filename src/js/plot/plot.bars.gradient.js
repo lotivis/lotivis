@@ -33,7 +33,7 @@ export class PlotBarsGradientRenderer extends Renderer {
     chart.bars = chart.barsData
       .append("rect")
       .attr("transform", (d) => `translate(0,${chart.yChartPadding(d.label)})`)
-      .attr("fill", (d) => `url(#ltv-plot-gradient-${hash_str(d.label)})`)
+      .attr("fill", (d) => `url(#${chart.selector}-${hash_str(d.label)})`)
       .attr("class", "ltv-plot-bar")
       .attr("rx", radius)
       .attr("ry", radius)

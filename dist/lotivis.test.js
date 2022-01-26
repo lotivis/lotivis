@@ -373,14 +373,14 @@ function rollups(values, reduce, ...keys) {
 }
 
 function index$4(values, ...keys) {
-  return nest(values, identity$a, unique$1, keys);
+  return nest(values, identity$a, unique, keys);
 }
 
 function indexes(values, ...keys) {
-  return nest(values, Array.from, unique$1, keys);
+  return nest(values, Array.from, unique, keys);
 }
 
-function unique$1(values) {
+function unique(values) {
   if (values.length !== 1) throw new Error("duplicate key");
   return values[0];
 }
@@ -20326,44 +20326,55 @@ function PlotColors(till) {
 }
 
 class FilterArray extends Array {
-  constructor(listener) {
+  constructor(name, listener) {
     super();
+    this.name = name;
     this.listener = listener;
   }
 
-  notify(reason, item, notify = true) {
-    if (notify) this.listener(reason, item);
+  validate(item, sender) {
+    if (!item) throw new Error("no item.");
+    if (!sender) throw new Error("no sender.");
   }
 
-  add(item, notify = true) {
+  notify(reason, item, sender, notify = true) {
+    if (notify) this.listener(this.name, reason, item, sender);
+  }
+
+  add(item, sender, notify = true) {
+    this.validate(item, sender);
     if (this.indexOf(item) === -1)
-      this.push(item), this.notify("add", item, notify);
+      this.push(item), this.notify("add", item, sender, notify);
   }
 
   addAll(source) {
     if (!Array.isArray(source)) throw new Error("no array given");
-    this.push(...source), this.notify("add", item, notify);
+    this.push(...source), this.notify("add", item, sender, notify);
   }
 
-  remove(item, notify = true) {
+  remove(item, sender, notify = true) {
+    this.validate(item, sender);
     let i = this.indexOf(item);
-    if (i !== -1) this.splice(i, 1), this.notify("remove", item, notify);
+    if (i !== -1)
+      this.splice(i, 1), this.notify("remove", item, sender, notify);
   }
 
-  toggle(item, notify = true) {
+  toggle(item, sender, notify = true) {
+    this.validate(item, sender);
     let i = this.indexOf(item);
     i === -1 ? this.push(item) : this.splice(i, 1);
-    this.notify("toggle", item, notify);
+    this.notify("toggle", item, sender, notify);
   }
 
   contains(item) {
     return this.indexOf(item) !== -1;
   }
 
-  clear(notify = true) {
+  clear(sender, notify = true) {
+    this.validate(true, sender);
     if (this.length !== 0) {
       this.splice(0, this.length);
-      this.notify("clear", null, notify);
+      this.notify("clear", null, sender, notify);
     }
   }
 }
@@ -20435,18 +20446,6 @@ function set_data_preview(v) {
   if (e) e.textContent = s;
 }
 
-function snapshot(controller) {
-  let f = controller.filters;
-  return filter$1(controller.data, (d) => {
-    return !(
-      (d.location && f.locations.contains(d.location)) ||
-      (d.date && f.dates.contains(d.date)) ||
-      (d.label && f.labels.contains(d.label)) ||
-      (d.stack && f.stacks.contains(d.stack))
-    );
-  });
-}
-
 // Code from:
 // https://www.freecodecamp.org/news/how-to-code-your-own-event-emitter-in-node-js-a-step-by-step-guide-e13b7e7908e1/
 
@@ -20512,34 +20511,104 @@ class EventEmitter {
   }
 }
 
-class DataController extends EventEmitter {
-  constructor(flat, config) {
-    super();
+function isFunction(value) {
+  return value && typeof value === "function";
+}
 
-    if (!Array.isArray(flat)) {
-      throw new Error("Datasets are not an array.");
-    }
+class State {
+  constructor(state, config) {
+    if (!state) throw new Error("no state passed");
 
-    this.config = config || {};
-    this.data = flat;
-    this.original = this.config.original || flat;
+    // private
+    // Declare initial chart state attributes
+    const _state = state;
 
-    this.dateAccess = this.config.dateAccess || DEFAULT_DATE_ORDINATOR;
-    this.colorGenerator = new ColorGenerator(this.data);
+    Object.keys(_state).forEach((key) => {
+      // do not override (custom) existing functions
+      if (isFunction(this[key])) return;
+      this[key] = function (_) {
+        return arguments.length ? ((_state[key] = _), this) : _state[key];
+      };
+    });
 
-    this.filters = {
-      labels: new FilterArray((r) => this.filterChange("labels", r)),
-      locations: new FilterArray((r) => this.filterChange("locations", r)),
-      dates: new FilterArray((r) => this.filterChange("dates", r)),
-      stacks: new FilterArray((r) => this.filterChange("stacks", r)),
+    // if exists overwrite state from passed config
+    Object.keys(_state).forEach((key) => {
+      if (config && config[key]) _state[key] = config[key];
+    });
+
+    // public
+
+    // Define state getter and setter function
+    this.state = function (_) {
+      return arguments.length ? (Object.assign(_state, _), this) : _state;
     };
 
-    // this.filters.locations.push(...this.locations());
+    this.stateItem = function (name, fb) {
+      return _state.hasOwnProperty(name) ? _state[name] || fb : fb;
+    };
+
+    if (isFunction(this.didConstruct)) this.didConstruct();
+  }
+}
+
+class DataController extends State {
+  constructor(data, config) {
+    if (!Array.isArray(data)) throw new Error("data not an array.");
+
+    super(
+      // public state
+      {
+        data: data,
+        original: data,
+        dateAccess: DEFAULT_DATE_ORDINATOR,
+        colorGenerator: new ColorGenerator(data),
+      },
+      config
+    );
+
+    // private properties
+    var _events = new EventEmitter();
+
+    this.data = data;
+
+    // private sate
+    this.state({ calc: {}, cache: {} });
+
+    // filters
+    var change = this.filtersDidChange.bind(this);
+    this.filters = {
+      labels: new FilterArray("labels", change),
+      locations: new FilterArray("locations", change),
+      dates: new FilterArray("dates", change),
+      stacks: new FilterArray("stacks", change),
+    };
+
+    // events
+    this.on = function (eventName, fn) {
+      return _events.on(eventName, fn), this;
+    };
+
+    this.off = function (eventName, fn) {
+      return _events.off(eventName, fn), this;
+    };
+
+    this.emit = function (eventName, ...args) {
+      return _events.emit(eventName, args), this;
+    };
+
+    this.removeAllListeners = function () {
+      return _events.removeAllListeners(), this;
+    };
 
     if (LOTIVIS_CONFIG$1.debug) console.log("[ltv] ", this);
-    if (this.original) set_data_preview(this.original);
+    if (this.original && this.original()) set_data_preview(this.original());
 
     return this;
+  }
+
+  filtersDidChange(name, reason, item, sender) {
+    this.calculateSnapshot();
+    this.emit("change", this, name, reason, sender, item);
   }
 
   /** Returns entries with valid value. */
@@ -20564,7 +20633,7 @@ class DataController extends EventEmitter {
   }
 
   labels() {
-    return Array.from(this.byLabel().keys());
+    return this.cache("labels", () => Array.from(this.byLabel().keys()));
   }
 
   stacks() {
@@ -20623,7 +20692,7 @@ class DataController extends EventEmitter {
     return min$2(this.data, (item) => item.value);
   }
 
-  /** Returns a string that can be used as filename for downloads. */
+  /** Returns a string _this can be used as filename for downloads. */
   getFilename() {
     if (!this.labels) return "Unknown";
     let labels = this.labels.map((label) => label.split(` `).join(`-`));
@@ -20632,14 +20701,119 @@ class DataController extends EventEmitter {
     }
     return labels.join(",");
   }
-
-  // filters
-
-  filterChange(name, reason) {
-    this.snapshot = snapshot(this);
-    this.emit("change", this, name, reason);
-  }
 }
+
+DataController.prototype.calculateSnapshot = function () {
+  let f = this.filters;
+  let snapshot = filter$1(this.data, (d) => {
+    return !(
+      (d.location && f.locations.contains(d.location)) ||
+      (d.date && f.dates.contains(d.date)) ||
+      (d.label && f.labels.contains(d.label)) ||
+      (d.stack && f.stacks.contains(d.stack))
+    );
+  });
+  return this.state({ snapshot });
+};
+
+DataController.prototype.snapshot = function () {
+  return this.stateItem("snapshot", null);
+};
+
+DataController.prototype.snapshotOrData = function () {
+  return this.stateItem("snapshot", this.stateItem("data", null));
+};
+
+DataController.prototype.cache = function (key, valueFn) {
+  var cached = this.getCached(key);
+  if (cached) return cached;
+  var value = valueFn();
+  this.setCached(key, value);
+  return value;
+};
+
+DataController.prototype.getCached = function (key) {
+  var cache = this.stateItem("cache");
+  return cache && cache[key] ? cache[key] : null;
+};
+
+DataController.prototype.setCached = function (key, value) {
+  var { cache } = this.state();
+  cache[key] = value;
+  return this;
+};
+
+DataController.prototype.clearFilters = function (sender) {
+  this.filters.dates.clear(sender, false);
+  this.filters.locations.clear(sender, false);
+  this.filters.labels.clear(sender, false);
+  this.filters.stacks.clear(sender, false);
+  this.filtersDidChange("all", "clear", null, sender);
+};
+
+DataController.prototype.addLocationFilter = function (location, sender) {
+  return this.filters.locations.add(location, sender);
+};
+
+DataController.prototype.removeLocationFilter = function (location, sender) {
+  return this.filters.locations.remove(location, sender);
+};
+
+DataController.prototype.addDateFilter = function (location, sender) {
+  return this.filters.dates.add(location, sender);
+};
+
+DataController.prototype.removeDateFilter = function (location, sender) {
+  return this.filters.dates.remove(location, sender);
+};
+
+DataController.prototype.addLabelFilter = function (location, sender) {
+  return this.filters.labels.add(location, sender);
+};
+
+DataController.prototype.removeLabelFilter = function (location, sender) {
+  return this.filters.labels.remove(location, sender);
+};
+
+DataController.prototype.addStackFilter = function (location, sender) {
+  return this.filters.stacks.add(location, sender);
+};
+
+DataController.prototype.removeStackFilter = function (location, sender) {
+  return this.filters.stacks.remove(location, sender);
+};
+
+DataController.prototype.locationFilters = function () {
+  return this.filters.locations;
+};
+
+DataController.prototype.dateFilters = function () {
+  return this.filters.dates;
+};
+
+DataController.prototype.labelFilters = function () {
+  return this.filters.labels;
+};
+
+DataController.prototype.stackFilters = function () {
+  return this.filters.stacks;
+};
+
+DataController.prototype.isFilterLocation = function (loc) {
+  return this.filters.locations.contains(loc);
+};
+
+DataController.prototype.isFilterDate = function (date) {
+  return this.filters.dates.contains(date);
+};
+
+DataController.prototype.isFilterLabel = function (label) {
+  return this.filters.labels.contains(label);
+};
+
+DataController.prototype.isFilterStack = function (stack) {
+  return this.filters.stacks.contains(stack);
+};
 
 const DEFAULT_COLUMNS = ["label", "location", "date", "value", "stack"];
 
@@ -20747,15 +20921,20 @@ class Component extends EventEmitter {
   }
 }
 
-let unique = 0;
+const genId = (function () {
+  var prefix = "ltv";
+  var unique = 0;
 
-function next() {
-  return "ltv-id-" + unique++;
-}
+  function random() {
+    return Math.random().toString(36).substring(2, 8);
+  }
 
-function create_id() {
-  return next();
-}
+  return function (type = "id") {
+    return [prefix, type, "" + unique++, random()].join("-");
+  };
+})();
+
+const create_id = genId;
 
 class Chart extends Component {
   constructor(selector, config) {
@@ -20817,7 +20996,8 @@ class Chart extends Component {
     this.updateSensible = true;
   }
 
-  update(controller, filter, reason) {
+  update(controller, filter, reason, sender) {
+    // console.log("update", filter, reason, sender);
     if (!this.updateSensible) return;
     if (!this.controller) return;
     this.dataView = this.createDataView();
@@ -20828,7 +21008,7 @@ class Chart extends Component {
 
   setController(dc) {
     this.controller = dc;
-    this.controller.on("change", (d, f, r) => this.update(d, r, f));
+    this.controller.on("change", (d, f, r, s) => this.update(d, r, f, s));
     this.update(dc, "registration");
   }
 }
@@ -20921,7 +21101,7 @@ class BarLegendRenderer extends Renderer {
 class BarBarsRenderer extends Renderer {
   render(chart, controller) {
     let radius = chart.config.barRadius || LOTIVIS_CONFIG$1.barRadius;
-    let colors = controller.colorGenerator;
+    let colors = controller.colorGenerator();
     let barWidth = chart.xStack.bandwidth();
     let yChart = chart.yChart;
     let height = chart.yChart(0);
@@ -21051,7 +21231,7 @@ class BarTooltipRenderer extends Renderer {
         .map(function (label) {
           let value = filtered.get(label);
           if (!value) return undefined;
-          let colorGenerator = chart.controller.colorGenerator;
+          let colorGenerator = chart.controller.colorGenerator();
           let color = colorGenerator.label(label);
           let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
           let valueFormatted = numberFormat(value);
@@ -21281,7 +21461,7 @@ function isValue(value) {
 }
 
 function dataViewBar(dataController) {
-  let snapshot = dataController.snapshot;
+  let snapshot = dataController.snapshot();
   let data = snapshot || dataController.data;
 
   let byDateStackOriginal = rollup(
@@ -23088,6 +23268,8 @@ class MapLabelsRenderer extends Renderer {
 
 class MapTooltipRenderer extends Renderer {
   render(chart, controller, dataView) {
+    var colors = controller.colorGenerator();
+
     chart.element.select(".ltv-tooltip").remove();
     let tooltip = chart.element
       .append("div")
@@ -23137,7 +23319,7 @@ class MapTooltipRenderer extends Renderer {
       let components = [""];
       let sum = 0;
       for (const label in combinedByLabel) {
-        let color = controller.colorGenerator.label(label);
+        let color = colors.label(label);
         let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
         sum += combinedByLabel[label];
         let value = numberFormat(combinedByLabel[label]);
@@ -23319,7 +23501,7 @@ class MapSelectionRenderer extends Renderer {
  * ```
  */
 function dataViewMap(dataController) {
-  let data = dataController.snapshot || dataController.data;
+  let data = dataController.snapshotOrData();
   // console.log("data", data);
 
   let byLocationLabel = rollup(
@@ -23746,7 +23928,7 @@ class PlotBarsFractionsRenderer extends Renderer {
 
     let colors = PlotColors(max);
     let brush = max / 2;
-    let colorGenerator = controller.colorGenerator;
+    let colorGenerator = controller.colorGenerator();
     let colorMode = chart.config.colorMode;
 
     chart.barsData = chart.svg.append("g").selectAll("g").data(data).enter();
@@ -23792,7 +23974,7 @@ class PlotBarsGradientCreator {
     let max = this.chart.dataView.max;
     let gradient = this.chart.definitions
       .append("linearGradient")
-      .attr("id", "ltv-plot-gradient-" + hash_str(dataset.label))
+      .attr("id", this.chart.selector + "-" + hash_str(dataset.label))
       .attr("x1", "0%")
       .attr("x2", "100%")
       .attr("y1", "0%")
@@ -23806,7 +23988,7 @@ class PlotBarsGradientCreator {
 
     let plotColors = this.plotColors;
     let brush = max / 2;
-    let colorGenerator = this.controller.colorGenerator;
+    let colorGenerator = this.controller.colorGenerator();
     let colorMode = this.chart.config.colorMode;
 
     function append(value, percent) {
@@ -23869,7 +24051,7 @@ class PlotBarsGradientRenderer extends Renderer {
     chart.bars = chart.barsData
       .append("rect")
       .attr("transform", (d) => `translate(0,${chart.yChartPadding(d.label)})`)
-      .attr("fill", (d) => `url(#ltv-plot-gradient-${hash_str(d.label)})`)
+      .attr("fill", (d) => `url(#${chart.selector}-${hash_str(d.label)})`)
       .attr("class", "ltv-plot-bar")
       .attr("rx", radius)
       .attr("ry", radius)
@@ -23958,7 +24140,7 @@ class PlotChartSelectionRenderer extends Renderer {
 
 function dataViewPlot(dataController) {
   let dates = dataController.dates().sort();
-  let data = dataController.snapshot || dataController.data;
+  let data = dataController.snapshotOrData();
 
   let byLabelDate = rollups(
     data,

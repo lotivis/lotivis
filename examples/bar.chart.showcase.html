@@ -29,11 +29,17 @@
           <div id="bar-chart-1">
             <!-- Bar Chart 1 Code Here -->
           </div>
+          <div id="legend-1">
+            <!-- Bar Chart 1 Code Here -->
+          </div>
         </div>
         <div class="col-6">
           Combine
           <div id="bar-chart-3">
             <!-- Bar Chart 3 Code Here -->
+          </div>
+          <div id="legend-3">
+            <!-- Bar Chart 1 Code Here -->
           </div>
         </div>
         <div class="col-6">
@@ -41,11 +47,17 @@
           <div id="bar-chart-2">
             <!-- Bar Chart 2 Code Here -->
           </div>
+          <div id="legend-2">
+            <!-- Bar Chart 1 Code Here -->
+          </div>
         </div>
         <div class="col-6">
           Combine Labels
           <div id="bar-chart-4">
             <!-- Bar Chart 4 Code Here -->
+          </div>
+          <div id="legend-4">
+            <!-- Bar Chart 1 Code Here -->
           </div>
         </div>
         <div class="col-12">
@@ -232,6 +244,33 @@
         type: lotivis.BarChart.Type.combine,
         dataController,
       });
+
+      let legend1 = new lotivis.Legend()
+        .container("#legend-1")
+        .style("grouped")
+        .margin({ left: 40, right: 40 })
+        .dataController(dataController)
+        .run();
+
+      let legend2 = new lotivis.Legend()
+        .container("#legend-2")
+        .margin({ left: 40, right: 40 })
+        .dataController(dataController)
+        .run();
+
+      let legend3 = new lotivis.Legend()
+        .container("#legend-3")
+        .style("stacks")
+        .margin({ left: 40, right: 40 })
+        .dataController(dataController)
+        .run();
+
+      let legend4 = new lotivis.Legend()
+        .container("#legend-4")
+        .style("stacks")
+        .margin({ left: 40, right: 40 })
+        .dataController(dataController)
+        .run();
     </script>
   </body>
 </html>

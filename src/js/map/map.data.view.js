@@ -19,7 +19,7 @@ import { rollup, sum, max } from "d3";
  * ```
  */
 export function dataViewMap(dataController) {
-  let data = dataController.snapshot || dataController.data;
+  let data = dataController.snapshotOrData();
   // console.log("data", data);
 
   let byLocationLabel = rollup(

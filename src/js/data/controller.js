@@ -3,38 +3,69 @@ import { DEFAULT_DATE_ORDINATOR } from "./date.ordinator";
 import { ColorGenerator } from "../common/colors";
 import { FilterArray } from "./filter.array";
 import { set_data_preview } from "../common/debug";
-import { snapshot } from "./controller.snapshot.js";
 import { EventEmitter } from "../common/event.emitter";
 import { LOTIVIS_CONFIG } from "../common/config";
+import { State } from "../common/statefull.js";
 
-export class DataController extends EventEmitter {
-  constructor(flat, config) {
-    super();
+export class DataController extends State {
+  constructor(data, config) {
+    if (!Array.isArray(data)) throw new Error("data not an array.");
 
-    if (!Array.isArray(flat)) {
-      throw new Error("Datasets are not an array.");
-    }
+    super(
+      // public state
+      {
+        data: data,
+        original: data,
+        dateAccess: DEFAULT_DATE_ORDINATOR,
+        colorGenerator: new ColorGenerator(data),
+      },
+      config
+    );
 
-    this.config = config || {};
-    this.data = flat;
-    this.original = this.config.original || flat;
+    // private properties
+    var _events = new EventEmitter();
+    var _cache = {};
 
-    this.dateAccess = this.config.dateAccess || DEFAULT_DATE_ORDINATOR;
-    this.colorGenerator = new ColorGenerator(this.data);
+    this.data = data;
 
+    // private sate
+    this.state({ calc: {}, cache: {} });
+
+    // filters
+    var change = this.filtersDidChange.bind(this);
     this.filters = {
-      labels: new FilterArray((r) => this.filterChange("labels", r)),
-      locations: new FilterArray((r) => this.filterChange("locations", r)),
-      dates: new FilterArray((r) => this.filterChange("dates", r)),
-      stacks: new FilterArray((r) => this.filterChange("stacks", r)),
+      labels: new FilterArray("labels", change),
+      locations: new FilterArray("locations", change),
+      dates: new FilterArray("dates", change),
+      stacks: new FilterArray("stacks", change),
     };
 
-    // this.filters.locations.push(...this.locations());
+    // events
+    this.on = function (eventName, fn) {
+      return _events.on(eventName, fn), this;
+    };
+
+    this.off = function (eventName, fn) {
+      return _events.off(eventName, fn), this;
+    };
+
+    this.emit = function (eventName, ...args) {
+      return _events.emit(eventName, args), this;
+    };
+
+    this.removeAllListeners = function () {
+      return _events.removeAllListeners(), this;
+    };
 
     if (LOTIVIS_CONFIG.debug) console.log("[ltv] ", this);
-    if (this.original) set_data_preview(this.original);
+    if (this.original && this.original()) set_data_preview(this.original());
 
     return this;
+  }
+
+  filtersDidChange(name, reason, item, sender) {
+    this.calculateSnapshot();
+    this.emit("change", this, name, reason, sender, item);
   }
 
   /** Returns entries with valid value. */
@@ -59,7 +90,7 @@ export class DataController extends EventEmitter {
   }
 
   labels() {
-    return Array.from(this.byLabel().keys());
+    return this.cache("labels", () => Array.from(this.byLabel().keys()));
   }
 
   stacks() {
@@ -118,7 +149,7 @@ export class DataController extends EventEmitter {
     return d3.min(this.data, (item) => item.value);
   }
 
-  /** Returns a string that can be used as filename for downloads. */
+  /** Returns a string _this can be used as filename for downloads. */
   getFilename() {
     if (!this.labels) return "Unknown";
     let labels = this.labels.map((label) => label.split(` `).join(`-`));
@@ -126,12 +157,5 @@ export class DataController extends EventEmitter {
       labels = labels.splice(0, 10);
     }
     return labels.join(",");
-  }
-
-  // filters
-
-  filterChange(name, reason) {
-    this.snapshot = snapshot(this);
-    this.emit("change", this, name, reason);
   }
 }

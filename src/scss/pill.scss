@@ -1,14 +1,19 @@
-.ltv-stack-labels-container {
-  font-size: 10px;
-  margin-right: 5px;
+.ltv-legend {
+  display: block;
 
-  .ltv-pill-checkbox-span {
+  .ltv-pill-span {
     margin-bottom: 5px;
   }
 }
 
+.ltv-legend-group {
+  font-size: 12px;
+  margin-right: 5px;
+  display: block;
+}
+
 /* Customize the label (the container) */
-.ltv-pill-checkbox {
+.ltv-legend-pill {
   display: inline-block;
   position: relative;
   cursor: pointer;
@@ -19,7 +24,7 @@
 }
 
 /* Hide the browser's default checkbox */
-.ltv-pill-checkbox input {
+.ltv-legend-pill input {
   position: absolute;
   opacity: 0;
   cursor: pointer;
@@ -27,7 +32,7 @@
   width: 0;
 }
 
-.ltv-pill-checkbox-span {
+.ltv-legend-pill-span {
   font-size: 10px;
   display: inline-block;
   padding: 0 7px;
@@ -43,6 +48,6 @@
 // }
 
 /* When the checkbox is checked, add a blue background */
-.ltv-pill-checkbox input:checked ~ .ltv-pill-checkbox-span {
+.ltv-legend-pill input:checked ~ .ltv-legend-pill-span {
   opacity: 1;
 }
