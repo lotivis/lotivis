@@ -141,34 +141,52 @@ export class Legend extends LotivisChart {
       return stackFormat(stack, value, labels, index);
     }
 
-    function pills(selection, data) {
-      // <label class="ltv-legend-pill">
-      //   <input type="checkbox" id="ltv-legend-stack-id-{{LABEL}}"></input>
-      //   <span class="ltv-legend-pill-span">
-      //     {{LABEL}}
-      //   </span>
-      // </label>
-      return selection
-        .bindData(data, "label")
-        .attr("class", chart.className("pill"));
+    var data = [],
+      colors,
+      change,
+      checked,
+      text;
+    switch (style) {
+      case "grouped":
+        data = calc.stacks;
+        colors = colors.label;
+        change = toggleLabel;
+        checked = labelChecked;
+        text = labelText;
+        break;
+      case "stacks":
+        data = calc.stacks;
+        colors = colors.stack;
+        change = toggleStack;
+        checked = stackChecked;
+        text = stackTitle;
+        break;
+      default:
+        // single
+        data = calc.labels;
+        colors = colors.label;
+        change = toggleLabel;
+        checked = labelChecked;
+        text = labelText;
+        break;
     }
 
-    function appendCheckboxes(selection, checked, change) {
-      return selection
-        .append("input")
-        .attr("type", "checkbox")
-        .attr("disabled", selectable ? null : true)
-        .attr("checked", checked)
-        .on("change", change);
-    }
+    nodes.pills = div
+      .bindData(data, "label")
+      .attr("class", chart.className("pill"));
 
-    function appendSpans(selection, colorFn, text) {
-      return selection
-        .element({ tag: "span", class: chart.className("pill-span") })
-        .attr("disabled", selectable ? null : true)
-        .style("background-color", (d) => colorFn(d))
-        .text(text);
-    }
+    nodes.checkboxes = nodes.pills
+      .append("input")
+      .attr("type", "checkbox")
+      .attr("disabled", selectable ? null : true)
+      .attr("checked", checked)
+      .on("change", change);
+
+    nodes.spans = nodes.pills
+      .element({ tag: "span", class: chart.className("pill-span") })
+      .attr("disabled", selectable ? null : true)
+      .style("background-color", (d) => colors(d))
+      .text(text);
 
     function renderSingle() {
       nodes.pills = pills(div, calc.labels);
@@ -210,18 +228,6 @@ export class Legend extends LotivisChart {
       );
 
       nodes.spans = appendSpans(nodes.pills, colors.label, labelText);
-    }
-
-    switch (style) {
-      case "grouped":
-        renderGrouped(div);
-        break;
-      case "stacks":
-        renderStacks(div);
-        break;
-      default:
-        renderSingle(div);
-        break;
     }
 
     // nodes.pills
