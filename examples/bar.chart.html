@@ -75,14 +75,19 @@
       ];
 
       let dc = lotivis.parseDatasets(datasets);
-      let chart = new lotivis.BarChart("bar-chart");
-      let legend = new lotivis.Legend()
-        .container("#legend")
+      // let chart = new lotivis.BarChart("bar-chart");
+
+      let barChart = lotivis
+        .bar()
+        .selector("#bar-chart")
         .dataController(dc)
         .run();
 
-      chart.setController(dc);
-      // legend.setController(dc);
+      let legend = lotivis
+        .legend()
+        .selector("#legend")
+        .dataController(dc)
+        .run();
     </script>
   </body>
 </html>

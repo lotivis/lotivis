@@ -18,3 +18,11 @@ d3.selection.prototype.bindData = function (data, tag, aClass) {
     .enter()
     .element({ tag: tag, class: aClass });
 };
+
+d3.selection.prototype.disabled = function (bool) {
+  return this.attr("disabled", bool ? true : null);
+};
+
+d3.selection.prototype.checked = function (bool) {
+  return this.attr("checked", bool ? true : null);
+};

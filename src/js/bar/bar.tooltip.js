@@ -65,8 +65,8 @@ export class BarTooltipRenderer extends Renderer {
     }
 
     function showTooltip(event, date) {
-      // set examples content before positioning the tooltip cause the size is
-      // calculated based on the size
+      // set content before positioning the tooltip cause the size is
+      // calculated based on the content
       const html = getHTMLForDate(date);
       tooltip.html(html);
 

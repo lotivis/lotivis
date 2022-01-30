@@ -165,14 +165,21 @@
 
       let dataController = lotivis.parseDatasets(datasets);
 
-      let ploatChartGradient = new lotivis.PlotChart("plot-chart-gradient", {
-        dataController,
-      });
+      lotivis
+        .plot()
+        .selector("#plot-chart-gradient")
+        .marginLeft(100)
+        .style("gradient")
+        .dataController(dataController)
+        .run();
 
-      let ploatChartFraction = new lotivis.PlotChart("plot-chart-fraction", {
-        dataController,
-        type: "fraction",
-      });
+      lotivis
+        .plot()
+        .selector("#plot-chart-fraction")
+        .marginLeft(100)
+        .style("fraction")
+        .dataController(dataController)
+        .run();
     </script>
   </body>
 </html>

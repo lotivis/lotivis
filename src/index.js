@@ -1,10 +1,6 @@
 /* parse data */
-export { DataController } from "./js/data/controller.js";
-export * from "./js/data/controller.snapshot.js";
-export * from "./js/data/controller.cache.js";
-export * from "./js/data/controller.filter.js";
-
-export * as DateOrdinator from "./js/data/date.ordinator";
+export { DataController } from "./js/controller.js";
+export * as DateOrdinator from "./js/common/date.ordinator";
 
 export { csv, csvParse, csvRender } from "./js/parse/parse.csv";
 export * from "./js/parse/parse.json.js";
@@ -15,7 +11,9 @@ export { BarChart } from "./js/bar/bar.chart.js";
 export { MapChart } from "./js/map/map.chart.js";
 export { PlotChart } from "./js/plot/plot.chart.js";
 export * from "./js/plot/plot.config.js";
-export { Legend } from "./js/legend/legend.chart.js";
+export { plot } from "./js/plot.js";
+export { bar } from "./js/bar.js";
+export { legend } from "./js/legend.js";
 
 /* common */
 export * from "./js/common/url.parameters";

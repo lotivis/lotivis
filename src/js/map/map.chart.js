@@ -14,7 +14,7 @@ import { MapLabelsRenderer } from "./map.labels";
 import { MapTooltipRenderer } from "./map.tooltip";
 import { MapSelectionRenderer } from "./map.selection";
 import { dataViewMap } from "./map.data.view.js";
-import { DataController } from "../data/controller.js";
+import { DataController } from "../controller.js";
 
 export class MapChart extends Chart {
   initialize() {

@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { DataController } from "../data/controller.js";
+import { DataController } from "../controller.js";
 
 export const DEFAULT_COLUMNS = ["label", "location", "date", "value", "stack"];
 

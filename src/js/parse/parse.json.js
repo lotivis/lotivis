@@ -1,6 +1,6 @@
 import { json as d3json } from "d3";
-import { DataController } from "../data/controller";
-import { DataUnqualifiedError } from "../data/data.unqalified.error.js";
+import { DataController } from "../controller";
+import { DataUnqualifiedError } from "./data.unqalified.error.js";
 
 export function parseDataset(d) {
   return new DataController(flatDataset(d));

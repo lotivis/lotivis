@@ -87,6 +87,11 @@
   stroke-width: 1;
 }
 
+.ltv-selected {
+  fill: dodgerblue;
+  opacity: 0.3;
+}
+
 .ltv-plot-chart-background {
   fill: transparent;
   cursor: pointer;

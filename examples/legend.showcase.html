@@ -13,7 +13,7 @@
       crossorigin="anonymous"
     />
     <link rel="stylesheet" href="../dist/lotivis.css" />
-    <title>Lotivis Examples - Bar Chart Overview</title>
+    <title>Lotivis Examples - Legend Showcase</title>
   </head>
   <body>
     <div class="container mt-3">
@@ -22,58 +22,37 @@
           <a href="../index.html"> Back </a>
         </div>
         <div class="col-8 text-center">
-          <h1>Bar Chart Overview</h1>
+          <h1>Legend Showcase</h1>
         </div>
         <div class="col-6">
-          Default
-          <div id="bar-chart-1">
-            <!-- Bar Chart 1 Code Here -->
-          </div>
-          <div id="legend-1">
-            <!-- Bar Chart 1 Code Here -->
+          legend-group-labels
+          <div id="legend-group-labels">
+            <!-- legend-group-labels here -->
           </div>
         </div>
         <div class="col-6">
-          Combine
-          <div id="bar-chart-3">
-            <!-- Bar Chart 3 Code Here -->
-          </div>
-          <div id="legend-3">
-            <!-- Bar Chart 1 Code Here -->
+          legend-group-stacks
+          <div id="legend-group-stacks">
+            <!-- legend-group-stacks here -->
           </div>
         </div>
         <div class="col-6">
-          Labels
-          <div id="bar-chart-2">
-            <!-- Bar Chart 2 Code Here -->
-          </div>
-          <div id="legend-2">
-            <!-- Bar Chart 1 Code Here -->
+          legend-group-labels
+          <div id="legend-labels">
+            <!-- legend-labels here -->
           </div>
         </div>
         <div class="col-6">
-          Combine Labels
-          <div id="bar-chart-4">
-            <!-- Bar Chart 4 Code Here -->
-          </div>
-          <div id="legend-4">
-            <!-- Bar Chart 1 Code Here -->
+          legend-group-stacks
+          <div id="legend-stacks">
+            <!-- legend-stacks here -->
           </div>
         </div>
-        <div class="col-12">
-          <div class="card">
-            <div class="card-body">
-              <div id="ltv-url-container">
-                <!-- Generated Lotivis URL Here -->
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="col-4">
-          <pre id="ltv-data-preview">
+      </div>
+      <div class="col-4">
+        <pre id="ltv-data-preview">
             <!-- Data Here -->
           </pre>
-        </div>
       </div>
     </div>
 
@@ -225,53 +204,34 @@
 
       let dataController = lotivis.parseDatasets(datasets);
 
-      let barChartCard1 = new lotivis.BarChart("bar-chart-1", {
-        dataController,
-      });
-
-      let barChartCard2 = new lotivis.BarChart("bar-chart-2", {
-        labels: true,
-        dataController,
-      });
-
-      let barChartCard3 = new lotivis.BarChart("bar-chart-3", {
-        type: lotivis.BarChart.Type.combine,
-        dataController,
-      });
-
-      let barChartCard4 = new lotivis.BarChart("bar-chart-4", {
-        labels: true,
-        type: lotivis.BarChart.Type.combine,
-        dataController,
-      });
-
-      let legend1 = new lotivis.Legend()
-        .container("#legend-1")
+      let legendGroupLabels = lotivis
+        .legend()
+        .selector("#legend-group-labels")
         .group(true)
-        .margin({ left: 40, right: 40 })
         .dataController(dataController)
         .run();
 
-      let legend2 = new lotivis.Legend()
-        .container("#legend-2")
-        .group(false)
-        .margin({ left: 40, right: 40 })
-        .dataController(dataController)
-        .run();
-
-      let legend3 = new lotivis.Legend()
-        .container("#legend-3")
+      let legendGroupStacks = lotivis
+        .legend()
+        .selector("#legend-group-stacks")
         .group(true)
         .stacks(true)
-        .margin({ left: 40, right: 40 })
         .dataController(dataController)
         .run();
 
-      let legend4 = new lotivis.Legend()
-        .container("#legend-4")
+      let legendLabels = lotivis
+        .legend()
+        .selector("#legend-labels")
+        .group(false)
+        .stacks(false)
+        .dataController(dataController)
+        .run();
+
+      let legendStacks = lotivis
+        .legend()
+        .selector("#legend-stacks")
         .group(false)
         .stacks(true)
-        .margin({ left: 40, right: 40 })
         .dataController(dataController)
         .run();
     </script>

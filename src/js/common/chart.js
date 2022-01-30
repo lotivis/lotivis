@@ -1,6 +1,6 @@
 import { Component } from "./component.js";
 import { create_id } from "./create.id.js";
-import { DataController } from "../data/controller";
+import { DataController } from "../controller";
 
 export class Chart extends Component {
   constructor(selector, config) {
