@@ -25,34 +25,30 @@
           <h1>Legend Showcase</h1>
         </div>
         <div class="col-6">
-          legend-group-labels
           <div id="legend-group-labels">
             <!-- legend-group-labels here -->
           </div>
         </div>
         <div class="col-6">
-          legend-group-stacks
           <div id="legend-group-stacks">
             <!-- legend-group-stacks here -->
           </div>
         </div>
         <div class="col-6">
-          legend-group-labels
           <div id="legend-labels">
             <!-- legend-labels here -->
           </div>
         </div>
         <div class="col-6">
-          legend-group-stacks
           <div id="legend-stacks">
             <!-- legend-stacks here -->
           </div>
         </div>
       </div>
       <div class="col-4">
-        <pre id="ltv-data-preview">
+        <!-- <pre id="ltv-data-preview">
             <!-- Data Here -->
-          </pre>
+        <!-- </pre> -->
       </div>
     </div>
 
@@ -202,38 +198,44 @@
 
       lotivis.debug(true);
 
-      let dataController = lotivis.parseDatasets(datasets);
-
       let legendGroupLabels = lotivis
         .legend()
         .selector("#legend-group-labels")
+        .labelFormat((l) => l)
         .group(true)
-        .dataController(dataController)
-        .run();
+        .title((d) => d.selector().replace("#", ""));
 
       let legendGroupStacks = lotivis
         .legend()
         .selector("#legend-group-stacks")
         .group(true)
         .stacks(true)
-        .dataController(dataController)
-        .run();
+        .title((d) => d.selector().replace("#", ""));
 
       let legendLabels = lotivis
         .legend()
         .selector("#legend-labels")
+        .labelFormat(null)
         .group(false)
         .stacks(false)
-        .dataController(dataController)
-        .run();
+        .title((d) => d.selector().replace("#", ""));
 
       let legendStacks = lotivis
         .legend()
         .selector("#legend-stacks")
         .group(false)
         .stacks(true)
-        .dataController(dataController)
-        .run();
+        .title((d) => d.selector().replace("#", ""));
+
+      lotivis
+        .jsonFlat("./assets/generated.sample.json")
+        .then((dc) => {
+          legendGroupLabels.dataController(dc).run();
+          legendGroupStacks.dataController(dc).run();
+          legendLabels.dataController(dc).run();
+          legendStacks.dataController(dc).run();
+        })
+        .catch(alert);
     </script>
   </body>
 </html>

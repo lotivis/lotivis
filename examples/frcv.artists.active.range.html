@@ -38,11 +38,7 @@
             <!-- Plot Chart Here -->
           </div>
         </div>
-        <div class="col-4">
-          <pre id="ltv-data-preview">
-            <!-- Data Here -->
-          </pre>
-        </div>
+        <div class="col-4" id="ltv-data"></div>
       </div>
     </div>
 
@@ -52,20 +48,14 @@
       lotivis.debug(true);
 
       let datasets = [];
-      let chart = new lotivis.PlotChart("plot-chart", {
-        margin: {
-          left: 140,
-        },
-      });
+      let plot = lotivis.plot().selector("#plot-chart").marginLeft(140);
 
       function setIndex(index) {
-        let dataController = lotivis.parseDatasets(datasets[index]);
-        chart.setController(dataController);
+        plot.dataController(lotivis.parseDatasets(datasets[index])).run();
       }
 
       function dataChange() {
-        let dropdown = document.getElementById("dataSelection");
-        setIndex(dropdown.selectedIndex);
+        setIndex(document.getElementById("dataSelection").selectedIndex);
       }
 
       Promise.all([

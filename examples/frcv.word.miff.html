@@ -94,45 +94,54 @@
         lotivis.svgDownload(id);
       }
 
-      let barChart = new lotivis.BarChart("bar-chart", {
-        labels: true,
-        dates: Array.from(Array(26).keys()).map((index) => index + 1995),
-      });
+      let barChart = lotivis
+        .bar()
+        .selector("#bar-chart")
+        .labels(true)
+        .dates(Array.from(Array(26).keys()).map((index) => index + 1995));
 
-      let plotChart = new lotivis.PlotChart("plot-chart");
+      let legend = lotivis.legend().selector("#labels-chart");
 
-      let mapChart = new lotivis.MapChart("map-chart", {
-        labels: true,
-        exclude: ["2A", "2B"],
-        featureIDAccessor: (f) => +f.properties.code,
-        featureNameAccessor: (f) => f.properties.nom,
-      });
+      let plotChart = lotivis
+        .plot()
+        .selector("#plot-chart")
+        .style("fraction")
+        .colorMode("multi");
 
-      let mapChartMetropole = new lotivis.MapChart("map-chart-metropole", {
-        width: 300,
-        height: 300,
-        labels: true,
-        filter: ["75", "92", "93", "94"],
-        legend: false,
-        featureIDAccessor: (f) => +f.properties.code,
-        featureNameAccessor: (f) => f.properties.nom,
-      });
+      let mapChart = lotivis
+        .map()
+        .debug(true)
+        .selector("#map-chart")
+        .labels(true)
+        .exclude(["2A", "2B"])
+        .featureIDAccessor((f) => +f.properties.code)
+        .featureNameAccessor((f) => f.properties.nom);
 
-      // let labelsChart = new lotivis.LabelsChart("labels-chart");
-      let legend = new lotivis.Legend().title(null).container("#labels-chart");
+      let mapChartMetropole = lotivis
+        .map()
+        .selector("#map-chart-metropole")
+        .width(300)
+        .height(300)
+        .labels(true)
+        .include(["75", "92", "93", "94"])
+        .legend(false)
+        .featureIDAccessor((f) => +f.properties.code)
+        .featureNameAccessor((f) => f.properties.nom);
 
       lotivis.d3.json("./assets/departements.geojson").then((json) => {
-        mapChart.setGeoJSON(json);
-        mapChartMetropole.setGeoJSON(json);
-      });
+        mapChart.geoJSON(json);
+        mapChartMetropole.geoJSON(json);
 
-      lotivis.d3.json("./assets/miff.json").then((json) => {
-        let dataController = lotivis.parseDatasets(json);
-        barChart.setController(dataController);
-        plotChart.setController(dataController);
-        mapChart.setController(dataController);
-        mapChartMetropole.setController(dataController);
-        legend.dataController(dataController).run();
+        lotivis.d3.json("./assets/miff.json").then((json) => {
+          let dataController = lotivis.parseDatasets(json);
+
+          mapChart.dataController(dataController).run();
+          mapChartMetropole.dataController(dataController).run();
+
+          barChart.dataController(dataController).run();
+          plotChart.dataController(dataController).run();
+          legend.dataController(dataController).run();
+        });
       });
     </script>
   </body>

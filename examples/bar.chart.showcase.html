@@ -225,53 +225,31 @@
 
       let dataController = lotivis.parseDatasets(datasets);
 
-      let barChartCard1 = new lotivis.BarChart("bar-chart-1", {
-        dataController,
-      });
-
-      let barChartCard2 = new lotivis.BarChart("bar-chart-2", {
-        labels: true,
-        dataController,
-      });
-
-      let barChartCard3 = new lotivis.BarChart("bar-chart-3", {
-        type: lotivis.BarChart.Type.combine,
-        dataController,
-      });
-
-      let barChartCard4 = new lotivis.BarChart("bar-chart-4", {
-        labels: true,
-        type: lotivis.BarChart.Type.combine,
-        dataController,
-      });
-
-      let legend1 = new lotivis.Legend()
-        .container("#legend-1")
-        .group(true)
-        .margin({ left: 40, right: 40 })
+      lotivis
+        .bar()
+        .selector("#bar-chart-1")
         .dataController(dataController)
         .run();
 
-      let legend2 = new lotivis.Legend()
-        .container("#legend-2")
-        .group(false)
-        .margin({ left: 40, right: 40 })
+      lotivis
+        .bar()
+        .selector("#bar-chart-2")
+        .labels(true)
         .dataController(dataController)
         .run();
 
-      let legend3 = new lotivis.Legend()
-        .container("#legend-3")
-        .group(true)
-        .stacks(true)
-        .margin({ left: 40, right: 40 })
+      lotivis
+        .bar()
+        .selector("#bar-chart-3")
+        .style("combine")
         .dataController(dataController)
         .run();
 
-      let legend4 = new lotivis.Legend()
-        .container("#legend-4")
-        .group(false)
-        .stacks(true)
-        .margin({ left: 40, right: 40 })
+      lotivis
+        .bar()
+        .selector("#bar-chart-4")
+        .labels(true)
+        .style("combine")
         .dataController(dataController)
         .run();
     </script>

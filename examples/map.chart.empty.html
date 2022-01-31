@@ -57,9 +57,6 @@
       // print debug messages
       lotivis.debug(true);
 
-      // print debug messages
-      lotivis.debug(true);
-
       let data1 = {
         label: "dataset1",
         stack: "dataset1",
@@ -95,26 +92,32 @@
         },
       ];
 
-      let chart1 = new lotivis.MapChart("map-chart-1", {
-        width: 600,
-        height: 300,
-        labels: true,
-        dataController: lotivis.parseDataset(data1),
-      });
+      lotivis
+        .map()
+        .selector("#map-chart-1")
+        .width(600)
+        .height(300)
+        .labels(true)
+        .dataController(lotivis.parseDataset(data1))
+        .run();
 
-      let chart2 = new lotivis.MapChart("map-chart-2", {
-        width: 600,
-        height: 300,
-        labels: true,
-        dataController: lotivis.parseDatasets(data2),
-      });
+      lotivis
+        .map()
+        .selector("#map-chart-2")
+        .width(600)
+        .height(300)
+        .labels(true)
+        .dataController(lotivis.parseDatasets(data2))
+        .run();
 
-      let chart3 = new lotivis.MapChart("map-chart-3", {
-        width: 600,
-        height: 300,
-        labels: true,
-        dataController: lotivis.parseDatasets(data3),
-      });
+      lotivis
+        .map()
+        .selector("#map-chart-3")
+        .width(600)
+        .height(300)
+        .labels(true)
+        .dataController(lotivis.parseDatasets(data3))
+        .run();
     </script>
   </body>
 </html>

@@ -1,10 +1,5 @@
-export const DEFAULT_NUMBER_FORMAT = new Intl.NumberFormat("en-EN", {
-  maximumFractionDigits: 3,
-}).format;
-
-export const GERMAN_NUMBER_FORMAT = new Intl.NumberFormat("de-DE", {
-  maximumFractionDigits: 3,
-}).format;
+import { datatext } from "../datatext";
+import { GERMAN_NUMBER_FORMAT } from "./formats";
 
 export var LOTIVIS_CONFIG = {
   // The default margin to use for charts.
@@ -23,11 +18,64 @@ export var LOTIVIS_CONFIG = {
   unknown: "LOTIVIS_UNKNOWN",
   // The default number formatter used by all charts.
   numberFormat: GERMAN_NUMBER_FORMAT,
+
+  // the border style
+  defaultBorder: "solid 1px lightgray",
+
+  selectionOpacity: 0.1,
 };
 
-export const DEFAULT_MARGIN = {
-  top: LOTIVIS_CONFIG.defaultMargin,
-  right: LOTIVIS_CONFIG.defaultMargin,
-  bottom: LOTIVIS_CONFIG.defaultMargin,
-  left: LOTIVIS_CONFIG.defaultMargin,
-};
+/**
+ * Appends the passed value in appendix to the passed value of string if string not
+ * already ends with appendix.
+ *
+ * @param {*} string
+ * @param {*} appendix
+ * @returns {string} The passed string having the passed appendix
+ */
+export function append(string, appendix) {
+  return ("" + string).endsWith(appendix) ? string : string + appendix;
+}
+
+/**
+ * Initiates a download of the passed blob with the passed name.
+ * @param {*} blob The blob to download
+ * @param {*} filename The name of the downloaded file
+ */
+export function download(blob, filename) {
+  if (window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveBlob(blob, filename);
+  } else {
+    let a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+}
+
+// DEBUG
+
+/**
+ * Sets whether lotivis prints debug log messages to the console.
+ * @param enabled A Boolean value indicating whether to enable debug logging.
+ * @param printConfig A Boolean value indicating whether to print the global lotivis configuration.  Default is false.
+ */
+export function debug(enabled) {
+  LOTIVIS_CONFIG.debug = enabled;
+  console.log(`[ltv]  ${enabled ? "En" : "Dis"}abled debug mode.`);
+}
+
+/**
+ * Returns a Boolean value indicating whether lotivis
+ * runs in the browser (else it will probably run in an
+ * environment like Node.js)
+ * */
+export function runsInBrowser() {
+  return !(typeof document === "undefined");
+}
+
+export function data_preview(dc) {
+  if (!dc || !LOTIVIS_CONFIG.debug || !runsInBrowser()) return;
+  if (!document.getElementById("ltv-data")) return;
+  datatext().selector("#ltv-data").dataController(dc).run();
+}

@@ -26,45 +26,47 @@
         </div>
         <div class="col-2"></div>
         <div class="col-6">
-          Type: gradient
-          <div id="gradient">
-            <!-- Plot Chart (type: gradient) Here -->
+          gradient-single
+          <div id="gradient-single">
+            <!-- Plot Chart -->
           </div>
-          <div id="grad-hide-labels">
-            <!-- Plot Chart (type: gradient, hide labels) Here -->
+          gradient-multi-alphabetically
+          <div id="gradient-multi-alphabetically">
+            <!-- Plot Chart -->
           </div>
-          <div id="grad-sort-alpha">
-            <!-- Plot Chart (type: gradient, sort: alphabetically) Here -->
+          gradient-multi-duration
+          <div id="gradient-multi-duration">
+            <!-- Plot Chart -->
           </div>
-          <div id="grad-sort-duration">
-            <!-- Plot Chart (type: gradient, sort: duration) Here -->
+          gradient-multi-intensity
+          <div id="gradient-multi-intensity">
+            <!-- Plot Chart -->
           </div>
-          <div id="grad-sort-itensity">
-            <!-- Plot Chart (type: gradient, sort: itensity) Here -->
-          </div>
-          <div id="grad-sort-first-date">
-            <!-- Plot Chart (type: gradient, sort: first date) Here -->
+          gradient-multi-firstDate
+          <div id="gradient-multi-firstDate">
+            <!-- Plot Chart -->
           </div>
         </div>
         <div class="col-6">
-          Type: fraction
-          <div id="fraction">
-            <!-- Plot Chart (type: fraction) Here -->
+          fraction-single
+          <div id="fraction-single">
+            <!-- Plot Chart -->
           </div>
-          <div id="frac-hide-labels">
-            <!-- Plot Chart (type: fraction, hide labels) Here -->
+          fraction-multi-alphabetically
+          <div id="fraction-multi-alphabetically">
+            <!-- Plot Chart -->
           </div>
-          <div id="frac-sort-alpha">
-            <!-- Plot Chart (type: fraction, sort: alphabetically) Here -->
+          fraction-multi-duration
+          <div id="fraction-multi-duration">
+            <!-- Plot Chart -->
           </div>
-          <div id="frac-sort-duration">
-            <!-- Plot Chart (type: fraction, sort: duration) Here -->
+          fraction-multi-intensity
+          <div id="fraction-multi-intensity">
+            <!-- Plot Chart -->
           </div>
-          <div id="frac-sort-itensity">
-            <!-- Plot Chart (type: fraction, sort: itensity) Here -->
-          </div>
-          <div id="frac-sort-first-date">
-            <!-- Plot Chart (type: fraction, sort: first date) Here -->
+          fraction-multi-firstDate
+          <div id="fraction-multi-firstDate">
+            <!-- Plot Chart -->
           </div>
         </div>
         <div class="col-6">
@@ -200,60 +202,30 @@
 
       let dataController = lotivis.parseDatasets(datasets);
 
-      let plotChart1 = new lotivis.PlotChart("gradient", {
-        dataController,
-      });
-      let plotChart2 = new lotivis.PlotChart("grad-hide-labels", {
-        dataController,
-        labels: false,
-      });
-      let plotChart3 = new lotivis.PlotChart("grad-sort-alpha", {
-        dataController,
-        sort: "alphabetically",
-      });
-      let plotChart4 = new lotivis.PlotChart("grad-sort-duration", {
-        dataController,
-        sort: "duration",
-      });
-      let plotChart5 = new lotivis.PlotChart("grad-sort-itensity", {
-        dataController,
-        sort: "itensity",
-      });
-      let plotChart6 = new lotivis.PlotChart("grad-sort-first-date", {
-        dataController,
-        sort: "firstDate",
-      });
+      function plot(id) {
+        let comps = id.split("-");
+        lotivis
+          .plot()
+          .selector("#" + id)
+          .marginLeft(100)
+          .style(comps[0])
+          .colorMode(comps[1])
+          .sort(comps[2] || "alphabetically")
+          .dataController(dataController)
+          .run();
+      }
 
-      let plotChart7 = new lotivis.PlotChart("fraction", {
-        dataController,
-        type: "fraction",
-      });
-      let plotChart8 = new lotivis.PlotChart("frac-hide-labels", {
-        dataController,
-        type: "fraction",
-        labels: false,
-      });
+      plot("gradient-single");
+      plot("gradient-multi-alphabetically");
+      plot("gradient-multi-duration");
+      plot("gradient-multi-intensity");
+      plot("gradient-multi-firstDate");
 
-      let plotChart9 = new lotivis.PlotChart("frac-sort-alpha", {
-        dataController,
-        type: "fraction",
-        sort: "alphabetically",
-      });
-      let plotChart10 = new lotivis.PlotChart("frac-sort-duration", {
-        dataController,
-        type: "fraction",
-        sort: "duration",
-      });
-      let plotChart11 = new lotivis.PlotChart("frac-sort-itensity", {
-        dataController,
-        type: "fraction",
-        sort: "itensity",
-      });
-      let plotChart12 = new lotivis.PlotChart("frac-sort-first-date", {
-        dataController,
-        type: "fraction",
-        sort: "firstDate",
-      });
+      plot("fraction-single");
+      plot("fraction-multi-alphabetically");
+      plot("fraction-multi-duration");
+      plot("fraction-multi-intensity");
+      plot("fraction-multi-firstDate");
     </script>
   </body>
 </html>

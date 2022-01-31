@@ -43,7 +43,7 @@
       // enable debug messages
       lotivis.debug(true);
 
-      let dataController = lotivis.parseDataset({
+      let dc = lotivis.parseDataset({
         label: "dataset_1",
         data: [
           {
@@ -57,10 +57,12 @@
         ],
       });
 
-      let chart = new lotivis.BarChart("bar-chart", {
-        dates: [2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007],
-        dataController,
-      });
+      let chart = lotivis
+        .bar()
+        .selector("#bar-chart")
+        .dates([2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007])
+        .dataController(dc)
+        .run();
     </script>
   </body>
 </html>

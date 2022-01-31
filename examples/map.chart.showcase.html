@@ -75,41 +75,41 @@
 
       let dataController = lotivis.parseDatasets(datasets);
 
-      let mapChart1 = new lotivis.MapChart("map-chart-1", {
-        selectable: false,
-        dataController,
-      });
+      mapChart1 = lotivis
+        .map()
+        .selector("#map-chart-1")
+        .dataController(dataController);
 
-      let mapChart2 = new lotivis.MapChart("map-chart-2", {
-        selectable: false,
-        dataController,
-        labels: true,
-      });
+      mapChart2 = lotivis
+        .map()
+        .selector("#map-chart-2")
+        .labels(true)
+        .dataController(dataController);
 
-      let mapChart3 = new lotivis.MapChart("map-chart-3", {
-        dataController,
-        selectable: false,
-        include: ["2A", "2B"],
-        featureIDAccessor: (f) => "" + f.properties.code,
-        featureNameAccessor: (f) => f.properties.nom,
-      });
+      mapChart3 = lotivis
+        .map()
+        .selector("#map-chart-3")
+        .include(["2A", "2B"])
+        .featureIDAccessor((f) => "" + f.properties.code)
+        .featureNameAccessor((f) => f.properties.nom)
+        .dataController(dataController);
 
-      let mapChart4 = new lotivis.MapChart("map-chart-4", {
-        selectable: false,
-        dataController,
-        exclude: ["2A", "2B"],
-        featureIDAccessor: (f) => "" + f.properties.code,
-        featureNameAccessor: (f) => f.properties.nom,
-      });
+      mapChart4 = lotivis
+        .map()
+        .selector("#map-chart-4")
+        .exclude(["2A", "2B"])
+        .featureIDAccessor((f) => "" + f.properties.code)
+        .featureNameAccessor((f) => f.properties.nom)
+        .dataController(dataController);
 
       fetch("./assets/departements.geojson")
         .then((response) => response.text())
         .then((text) => JSON.parse(text))
         .then((geoJSON) => {
-          mapChart1.setGeoJSON(geoJSON);
-          mapChart2.setGeoJSON(geoJSON);
-          mapChart3.setGeoJSON(geoJSON);
-          mapChart4.setGeoJSON(geoJSON);
+          mapChart1.geoJSON(geoJSON).run();
+          mapChart2.geoJSON(geoJSON).run();
+          mapChart3.geoJSON(geoJSON).run();
+          mapChart4.geoJSON(geoJSON).run();
         });
     </script>
   </body>

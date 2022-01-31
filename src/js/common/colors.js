@@ -1,88 +1,119 @@
 import * as d3 from "d3";
 
-export const colorScheme = d3.schemeCategory10;
-export const tintColor = d3.color();
+function darker(color) {
+  return color.darker().darker();
+}
+
+function random(till) {
+  return Math.floor(Math.random() * till);
+}
+
+// constants
+
+/**
+ * The default colors used by lotivis.
+ */
+export const DATA_COLORS = []
+  .concat(d3.schemeTableau10)
+  .concat(d3.schemeCategory10)
+  .concat(d3.schemeDark2);
+
+/**
+ * The default tint color used by lotivis.
+ */
+export const TINT_COLOR = DATA_COLORS[0];
+
+/**
+ * The default random colors.
+ */
+export const DATA_COLORS_RANDOM = (() => {
+  let cs = Array.from(DATA_COLORS),
+    n = [];
+  while (cs.length > 0) n.push(cs.splice(random(cs.length), 1));
+  return n;
+})();
 
 export class ColorGenerator {
   constructor(data) {
-    let stacksToLabels = d3.group(
-      data,
-      (d) => d.stack || d.label,
-      (d) => d.label
-    );
+    let dataColors = DATA_COLORS,
+      stackToColor,
+      labelToColor;
 
-    let stacks = Array.from(stacksToLabels.keys());
+    function initialize() {
+      stackToColor = new Map();
+      labelToColor = new Map();
 
-    function stackOf(label) {
-      return data.find((d) => d.label == label).stack || label;
-    }
+      let stacksToLabels = d3.group(
+        data,
+        (d) => d.stack || d.label,
+        (d) => d.label
+      );
 
-    function stackLabels(stack) {
-      return Array.from(stacksToLabels.get(stack).keys() || []);
-    }
+      let stacks = Array.from(stacksToLabels.keys());
 
-    function stackColor(stack) {
-      return colorScheme[stacks.indexOf(stack) % colorScheme.length];
-    }
-
-    // let colorScheme = d3.schemeCategory10;
-
-    let stackToColor = new Map();
-    let labelToColor = new Map();
-    for (let i = 0; i < stacks.length; i++) {
-      let stack = stacks[i];
-      let labels = stackLabels(stack);
-      let c1 = d3.color(stackColor(stack));
-      let c2 = c1.darker().darker();
-      let generator = d3
-        .scaleLinear()
-        .domain([0, labels.length])
-        .range([c1, c2]);
-
-      stackToColor.set(stack, c1);
-
-      for (let j = 0; j < labels.length; j++) {
-        let label = labels[j];
-        let color = generator(j);
-        labelToColor.set(label, color);
+      function stackLabels(stack) {
+        return Array.from((stacksToLabels.get(stack) || []).keys());
       }
+
+      function stackColor(stack) {
+        return dataColors[stacks.indexOf(stack) % dataColors.length];
+      }
+
+      stacks.forEach((stack) => {
+        let labels = stackLabels(stack);
+        let c1 = d3.color(stackColor(stack));
+        let colors = ColorScale(labels.length, [c1, darker(c1)]);
+
+        stackToColor.set(stack, c1);
+
+        labels.forEach((label, index) => {
+          labelToColor.set(label, colors(index));
+        });
+      });
     }
 
+    // public api
+
+    /**
+     * Returns the color for the given stack.
+     *
+     * @param {stack} stack The stack
+     * @returns The d3.color for the stack
+     * @public
+     */
     this.stack = function (stack) {
-      return stackToColor.get(stack) || tintColor;
+      return stackToColor ? stackToColor.get(stack) || TINT_COLOR : TINT_COLOR;
     };
 
+    /**
+     * Returns the color for the given label.
+     *
+     * @param {label} label The label
+     * @returns The d3.color for the label
+     * @public
+     */
     this.label = function (label) {
-      return labelToColor.get(label) || tintColor;
+      return labelToColor ? labelToColor.get(label) || TINT_COLOR : TINT_COLOR;
     };
 
-    this.stackColors = function (stack) {
-      let c1 = d3.color(this.stack(stack));
-      let c2 = c1.darker().darker();
-      let size = stacksToLabels.get(stack).size;
-      let generator = d3.scaleLinear().domain([0, size]).range([c1, c2]);
-      let colors = d3.range(0, size).map(generator);
-      return colors;
-    };
+    initialize();
   }
 }
 
-export function MapColors(till) {
+export function MapColors(max) {
   return d3
     .scaleLinear()
-    .domain([0, (1 / 3) * till, (2 / 3) * till, till])
+    .domain([0, (1 / 3) * max, (2 / 3) * max, max])
     .range(["yellow", "orange", "red", "purple"]);
 }
 
-export function PlotColors(till) {
+export function PlotColors(max) {
+  return ColorScale(max, ["yellow", "orange", "red", "purple"]);
+}
+
+export function ColorScale(max, colors) {
   return d3
     .scaleLinear()
-    .domain([0, (1 / 3) * till, (2 / 3) * till, till])
-    .range(["yellow", "orange", "red", "purple"]);
+    .domain(colors.map((c, i) => (i / (colors.length - 1)) * max))
+    .range(colors);
 }
-
-export function ColorRange(color, till) {
-  return d3.scaleLinear().domain([0, till]).range(["white", color]);
-}
-
-export default { ColorGenerator, MapColors: MapColors, PlotColors };

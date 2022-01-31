@@ -35,7 +35,6 @@
           <div id="plot-chart-gradient-single">
             <!-- Plot Chart Card (type: gradient, colorMode: single) Here -->
           </div>
-          <p>Color Mode: single</p>
         </div>
 
         <div class="col-6">
@@ -183,31 +182,45 @@
 
       let dataController = lotivis.parseDatasets(datasets);
 
-      new lotivis.PlotChart("plot-chart-gradient-multiple", {
-        dataController,
-        colorMode: lotivis.PLOT_COLOR_MODE.multiple,
-        selectable: false,
-      });
+      lotivis
+        .plot()
+        .selector("#plot-chart-gradient-multiple")
+        .marginLeft(100)
+        .style("gradient")
+        .colorMode("multiple")
+        .selectable(false)
+        .dataController(dataController)
+        .run();
 
-      new lotivis.PlotChart("plot-chart-gradient-single", {
-        dataController,
-        colorMode: lotivis.PLOT_COLOR_MODE.single,
-        selectable: false,
-      });
+      lotivis
+        .plot()
+        .selector("#plot-chart-gradient-single")
+        .marginLeft(100)
+        .style("gradient")
+        .colorMode("single")
+        .selectable(false)
+        .dataController(dataController)
+        .run();
 
-      new lotivis.PlotChart("plot-chart-fraction-multiple", {
-        dataController,
-        type: "fraction",
-        colorMode: lotivis.PLOT_COLOR_MODE.multiple,
-        selectable: false,
-      });
+      lotivis
+        .plot()
+        .selector("#plot-chart-fraction-multiple")
+        .marginLeft(100)
+        .style("fraction")
+        .colorMode("multiple")
+        .selectable(false)
+        .dataController(dataController)
+        .run();
 
-      new lotivis.PlotChart("plot-chart-fraction-single", {
-        dataController,
-        type: "fraction",
-        colorMode: lotivis.PLOT_COLOR_MODE.single,
-        selectable: false,
-      });
+      lotivis
+        .plot()
+        .selector("#plot-chart-fraction-single")
+        .marginLeft(100)
+        .style("fraction")
+        .colorMode("single")
+        .selectable(false)
+        .dataController(dataController)
+        .run();
     </script>
   </body>
 </html>

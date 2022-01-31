@@ -1,9 +1,11 @@
 import * as d3 from "d3";
+import { FILENAME_GENERATOR } from "./common/filename.js";
 import { DEFAULT_DATE_ORDINATOR } from "./common/date.ordinator";
 import { ColorGenerator } from "./common/colors";
-import { set_data_preview } from "./common/debug";
-import { LOTIVIS_CONFIG } from "./common/config";
-import { State } from "./common/statefull.js";
+import { data_preview } from "./common/config.js";
+import { LOTIVIS_CONFIG, append } from "./common/config";
+import { isEmpty } from "./common/values";
+import { Data } from "./data";
 
 /**
  * Adds the item if it not already exists in the array.
@@ -26,47 +28,40 @@ Array.prototype.remove = function (item) {
   return i !== -1 ? this.splice(i, 1) : false;
 };
 
-export class DataController extends State {
-  constructor(data, config) {
+export class DataController {
+  constructor(data) {
     if (!Array.isArray(data)) throw new Error("data not an array.");
 
-    super(
-      // public state
-      {
-        data: data,
-        original: data,
-        dateAccess: DEFAULT_DATE_ORDINATOR,
-        colorGenerator: new ColorGenerator(data),
-      },
-      config
-    );
+    let _data = Data(data),
+      filenameGen = FILENAME_GENERATOR,
+      dateAccess = DEFAULT_DATE_ORDINATOR,
+      colorGenerator = new ColorGenerator(_data),
+      disp = d3.dispatch("filter", "change"),
+      debug = true;
 
-    // private properties
-    var _disp = d3.dispatch("filter", "change");
-
-    this.data = data;
-
-    // private sate
-    this.state({ calc: {}, cache: {} });
-
-    // filters
-    var change = this.filtersDidChange.bind(this);
+    this.data = Data(data);
     this.filters = { labels: [], locations: [], dates: [], stacks: [] };
 
+    // private
+    function callFilterChange(name, item, sender) {
+      if (!sender) throw new Error("missing sender");
+      if (debug) console.log("filter", name, item);
+      return disp.call("filter", this, name, item, sender), this;
+    }
+
+    // public api
+
     this.on = function (name, callback) {
-      return _disp.on(name, callback), this;
+      return disp.on(name, callback), this;
     };
 
-    this.call = function (name, that, type, sender) {
-      return _disp.call(name, that, type, sender), this;
-    };
-
+    /**
+     * Removes all callbacks from the dispatcher.
+     * @returns {this} The chart itself
+     */
     this.removeAllListeners = function () {
-      return (_disp = d3.dispatch("filter", "change")), this;
+      return (disp = d3.dispatch("filter", "change")), this;
     };
-
-    if (LOTIVIS_CONFIG.debug) console.log("[ltv] ", this);
-    if (this.original && this.original()) set_data_preview(this.original());
 
     // # FILTERS
 
@@ -75,47 +70,68 @@ export class DataController extends State {
       this.filters.locations.clear();
       this.filters.labels.clear();
       this.filters.stacks.clear();
-      this.call("filter", this, null, sender);
+      callFilterChange("all", null, sender);
+    };
+
+    this.clearLabelFilters = function (sender) {
+      if (!isEmpty(this.filters.labels))
+        (this.filters.labels = []), callFilterChange("label", null, sender);
+    };
+
+    this.clearStackFilters = function (sender) {
+      if (!isEmpty(this.filters.stacks))
+        (this.filters.stacks = []), callFilterChange("stack", null, sender);
+    };
+
+    this.clearLocationFilters = function (sender) {
+      if (!isEmpty(this.filters.locations))
+        (this.filters.locations = []),
+          callFilterChange("location", null, sender);
+    };
+
+    this.clearDateFilters = function (sender) {
+      if (!isEmpty(this.filters.dates))
+        (this.filters.dates = []), callFilterChange("date", null, sender);
     };
 
     this.addLocationFilter = function (location, sender) {
       if (this.filters.locations.add(location, sender))
-        this.call("filter", this, location, sender);
+        callFilterChange("location", location, sender);
     };
 
     this.removeLocationFilter = function (location, sender) {
       if (this.filters.locations.remove(location, sender))
-        this.call("filter", this, location, sender);
+        callFilterChange("location", location, sender);
     };
 
     this.addDateFilter = function (date, sender) {
       if (this.filters.dates.add(date, sender))
-        this.call("filter", this, date, sender);
+        callFilterChange("date", date, sender);
     };
 
     this.removeDateFilter = function (date, sender) {
       if (this.filters.dates.remove(date, sender))
-        this.call("filter", this, date, sender);
+        callFilterChange("date", date, sender);
     };
 
     this.addLabelFilter = function (label, sender) {
       if (this.filters.labels.add(label, sender))
-        this.call("filter", this, label, sender);
+        callFilterChange("label", label, sender);
     };
 
     this.removeLabelFilter = function (label, sender) {
       if (this.filters.labels.remove(label, sender))
-        this.call("filter", this, label, sender);
+        callFilterChange("label", label, sender);
     };
 
     this.addStackFilter = function (stack, sender) {
       if (this.filters.stacks.add(stack, sender))
-        this.call("filter", this, stack, sender);
+        callFilterChange("stack", stack, sender);
     };
 
     this.removeStackFilter = function (stack, sender) {
       if (this.filters.stacks.remove(stack, sender))
-        this.call("filter", this, stack, sender);
+        callFilterChange("stack", stack, sender);
     };
 
     this.locationFilters = function () {
@@ -174,13 +190,38 @@ export class DataController extends State {
         : this.addStackFilter(stack, sender);
     };
 
-    return this;
-  }
+    /**
+     * Gets or sets the filename generator.
+     *
+     * @param {*} _
+     * @returns {filenameGen | this}
+     */
+    this.filenameGenerator = function (_) {
+      return arguments.length ? ((filenameGen = _), this) : filenameGen;
+    };
 
-  filtersDidChange(name, reason, item, sender) {
-    // console.log("filtersDidChange", name, reason, item, sender);
-    this.calculateSnapshot();
-    this.emit("change", this, name, reason, sender, item);
+    this.dateAccess = function (_) {
+      return arguments.length ? ((dateAccess = _), this) : dateAccess;
+    };
+
+    this.colorGenerator = function (_) {
+      return arguments.length ? ((colorGenerator = _), this) : colorGenerator;
+    };
+
+    this.debug = function (_) {
+      return arguments.length ? ((debug = _), this) : debug;
+    };
+
+    this.labelColor = colorGenerator.label;
+    this.stackColor = colorGenerator.stack;
+
+    this.calculateSnapshot.bind(this)();
+    // console.timeEnd("DataController");
+
+    if (LOTIVIS_CONFIG.debug && this.debug) console.log("[ltv] ", this);
+    data_preview(this);
+
+    return this;
   }
 
   /** Returns entries with valid value. */
@@ -264,7 +305,21 @@ export class DataController extends State {
     return d3.min(this.data, (item) => item.value);
   }
 
-  /** Returns a string _this can be used as filename for downloads. */
+  /**
+   *
+   * @param {string} ext
+   * @param {string} prefix
+   * @returns The generated filename
+   */
+  filename(ext, prefix) {
+    let generator = this.filenameGenerator() || FILENAME_GENERATOR;
+    let name = generator(this.data, this);
+    if (prefix) name = prefix + "-" + name;
+    if (ext) name = append(name, ".") + ext;
+    return generator(this.data, this, prefix, ext);
+  }
+
+  /** Returns a string that can be used as filename for downloads. */
   getFilename() {
     if (!this.labels) return "Unknown";
     let labels = this.labels.map((label) => label.split(` `).join(`-`));
@@ -277,23 +332,24 @@ export class DataController extends State {
   // # SNAPSHOT
 
   calculateSnapshot() {
+    // console.time("calculateSnapshot");
     let f = this.filters;
     let snapshot = d3.filter(this.data, (d) => {
       return !(
-        (d.location && f.locations.contains(d.location)) ||
-        (d.date && f.dates.contains(d.date)) ||
-        (d.label && f.labels.contains(d.label)) ||
-        (d.stack && f.stacks.contains(d.stack))
+        f.locations.indexOf(d.location) !== -1 ||
+        f.dates.indexOf(d.dateAccess) !== -1 ||
+        f.labels.indexOf(d.label) !== -1 ||
+        f.stacks.indexOf(d.stack) !== -1
       );
     });
-    return this.state({ snapshot });
+    return (this.snapshotData = snapshot), this;
   }
 
   snapshot() {
-    return this.stateItem("snapshot", null);
+    return this.snapshotData;
   }
 
   snapshotOrData() {
-    return this.stateItem("snapshot", this.stateItem("data", null));
+    return this.snapshotData ?? this.data;
   }
 }

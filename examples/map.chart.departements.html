@@ -54,11 +54,12 @@
       lotivis.debug(true);
 
       let datasets = [];
-      let chart = new lotivis.MapChart("map-chart", {
-        exclude: ["2A", "2B"],
-        featureIDAccessor: (f) => f.properties.code,
-        featureNameAccessor: (f) => f.properties.nom,
-      });
+      let chart = lotivis
+        .map()
+        .selector("#map-chart")
+        .exclude(["2A", "2B"])
+        .featureIDAccessor((f) => f.properties.code)
+        .featureNameAccessor((f) => f.properties.nom);
 
       function dataChange() {
         let dropdown = document.getElementById("dataSelection");
@@ -74,7 +75,7 @@
       function setDataset(index) {
         let dataset = datasets[index];
         let dataController = lotivis.parseDataset(dataset);
-        chart.setController(dataController);
+        chart.dataController(dataController).run();
       }
 
       Promise.all([
@@ -87,7 +88,7 @@
         lotivis.d3.json("./assets/departements.geojson"),
       ]).then((all) => {
         let geoJSON = all.pop();
-        chart.setGeoJSON(geoJSON);
+        chart.geoJSON(geoJSON);
 
         datasets = all;
         setDataset(0);

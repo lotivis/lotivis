@@ -39,17 +39,15 @@
       // print debug messages
       lotivis.debug(true);
 
-      let chart = new lotivis.MapChart("map-chart", {
-        featureNameAccessor: (f) => f.properties["NAME_3"],
-        featureIDAccessor: (f) => f.properties["ID_3"],
-      });
+      let chart = lotivis
+        .map()
+        .selector("#map-chart")
+        .featureNameAccessor((f) => f.properties["NAME_3"])
+        .featureIDAccessor((f) => f.properties["ID_3"]);
 
       fetch("./assets/germany.geojson")
         .then((raw) => raw.json())
-        .then((geoJSON) => {
-          console.log("geoJSON", geoJSON);
-          chart.setGeoJSON(geoJSON);
-        });
+        .then((geoJSON) => chart.geoJSON(geoJSON).run());
     </script>
   </body>
 </html>

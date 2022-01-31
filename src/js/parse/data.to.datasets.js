@@ -1,4 +1,4 @@
-import { isValue } from "../common/is.value.js";
+import { isValue } from "../common/values";
 
 export function DataItem(item) {
   return { date: item.date, location: item.location, value: item.value };

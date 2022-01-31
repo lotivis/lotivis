@@ -32,7 +32,7 @@
             <!-- Labels Chart Here -->
           </div>
 
-          <div id="legend-1">
+          <div id="legend">
             <!-- Legend here -->
           </div>
         </div>
@@ -150,16 +150,12 @@
       lotivis.debug(true);
 
       let dataController = lotivis.parseDatasets(datasets);
-      let chart = new lotivis.BarChart("bar-chart", {
-        dataController,
-        selectable: false,
-        labels: true,
-      });
 
-      let legend1 = new lotivis.Legend()
-        .debug(true)
-        .container("#legend-1")
-        .margin({ left: 40, right: 40 })
+      let barChart = lotivis
+        .bar()
+        .selector("#bar-chart")
+        .enabled(false)
+        .labels(false)
         .dataController(dataController)
         .run();
     </script>

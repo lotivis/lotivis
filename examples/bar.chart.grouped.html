@@ -29,10 +29,8 @@
             <!-- Bar Chart Code Here -->
           </div>
         </div>
-        <div class="col-4">
-          <pre id="ltv-data-preview">
-            <!-- Data Chart Here -->
-          </pre>
+        <div class="col-4" id="ltv-data">
+          <!-- Data Here -->
         </div>
       </div>
     </div>
@@ -198,8 +196,7 @@
       ];
 
       let dc = lotivis.parseDatasets(datasets);
-      let chart = new lotivis.BarChart("bar-chart");
-      chart.setController(dc);
+      let chart = lotivis.bar().selector("#bar-chart").dataController(dc).run();
     </script>
   </body>
 </html>

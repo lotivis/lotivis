@@ -1,11 +1,11 @@
 import * as d3 from "d3";
-import { ltv_chart } from "./common/lotivis.chart";
-import { DEFAULT_NUMBER_FORMAT, LOTIVIS_CONFIG } from "./common/config";
-import { uniqueId } from "./common/create.id";
-import "./common/d3selection.js";
-import { safeId } from "./common/safe.id";
+import { baseChart } from "./chart";
+import { LOTIVIS_CONFIG } from "./common/config";
+import { uniqueId } from "./common/identifiers";
 import { tooltip } from "./tooltip";
-import { hash_str } from "./common/hash";
+import { hash } from "./common/hash";
+import { PlotColors } from "./common/colors";
+import { DEFAULT_NUMBER_FORMAT } from "./common/formats";
 
 function transX(x) {
   return "translate(" + x + ",0)";
@@ -13,13 +13,6 @@ function transX(x) {
 
 function transY(y) {
   return "translate(0," + y + ")";
-}
-
-export function PlotColors(till) {
-  return d3
-    .scaleLinear()
-    .domain([0, (1 / 3) * till, (2 / 3) * till, till])
-    .range(["yellow", "orange", "red", "purple"]);
 }
 
 export const DATE_ACCESS = function (d) {
@@ -30,7 +23,7 @@ export const PLOT_SORT = {
   /**
    * Sorts datasets alphabetically.
    */
-  alphabetically: (left, right) => left.label > right.label,
+  alphabetically: (left, right) => left.label < right.label,
 
   /**
    * Sorts datasets by duration.
@@ -69,7 +62,7 @@ export function plot() {
   let dv;
   let calc = {};
   let state = {
-    ltvId: uniqueId("bar"),
+    id: uniqueId("plot"),
 
     // width of the svg
     width: 1000,
@@ -90,16 +83,34 @@ export function plot() {
     style: "gradient",
 
     // the plot's color mode, "single" or "multi"
-    colorMode: "single",
+    colorMode: "multi",
 
     // Whether the chart is selectable.
     selectable: true,
+
+    // the border style of the data preview
+    border: LOTIVIS_CONFIG.defaultBorder,
 
     // transformes a given date into a numeric value.
     dateAccess: DATE_ACCESS,
 
     // format for displayed numbers
     numberFormat: DEFAULT_NUMBER_FORMAT,
+
+    // sort, "alphabetically"
+    sort: null,
+
+    // displayed dates
+    dates: null,
+
+    // whether to draw the bottom axis
+    drawBottomAxis: false,
+
+    // whether to draw labels on chart
+    labels: true,
+
+    // whether to show the tooltip
+    tooltip: true,
 
     // the data controller.
     dataController: null,
@@ -108,44 +119,10 @@ export function plot() {
     dataView: null,
   };
 
-  // Create new underlying chart with the specified state.
-  let chart = ltv_chart(state);
+  // create new underlying chart with the specified state
+  let chart = baseChart(state);
 
-  /**
-   *
-   * @param {*} dv
-   * @private
-   */
-  function sortDatasets(dv) {
-    let datasets = dv.datasets;
-    let sortedDatasets = [];
-    switch (state.sort) {
-      case PLOT_CHART_SORT.alphabetically:
-        sortedDatasets = datasets.sort((set1, set2) => set1.label > set2.label);
-        break;
-      case PLOT_CHART_SORT.duration:
-        sortedDatasets = datasets.sort(
-          (set1, set2) => set1.duration < set2.duration
-        );
-        break;
-      case PLOT_CHART_SORT.intensity:
-        sortedDatasets = datasets.sort((set1, set2) => set1.sum < set2.sum);
-        break;
-      case PLOT_CHART_SORT.firstDate:
-        sortedDatasets = datasets.sort(
-          (set1, set2) => set1.firstDate > set2.firstDate
-        );
-        break;
-      default:
-        sortedDatasets = datasets;
-        break;
-    }
-
-    this.dv.labels = sortedDatasets
-      .map((dataset) => String(dataset.label))
-      .reverse();
-    this.dv.datasetsSorted = this.dv.labels;
-  }
+  // private
 
   /**
    * Creates the scales used by the plot chart.
@@ -155,9 +132,16 @@ export function plot() {
    * @private
    */
   function createScales(calc, dv) {
+    // preferre dates from state if specified. fallback to
+    // dates of data view
+    let dates = Array.isArray(state.dates) ? state.dates : dv.dates;
+
+    // Sort date according to access function
+    dates = dates.sort((a, b) => state.dateAccess(a) - state.dateAccess(b));
+
     calc.xChart = d3
       .scaleBand()
-      .domain(dv.dates)
+      .domain(dates)
       .rangeRound([state.marginLeft, calc.graphRight])
       .paddingInner(0.1);
 
@@ -181,11 +165,14 @@ export function plot() {
       .axisLeft(calc.yChart)
       .tickSize(-calc.graphWidth)
       .tickFormat("");
+
+    calc.yBandwidth = calc.yChart.bandwidth();
   }
 
   /**
+   * Renders the main svg of the chart.
    *
-   * @param {*} calc
+   * @param {calc} calc The calc object.
    * @private
    */
   function renderSVG(calc) {
@@ -197,8 +184,9 @@ export function plot() {
   }
 
   /**
+   * Renders the axis of the chart.
    *
-   * @param {*} calc
+   * @param {calc} calc The calc object.
    * @private
    */
   function renderAxis(calc) {
@@ -215,20 +203,21 @@ export function plot() {
       .attr("transform", transX(state.marginLeft));
 
     // bottom
-    calc.svg
-      .append("g")
-      .call(d3.axisBottom(calc.xChart))
-      .attr("transform", transY(calc.height - state.marginBottom));
+    if (state.drawBottomAxis) {
+      calc.svg
+        .append("g")
+        .call(d3.axisBottom(calc.xChart))
+        .attr("transform", transY(calc.height - state.marginBottom));
+    }
   }
 
   /**
    * Renders the grid of the plot chart.
    *
-   * @param {*} calc The calculations
-   * @param {*} dv The data view
+   * @param {calc} calc The calc object.
    * @private
    */
-  function renderGrid(calc, dv) {
+  function renderGrid(calc) {
     calc.svg
       .append("g")
       .classed("ltv-plot-grid ltv-plot-grid-x", true)
@@ -245,7 +234,7 @@ export function plot() {
   /**
    * Renders the selction bars of the plot chart.
    *
-   * @param {*} calc The calculations
+   * @param {calc} calc The calc object.
    * @param {*} dv The data view
    * @private
    */
@@ -274,7 +263,13 @@ export function plot() {
       });
   }
 
-  function renderBarsFraction(calc, dv, dc) {
+  /**
+   * Renders the bars of of the chart for style "fraction".
+   *
+   * @param {calc} calc The calc object.
+   * @param {*} dv The data view
+   */
+  function renderBarsFraction(calc, dv) {
     let colors = PlotColors(dv.max);
     let brush = dv.max / 2;
     let colorGenerator = state.dataController.colorGenerator();
@@ -289,7 +284,7 @@ export function plot() {
     calc.bars = calc.barsData
       .append("g")
       .attr("transform", (d) => transY(calc.yChartPadding(d[0])))
-      .attr("id", (d) => "ltv-plot-rect-" + hash_str(d[0]))
+      .attr("id", (d) => "ltv-plot-rect-" + hash(d[0]))
       .attr(`fill`, (d) => (isSingle ? colorGenerator.label(d[0]) : null))
       .selectAll(".rect")
       .data((d) => d[1]) // map to dates data
@@ -308,51 +303,54 @@ export function plot() {
       .attr("rx", state.radius)
       .attr("ry", state.radius);
 
-    // Labels
-    let yBandwidth = calc.yChart.bandwidth() / 2;
-
-    calc.labels = calc.barsData
-      .append("g")
-      .attr("transform", (d) => `translate(0,${calc.yChartPadding(d[0])})`)
-      .attr("id", (d) => "rect-" + hash_str(d[0]))
-      .selectAll(".text")
-      .data((d) => d[1]) // map to dates data
-      .enter()
-      .filter((d) => d[1] > 0)
-      .append("text")
-      .attr("class", "ltv-plot-label")
-      .attr("y", (d) => yBandwidth)
-      .attr("x", (d) => calc.xChart(d[0]) + 4)
-      .text((d) => (d.sum === 0 ? null : state.numberFormat(d[1])));
+    if (state.labels === true) {
+      calc.labels = calc.barsData
+        .append("g")
+        .attr("transform", (d) => `translate(0,${calc.yChartPadding(d[0])})`)
+        .attr("id", (d) => "rect-" + hash(d[0]))
+        .selectAll(".text")
+        .data((d) => d[1]) // map to dates data
+        .enter()
+        .filter((d) => d[1] > 0)
+        .append("text")
+        .attr("class", "ltv-plot-label")
+        .attr("y", (d) => calc.yBandwidth / 2)
+        .attr("x", (d) => calc.xChart(d[0]) + 4)
+        .text((d) => (d.sum === 0 ? null : state.numberFormat(d[1])));
+    }
   }
 
+  /**
+   *
+   * @param {calc} calc The calc object.
+   * @param {*} dv
+   * @param {*} dc
+   */
   function renderBarsGradient(calc, dv, dc) {
     let plotColors = PlotColors(dv.max);
-    let datasets = dv.datasets;
-
-    console.log("renderBarsGradient", dv);
-
     calc.definitions = calc.svg.append("defs");
 
-    for (let index = 0; index < datasets.length; index++) {
-      createGradient(datasets[index], dv, calc, plotColors, dc);
+    for (let index = 0; index < dv.datasets.length; index++) {
+      createGradient(dv.datasets[index], dv, calc, plotColors, dc);
     }
 
-    calc.barsData = calc.svg.append("g").selectAll("g").data(datasets).enter();
+    calc.barsData = calc.svg
+      .append("g")
+      .selectAll("g")
+      .data(dv.datasets)
+      .enter();
 
     calc.bars = calc.barsData
       .append("rect")
       .attr("transform", (d) => `translate(0,${calc.yChartPadding(d.label)})`)
-      .attr("fill", (d) => `url(#${state.id}-${hash_str(d.label)})`)
+      .attr("fill", (d) => `url(#${state.id}-${hash(d.label)})`)
       .attr("class", "ltv-plot-bar")
       .attr("rx", state.radius)
       .attr("ry", state.radius)
       .attr("x", (d) =>
         calc.xChart(d.duration < 0 ? d.lastDate : d.firstDate || 0)
       )
-      // .attr("y", (d) => chart.yChartPadding(d.label))
       .attr("height", calc.yChartPadding.bandwidth())
-      .attr("id", (d) => "ltv-plot-rect-" + hash_str(d.label))
       .attr("width", (d) => {
         if (!d.firstDate || !d.lastDate) return 0;
         return (
@@ -362,33 +360,41 @@ export function plot() {
         );
       });
 
-    let xBandwidth = calc.yChart.bandwidth();
-
-    calc.labels = calc.barsData
-      .append("text")
-      .attr("transform", `translate(0,${xBandwidth / 2 + 4})`)
-      .attr("class", "ltv-plot-label")
-      .attr("id", (d) => "rect-" + hash_str(d.label))
-      .attr("x", (d) => calc.xChart(d.firstDate) + xBandwidth / 2)
-      .attr("y", (d) => calc.yChart(d.label))
-      .attr("height", calc.yChartPadding.bandwidth())
-      .attr(
-        "width",
-        (d) => calc.xChart(d.lastDate) - calc.xChart(d.firstDate) + xBandwidth
-      )
-      .text(function (dataset) {
-        if (dataset.sum === 0) return;
-        return `${state.numberFormat(
-          dataset.sum
-        )} (${dataset.duration + 1} years)`;
-      });
+    if (state.labels === true) {
+      calc.labels = calc.barsData
+        .append("text")
+        .attr("transform", `translate(0,${calc.yBandwidth / 2 + 4})`)
+        .attr("class", "ltv-plot-label")
+        .attr("id", (d) => "rect-" + hash(d.label))
+        .attr("x", (d) => calc.xChart(d.firstDate) + calc.yBandwidth / 2)
+        .attr("y", (d) => calc.yChart(d.label))
+        .attr("height", calc.yChartPadding.bandwidth())
+        .attr(
+          "width",
+          (d) =>
+            calc.xChart(d.lastDate) - calc.xChart(d.firstDate) + calc.yBandwidth
+        )
+        .text(function (dataset) {
+          if (dataset.sum === 0) return;
+          return `${state.numberFormat(
+            dataset.sum
+          )} (${dataset.duration + 1} years)`;
+        });
+    }
   }
 
+  /**
+   *
+   * @param {*} ds
+   * @param {*} dv
+   * @param {*} calc
+   * @param {*} plotColors
+   * @returns
+   */
   function createGradient(ds, dv, calc, plotColors) {
-    let max = dv.max;
     let gradient = calc.definitions
       .append("linearGradient")
-      .attr("id", state.id + "-" + hash_str(ds.label))
+      .attr("id", state.id + "-" + hash(ds.label))
       .attr("x1", "0%")
       .attr("x2", "100%")
       .attr("y1", "0%")
@@ -396,25 +402,20 @@ export function plot() {
 
     if (!ds.data || ds.data.length === 0) return;
 
-    console.log("state", state);
-
     let count = ds.data.length;
     let latestDate = ds.lastDate;
 
-    let brush = max / 2;
     let dataController = chart.dataController();
     let colorGenerator = dataController.colorGenerator();
     let isSingle = state.colorMode === "single";
+    let colors = isSingle ? colorGenerator.label : plotColors;
 
     function append(value, percent) {
       gradient
         .append("stop")
         .attr("offset", percent + "%")
-        .attr(
-          "stop-color",
-          isSingle ? colorGenerator.label(ds.label) : plotColors(value)
-        )
-        .attr("stop-opacity", isSingle ? (value + brush) / (max + brush) : 1);
+        .attr("stop-color", colors(isSingle ? ds.label : value))
+        .attr("stop-opacity", isSingle ? value / dv.max : 1);
     }
 
     if (ds.duration === 0) {
@@ -429,8 +430,13 @@ export function plot() {
     }
   }
 
+  /**
+   *
+   * @param {*} calc
+   * @param {*} ds
+   */
   function showTooltip(calc, ds) {
-    // if (!state.showTooltip) return;
+    if (!state.tooltip) return;
     calc.tooltip.html(tooltipHTML(ds));
 
     // position tooltip
@@ -491,7 +497,6 @@ export function plot() {
    */
   chart.dataView = function (dc) {
     var dv = {};
-    dv.labels = dc.labels();
     dv.dates = dc.dates().sort();
     dv.data = dc.snapshotOrData();
     dv.byLabelDate = d3.rollups(
@@ -518,9 +523,28 @@ export function plot() {
       return { label, data, sum, firstDate, lastDate, duration };
     });
 
+    switch (state.sort) {
+      case "alphabetically":
+        dv.datasets = dv.datasets.sort(PLOT_SORT.alphabetically);
+        break;
+      case "duration":
+        dv.datasets = dv.datasets.sort(PLOT_SORT.duration);
+        break;
+      case "intensity":
+        dv.datasets = dv.datasets.sort(PLOT_SORT.intensity);
+        break;
+      case "firstDate":
+        dv.datasets = dv.datasets.sort(PLOT_SORT.firstDate);
+        break;
+      default:
+        dv.datasets = dv.datasets.reverse();
+        break;
+    }
+
+    dv.labels = dv.datasets.map((d) => d.label);
     dv.firstDate = dv.dates[0];
     dv.lastDate = dv.dates[dv.dates.length - 1];
-    dv.max = d3.max(datasets, (d) => d3.max(d.data, (i) => i.value));
+    dv.max = d3.max(dv.datasets, (d) => d3.max(d.data, (i) => i.value));
 
     return dv;
   };
@@ -529,17 +553,14 @@ export function plot() {
    * Renders all components of the plot chart.
    *
    * @param {*} container The d3 container
-   * @param {*} state The state object of the chart
    * @param {*} calc The calc objct of the chart
    * @param {*} dv The data view
    * @returns The chart itself
    *
    * @public
    */
-  chart.render = function (container, state, calc, dv) {
+  chart.render = function (container, calc, dv) {
     // calculations
-    // Sort date accoding to access function
-    // calc.dates = dates.sort((a, b) => dateAccess(a) - dateAccess(b));
     calc.container = container;
     calc.graphWidth = state.width - state.marginLeft - state.marginRight;
     calc.graphHeight = dv.labels.length * state.barHeight;
@@ -569,6 +590,6 @@ export function plot() {
     return chart;
   };
 
-  // Return generated chart
+  // return generated chart
   return chart;
 }

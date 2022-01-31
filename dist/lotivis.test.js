@@ -2,55 +2,51 @@
 
 Object.defineProperty(exports, '__esModule', { value: true });
 
-var version = "6.6.0";
-
 function ascending$3(a, b) {
-  return a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
+  return a == null || b == null ? NaN : a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
 }
 
 function bisector(f) {
   let delta = f;
-  let compare = f;
+  let compare1 = f;
+  let compare2 = f;
 
-  if (f.length === 1) {
+  if (f.length !== 2) {
     delta = (d, x) => f(d) - x;
-    compare = ascendingComparator(f);
+    compare1 = ascending$3;
+    compare2 = (d, x) => ascending$3(f(d), x);
   }
 
-  function left(a, x, lo, hi) {
-    if (lo == null) lo = 0;
-    if (hi == null) hi = a.length;
-    while (lo < hi) {
-      const mid = (lo + hi) >>> 1;
-      if (compare(a[mid], x) < 0) lo = mid + 1;
-      else hi = mid;
+  function left(a, x, lo = 0, hi = a.length) {
+    if (lo < hi) {
+      if (compare1(x, x) !== 0) return hi;
+      do {
+        const mid = (lo + hi) >>> 1;
+        if (compare2(a[mid], x) < 0) lo = mid + 1;
+        else hi = mid;
+      } while (lo < hi);
     }
     return lo;
   }
 
-  function right(a, x, lo, hi) {
-    if (lo == null) lo = 0;
-    if (hi == null) hi = a.length;
-    while (lo < hi) {
-      const mid = (lo + hi) >>> 1;
-      if (compare(a[mid], x) > 0) hi = mid;
-      else lo = mid + 1;
+  function right(a, x, lo = 0, hi = a.length) {
+    if (lo < hi) {
+      if (compare1(x, x) !== 0) return hi;
+      do {
+        const mid = (lo + hi) >>> 1;
+        if (compare2(a[mid], x) <= 0) lo = mid + 1;
+        else hi = mid;
+      } while (lo < hi);
     }
     return lo;
   }
 
-  function center(a, x, lo, hi) {
-    if (lo == null) lo = 0;
-    if (hi == null) hi = a.length;
+  function center(a, x, lo = 0, hi = a.length) {
     const i = left(a, x, lo, hi - 1);
     return i > lo && delta(a[i - 1], x) > -delta(a[i], x) ? i - 1 : i;
   }
 
   return {left, center, right};
-}
-
-function ascendingComparator(f) {
-  return (d, x) => ascending$3(f(d), x);
 }
 
 function number$3(x) {
@@ -78,6 +74,7 @@ const ascendingBisect = bisector(ascending$3);
 const bisectRight = ascendingBisect.right;
 const bisectLeft = ascendingBisect.left;
 const bisectCenter = bisector(number$3).center;
+var bisect = bisectRight;
 
 function count$1(values, valueof) {
   let count = 0;
@@ -140,7 +137,11 @@ function cumsum(values, valueof) {
 }
 
 function descending$2(a, b) {
-  return b < a ? -1 : b > a ? 1 : b >= a ? 0 : NaN;
+  return a == null || b == null ? NaN
+    : b < a ? -1
+    : b > a ? 1
+    : b >= a ? 0
+    : NaN;
 }
 
 function variance(values, valueof) {
@@ -326,7 +327,7 @@ function intern_set({_intern, _key}, value) {
 function intern_delete({_intern, _key}, value) {
   const key = _key(value);
   if (_intern.has(key)) {
-    value = _intern.get(value);
+    value = _intern.get(key);
     _intern.delete(key);
   }
   return value;
@@ -348,6 +349,21 @@ function groups(values, ...keys) {
   return nest(values, Array.from, identity$a, keys);
 }
 
+function flatten$1(groups, keys) {
+  for (let i = 1, n = keys.length; i < n; ++i) {
+    groups = groups.flatMap(g => g.pop().map(([key, value]) => [...g, key, value]));
+  }
+  return groups;
+}
+
+function flatGroup(values, ...keys) {
+  return flatten$1(groups(values, ...keys), keys);
+}
+
+function flatRollup(values, reduce, ...keys) {
+  return flatten$1(rollups(values, reduce, ...keys), keys);
+}
+
 function rollup(values, reduce, ...keys) {
   return nest(values, identity$a, reduce, keys);
 }
@@ -356,7 +372,7 @@ function rollups(values, reduce, ...keys) {
   return nest(values, Array.from, reduce, keys);
 }
 
-function index$4(values, ...keys) {
+function index$5(values, ...keys) {
   return nest(values, identity$a, unique, keys);
 }
 
@@ -395,28 +411,42 @@ function permute(source, keys) {
 function sort(values, ...F) {
   if (typeof values[Symbol.iterator] !== "function") throw new TypeError("values is not iterable");
   values = Array.from(values);
-  let [f = ascending$3] = F;
-  if (f.length === 1 || F.length > 1) {
+  let [f] = F;
+  if ((f && f.length !== 2) || F.length > 1) {
     const index = Uint32Array.from(values, (d, i) => i);
     if (F.length > 1) {
       F = F.map(f => values.map(f));
       index.sort((i, j) => {
         for (const f of F) {
-          const c = ascending$3(f[i], f[j]);
+          const c = ascendingDefined(f[i], f[j]);
           if (c) return c;
         }
       });
     } else {
       f = values.map(f);
-      index.sort((i, j) => ascending$3(f[i], f[j]));
+      index.sort((i, j) => ascendingDefined(f[i], f[j]));
     }
     return permute(values, index);
   }
-  return values.sort(f);
+  return values.sort(compareDefined(f));
+}
+
+function compareDefined(compare = ascending$3) {
+  if (compare === ascending$3) return ascendingDefined;
+  if (typeof compare !== "function") throw new TypeError("compare is not a function");
+  return (a, b) => {
+    const x = compare(a, b);
+    if (x || x === 0) return x;
+    return (compare(b, b) === 0) - (compare(a, a) === 0);
+  };
+}
+
+function ascendingDefined(a, b) {
+  return (a == null || !(a >= a)) - (b == null || !(b >= b)) || (a < b ? -1 : a > b ? 1 : 0);
 }
 
 function groupSort(values, reduce, key) {
-  return (reduce.length === 1
+  return (reduce.length !== 2
     ? sort(rollup(values, reduce, key), (([ak, av], [bk, bv]) => ascending$3(av, bv) || ascending$3(ak, bk)))
     : sort(group(values, key), (([ak, av], [bk, bv]) => reduce(av, bv) || ascending$3(ak, bk))))
     .map(([key]) => key);
@@ -424,12 +454,10 @@ function groupSort(values, reduce, key) {
 
 var array$5 = Array.prototype;
 
-var slice$4 = array$5.slice;
+var slice$3 = array$5.slice;
 
 function constant$b(x) {
-  return function() {
-    return x;
-  };
+  return () => x;
 }
 
 var e10 = Math.sqrt(50),
@@ -449,16 +477,18 @@ function ticks(start, stop, count) {
   if ((step = tickIncrement(start, stop, count)) === 0 || !isFinite(step)) return [];
 
   if (step > 0) {
-    start = Math.ceil(start / step);
-    stop = Math.floor(stop / step);
-    ticks = new Array(n = Math.ceil(stop - start + 1));
-    while (++i < n) ticks[i] = (start + i) * step;
+    let r0 = Math.round(start / step), r1 = Math.round(stop / step);
+    if (r0 * step < start) ++r0;
+    if (r1 * step > stop) --r1;
+    ticks = new Array(n = r1 - r0 + 1);
+    while (++i < n) ticks[i] = (r0 + i) * step;
   } else {
     step = -step;
-    start = Math.ceil(start * step);
-    stop = Math.floor(stop * step);
-    ticks = new Array(n = Math.ceil(stop - start + 1));
-    while (++i < n) ticks[i] = (start + i) / step;
+    let r0 = Math.round(start * step), r1 = Math.round(stop * step);
+    if (r0 / step < start) ++r0;
+    if (r1 / step > stop) --r1;
+    ticks = new Array(n = r1 - r0 + 1);
+    while (++i < n) ticks[i] = (r0 + i) / step;
   }
 
   if (reverse) ticks.reverse();
@@ -576,8 +606,8 @@ function bin() {
     // Assign data to bins by value, ignoring any outside the domain.
     for (i = 0; i < n; ++i) {
       x = values[i];
-      if (x0 <= x && x <= x1) {
-        bins[bisectRight(tz, x, 0, m)].push(data[i]);
+      if (x != null && x0 <= x && x <= x1) {
+        bins[bisect(tz, x, 0, m)].push(data[i]);
       }
     }
 
@@ -593,7 +623,7 @@ function bin() {
   };
 
   histogram.thresholds = function(_) {
-    return arguments.length ? (threshold = typeof _ === "function" ? _ : Array.isArray(_) ? constant$b(slice$4.call(_)) : constant$b(_), histogram) : threshold;
+    return arguments.length ? (threshold = typeof _ === "function" ? _ : Array.isArray(_) ? constant$b(slice$3.call(_)) : constant$b(_), histogram) : threshold;
   };
 
   return histogram;
@@ -643,7 +673,9 @@ function min$2(values, valueof) {
 
 // Based on https://github.com/mourner/quickselect
 // ISC license, Copyright 2018 Vladimir Agafonkin.
-function quickselect(array, k, left = 0, right = array.length - 1, compare = ascending$3) {
+function quickselect(array, k, left = 0, right = array.length - 1, compare) {
+  compare = compare === undefined ? ascendingDefined : compareDefined(compare);
+
   while (right > left) {
     if (right - left > 600) {
       const n = right - left + 1;
@@ -709,11 +741,11 @@ function quantileSorted(values, p, valueof = number$3) {
   return value0 + (value1 - value0) * (i - i0);
 }
 
-function freedmanDiaconis(values, min, max) {
+function thresholdFreedmanDiaconis(values, min, max) {
   return Math.ceil((max - min) / (2 * (quantile$1(values, 0.75) - quantile$1(values, 0.25)) * Math.pow(count$1(values), -1 / 3)));
 }
 
-function scott(values, min, max) {
+function thresholdScott(values, min, max) {
   return Math.ceil((max - min) / (3.5 * deviation(values) * Math.pow(count$1(values), -1 / 3)));
 }
 
@@ -797,6 +829,33 @@ function minIndex(values, valueof) {
   return minIndex;
 }
 
+function mode(values, valueof) {
+  const counts = new InternMap();
+  if (valueof === undefined) {
+    for (let value of values) {
+      if (value != null && value >= value) {
+        counts.set(value, (counts.get(value) || 0) + 1);
+      }
+    }
+  } else {
+    let index = -1;
+    for (let value of values) {
+      if ((value = valueof(value, ++index, values)) != null && value >= value) {
+        counts.set(value, (counts.get(value) || 0) + 1);
+      }
+    }
+  }
+  let modeValue;
+  let modeCount = 0;
+  for (const [value, count] of counts) {
+    if (count > modeCount) {
+      modeCount = count;
+      modeValue = value;
+    }
+  }
+  return modeValue;
+}
+
 function pairs(values, pairof = pair) {
   const pairs = [];
   let previous;
@@ -813,7 +872,7 @@ function pair(a, b) {
   return [a, b];
 }
 
-function sequence(start, stop, step) {
+function range$2(start, stop, step) {
   start = +start, stop = +stop, step = (n = arguments.length) < 2 ? (stop = start, start = 0, 1) : n < 3 ? 1 : +step;
 
   var i = -1,
@@ -825,6 +884,28 @@ function sequence(start, stop, step) {
   }
 
   return range;
+}
+
+function rank(values, valueof = ascending$3) {
+  if (typeof values[Symbol.iterator] !== "function") throw new TypeError("values is not iterable");
+  let V = Array.from(values);
+  const R = new Float64Array(V.length);
+  if (valueof.length !== 2) V = V.map(valueof), valueof = ascending$3;
+  const compareIndex = (i, j) => valueof(V[i], V[j]);
+  let k, r;
+  Uint32Array
+    .from(V, (_, i) => i)
+    .sort(valueof === ascending$3 ? (i, j) => ascendingDefined(V[i], V[j]) : compareDefined(compareIndex))
+    .forEach((j, i) => {
+      const c = compareIndex(j, k === undefined ? j : k);
+      if (c >= 0) {
+        if (k === undefined || c > 0) k = j, r = i;
+        R[j] = r;
+      } else {
+        R[j] = NaN;
+      }
+    });
+  return R;
 }
 
 function least(values, compare = ascending$3) {
@@ -936,7 +1017,7 @@ function shuffler(random) {
   };
 }
 
-function sum$1(values, valueof) {
+function sum$2(values, valueof) {
   let sum = 0;
   if (valueof === undefined) {
     for (let value of values) {
@@ -1007,7 +1088,7 @@ function filter$1(values, test) {
   return array;
 }
 
-function map$1(values, mapper) {
+function map$2(values, mapper) {
   if (typeof values[Symbol.iterator] !== "function") throw new TypeError("values is not iterable");
   if (typeof mapper !== "function") throw new TypeError("mapper is not a function");
   return Array.from(values, (value, index) => mapper(value, index, values));
@@ -1034,7 +1115,7 @@ function reverse$3(values) {
 }
 
 function difference(values, ...others) {
-  values = new Set(values);
+  values = new InternSet(values);
   for (const other of others) {
     for (const value of other) {
       values.delete(value);
@@ -1044,7 +1125,7 @@ function difference(values, ...others) {
 }
 
 function disjoint(values, other) {
-  const iterator = other[Symbol.iterator](), set = new Set();
+  const iterator = other[Symbol.iterator](), set = new InternSet();
   for (const v of values) {
     if (set.has(v)) return false;
     let value, done;
@@ -1057,12 +1138,8 @@ function disjoint(values, other) {
   return true;
 }
 
-function set$2(values) {
-  return values instanceof Set ? values : new Set(values);
-}
-
 function intersection(values, ...others) {
-  values = new Set(values);
+  values = new InternSet(values);
   others = others.map(set$2);
   out: for (const value of values) {
     for (const other of others) {
@@ -1075,18 +1152,28 @@ function intersection(values, ...others) {
   return values;
 }
 
+function set$2(values) {
+  return values instanceof InternSet ? values : new InternSet(values);
+}
+
 function superset(values, other) {
   const iterator = values[Symbol.iterator](), set = new Set();
   for (const o of other) {
-    if (set.has(o)) continue;
+    const io = intern(o);
+    if (set.has(io)) continue;
     let value, done;
     while (({value, done} = iterator.next())) {
       if (done) return false;
-      set.add(value);
-      if (Object.is(o, value)) break;
+      const ivalue = intern(value);
+      set.add(ivalue);
+      if (Object.is(io, ivalue)) break;
     }
   }
   return true;
+}
+
+function intern(value) {
+  return value !== null && typeof value === "object" ? value.valueOf() : value;
 }
 
 function subset(values, other) {
@@ -1094,7 +1181,7 @@ function subset(values, other) {
 }
 
 function union(...others) {
-  const set = new Set();
+  const set = new InternSet();
   for (const other of others) {
     for (const o of other) {
       set.add(o);
@@ -1102,8 +1189,6 @@ function union(...others) {
   }
   return set;
 }
-
-var slice$3 = Array.prototype.slice;
 
 function identity$9(x) {
   return x;
@@ -1113,7 +1198,7 @@ var top = 1,
     right = 2,
     bottom = 3,
     left = 4,
-    epsilon$5 = 1e-6;
+    epsilon$6 = 1e-6;
 
 function translateX(x) {
   return "translate(" + x + ",0)";
@@ -1187,11 +1272,11 @@ function axis(orient, scale) {
       text = text.transition(context);
 
       tickExit = tickExit.transition(context)
-          .attr("opacity", epsilon$5)
+          .attr("opacity", epsilon$6)
           .attr("transform", function(d) { return isFinite(d = position(d)) ? transform(d + offset) : this.getAttribute("transform"); });
 
       tickEnter
-          .attr("opacity", epsilon$5)
+          .attr("opacity", epsilon$6)
           .attr("transform", function(d) { var p = this.parentNode.__axis; return transform((p && isFinite(p = p(d)) ? p : position(d)) + offset); });
     }
 
@@ -1228,15 +1313,15 @@ function axis(orient, scale) {
   };
 
   axis.ticks = function() {
-    return tickArguments = slice$3.call(arguments), axis;
+    return tickArguments = Array.from(arguments), axis;
   };
 
   axis.tickArguments = function(_) {
-    return arguments.length ? (tickArguments = _ == null ? [] : slice$3.call(_), axis) : tickArguments.slice();
+    return arguments.length ? (tickArguments = _ == null ? [] : Array.from(_), axis) : tickArguments.slice();
   };
 
   axis.tickValues = function(_) {
-    return arguments.length ? (tickValues = _ == null ? null : slice$3.call(_), axis) : tickValues && tickValues.slice();
+    return arguments.length ? (tickValues = _ == null ? null : Array.from(_), axis) : tickValues && tickValues.slice();
   };
 
   axis.tickFormat = function(_) {
@@ -1427,10 +1512,14 @@ function selection_select(select) {
   return new Selection$1(subgroups, this._parents);
 }
 
+// Given something array like (or null), returns something that is strictly an
+// array. This is used to ensure that array-like objects passed to d3.selectAll
+// or selection.selectAll are converted into proper arrays when creating a
+// selection; we don’t ever want to create a selection backed by a live
+// HTMLCollection or NodeList. However, note that selection.selectAll will use a
+// static NodeList as a group, since it safely derived from querySelectorAll.
 function array$4(x) {
-  return typeof x === "object" && "length" in x
-    ? x // Array, TypedArray, NodeList, array-like
-    : Array.from(x); // Map, Set, iterable, string, or anything else
+  return x == null ? [] : Array.isArray(x) ? x : Array.from(x);
 }
 
 function empty$1() {
@@ -1445,8 +1534,7 @@ function selectorAll(selector) {
 
 function arrayAll(select) {
   return function() {
-    var group = select.apply(this, arguments);
-    return group == null ? [] : array$4(group);
+    return array$4(select.apply(this, arguments));
   };
 }
 
@@ -1498,7 +1586,7 @@ function selection_selectChild(match) {
 var filter = Array.prototype.filter;
 
 function children() {
-  return this.children;
+  return Array.from(this.children);
 }
 
 function childrenFilter(match) {
@@ -1643,7 +1731,7 @@ function selection_data(value, key) {
     var parent = parents[j],
         group = groups[j],
         groupLength = group.length,
-        data = array$4(value.call(parent, parent && parent.__data__, j, parents)),
+        data = arraylike(value.call(parent, parent && parent.__data__, j, parents)),
         dataLength = data.length,
         enterGroup = enter[j] = new Array(dataLength),
         updateGroup = update[j] = new Array(dataLength),
@@ -1669,20 +1757,40 @@ function selection_data(value, key) {
   return update;
 }
 
+// Given some data, this returns an array-like view of it: an object that
+// exposes a length property and allows numeric indexing. Note that unlike
+// selectAll, this isn’t worried about “live” collections because the resulting
+// array will only be used briefly while data is being bound. (It is possible to
+// cause the data to change while iterating by using a key function, but please
+// don’t; we’d rather avoid a gratuitous copy.)
+function arraylike(data) {
+  return typeof data === "object" && "length" in data
+    ? data // Array, TypedArray, NodeList, array-like
+    : Array.from(data); // Map, Set, iterable, string, or anything else
+}
+
 function selection_exit() {
   return new Selection$1(this._exit || this._groups.map(sparse), this._parents);
 }
 
 function selection_join(onenter, onupdate, onexit) {
   var enter = this.enter(), update = this, exit = this.exit();
-  enter = typeof onenter === "function" ? onenter(enter) : enter.append(onenter + "");
-  if (onupdate != null) update = onupdate(update);
+  if (typeof onenter === "function") {
+    enter = onenter(enter);
+    if (enter) enter = enter.selection();
+  } else {
+    enter = enter.append(onenter + "");
+  }
+  if (onupdate != null) {
+    update = onupdate(update);
+    if (update) update = update.selection();
+  }
   if (onexit == null) exit.remove(); else onexit(exit);
   return enter && update ? enter.merge(update).order() : update;
 }
 
-function selection_merge(selection) {
-  if (!(selection instanceof Selection$1)) throw new Error("invalid merge");
+function selection_merge(context) {
+  var selection = context.selection ? context.selection() : context;
 
   for (var groups0 = this._groups, groups1 = selection._groups, m0 = groups0.length, m1 = groups1.length, m = Math.min(m0, m1), merges = new Array(m0), j = 0; j < m; ++j) {
     for (var group0 = groups0[j], group1 = groups1[j], n = group0.length, merge = merges[j] = new Array(n), node, i = 0; i < n; ++i) {
@@ -2335,8 +2443,13 @@ function pointers(events, node) {
 function selectAll(selector) {
   return typeof selector === "string"
       ? new Selection$1([document.querySelectorAll(selector)], [document.documentElement])
-      : new Selection$1([selector == null ? [] : array$4(selector)], root$1);
+      : new Selection$1([array$4(selector)], root$1);
 }
+
+// These are typically used in conjunction with noevent to ensure that we can
+// preventDefault on the event.
+const nonpassive = {passive: false};
+const nonpassivecapture = {capture: true, passive: false};
 
 function nopropagation$2(event) {
   event.stopImmediatePropagation();
@@ -2349,9 +2462,9 @@ function noevent$2(event) {
 
 function dragDisable(view) {
   var root = view.document.documentElement,
-      selection = select(view).on("dragstart.drag", noevent$2, true);
+      selection = select(view).on("dragstart.drag", noevent$2, nonpassivecapture);
   if ("onselectstart" in root) {
-    selection.on("selectstart.drag", noevent$2, true);
+    selection.on("selectstart.drag", noevent$2, nonpassivecapture);
   } else {
     root.__noselect = root.style.MozUserSelect;
     root.style.MozUserSelect = "none";
@@ -2362,7 +2475,7 @@ function yesdrag(view, noclick) {
   var root = view.document.documentElement,
       selection = select(view).on("dragstart.drag", null);
   if (noclick) {
-    selection.on("click.drag", noevent$2, true);
+    selection.on("click.drag", noevent$2, nonpassivecapture);
     setTimeout(function() { selection.on("click.drag", null); }, 0);
   }
   if ("onselectstart" in root) {
@@ -2440,7 +2553,7 @@ function drag() {
         .on("mousedown.drag", mousedowned)
       .filter(touchable)
         .on("touchstart.drag", touchstarted)
-        .on("touchmove.drag", touchmoved)
+        .on("touchmove.drag", touchmoved, nonpassive)
         .on("touchend.drag touchcancel.drag", touchended)
         .style("touch-action", "none")
         .style("-webkit-tap-highlight-color", "rgba(0,0,0,0)");
@@ -2450,7 +2563,9 @@ function drag() {
     if (touchending || !filter.call(this, event, d)) return;
     var gesture = beforestart(this, container.call(this, event, d), event, d, "mouse");
     if (!gesture) return;
-    select(event.view).on("mousemove.drag", mousemoved, true).on("mouseup.drag", mouseupped, true);
+    select(event.view)
+      .on("mousemove.drag", mousemoved, nonpassivecapture)
+      .on("mouseup.drag", mouseupped, nonpassivecapture);
     dragDisable(event.view);
     nopropagation$2(event);
     mousemoving = false;
@@ -2539,7 +2654,7 @@ function drag() {
       var p0 = p, n;
       switch (type) {
         case "start": gestures[identifier] = gesture, n = active++; break;
-        case "end": delete gestures[identifier], --active; // nobreak
+        case "end": delete gestures[identifier], --active; // falls through
         case "drag": p = pointer(touch || event, container), n = active; break;
       }
       dispatch.call(
@@ -2603,8 +2718,8 @@ function extend(parent, definition) {
 
 function Color() {}
 
-var darker = 0.7;
-var brighter = 1 / darker;
+var darker$1 = 0.7;
+var brighter = 1 / darker$1;
 
 var reI = "\\s*([+-]?\\d+)\\s*",
     reN = "\\s*([+-]?\\d*\\.?\\d+(?:[eE][+-]?\\d+)?)\\s*",
@@ -2846,7 +2961,7 @@ define(Rgb, rgb, extend(Color, {
     return new Rgb(this.r * k, this.g * k, this.b * k, this.opacity);
   },
   darker: function(k) {
-    k = k == null ? darker : Math.pow(darker, k);
+    k = k == null ? darker$1 : Math.pow(darker$1, k);
     return new Rgb(this.r * k, this.g * k, this.b * k, this.opacity);
   },
   rgb: function() {
@@ -2932,7 +3047,7 @@ define(Hsl, hsl$2, extend(Color, {
     return new Hsl(this.h, this.s, this.l * k, this.opacity);
   },
   darker: function(k) {
-    k = k == null ? darker : Math.pow(darker, k);
+    k = k == null ? darker$1 : Math.pow(darker$1, k);
     return new Hsl(this.h, this.s, this.l * k, this.opacity);
   },
   rgb: function() {
@@ -3095,13 +3210,13 @@ define(Hcl, hcl$2, extend(Color, {
 }));
 
 var A = -0.14861,
-    B = +1.78277,
+    B$1 = +1.78277,
     C = -0.29227,
-    D = -0.90649,
+    D$1 = -0.90649,
     E = +1.97294,
-    ED = E * D,
-    EB = E * B,
-    BC_DA = B * C - D * A;
+    ED = E * D$1,
+    EB = E * B$1,
+    BC_DA = B$1 * C - D$1 * A;
 
 function cubehelixConvert(o) {
   if (o instanceof Cubehelix) return new Cubehelix(o.h, o.s, o.l, o.opacity);
@@ -3111,7 +3226,7 @@ function cubehelixConvert(o) {
       b = o.b / 255,
       l = (BC_DA * b + ED * r - EB * g) / (BC_DA + ED - EB),
       bl = b - l,
-      k = (E * (g - l) - C * bl) / D,
+      k = (E * (g - l) - C * bl) / D$1,
       s = Math.sqrt(k * k + bl * bl) / (E * l * (1 - l)), // NaN if l=0 or l=1
       h = s ? Math.atan2(k, bl) * degrees$2 - 120 : NaN;
   return new Cubehelix(h < 0 ? h + 360 : h, s, l, o.opacity);
@@ -3134,7 +3249,7 @@ define(Cubehelix, cubehelix$3, extend(Color, {
     return new Cubehelix(this.h, this.s, this.l * k, this.opacity);
   },
   darker: function(k) {
-    k = k == null ? darker : Math.pow(darker, k);
+    k = k == null ? darker$1 : Math.pow(darker$1, k);
     return new Cubehelix(this.h, this.s, this.l * k, this.opacity);
   },
   rgb: function() {
@@ -3144,8 +3259,8 @@ define(Cubehelix, cubehelix$3, extend(Color, {
         cosh = Math.cos(h),
         sinh = Math.sin(h);
     return new Rgb(
-      255 * (l + a * (A * cosh + B * sinh)),
-      255 * (l + a * (C * cosh + D * sinh)),
+      255 * (l + a * (A * cosh + B$1 * sinh)),
+      255 * (l + a * (C * cosh + D$1 * sinh)),
       255 * (l + a * (E * cosh)),
       this.opacity
     );
@@ -3764,7 +3879,7 @@ function timerFlush() {
   ++frame; // Pretend we’ve set an alarm, if we haven’t already.
   var t = taskHead, e;
   while (t) {
-    if ((e = clockNow - t._time) >= 0) t._call.call(null, e);
+    if ((e = clockNow - t._time) >= 0) t._call.call(undefined, e);
     t = t._next;
   }
   --frame;
@@ -4638,6 +4753,8 @@ Transition.prototype = transition.prototype = {
   constructor: Transition,
   select: transition_select,
   selectAll: transition_selectAll,
+  selectChild: selection_prototype.selectChild,
+  selectChildren: selection_prototype.selectChildren,
   filter: transition_filter,
   merge: transition_merge,
   selection: transition_selection,
@@ -5171,7 +5288,7 @@ function brush$1(dim) {
         .style("-webkit-tap-highlight-color", "rgba(0,0,0,0)");
   }
 
-  brush.move = function(group, selection) {
+  brush.move = function(group, selection, event) {
     if (group.tween) {
       group
           .on("start.brush", function(event) { emitter(this, arguments).beforestart().start(event); })
@@ -5204,13 +5321,13 @@ function brush$1(dim) {
             interrupt(that);
             state.selection = selection1 === null ? null : selection1;
             redraw.call(that);
-            emit.start().brush().end();
+            emit.start(event).brush(event).end(event);
           });
     }
   };
 
-  brush.clear = function(group) {
-    brush.move(group, null);
+  brush.clear = function(group, event) {
+    brush.move(group, null, event);
   };
 
   function redraw() {
@@ -5321,6 +5438,9 @@ function brush$1(dim) {
           return t;
         });
 
+    interrupt(that);
+    var emit = emitter(that, arguments, true).beforestart();
+
     if (type === "overlay") {
       if (selection) moving = true;
       const pts = [points[0], points[1] || points[0]];
@@ -5331,7 +5451,7 @@ function brush$1(dim) {
           e0 = dim === Y ? E : max$2(pts[0][0], pts[1][0]),
           s0 = dim === X ? S : max$2(pts[0][1], pts[1][1])
         ]];
-      if (points.length > 1) move();
+      if (points.length > 1) move(event);
     } else {
       w0 = selection[0][0];
       n0 = selection[0][1];
@@ -5349,9 +5469,6 @@ function brush$1(dim) {
 
     var overlay = group.selectAll(".overlay")
         .attr("cursor", cursors[type]);
-
-    interrupt(that);
-    var emit = emitter(that, arguments, true).beforestart();
 
     if (event.touches) {
       emit.moved = moved;
@@ -5478,7 +5595,7 @@ function brush$1(dim) {
             if (signX) e0 = e1 - dx * signX, w0 = w1 + dx * signX;
             if (signY) s0 = s1 - dy * signY, n0 = n1 + dy * signY;
             mode = MODE_CENTER;
-            move();
+            move(event);
           }
           break;
         }
@@ -5488,7 +5605,7 @@ function brush$1(dim) {
             if (signY < 0) s0 = s1 - dy; else if (signY > 0) n0 = n1 - dy;
             mode = MODE_SPACE;
             overlay.attr("cursor", cursors.selection);
-            move();
+            move(event);
           }
           break;
         }
@@ -5502,7 +5619,7 @@ function brush$1(dim) {
         case 16: { // SHIFT
           if (shifting) {
             lockX = lockY = shifting = false;
-            move();
+            move(event);
           }
           break;
         }
@@ -5511,7 +5628,7 @@ function brush$1(dim) {
             if (signX < 0) e0 = e1; else if (signX > 0) w0 = w1;
             if (signY < 0) s0 = s1; else if (signY > 0) n0 = n1;
             mode = MODE_HANDLE;
-            move();
+            move(event);
           }
           break;
         }
@@ -5527,7 +5644,7 @@ function brush$1(dim) {
               mode = MODE_HANDLE;
             }
             overlay.attr("cursor", cursors[type]);
-            move();
+            move(event);
           }
           break;
         }
@@ -5587,7 +5704,7 @@ var pi$3 = Math.PI;
 var halfPi$2 = pi$3 / 2;
 var tau$4 = pi$3 * 2;
 var max$1 = Math.max;
-var epsilon$4 = 1e-12;
+var epsilon$5 = 1e-12;
 
 function range$1(i, j) {
   return Array.from({length: j - i}, (_, k) => i + k);
@@ -5712,8 +5829,8 @@ function chord$1(directed, transpose) {
 
 const pi$2 = Math.PI,
     tau$3 = 2 * pi$2,
-    epsilon$3 = 1e-6,
-    tauEpsilon = tau$3 - epsilon$3;
+    epsilon$4 = 1e-6,
+    tauEpsilon = tau$3 - epsilon$4;
 
 function Path$1() {
   this._x0 = this._y0 = // start of current subpath
@@ -5764,12 +5881,12 @@ Path$1.prototype = path.prototype = {
     }
 
     // Or, is (x1,y1) coincident with (x0,y0)? Do nothing.
-    else if (!(l01_2 > epsilon$3));
+    else if (!(l01_2 > epsilon$4));
 
     // Or, are (x0,y0), (x1,y1) and (x2,y2) collinear?
     // Equivalently, is (x1,y1) coincident with (x2,y2)?
     // Or, is the radius zero? Line to (x1,y1).
-    else if (!(Math.abs(y01 * x21 - y21 * x01) > epsilon$3) || !r) {
+    else if (!(Math.abs(y01 * x21 - y21 * x01) > epsilon$4) || !r) {
       this._ += "L" + (this._x1 = x1) + "," + (this._y1 = y1);
     }
 
@@ -5786,7 +5903,7 @@ Path$1.prototype = path.prototype = {
           t21 = l / l21;
 
       // If the start tangent is not coincident with (x0,y0), line to.
-      if (Math.abs(t01 - 1) > epsilon$3) {
+      if (Math.abs(t01 - 1) > epsilon$4) {
         this._ += "L" + (x1 + t01 * x01) + "," + (y1 + t01 * y01);
       }
 
@@ -5811,7 +5928,7 @@ Path$1.prototype = path.prototype = {
     }
 
     // Or, is (x0,y0) not coincident with the previous point? Line to (x0,y0).
-    else if (Math.abs(this._x1 - x0) > epsilon$3 || Math.abs(this._y1 - y0) > epsilon$3) {
+    else if (Math.abs(this._x1 - x0) > epsilon$4 || Math.abs(this._y1 - y0) > epsilon$4) {
       this._ += "L" + x0 + "," + y0;
     }
 
@@ -5827,7 +5944,7 @@ Path$1.prototype = path.prototype = {
     }
 
     // Is this arc non-empty? Draw an arc!
-    else if (da > epsilon$3) {
+    else if (da > epsilon$4) {
       this._ += "A" + r + "," + r + ",0," + (+(da >= pi$2)) + "," + cw + "," + (this._x1 = x + r * Math.cos(a1)) + "," + (this._y1 = y + r * Math.sin(a1));
     }
   },
@@ -5900,10 +6017,10 @@ function ribbon(headRadius) {
 
     if (!context) context = buffer = path();
 
-    if (ap > epsilon$4) {
-      if (abs$2(sa1 - sa0) > ap * 2 + epsilon$4) sa1 > sa0 ? (sa0 += ap, sa1 -= ap) : (sa0 -= ap, sa1 += ap);
+    if (ap > epsilon$5) {
+      if (abs$2(sa1 - sa0) > ap * 2 + epsilon$5) sa1 > sa0 ? (sa0 += ap, sa1 -= ap) : (sa0 -= ap, sa1 += ap);
       else sa0 = sa1 = (sa0 + sa1) / 2;
-      if (abs$2(ta1 - ta0) > ap * 2 + epsilon$4) ta1 > ta0 ? (ta0 += ap, ta1 -= ap) : (ta0 -= ap, ta1 += ap);
+      if (abs$2(ta1 - ta0) > ap * 2 + epsilon$5) ta1 > ta0 ? (ta0 += ap, ta1 -= ap) : (ta0 -= ap, ta1 += ap);
       else ta0 = ta1 = (ta0 + ta1) / 2;
     }
 
@@ -6053,16 +6170,13 @@ function contours() {
 
     // Convert number of thresholds into uniform thresholds.
     if (!Array.isArray(tz)) {
-      var domain = extent$1(values), start = domain[0], stop = domain[1];
-      tz = tickStep(start, stop, tz);
-      tz = sequence(Math.floor(start / tz) * tz, Math.floor(stop / tz) * tz, tz);
+      const e = extent$1(values), ts = tickStep(e[0], e[1], tz);
+      tz = ticks(Math.floor(e[0] / ts) * ts, Math.floor(e[1] / ts - 1) * ts, tz);
     } else {
       tz = tz.slice().sort(ascending$1);
     }
 
-    return tz.map(function(value) {
-      return contour(values, value);
-    });
+    return tz.map(value => contour(values, value));
   }
 
   // Accumulate, smooth contour rings, assign holes to exterior rings.
@@ -6290,14 +6404,22 @@ function density() {
 
   function density(data) {
     var values0 = new Float32Array(n * m),
-        values1 = new Float32Array(n * m);
+        values1 = new Float32Array(n * m),
+        pow2k = Math.pow(2, -k);
 
     data.forEach(function(d, i, data) {
-      var xi = (+x(d, i, data) + o) >> k,
-          yi = (+y(d, i, data) + o) >> k,
+      var xi = (x(d, i, data) + o) * pow2k,
+          yi = (y(d, i, data) + o) * pow2k,
           wi = +weight(d, i, data);
       if (xi >= 0 && xi < n && yi >= 0 && yi < m) {
-        values0[xi + yi * n] += wi;
+        var x0 = Math.floor(xi),
+            y0 = Math.floor(yi),
+            xt = xi - x0 - 0.5,
+            yt = yi - y0 - 0.5;
+        values0[x0 + y0 * n] += (1 - xt) * (1 - yt) * wi;
+        values0[x0 + 1 + y0 * n] += xt * (1 - yt) * wi;
+        values0[x0 + 1 + (y0 + 1) * n] += xt * yt * wi;
+        values0[x0 + (y0 + 1) * n] += (1 - xt) * yt * wi;
       }
     });
 
@@ -6315,7 +6437,7 @@ function density() {
     if (!Array.isArray(tz)) {
       var stop = max$3(values0);
       tz = tickStep(0, stop, tz);
-      tz = sequence(0, Math.floor(stop / tz) * tz, tz);
+      tz = range$2(0, Math.floor(stop / tz) * tz, tz);
       tz.shift();
     }
 
@@ -6389,6 +6511,274 @@ function density() {
   };
 
   return density;
+}
+
+const epsilon$3 = 1.1102230246251565e-16;
+const splitter = 134217729;
+const resulterrbound = (3 + 8 * epsilon$3) * epsilon$3;
+
+// fast_expansion_sum_zeroelim routine from oritinal code
+function sum$1(elen, e, flen, f, h) {
+    let Q, Qnew, hh, bvirt;
+    let enow = e[0];
+    let fnow = f[0];
+    let eindex = 0;
+    let findex = 0;
+    if ((fnow > enow) === (fnow > -enow)) {
+        Q = enow;
+        enow = e[++eindex];
+    } else {
+        Q = fnow;
+        fnow = f[++findex];
+    }
+    let hindex = 0;
+    if (eindex < elen && findex < flen) {
+        if ((fnow > enow) === (fnow > -enow)) {
+            Qnew = enow + Q;
+            hh = Q - (Qnew - enow);
+            enow = e[++eindex];
+        } else {
+            Qnew = fnow + Q;
+            hh = Q - (Qnew - fnow);
+            fnow = f[++findex];
+        }
+        Q = Qnew;
+        if (hh !== 0) {
+            h[hindex++] = hh;
+        }
+        while (eindex < elen && findex < flen) {
+            if ((fnow > enow) === (fnow > -enow)) {
+                Qnew = Q + enow;
+                bvirt = Qnew - Q;
+                hh = Q - (Qnew - bvirt) + (enow - bvirt);
+                enow = e[++eindex];
+            } else {
+                Qnew = Q + fnow;
+                bvirt = Qnew - Q;
+                hh = Q - (Qnew - bvirt) + (fnow - bvirt);
+                fnow = f[++findex];
+            }
+            Q = Qnew;
+            if (hh !== 0) {
+                h[hindex++] = hh;
+            }
+        }
+    }
+    while (eindex < elen) {
+        Qnew = Q + enow;
+        bvirt = Qnew - Q;
+        hh = Q - (Qnew - bvirt) + (enow - bvirt);
+        enow = e[++eindex];
+        Q = Qnew;
+        if (hh !== 0) {
+            h[hindex++] = hh;
+        }
+    }
+    while (findex < flen) {
+        Qnew = Q + fnow;
+        bvirt = Qnew - Q;
+        hh = Q - (Qnew - bvirt) + (fnow - bvirt);
+        fnow = f[++findex];
+        Q = Qnew;
+        if (hh !== 0) {
+            h[hindex++] = hh;
+        }
+    }
+    if (Q !== 0 || hindex === 0) {
+        h[hindex++] = Q;
+    }
+    return hindex;
+}
+
+function estimate(elen, e) {
+    let Q = e[0];
+    for (let i = 1; i < elen; i++) Q += e[i];
+    return Q;
+}
+
+function vec(n) {
+    return new Float64Array(n);
+}
+
+const ccwerrboundA = (3 + 16 * epsilon$3) * epsilon$3;
+const ccwerrboundB = (2 + 12 * epsilon$3) * epsilon$3;
+const ccwerrboundC = (9 + 64 * epsilon$3) * epsilon$3 * epsilon$3;
+
+const B = vec(4);
+const C1 = vec(8);
+const C2 = vec(12);
+const D = vec(16);
+const u = vec(4);
+
+function orient2dadapt(ax, ay, bx, by, cx, cy, detsum) {
+    let acxtail, acytail, bcxtail, bcytail;
+    let bvirt, c, ahi, alo, bhi, blo, _i, _j, _0, s1, s0, t1, t0, u3;
+
+    const acx = ax - cx;
+    const bcx = bx - cx;
+    const acy = ay - cy;
+    const bcy = by - cy;
+
+    s1 = acx * bcy;
+    c = splitter * acx;
+    ahi = c - (c - acx);
+    alo = acx - ahi;
+    c = splitter * bcy;
+    bhi = c - (c - bcy);
+    blo = bcy - bhi;
+    s0 = alo * blo - (s1 - ahi * bhi - alo * bhi - ahi * blo);
+    t1 = acy * bcx;
+    c = splitter * acy;
+    ahi = c - (c - acy);
+    alo = acy - ahi;
+    c = splitter * bcx;
+    bhi = c - (c - bcx);
+    blo = bcx - bhi;
+    t0 = alo * blo - (t1 - ahi * bhi - alo * bhi - ahi * blo);
+    _i = s0 - t0;
+    bvirt = s0 - _i;
+    B[0] = s0 - (_i + bvirt) + (bvirt - t0);
+    _j = s1 + _i;
+    bvirt = _j - s1;
+    _0 = s1 - (_j - bvirt) + (_i - bvirt);
+    _i = _0 - t1;
+    bvirt = _0 - _i;
+    B[1] = _0 - (_i + bvirt) + (bvirt - t1);
+    u3 = _j + _i;
+    bvirt = u3 - _j;
+    B[2] = _j - (u3 - bvirt) + (_i - bvirt);
+    B[3] = u3;
+
+    let det = estimate(4, B);
+    let errbound = ccwerrboundB * detsum;
+    if (det >= errbound || -det >= errbound) {
+        return det;
+    }
+
+    bvirt = ax - acx;
+    acxtail = ax - (acx + bvirt) + (bvirt - cx);
+    bvirt = bx - bcx;
+    bcxtail = bx - (bcx + bvirt) + (bvirt - cx);
+    bvirt = ay - acy;
+    acytail = ay - (acy + bvirt) + (bvirt - cy);
+    bvirt = by - bcy;
+    bcytail = by - (bcy + bvirt) + (bvirt - cy);
+
+    if (acxtail === 0 && acytail === 0 && bcxtail === 0 && bcytail === 0) {
+        return det;
+    }
+
+    errbound = ccwerrboundC * detsum + resulterrbound * Math.abs(det);
+    det += (acx * bcytail + bcy * acxtail) - (acy * bcxtail + bcx * acytail);
+    if (det >= errbound || -det >= errbound) return det;
+
+    s1 = acxtail * bcy;
+    c = splitter * acxtail;
+    ahi = c - (c - acxtail);
+    alo = acxtail - ahi;
+    c = splitter * bcy;
+    bhi = c - (c - bcy);
+    blo = bcy - bhi;
+    s0 = alo * blo - (s1 - ahi * bhi - alo * bhi - ahi * blo);
+    t1 = acytail * bcx;
+    c = splitter * acytail;
+    ahi = c - (c - acytail);
+    alo = acytail - ahi;
+    c = splitter * bcx;
+    bhi = c - (c - bcx);
+    blo = bcx - bhi;
+    t0 = alo * blo - (t1 - ahi * bhi - alo * bhi - ahi * blo);
+    _i = s0 - t0;
+    bvirt = s0 - _i;
+    u[0] = s0 - (_i + bvirt) + (bvirt - t0);
+    _j = s1 + _i;
+    bvirt = _j - s1;
+    _0 = s1 - (_j - bvirt) + (_i - bvirt);
+    _i = _0 - t1;
+    bvirt = _0 - _i;
+    u[1] = _0 - (_i + bvirt) + (bvirt - t1);
+    u3 = _j + _i;
+    bvirt = u3 - _j;
+    u[2] = _j - (u3 - bvirt) + (_i - bvirt);
+    u[3] = u3;
+    const C1len = sum$1(4, B, 4, u, C1);
+
+    s1 = acx * bcytail;
+    c = splitter * acx;
+    ahi = c - (c - acx);
+    alo = acx - ahi;
+    c = splitter * bcytail;
+    bhi = c - (c - bcytail);
+    blo = bcytail - bhi;
+    s0 = alo * blo - (s1 - ahi * bhi - alo * bhi - ahi * blo);
+    t1 = acy * bcxtail;
+    c = splitter * acy;
+    ahi = c - (c - acy);
+    alo = acy - ahi;
+    c = splitter * bcxtail;
+    bhi = c - (c - bcxtail);
+    blo = bcxtail - bhi;
+    t0 = alo * blo - (t1 - ahi * bhi - alo * bhi - ahi * blo);
+    _i = s0 - t0;
+    bvirt = s0 - _i;
+    u[0] = s0 - (_i + bvirt) + (bvirt - t0);
+    _j = s1 + _i;
+    bvirt = _j - s1;
+    _0 = s1 - (_j - bvirt) + (_i - bvirt);
+    _i = _0 - t1;
+    bvirt = _0 - _i;
+    u[1] = _0 - (_i + bvirt) + (bvirt - t1);
+    u3 = _j + _i;
+    bvirt = u3 - _j;
+    u[2] = _j - (u3 - bvirt) + (_i - bvirt);
+    u[3] = u3;
+    const C2len = sum$1(C1len, C1, 4, u, C2);
+
+    s1 = acxtail * bcytail;
+    c = splitter * acxtail;
+    ahi = c - (c - acxtail);
+    alo = acxtail - ahi;
+    c = splitter * bcytail;
+    bhi = c - (c - bcytail);
+    blo = bcytail - bhi;
+    s0 = alo * blo - (s1 - ahi * bhi - alo * bhi - ahi * blo);
+    t1 = acytail * bcxtail;
+    c = splitter * acytail;
+    ahi = c - (c - acytail);
+    alo = acytail - ahi;
+    c = splitter * bcxtail;
+    bhi = c - (c - bcxtail);
+    blo = bcxtail - bhi;
+    t0 = alo * blo - (t1 - ahi * bhi - alo * bhi - ahi * blo);
+    _i = s0 - t0;
+    bvirt = s0 - _i;
+    u[0] = s0 - (_i + bvirt) + (bvirt - t0);
+    _j = s1 + _i;
+    bvirt = _j - s1;
+    _0 = s1 - (_j - bvirt) + (_i - bvirt);
+    _i = _0 - t1;
+    bvirt = _0 - _i;
+    u[1] = _0 - (_i + bvirt) + (bvirt - t1);
+    u3 = _j + _i;
+    bvirt = u3 - _j;
+    u[2] = _j - (u3 - bvirt) + (_i - bvirt);
+    u[3] = u3;
+    const Dlen = sum$1(C2len, C2, 4, u, D);
+
+    return D[Dlen - 1];
+}
+
+function orient2d(ax, ay, bx, by, cx, cy) {
+    const detleft = (ay - cy) * (bx - cx);
+    const detright = (ax - cx) * (by - cy);
+    const det = detleft - detright;
+
+    if (detleft === 0 || detright === 0 || (detleft > 0) !== (detright > 0)) return det;
+
+    const detsum = Math.abs(detleft + detright);
+    if (Math.abs(det) >= ccwerrboundA * detsum) return det;
+
+    return -orient2dadapt(ax, ay, bx, by, cx, cy, detsum);
 }
 
 const EPSILON = Math.pow(2, -52);
@@ -6521,7 +6911,7 @@ class Delaunator {
         }
 
         // swap the order of the seed points for counter-clockwise orientation
-        if (orient(i0x, i0y, i1x, i1y, i2x, i2y)) {
+        if (orient2d(i0x, i0y, i1x, i1y, i2x, i2y) < 0) {
             const i = i1;
             const x = i1x;
             const y = i1y;
@@ -6586,7 +6976,7 @@ class Delaunator {
 
             start = hullPrev[start];
             let e = start, q;
-            while (q = hullNext[e], !orient(x, y, coords[2 * e], coords[2 * e + 1], coords[2 * q], coords[2 * q + 1])) {
+            while (q = hullNext[e], orient2d(x, y, coords[2 * e], coords[2 * e + 1], coords[2 * q], coords[2 * q + 1]) >= 0) {
                 e = q;
                 if (e === start) {
                     e = -1;
@@ -6605,7 +6995,7 @@ class Delaunator {
 
             // walk forward through the hull, adding more triangles and flipping recursively
             let n = hullNext[e];
-            while (q = hullNext[n], orient(x, y, coords[2 * n], coords[2 * n + 1], coords[2 * q], coords[2 * q + 1])) {
+            while (q = hullNext[n], orient2d(x, y, coords[2 * n], coords[2 * n + 1], coords[2 * q], coords[2 * q + 1]) < 0) {
                 t = this._addTriangle(n, i, q, hullTri[i], -1, hullTri[n]);
                 hullTri[i] = this._legalize(t + 2);
                 hullNext[n] = n; // mark as removed
@@ -6615,7 +7005,7 @@ class Delaunator {
 
             // walk backward from the other side, adding more triangles and flipping
             if (e === start) {
-                while (q = hullPrev[e], orient(x, y, coords[2 * q], coords[2 * q + 1], coords[2 * e], coords[2 * e + 1])) {
+                while (q = hullPrev[e], orient2d(x, y, coords[2 * q], coords[2 * q + 1], coords[2 * e], coords[2 * e + 1]) < 0) {
                     t = this._addTriangle(q, i, e, -1, hullTri[e], hullTri[q]);
                     this._legalize(t + 2);
                     hullTri[q] = t;
@@ -6768,21 +7158,6 @@ function dist(ax, ay, bx, by) {
     const dx = ax - bx;
     const dy = ay - by;
     return dx * dx + dy * dy;
-}
-
-// return 2d orientation sign if we're confident in it through J. Shewchuk's error bound check
-function orientIfSure(px, py, rx, ry, qx, qy) {
-    const l = (ry - py) * (qx - px);
-    const r = (rx - px) * (qy - py);
-    return Math.abs(l - r) >= 3.3306690738754716e-16 * Math.abs(l + r) ? l - r : 0;
-}
-
-// a more robust orientation test that's stable in a given triangle (to fix robustness issues)
-function orient(rx, ry, qx, qy, px, py) {
-    const sign = orientIfSure(px, py, rx, ry, qx, qy) ||
-    orientIfSure(rx, ry, qx, qy, px, py) ||
-    orientIfSure(qx, qy, px, py, rx, ry);
-    return sign < 0;
 }
 
 function inCircle(ax, ay, bx, by, cx, cy, px, py) {
@@ -6977,21 +7352,26 @@ class Voronoi {
       const dy = y2 - y1;
       const ex = x3 - x1;
       const ey = y3 - y1;
-      const bl = dx * dx + dy * dy;
-      const cl = ex * ex + ey * ey;
       const ab = (dx * ey - dy * ex) * 2;
 
-      if (!ab) {
+      if (Math.abs(ab) < 1e-9) {
         // degenerate case (collinear diagram)
-        x = (x1 + x3) / 2 - 1e8 * ey;
-        y = (y1 + y3) / 2 + 1e8 * ex;
-      }
-      else if (Math.abs(ab) < 1e-8) {
         // almost equal points (degenerate triangle)
-        x = (x1 + x3) / 2;
-        y = (y1 + y3) / 2;
+        // the circumcenter is at the infinity, in a
+        // direction that is:
+        // 1. orthogonal to the halfedge.
+        let a = 1e9;
+        // 2. points away from the center; since the list of triangles starts
+        // in the center, the first point of the first triangle
+        // will be our reference
+        const r = triangles[0] * 2;
+        a *= Math.sign((points[r] - x1) * ey - (points[r + 1] - y1) * ex);
+        x = (x1 + x3) / 2 - a * ey;
+        y = (y1 + y3) / 2 + a * ex;
       } else {
         const d = 1 / ab;
+        const bl = dx * dx + dy * dy;
+        const cl = ex * ex + ey * ey;
         x = x1 + (ey * bl - dy * cl) * d;
         y = y1 + (dx * cl - ex * bl) * d;
       }
@@ -7139,7 +7519,7 @@ class Voronoi {
     let P = null;
     let x0, y0, x1 = points[n - 2], y1 = points[n - 1];
     let c0, c1 = this._regioncode(x1, y1);
-    let e0, e1;
+    let e0, e1 = 0;
     for (let j = 0; j < n; j += 2) {
       x0 = x1, y0 = y1, x1 = points[j], y1 = points[j + 1];
       c0 = c1, c1 = this._regioncode(x1, y1);
@@ -7214,6 +7594,8 @@ class Voronoi {
         case 0b1001: e0 = 0b0001; continue; // bottom-left
         case 0b0001: e0 = 0b0101, x = this.xmin, y = this.ymin; break; // left
       }
+      // Note: this implicitly checks for out of bounds: if P[j] or P[j+1] are
+      // undefined, the conditional statement will be executed.
       if ((P[j] !== x || P[j + 1] !== y) && this.contains(i, x, y)) {
         P.splice(j, 0, x, y), j += 2;
       }
@@ -7348,10 +7730,12 @@ class Delaunay {
       this.triangles = new Int32Array(3).fill(-1);
       this.halfedges = new Int32Array(3).fill(-1);
       this.triangles[0] = hull[0];
-      this.triangles[1] = hull[1];
-      this.triangles[2] = hull[1];
       inedges[hull[0]] = 1;
-      if (hull.length === 2) inedges[hull[1]] = 0;
+      if (hull.length === 2) {
+        inedges[hull[1]] = 0;
+        this.triangles[1] = hull[1];
+        this.triangles[2] = hull[1];
+      }
     }
   }
   voronoi(bounds) {
@@ -7428,7 +7812,9 @@ class Delaunay {
     this.renderHull(context);
     return buffer && buffer.value();
   }
-  renderPoints(context, r = 2) {
+  renderPoints(context, r) {
+    if (r === undefined && (!context || typeof context.moveTo !== "function")) r = context, context = null;
+    r = r == undefined ? 2 : +r;
     const buffer = context == null ? context = new Path : undefined;
     const {points} = this;
     for (let i = 0, n = points.length; i < n; i += 2) {
@@ -7769,7 +8155,7 @@ function responseJson(response) {
   return response.json();
 }
 
-function d3json(input, init) {
+function json$1(input, init) {
   return fetch(input, init).then(responseJson);
 }
 
@@ -8339,7 +8725,7 @@ function collide(radius) {
   return force;
 }
 
-function index$3(d) {
+function index$4(d) {
   return d.index;
 }
 
@@ -8350,7 +8736,7 @@ function find(nodeById, nodeId) {
 }
 
 function link$2(links) {
-  var id = index$3,
+  var id = index$4,
       strength = defaultStrength,
       strengths,
       distance = constant$4(30),
@@ -9022,15 +9408,15 @@ function identity$7(x) {
   return x;
 }
 
-var map = Array.prototype.map,
+var map$1 = Array.prototype.map,
     prefixes = ["y","z","a","f","p","n","µ","m","","k","M","G","T","P","E","Z","Y"];
 
 function formatLocale$1(locale) {
-  var group = locale.grouping === undefined || locale.thousands === undefined ? identity$7 : formatGroup(map.call(locale.grouping, Number), locale.thousands + ""),
+  var group = locale.grouping === undefined || locale.thousands === undefined ? identity$7 : formatGroup(map$1.call(locale.grouping, Number), locale.thousands + ""),
       currencyPrefix = locale.currency === undefined ? "" : locale.currency[0] + "",
       currencySuffix = locale.currency === undefined ? "" : locale.currency[1] + "",
       decimal = locale.decimal === undefined ? "." : locale.decimal + "",
-      numerals = locale.numerals === undefined ? identity$7 : formatNumerals(map.call(locale.numerals, String)),
+      numerals = locale.numerals === undefined ? identity$7 : formatNumerals(map$1.call(locale.numerals, String)),
       percent = locale.percent === undefined ? "%" : locale.percent + "",
       minus = locale.minus === undefined ? "−" : locale.minus + "",
       nan = locale.nan === undefined ? "NaN" : locale.nan + "";
@@ -9412,22 +9798,22 @@ var lambda0$1, phi0, lambda1, phi1, // bounds
     ranges,
     range;
 
-var boundsStream$1 = {
+var boundsStream$2 = {
   point: boundsPoint$1,
   lineStart: boundsLineStart,
   lineEnd: boundsLineEnd,
   polygonStart: function() {
-    boundsStream$1.point = boundsRingPoint;
-    boundsStream$1.lineStart = boundsRingStart;
-    boundsStream$1.lineEnd = boundsRingEnd;
+    boundsStream$2.point = boundsRingPoint;
+    boundsStream$2.lineStart = boundsRingStart;
+    boundsStream$2.lineEnd = boundsRingEnd;
     deltaSum = new Adder();
     areaStream$1.polygonStart();
   },
   polygonEnd: function() {
     areaStream$1.polygonEnd();
-    boundsStream$1.point = boundsPoint$1;
-    boundsStream$1.lineStart = boundsLineStart;
-    boundsStream$1.lineEnd = boundsLineEnd;
+    boundsStream$2.point = boundsPoint$1;
+    boundsStream$2.lineStart = boundsLineStart;
+    boundsStream$2.lineEnd = boundsLineEnd;
     if (areaRingSum$1 < 0) lambda0$1 = -(lambda1 = 180), phi0 = -(phi1 = 90);
     else if (deltaSum > epsilon$1) phi1 = 90;
     else if (deltaSum < -epsilon$1) phi0 = -90;
@@ -9494,12 +9880,12 @@ function linePoint(lambda, phi) {
 }
 
 function boundsLineStart() {
-  boundsStream$1.point = linePoint;
+  boundsStream$2.point = linePoint;
 }
 
 function boundsLineEnd() {
   range[0] = lambda0$1, range[1] = lambda1;
-  boundsStream$1.point = boundsPoint$1;
+  boundsStream$2.point = boundsPoint$1;
   p0 = null;
 }
 
@@ -9541,12 +9927,12 @@ function rangeContains(range, x) {
   return range[0] <= range[1] ? range[0] <= x && x <= range[1] : x < range[0] || range[1] < x;
 }
 
-function geoBounds(feature) {
+function bounds$1(feature) {
   var i, n, a, b, merged, deltaMax, delta;
 
   phi1 = lambda1 = -(lambda0$1 = phi0 = Infinity);
   ranges = [];
-  geoStream(feature, boundsStream$1);
+  geoStream(feature, boundsStream$2);
 
   // First, sort ranges by their minimum longitudes.
   if (n = ranges.length) {
@@ -9690,7 +10076,7 @@ function centroidRingPoint(lambda, phi) {
   centroidPointCartesian(x0$4, y0$4, z0);
 }
 
-function geoCentroid(object) {
+function centroid$1(object) {
   W0 = W1 =
   X0$1 = Y0$1 = Z0$1 =
   X1$1 = Y1$1 = Z1$1 = 0;
@@ -10007,10 +10393,7 @@ function link$1(array) {
 }
 
 function longitude(point) {
-  if (abs$1(point[0]) <= pi$1)
-    return point[0];
-  else
-    return sign$1(point[0]) * ((abs$1(point[0]) + pi$1) % tau$1 - pi$1);
+  return abs$1(point[0]) <= pi$1 ? point[0] : sign$1(point[0]) * ((abs$1(point[0]) + pi$1) % tau$1 - pi$1);
 }
 
 function polygonContains(polygon, point) {
@@ -10863,12 +11246,12 @@ function contains$1(object, point) {
 }
 
 function graticuleX(y0, y1, dy) {
-  var y = sequence(y0, y1 - epsilon$1, dy).concat(y1);
+  var y = range$2(y0, y1 - epsilon$1, dy).concat(y1);
   return function(x) { return y.map(function(y) { return [x, y]; }); };
 }
 
 function graticuleY(x0, x1, dx) {
-  var x = sequence(x0, x1 - epsilon$1, dx).concat(x1);
+  var x = range$2(x0, x1 - epsilon$1, dx).concat(x1);
   return function(y) { return x.map(function(x) { return [x, y]; }); };
 }
 
@@ -10884,10 +11267,10 @@ function graticule() {
   }
 
   function lines() {
-    return sequence(ceil(X0 / DX) * DX, X1, DX).map(X)
-        .concat(sequence(ceil(Y0 / DY) * DY, Y1, DY).map(Y))
-        .concat(sequence(ceil(x0 / dx) * dx, x1, dx).filter(function(x) { return abs$1(x % DX) > epsilon$1; }).map(x))
-        .concat(sequence(ceil(y0 / dy) * dy, y1, dy).filter(function(y) { return abs$1(y % DY) > epsilon$1; }).map(y));
+    return range$2(ceil(X0 / DX) * DX, X1, DX).map(X)
+        .concat(range$2(ceil(Y0 / DY) * DY, Y1, DY).map(Y))
+        .concat(range$2(ceil(x0 / dx) * dx, x1, dx).filter(function(x) { return abs$1(x % DX) > epsilon$1; }).map(x))
+        .concat(range$2(ceil(y0 / dy) * dy, y1, dy).filter(function(y) { return abs$1(y % DY) > epsilon$1; }).map(y));
   }
 
   graticule.lines = function() {
@@ -11047,6 +11430,8 @@ function areaRingEnd() {
   areaPoint(x00$2, y00$2);
 }
 
+var pathArea = areaStream;
+
 var x0$2 = Infinity,
     y0$2 = x0$2,
     x1 = -x0$2,
@@ -11071,6 +11456,8 @@ function boundsPoint(x, y) {
   if (y < y0$2) y0$2 = y;
   if (y > y1) y1 = y;
 }
+
+var boundsStream$1 = boundsStream;
 
 // TODO Enforce positive area for exterior, negative area for interior?
 
@@ -11169,6 +11556,8 @@ function centroidPointRing(x, y) {
   centroidPoint(x0$1 = x, y0$1 = y);
 }
 
+var pathCentroid = centroidStream;
+
 function PathContext(context) {
   this._context = context;
 }
@@ -11252,6 +11641,8 @@ function lengthPoint(x, y) {
   x0 = x, y0 = y;
 }
 
+var pathMeasure = lengthStream;
+
 function PathString() {
   this._string = [];
 }
@@ -11312,7 +11703,7 @@ function circle$1(radius) {
       + "z";
 }
 
-function geoPath(projection, context) {
+function index$3(projection, context) {
   var pointRadius = 4.5,
       projectionStream,
       contextStream;
@@ -11326,23 +11717,23 @@ function geoPath(projection, context) {
   }
 
   path.area = function(object) {
-    geoStream(object, projectionStream(areaStream));
-    return areaStream.result();
+    geoStream(object, projectionStream(pathArea));
+    return pathArea.result();
   };
 
   path.measure = function(object) {
-    geoStream(object, projectionStream(lengthStream));
-    return lengthStream.result();
+    geoStream(object, projectionStream(pathMeasure));
+    return pathMeasure.result();
   };
 
   path.bounds = function(object) {
-    geoStream(object, projectionStream(boundsStream));
-    return boundsStream.result();
+    geoStream(object, projectionStream(boundsStream$1));
+    return boundsStream$1.result();
   };
 
   path.centroid = function(object) {
-    geoStream(object, projectionStream(centroidStream));
-    return centroidStream.result();
+    geoStream(object, projectionStream(pathCentroid));
+    return pathCentroid.result();
   };
 
   path.projection = function(_) {
@@ -11396,8 +11787,8 @@ function fit(projection, fitBounds, object) {
   var clip = projection.clipExtent && projection.clipExtent();
   projection.scale(150).translate([0, 0]);
   if (clip != null) projection.clipExtent(null);
-  geoStream(object, projection.stream(boundsStream));
-  fitBounds(boundsStream.result());
+  geoStream(object, projection.stream(boundsStream$1));
+  fitBounds(boundsStream$1.result());
   if (clip != null) projection.clipExtent(clip);
   return projection;
 }
@@ -11938,7 +12329,7 @@ mercatorRaw.invert = function(x, y) {
   return [x, 2 * atan(exp(y)) - halfPi$1];
 };
 
-function geoMercator() {
+function mercator() {
   return mercatorProjection(mercatorRaw)
       .scale(961 / tau$1);
 }
@@ -12998,7 +13389,8 @@ function partition() {
 }
 
 var preroot = {depth: -1},
-    ambiguous = {};
+    ambiguous = {},
+    imputed = {};
 
 function defaultId(d) {
   return d.id;
@@ -13010,11 +13402,14 @@ function defaultParentId(d) {
 
 function stratify() {
   var id = defaultId,
-      parentId = defaultParentId;
+      parentId = defaultParentId,
+      path;
 
   function stratify(data) {
     var nodes = Array.from(data),
-        n = nodes.length,
+        currentId = id,
+        currentParentId = parentId,
+        n,
         d,
         i,
         root,
@@ -13024,13 +13419,29 @@ function stratify() {
         nodeKey,
         nodeByKey = new Map;
 
-    for (i = 0; i < n; ++i) {
+    if (path != null) {
+      const I = nodes.map((d, i) => normalize$1(path(d, i, data)));
+      const P = I.map(parentof);
+      const S = new Set(I).add("");
+      for (const i of P) {
+        if (!S.has(i)) {
+          S.add(i);
+          I.push(i);
+          P.push(parentof(i));
+          nodes.push(imputed);
+        }
+      }
+      currentId = (_, i) => I[i];
+      currentParentId = (_, i) => P[i];
+    }
+
+    for (i = 0, n = nodes.length; i < n; ++i) {
       d = nodes[i], node = nodes[i] = new Node$1(d);
-      if ((nodeId = id(d, i, data)) != null && (nodeId += "")) {
+      if ((nodeId = currentId(d, i, data)) != null && (nodeId += "")) {
         nodeKey = node.id = nodeId;
         nodeByKey.set(nodeKey, nodeByKey.has(nodeKey) ? ambiguous : node);
       }
-      if ((nodeId = parentId(d, i, data)) != null && (nodeId += "")) {
+      if ((nodeId = currentParentId(d, i, data)) != null && (nodeId += "")) {
         node.parent = nodeId;
       }
     }
@@ -13051,6 +13462,20 @@ function stratify() {
     }
 
     if (!root) throw new Error("no root");
+
+    // When imputing internal nodes, only introduce roots if needed.
+    // Then replace the imputed marker data with null.
+    if (path != null) {
+      while (root.data === imputed && root.children.length === 1) {
+        root = root.children[0], --n;
+      }
+      for (let i = nodes.length - 1; i >= 0; --i) {
+        node = nodes[i];
+        if (node.data !== imputed) break;
+        node.data = null;
+      }
+    }
+
     root.parent = preroot;
     root.eachBefore(function(node) { node.depth = node.parent.depth + 1; --n; }).eachBefore(computeHeight);
     root.parent = null;
@@ -13060,14 +13485,50 @@ function stratify() {
   }
 
   stratify.id = function(x) {
-    return arguments.length ? (id = required(x), stratify) : id;
+    return arguments.length ? (id = optional(x), stratify) : id;
   };
 
   stratify.parentId = function(x) {
-    return arguments.length ? (parentId = required(x), stratify) : parentId;
+    return arguments.length ? (parentId = optional(x), stratify) : parentId;
+  };
+
+  stratify.path = function(x) {
+    return arguments.length ? (path = optional(x), stratify) : path;
   };
 
   return stratify;
+}
+
+// To normalize a path, we coerce to a string, strip the trailing slash if any
+// (as long as the trailing slash is not immediately preceded by another slash),
+// and add leading slash if missing.
+function normalize$1(path) {
+  path = `${path}`;
+  let i = path.length;
+  if (slash(path, i - 1) && !slash(path, i - 2)) path = path.slice(0, -1);
+  return path[0] === "/" ? path : `/${path}`;
+}
+
+// Walk backwards to find the first slash that is not the leading slash, e.g.:
+// "/foo/bar" ⇥ "/foo", "/foo" ⇥ "/", "/" ↦ "". (The root is special-cased
+// because the id of the root must be a truthy value.)
+function parentof(path) {
+  let i = path.length;
+  if (i < 2) return "";
+  while (--i > 1) if (slash(path, i)) break;
+  return path.slice(0, i);
+}
+
+// Slashes can be escaped; to determine whether a slash is a path delimiter, we
+// count the number of preceding backslashes escaping the forward slash: an odd
+// number indicates an escaped forward slash.
+function slash(path, i) {
+  if (path[i] === "/") {
+    let k = 0;
+    while (i > 0 && path[--i] === "\\") ++k;
+    if ((k & 1) === 0) return true;
+  }
+  return false;
 }
 
 function defaultSeparation(a, b) {
@@ -14050,27 +14511,26 @@ function initInterpolator(domain, interpolator) {
 const implicit = Symbol("implicit");
 
 function ordinal() {
-  var index = new Map(),
+  var index = new InternMap(),
       domain = [],
       range = [],
       unknown = implicit;
 
   function scale(d) {
-    var key = d + "", i = index.get(key);
-    if (!i) {
+    let i = index.get(d);
+    if (i === undefined) {
       if (unknown !== implicit) return unknown;
-      index.set(key, i = domain.push(d));
+      index.set(d, i = domain.push(d) - 1);
     }
-    return range[(i - 1) % range.length];
+    return range[i % range.length];
   }
 
   scale.domain = function(_) {
     if (!arguments.length) return domain.slice();
-    domain = [], index = new Map();
+    domain = [], index = new InternMap();
     for (const value of _) {
-      const key = value + "";
-      if (index.has(key)) continue;
-      index.set(key, domain.push(value));
+      if (index.has(value)) continue;
+      index.set(value, domain.push(value) - 1);
     }
     return scale;
   };
@@ -14117,7 +14577,7 @@ function band() {
     start += (stop - start - step * (n - paddingInner)) * align;
     bandwidth = step * (1 - paddingInner);
     if (round) start = Math.round(start), bandwidth = Math.round(bandwidth);
-    var values = sequence(n).map(function(i) { return start + step * i; });
+    var values = range$2(n).map(function(i) { return start + step * i; });
     return ordinalRange(reverse ? values.reverse() : values);
   }
 
@@ -14245,7 +14705,7 @@ function polymap(domain, range, interpolate) {
   }
 
   return function(x) {
-    var i = bisectRight(domain, x, 1, j) - 1;
+    var i = bisect(domain, x, 1, j) - 1;
     return r[i](d[i](x));
   };
 }
@@ -14280,7 +14740,7 @@ function transformer$2() {
   }
 
   function scale(x) {
-    return isNaN(x = +x) ? unknown : (output || (output = piecewise(domain.map(transform), range, interpolate)))(transform(clamp(x)));
+    return x == null || isNaN(x = +x) ? unknown : (output || (output = piecewise(domain.map(transform), range, interpolate)))(transform(clamp(x)));
   }
 
   scale.invert = function(y) {
@@ -14418,7 +14878,7 @@ function identity$3(domain) {
   var unknown;
 
   function scale(x) {
-    return isNaN(x = +x) ? unknown : x;
+    return x == null || isNaN(x = +x) ? unknown : x;
   }
 
   scale.invert = scale;
@@ -14482,28 +14942,26 @@ function pow10(x) {
 function powp(base) {
   return base === 10 ? pow10
       : base === Math.E ? Math.exp
-      : function(x) { return Math.pow(base, x); };
+      : x => Math.pow(base, x);
 }
 
 function logp(base) {
   return base === Math.E ? Math.log
       : base === 10 && Math.log10
       || base === 2 && Math.log2
-      || (base = Math.log(base), function(x) { return Math.log(x) / base; });
+      || (base = Math.log(base), x => Math.log(x) / base);
 }
 
 function reflect(f) {
-  return function(x) {
-    return -f(-x);
-  };
+  return (x, k) => -f(-x, k);
 }
 
 function loggish(transform) {
-  var scale = transform(transformLog, transformExp),
-      domain = scale.domain,
-      base = 10,
-      logs,
-      pows;
+  const scale = transform(transformLog, transformExp);
+  const domain = scale.domain;
+  let base = 10;
+  let logs;
+  let pows;
 
   function rescale() {
     logs = logp(base), pows = powp(base);
@@ -14524,34 +14982,33 @@ function loggish(transform) {
     return arguments.length ? (domain(_), rescale()) : domain();
   };
 
-  scale.ticks = function(count) {
-    var d = domain(),
-        u = d[0],
-        v = d[d.length - 1],
-        r;
+  scale.ticks = count => {
+    const d = domain();
+    let u = d[0];
+    let v = d[d.length - 1];
+    const r = v < u;
 
-    if (r = v < u) i = u, u = v, v = i;
+    if (r) ([u, v] = [v, u]);
 
-    var i = logs(u),
-        j = logs(v),
-        p,
-        k,
-        t,
-        n = count == null ? 10 : +count,
-        z = [];
+    let i = logs(u);
+    let j = logs(v);
+    let k;
+    let t;
+    const n = count == null ? 10 : +count;
+    let z = [];
 
     if (!(base % 1) && j - i < n) {
       i = Math.floor(i), j = Math.ceil(j);
       if (u > 0) for (; i <= j; ++i) {
-        for (k = 1, p = pows(i); k < base; ++k) {
-          t = p * k;
+        for (k = 1; k < base; ++k) {
+          t = i < 0 ? k / pows(-i) : k * pows(i);
           if (t < u) continue;
           if (t > v) break;
           z.push(t);
         }
       } else for (; i <= j; ++i) {
-        for (k = base - 1, p = pows(i); k >= 1; --k) {
-          t = p * k;
+        for (k = base - 1; k >= 1; --k) {
+          t = i > 0 ? k / pows(-i) : k * pows(i);
           if (t < u) continue;
           if (t > v) break;
           z.push(t);
@@ -14561,27 +15018,29 @@ function loggish(transform) {
     } else {
       z = ticks(i, j, Math.min(j - i, n)).map(pows);
     }
-
     return r ? z.reverse() : z;
   };
 
-  scale.tickFormat = function(count, specifier) {
-    if (specifier == null) specifier = base === 10 ? ".0e" : ",";
-    if (typeof specifier !== "function") specifier = format(specifier);
-    if (count === Infinity) return specifier;
+  scale.tickFormat = (count, specifier) => {
     if (count == null) count = 10;
-    var k = Math.max(1, base * count / scale.ticks().length); // TODO fast estimate?
-    return function(d) {
-      var i = d / pows(Math.round(logs(d)));
+    if (specifier == null) specifier = base === 10 ? "s" : ",";
+    if (typeof specifier !== "function") {
+      if (!(base % 1) && (specifier = formatSpecifier(specifier)).precision == null) specifier.trim = true;
+      specifier = format(specifier);
+    }
+    if (count === Infinity) return specifier;
+    const k = Math.max(1, base * count / scale.ticks().length); // TODO fast estimate?
+    return d => {
+      let i = d / pows(Math.round(logs(d)));
       if (i * base < base - 0.5) i *= base;
       return i <= k ? specifier(d) : "";
     };
   };
 
-  scale.nice = function() {
+  scale.nice = () => {
     return domain(nice(domain(), {
-      floor: function(x) { return pows(Math.floor(logs(x))); },
-      ceil: function(x) { return pows(Math.ceil(logs(x))); }
+      floor: x => pows(Math.floor(logs(x))),
+      ceil: x => pows(Math.ceil(logs(x)))
     }));
   };
 
@@ -14589,14 +15048,9 @@ function loggish(transform) {
 }
 
 function log() {
-  var scale = loggish(transformer$2()).domain([1, 10]);
-
-  scale.copy = function() {
-    return copy$2(scale, log()).base(scale.base());
-  };
-
+  const scale = loggish(transformer$2()).domain([1, 10]);
+  scale.copy = () => copy$2(scale, log()).base(scale.base());
   initRange.apply(scale, arguments);
-
   return scale;
 }
 
@@ -14752,7 +15206,7 @@ function quantile() {
   }
 
   function scale(x) {
-    return isNaN(x = +x) ? unknown : range[bisectRight(thresholds, x)];
+    return x == null || isNaN(x = +x) ? unknown : range[bisect(thresholds, x)];
   }
 
   scale.invertExtent = function(y) {
@@ -14802,7 +15256,7 @@ function quantize() {
       unknown;
 
   function scale(x) {
-    return x <= x ? range[bisectRight(domain, x, 0, n)] : unknown;
+    return x != null && x <= x ? range[bisect(domain, x, 0, n)] : unknown;
   }
 
   function rescale() {
@@ -14853,7 +15307,7 @@ function threshold() {
       n = 1;
 
   function scale(x) {
-    return x <= x ? range[bisectRight(domain, x, 0, n)] : unknown;
+    return x != null && x <= x ? range[bisect(domain, x, 0, n)] : unknown;
   }
 
   scale.domain = function(_) {
@@ -14975,53 +15429,65 @@ millisecond.every = function(k) {
     return (end - start) / k;
   });
 };
+
+var millisecond$1 = millisecond;
 var milliseconds = millisecond.range;
 
-var durationSecond$1 = 1e3;
-var durationMinute$1 = 6e4;
-var durationHour$1 = 36e5;
-var durationDay$1 = 864e5;
-var durationWeek$1 = 6048e5;
+const durationSecond = 1000;
+const durationMinute = durationSecond * 60;
+const durationHour = durationMinute * 60;
+const durationDay = durationHour * 24;
+const durationWeek = durationDay * 7;
+const durationMonth = durationDay * 30;
+const durationYear = durationDay * 365;
 
 var second = newInterval(function(date) {
   date.setTime(date - date.getMilliseconds());
 }, function(date, step) {
-  date.setTime(+date + step * durationSecond$1);
+  date.setTime(+date + step * durationSecond);
 }, function(start, end) {
-  return (end - start) / durationSecond$1;
+  return (end - start) / durationSecond;
 }, function(date) {
   return date.getUTCSeconds();
 });
+
+var utcSecond = second;
 var seconds = second.range;
 
 var minute = newInterval(function(date) {
-  date.setTime(date - date.getMilliseconds() - date.getSeconds() * durationSecond$1);
+  date.setTime(date - date.getMilliseconds() - date.getSeconds() * durationSecond);
 }, function(date, step) {
-  date.setTime(+date + step * durationMinute$1);
+  date.setTime(+date + step * durationMinute);
 }, function(start, end) {
-  return (end - start) / durationMinute$1;
+  return (end - start) / durationMinute;
 }, function(date) {
   return date.getMinutes();
 });
+
+var timeMinute = minute;
 var minutes = minute.range;
 
 var hour = newInterval(function(date) {
-  date.setTime(date - date.getMilliseconds() - date.getSeconds() * durationSecond$1 - date.getMinutes() * durationMinute$1);
+  date.setTime(date - date.getMilliseconds() - date.getSeconds() * durationSecond - date.getMinutes() * durationMinute);
 }, function(date, step) {
-  date.setTime(+date + step * durationHour$1);
+  date.setTime(+date + step * durationHour);
 }, function(start, end) {
-  return (end - start) / durationHour$1;
+  return (end - start) / durationHour;
 }, function(date) {
   return date.getHours();
 });
+
+var timeHour = hour;
 var hours = hour.range;
 
 var day = newInterval(
   date => date.setHours(0, 0, 0, 0),
   (date, step) => date.setDate(date.getDate() + step),
-  (start, end) => (end - start - (end.getTimezoneOffset() - start.getTimezoneOffset()) * durationMinute$1) / durationDay$1,
+  (start, end) => (end - start - (end.getTimezoneOffset() - start.getTimezoneOffset()) * durationMinute) / durationDay,
   date => date.getDate() - 1
 );
+
+var timeDay = day;
 var days = day.range;
 
 function weekday(i) {
@@ -15031,7 +15497,7 @@ function weekday(i) {
   }, function(date, step) {
     date.setDate(date.getDate() + step * 7);
   }, function(start, end) {
-    return (end - start - (end.getTimezoneOffset() - start.getTimezoneOffset()) * durationMinute$1) / durationWeek$1;
+    return (end - start - (end.getTimezoneOffset() - start.getTimezoneOffset()) * durationMinute) / durationWeek;
   });
 }
 
@@ -15061,6 +15527,8 @@ var month = newInterval(function(date) {
 }, function(date) {
   return date.getMonth();
 });
+
+var timeMonth = month;
 var months = month.range;
 
 var year = newInterval(function(date) {
@@ -15084,28 +15552,34 @@ year.every = function(k) {
     date.setFullYear(date.getFullYear() + step * k);
   });
 };
+
+var timeYear = year;
 var years = year.range;
 
 var utcMinute = newInterval(function(date) {
   date.setUTCSeconds(0, 0);
 }, function(date, step) {
-  date.setTime(+date + step * durationMinute$1);
+  date.setTime(+date + step * durationMinute);
 }, function(start, end) {
-  return (end - start) / durationMinute$1;
+  return (end - start) / durationMinute;
 }, function(date) {
   return date.getUTCMinutes();
 });
+
+var utcMinute$1 = utcMinute;
 var utcMinutes = utcMinute.range;
 
 var utcHour = newInterval(function(date) {
   date.setUTCMinutes(0, 0, 0);
 }, function(date, step) {
-  date.setTime(+date + step * durationHour$1);
+  date.setTime(+date + step * durationHour);
 }, function(start, end) {
-  return (end - start) / durationHour$1;
+  return (end - start) / durationHour;
 }, function(date) {
   return date.getUTCHours();
 });
+
+var utcHour$1 = utcHour;
 var utcHours = utcHour.range;
 
 var utcDay = newInterval(function(date) {
@@ -15113,10 +15587,12 @@ var utcDay = newInterval(function(date) {
 }, function(date, step) {
   date.setUTCDate(date.getUTCDate() + step);
 }, function(start, end) {
-  return (end - start) / durationDay$1;
+  return (end - start) / durationDay;
 }, function(date) {
   return date.getUTCDate() - 1;
 });
+
+var utcDay$1 = utcDay;
 var utcDays = utcDay.range;
 
 function utcWeekday(i) {
@@ -15126,7 +15602,7 @@ function utcWeekday(i) {
   }, function(date, step) {
     date.setUTCDate(date.getUTCDate() + step * 7);
   }, function(start, end) {
-    return (end - start) / durationWeek$1;
+    return (end - start) / durationWeek;
   });
 }
 
@@ -15156,6 +15632,8 @@ var utcMonth = newInterval(function(date) {
 }, function(date) {
   return date.getUTCMonth();
 });
+
+var utcMonth$1 = utcMonth;
 var utcMonths = utcMonth.range;
 
 var utcYear = newInterval(function(date) {
@@ -15179,7 +15657,55 @@ utcYear.every = function(k) {
     date.setUTCFullYear(date.getUTCFullYear() + step * k);
   });
 };
+
+var utcYear$1 = utcYear;
 var utcYears = utcYear.range;
+
+function ticker(year, month, week, day, hour, minute) {
+
+  const tickIntervals = [
+    [utcSecond,  1,      durationSecond],
+    [utcSecond,  5,  5 * durationSecond],
+    [utcSecond, 15, 15 * durationSecond],
+    [utcSecond, 30, 30 * durationSecond],
+    [minute,  1,      durationMinute],
+    [minute,  5,  5 * durationMinute],
+    [minute, 15, 15 * durationMinute],
+    [minute, 30, 30 * durationMinute],
+    [  hour,  1,      durationHour  ],
+    [  hour,  3,  3 * durationHour  ],
+    [  hour,  6,  6 * durationHour  ],
+    [  hour, 12, 12 * durationHour  ],
+    [   day,  1,      durationDay   ],
+    [   day,  2,  2 * durationDay   ],
+    [  week,  1,      durationWeek  ],
+    [ month,  1,      durationMonth ],
+    [ month,  3,  3 * durationMonth ],
+    [  year,  1,      durationYear  ]
+  ];
+
+  function ticks(start, stop, count) {
+    const reverse = stop < start;
+    if (reverse) [start, stop] = [stop, start];
+    const interval = count && typeof count.range === "function" ? count : tickInterval(start, stop, count);
+    const ticks = interval ? interval.range(start, +stop + 1) : []; // inclusive stop
+    return reverse ? ticks.reverse() : ticks;
+  }
+
+  function tickInterval(start, stop, count) {
+    const target = Math.abs(stop - start) / count;
+    const i = bisector(([,, step]) => step).right(tickIntervals, target);
+    if (i === tickIntervals.length) return year.every(tickStep(start / durationYear, stop / durationYear, count));
+    if (i === 0) return millisecond$1.every(Math.max(tickStep(start, stop, count), 1));
+    const [t, step] = tickIntervals[target / tickIntervals[i - 1][2] < tickIntervals[i][2] / target ? i - 1 : i];
+    return t.every(step);
+  }
+
+  return [ticks, tickInterval];
+}
+
+const [utcTicks, utcTickInterval] = ticker(utcYear$1, utcMonth$1, utcSunday, utcDay$1, utcHour$1, utcMinute$1);
+const [timeTicks, timeTickInterval] = ticker(timeYear, timeMonth, sunday, timeDay, timeHour, timeMinute);
 
 function localDate(d) {
   if (0 <= d.y && d.y < 100) {
@@ -15369,7 +15895,7 @@ function formatLocale(locale) {
     return function(string) {
       var d = newDate(1900, undefined, 1),
           i = parseSpecifier(d, specifier, string += "", 0),
-          week, day$1;
+          week, day;
       if (i != string.length) return null;
 
       // If a UNIX timestamp is specified, return it.
@@ -15390,25 +15916,25 @@ function formatLocale(locale) {
         if (d.V < 1 || d.V > 53) return null;
         if (!("w" in d)) d.w = 1;
         if ("Z" in d) {
-          week = utcDate(newDate(d.y, 0, 1)), day$1 = week.getUTCDay();
-          week = day$1 > 4 || day$1 === 0 ? utcMonday.ceil(week) : utcMonday(week);
-          week = utcDay.offset(week, (d.V - 1) * 7);
+          week = utcDate(newDate(d.y, 0, 1)), day = week.getUTCDay();
+          week = day > 4 || day === 0 ? utcMonday.ceil(week) : utcMonday(week);
+          week = utcDay$1.offset(week, (d.V - 1) * 7);
           d.y = week.getUTCFullYear();
           d.m = week.getUTCMonth();
           d.d = week.getUTCDate() + (d.w + 6) % 7;
         } else {
-          week = localDate(newDate(d.y, 0, 1)), day$1 = week.getDay();
-          week = day$1 > 4 || day$1 === 0 ? monday.ceil(week) : monday(week);
-          week = day.offset(week, (d.V - 1) * 7);
+          week = localDate(newDate(d.y, 0, 1)), day = week.getDay();
+          week = day > 4 || day === 0 ? monday.ceil(week) : monday(week);
+          week = timeDay.offset(week, (d.V - 1) * 7);
           d.y = week.getFullYear();
           d.m = week.getMonth();
           d.d = week.getDate() + (d.w + 6) % 7;
         }
       } else if ("W" in d || "U" in d) {
         if (!("w" in d)) d.w = "u" in d ? d.u % 7 : "W" in d ? 1 : 0;
-        day$1 = "Z" in d ? utcDate(newDate(d.y, 0, 1)).getUTCDay() : localDate(newDate(d.y, 0, 1)).getDay();
+        day = "Z" in d ? utcDate(newDate(d.y, 0, 1)).getUTCDay() : localDate(newDate(d.y, 0, 1)).getDay();
         d.m = 0;
-        d.d = "W" in d ? (d.w + 6) % 7 + d.W * 7 - (day$1 + 5) % 7 : d.w + d.U * 7 - (day$1 + 6) % 7;
+        d.d = "W" in d ? (d.w + 6) % 7 + d.W * 7 - (day + 5) % 7 : d.w + d.U * 7 - (day + 6) % 7;
       }
 
       // If a time zone is specified, all fields are interpreted as UTC and then
@@ -15692,7 +16218,7 @@ function formatHour12(d, p) {
 }
 
 function formatDayOfYear(d, p) {
-  return pad(1 + day.count(year(d), d), p, 3);
+  return pad(1 + timeDay.count(timeYear(d), d), p, 3);
 }
 
 function formatMilliseconds(d, p) {
@@ -15721,7 +16247,7 @@ function formatWeekdayNumberMonday(d) {
 }
 
 function formatWeekNumberSunday(d, p) {
-  return pad(sunday.count(year(d) - 1, d), p, 2);
+  return pad(sunday.count(timeYear(d) - 1, d), p, 2);
 }
 
 function dISO(d) {
@@ -15731,7 +16257,7 @@ function dISO(d) {
 
 function formatWeekNumberISO(d, p) {
   d = dISO(d);
-  return pad(thursday.count(year(d), d) + (year(d).getDay() === 4), p, 2);
+  return pad(thursday.count(timeYear(d), d) + (timeYear(d).getDay() === 4), p, 2);
 }
 
 function formatWeekdayNumberSunday(d) {
@@ -15739,7 +16265,7 @@ function formatWeekdayNumberSunday(d) {
 }
 
 function formatWeekNumberMonday(d, p) {
-  return pad(monday.count(year(d) - 1, d), p, 2);
+  return pad(monday.count(timeYear(d) - 1, d), p, 2);
 }
 
 function formatYear(d, p) {
@@ -15781,7 +16307,7 @@ function formatUTCHour12(d, p) {
 }
 
 function formatUTCDayOfYear(d, p) {
-  return pad(1 + utcDay.count(utcYear(d), d), p, 3);
+  return pad(1 + utcDay$1.count(utcYear$1(d), d), p, 3);
 }
 
 function formatUTCMilliseconds(d, p) {
@@ -15810,7 +16336,7 @@ function formatUTCWeekdayNumberMonday(d) {
 }
 
 function formatUTCWeekNumberSunday(d, p) {
-  return pad(utcSunday.count(utcYear(d) - 1, d), p, 2);
+  return pad(utcSunday.count(utcYear$1(d) - 1, d), p, 2);
 }
 
 function UTCdISO(d) {
@@ -15820,7 +16346,7 @@ function UTCdISO(d) {
 
 function formatUTCWeekNumberISO(d, p) {
   d = UTCdISO(d);
-  return pad(utcThursday.count(utcYear(d), d) + (utcYear(d).getUTCDay() === 4), p, 2);
+  return pad(utcThursday.count(utcYear$1(d), d) + (utcYear$1(d).getUTCDay() === 4), p, 2);
 }
 
 function formatUTCWeekdayNumberSunday(d) {
@@ -15828,7 +16354,7 @@ function formatUTCWeekdayNumberSunday(d) {
 }
 
 function formatUTCWeekNumberMonday(d, p) {
-  return pad(utcMonday.count(utcYear(d) - 1, d), p, 2);
+  return pad(utcMonday.count(utcYear$1(d) - 1, d), p, 2);
 }
 
 function formatUTCYear(d, p) {
@@ -15902,6 +16428,8 @@ var formatIso$1 = Date.prototype.toISOString
     ? formatIsoNative
     : utcFormat(isoSpecifier);
 
+var formatIso$2 = formatIso$1;
+
 function parseIsoNative(string) {
   var date = new Date(string);
   return isNaN(date) ? null : date;
@@ -15911,13 +16439,7 @@ var parseIso = +new Date("2000-01-01T00:00:00.000Z")
     ? parseIsoNative
     : utcParse(isoSpecifier);
 
-var durationSecond = 1000,
-    durationMinute = durationSecond * 60,
-    durationHour = durationMinute * 60,
-    durationDay = durationHour * 24,
-    durationWeek = durationDay * 7,
-    durationMonth = durationDay * 30,
-    durationYear = durationDay * 365;
+var parseIso$1 = parseIso;
 
 function date(t) {
   return new Date(t);
@@ -15927,7 +16449,7 @@ function number(t) {
   return t instanceof Date ? +t : +new Date(+t);
 }
 
-function calendar(year, month, week, day, hour, minute, second, millisecond, format) {
+function calendar(ticks, tickInterval, year, month, week, day, hour, minute, second, format) {
   var scale = continuous(),
       invert = scale.invert,
       domain = scale.domain;
@@ -15941,27 +16463,6 @@ function calendar(year, month, week, day, hour, minute, second, millisecond, for
       formatMonth = format("%B"),
       formatYear = format("%Y");
 
-  var tickIntervals = [
-    [second,  1,      durationSecond],
-    [second,  5,  5 * durationSecond],
-    [second, 15, 15 * durationSecond],
-    [second, 30, 30 * durationSecond],
-    [minute,  1,      durationMinute],
-    [minute,  5,  5 * durationMinute],
-    [minute, 15, 15 * durationMinute],
-    [minute, 30, 30 * durationMinute],
-    [  hour,  1,      durationHour  ],
-    [  hour,  3,  3 * durationHour  ],
-    [  hour,  6,  6 * durationHour  ],
-    [  hour, 12, 12 * durationHour  ],
-    [   day,  1,      durationDay   ],
-    [   day,  2,  2 * durationDay   ],
-    [  week,  1,      durationWeek  ],
-    [ month,  1,      durationMonth ],
-    [ month,  3,  3 * durationMonth ],
-    [  year,  1,      durationYear  ]
-  ];
-
   function tickFormat(date) {
     return (second(date) < date ? formatMillisecond
         : minute(date) < date ? formatSecond
@@ -15970,33 +16471,6 @@ function calendar(year, month, week, day, hour, minute, second, millisecond, for
         : month(date) < date ? (week(date) < date ? formatDay : formatWeek)
         : year(date) < date ? formatMonth
         : formatYear)(date);
-  }
-
-  function tickInterval(interval, start, stop) {
-    if (interval == null) interval = 10;
-
-    // If a desired tick count is specified, pick a reasonable tick interval
-    // based on the extent of the domain and a rough estimate of tick size.
-    // Otherwise, assume interval is already a time interval and use it.
-    if (typeof interval === "number") {
-      var target = Math.abs(stop - start) / interval,
-          i = bisector(function(i) { return i[2]; }).right(tickIntervals, target),
-          step;
-      if (i === tickIntervals.length) {
-        step = tickStep(start / durationYear, stop / durationYear, interval);
-        interval = year;
-      } else if (i) {
-        i = tickIntervals[target / tickIntervals[i - 1][2] < tickIntervals[i][2] / target ? i - 1 : i];
-        step = i[1];
-        interval = i[0];
-      } else {
-        step = Math.max(tickStep(start, stop, interval), 1);
-        interval = millisecond;
-      }
-      return interval.every(step);
-    }
-
-    return interval;
   }
 
   scale.invert = function(y) {
@@ -16008,15 +16482,8 @@ function calendar(year, month, week, day, hour, minute, second, millisecond, for
   };
 
   scale.ticks = function(interval) {
-    var d = domain(),
-        t0 = d[0],
-        t1 = d[d.length - 1],
-        r = t1 < t0,
-        t;
-    if (r) t = t0, t0 = t1, t1 = t;
-    t = tickInterval(interval, t0, t1);
-    t = t ? t.range(t0, t1 + 1) : []; // inclusive stop
-    return r ? t.reverse() : t;
+    var d = domain();
+    return ticks(d[0], d[d.length - 1], interval == null ? 10 : interval);
   };
 
   scale.tickFormat = function(count, specifier) {
@@ -16025,24 +16492,23 @@ function calendar(year, month, week, day, hour, minute, second, millisecond, for
 
   scale.nice = function(interval) {
     var d = domain();
-    return (interval = tickInterval(interval, d[0], d[d.length - 1]))
-        ? domain(nice(d, interval))
-        : scale;
+    if (!interval || typeof interval.range !== "function") interval = tickInterval(d[0], d[d.length - 1], interval == null ? 10 : interval);
+    return interval ? domain(nice(d, interval)) : scale;
   };
 
   scale.copy = function() {
-    return copy$2(scale, calendar(year, month, week, day, hour, minute, second, millisecond, format));
+    return copy$2(scale, calendar(ticks, tickInterval, year, month, week, day, hour, minute, second, format));
   };
 
   return scale;
 }
 
 function time() {
-  return initRange.apply(calendar(year, month, sunday, day, hour, minute, second, millisecond, timeFormat).domain([new Date(2000, 0, 1), new Date(2000, 0, 2)]), arguments);
+  return initRange.apply(calendar(timeTicks, timeTickInterval, timeYear, timeMonth, sunday, timeDay, timeHour, timeMinute, utcSecond, timeFormat).domain([new Date(2000, 0, 1), new Date(2000, 0, 2)]), arguments);
 }
 
 function utcTime() {
-  return initRange.apply(calendar(utcYear, utcMonth, utcSunday, utcDay, utcHour, utcMinute, second, millisecond, utcFormat).domain([Date.UTC(2000, 0, 1), Date.UTC(2000, 0, 2)]), arguments);
+  return initRange.apply(calendar(utcTicks, utcTickInterval, utcYear$1, utcMonth$1, utcSunday, utcDay$1, utcHour$1, utcMinute$1, utcSecond, utcFormat).domain([Date.UTC(2000, 0, 1), Date.UTC(2000, 0, 2)]), arguments);
 }
 
 function transformer$1() {
@@ -16057,7 +16523,7 @@ function transformer$1() {
       unknown;
 
   function scale(x) {
-    return isNaN(x = +x) ? unknown : interpolator(k10 === 0 ? 0.5 : (x = (transform(x) - t0) * k10, clamp ? Math.max(0, Math.min(1, x)) : x));
+    return x == null || isNaN(x = +x) ? unknown : interpolator(k10 === 0 ? 0.5 : (x = (transform(x) - t0) * k10, clamp ? Math.max(0, Math.min(1, x)) : x));
   }
 
   scale.domain = function(_) {
@@ -16150,7 +16616,7 @@ function sequentialQuantile() {
       interpolator = identity$4;
 
   function scale(x) {
-    if (!isNaN(x = +x)) return interpolator((bisectRight(domain, x, 1) - 1) / (domain.length - 1));
+    if (x != null && !isNaN(x = +x)) return interpolator((bisect(domain, x, 1) - 1) / (domain.length - 1));
   }
 
   scale.domain = function(_) {
@@ -17024,7 +17490,7 @@ Linear.prototype = {
     x = +x, y = +y;
     switch (this._point) {
       case 0: this._point = 1; this._line ? this._context.lineTo(x, y) : this._context.moveTo(x, y); break;
-      case 1: this._point = 2; // proceed
+      case 1: this._point = 2; // falls through
       default: this._context.lineTo(x, y); break;
     }
   }
@@ -17623,7 +18089,7 @@ Basis.prototype = {
   },
   lineEnd: function() {
     switch (this._point) {
-      case 3: point$3(this, this._x1, this._y1); // proceed
+      case 3: point$3(this, this._x1, this._y1); // falls through
       case 2: this._context.lineTo(this._x1, this._y1); break;
     }
     if (this._line || (this._line !== 0 && this._point === 1)) this._context.closePath();
@@ -17634,7 +18100,7 @@ Basis.prototype = {
     switch (this._point) {
       case 0: this._point = 1; this._line ? this._context.lineTo(x, y) : this._context.moveTo(x, y); break;
       case 1: this._point = 2; break;
-      case 2: this._point = 3; this._context.lineTo((5 * this._x0 + this._x1) / 6, (5 * this._y0 + this._y1) / 6); // proceed
+      case 2: this._point = 3; this._context.lineTo((5 * this._x0 + this._x1) / 6, (5 * this._y0 + this._y1) / 6); // falls through
       default: point$3(this, x, y); break;
     }
     this._x0 = this._x1, this._x1 = x;
@@ -17722,7 +18188,7 @@ BasisOpen.prototype = {
       case 0: this._point = 1; break;
       case 1: this._point = 2; break;
       case 2: this._point = 3; var x0 = (this._x0 + 4 * this._x1 + x) / 6, y0 = (this._y0 + 4 * this._y1 + y) / 6; this._line ? this._context.lineTo(x0, y0) : this._context.moveTo(x0, y0); break;
-      case 3: this._point = 4; // proceed
+      case 3: this._point = 4; // falls through
       default: point$3(this, x, y); break;
     }
     this._x0 = this._x1, this._x1 = x;
@@ -17761,7 +18227,7 @@ class Bump {
         else this._context.moveTo(x, y);
         break;
       }
-      case 1: this._point = 2; // proceed
+      case 1: this._point = 2; // falls through
       default: {
         if (this._x) this._context.bezierCurveTo(this._x0 = (this._x0 + x) / 2, this._y0, this._x0, y, x, y);
         else this._context.bezierCurveTo(this._x0, this._y0 = (this._y0 + y) / 2, x, this._y0, x, y);
@@ -17876,7 +18342,7 @@ Cardinal.prototype = {
     switch (this._point) {
       case 0: this._point = 1; this._line ? this._context.lineTo(x, y) : this._context.moveTo(x, y); break;
       case 1: this._point = 2; this._x1 = x, this._y1 = y; break;
-      case 2: this._point = 3; // proceed
+      case 2: this._point = 3; // falls through
       default: point$2(this, x, y); break;
     }
     this._x0 = this._x1, this._x1 = this._x2, this._x2 = x;
@@ -17983,7 +18449,7 @@ CardinalOpen.prototype = {
       case 0: this._point = 1; break;
       case 1: this._point = 2; break;
       case 2: this._point = 3; this._line ? this._context.lineTo(this._x2, this._y2) : this._context.moveTo(this._x2, this._y2); break;
-      case 3: this._point = 4; // proceed
+      case 3: this._point = 4; // falls through
       default: point$2(this, x, y); break;
     }
     this._x0 = this._x1, this._x1 = this._x2, this._x2 = x;
@@ -18066,7 +18532,7 @@ CatmullRom.prototype = {
     switch (this._point) {
       case 0: this._point = 1; this._line ? this._context.lineTo(x, y) : this._context.moveTo(x, y); break;
       case 1: this._point = 2; break;
-      case 2: this._point = 3; // proceed
+      case 2: this._point = 3; // falls through
       default: point$1(this, x, y); break;
     }
 
@@ -18197,7 +18663,7 @@ CatmullRomOpen.prototype = {
       case 0: this._point = 1; break;
       case 1: this._point = 2; break;
       case 2: this._point = 3; this._line ? this._context.lineTo(this._x2, this._y2) : this._context.moveTo(this._x2, this._y2); break;
-      case 3: this._point = 4; // proceed
+      case 3: this._point = 4; // falls through
       default: point$1(this, x, y); break;
     }
 
@@ -18441,7 +18907,7 @@ Step.prototype = {
     x = +x, y = +y;
     switch (this._point) {
       case 0: this._point = 1; this._line ? this._context.lineTo(x, y) : this._context.moveTo(x, y); break;
-      case 1: this._point = 2; // proceed
+      case 1: this._point = 2; // falls through
       default: {
         if (this._t <= 0) {
           this._context.lineTo(this._x, y);
@@ -18793,7 +19259,7 @@ function zoom() {
   function zoom(selection) {
     selection
         .property("__zoom", defaultTransform)
-        .on("wheel.zoom", wheeled)
+        .on("wheel.zoom", wheeled, {passive: false})
         .on("mousedown.zoom", mousedowned)
         .on("dblclick.zoom", dblclicked)
       .filter(touchable)
@@ -18990,10 +19456,10 @@ function zoom() {
 
   function mousedowned(event, ...args) {
     if (touchending || !filter.apply(this, arguments)) return;
-    var g = gesture(this, args, true).event(event),
+    var currentTarget = event.currentTarget,
+        g = gesture(this, args, true).event(event),
         v = select(event.view).on("mousemove.zoom", mousemoved, true).on("mouseup.zoom", mouseupped, true),
         p = pointer(event, currentTarget),
-        currentTarget = event.currentTarget,
         x0 = event.clientX,
         y0 = event.clientY;
 
@@ -19169,8 +19635,7 @@ function zoom() {
 
 var index = /*#__PURE__*/Object.freeze({
   __proto__: null,
-  version: version,
-  bisect: bisectRight,
+  bisect: bisect,
   bisectRight: bisectRight,
   bisectLeft: bisectLeft,
   bisectCenter: bisectCenter,
@@ -19186,16 +19651,18 @@ var index = /*#__PURE__*/Object.freeze({
   fsum: fsum,
   fcumsum: fcumsum,
   group: group,
+  flatGroup: flatGroup,
+  flatRollup: flatRollup,
   groups: groups,
-  index: index$4,
+  index: index$5,
   indexes: indexes,
   rollup: rollup,
   rollups: rollups,
   groupSort: groupSort,
   bin: bin,
   histogram: bin,
-  thresholdFreedmanDiaconis: freedmanDiaconis,
-  thresholdScott: scott,
+  thresholdFreedmanDiaconis: thresholdFreedmanDiaconis,
+  thresholdScott: thresholdScott,
   thresholdSturges: thresholdSturges,
   max: max$3,
   maxIndex: maxIndex,
@@ -19204,13 +19671,15 @@ var index = /*#__PURE__*/Object.freeze({
   merge: merge$1,
   min: min$2,
   minIndex: minIndex,
+  mode: mode,
   nice: nice$1,
   pairs: pairs,
   permute: permute,
   quantile: quantile$1,
   quantileSorted: quantileSorted,
   quickselect: quickselect,
-  range: sequence,
+  range: range$2,
+  rank: rank,
   least: least,
   leastIndex: leastIndex,
   greatest: greatest,
@@ -19218,7 +19687,7 @@ var index = /*#__PURE__*/Object.freeze({
   scan: scan,
   shuffle: shuffle$1,
   shuffler: shuffler,
-  sum: sum$1,
+  sum: sum$2,
   ticks: ticks,
   tickIncrement: tickIncrement,
   tickStep: tickStep,
@@ -19228,7 +19697,7 @@ var index = /*#__PURE__*/Object.freeze({
   every: every,
   some: some,
   filter: filter$1,
-  map: map$1,
+  map: map$2,
   reduce: reduce,
   reverse: reverse$3,
   sort: sort,
@@ -19328,7 +19797,7 @@ var index = /*#__PURE__*/Object.freeze({
   csv: csv$1,
   tsv: tsv,
   image: image,
-  json: d3json,
+  json: json$1,
   text: text,
   xml: xml,
   html: html,
@@ -19351,8 +19820,8 @@ var index = /*#__PURE__*/Object.freeze({
   precisionPrefix: precisionPrefix,
   precisionRound: precisionRound,
   geoArea: area$2,
-  geoBounds: geoBounds,
-  geoCentroid: geoCentroid,
+  geoBounds: bounds$1,
+  geoCentroid: centroid$1,
   geoCircle: circle$2,
   geoClipAntimeridian: clipAntimeridian,
   geoClipCircle: clipCircle,
@@ -19364,7 +19833,7 @@ var index = /*#__PURE__*/Object.freeze({
   geoGraticule10: graticule10,
   geoInterpolate: interpolate,
   geoLength: length$1,
-  geoPath: geoPath,
+  geoPath: index$3,
   geoAlbers: albers,
   geoAlbersUsa: albersUsa,
   geoAzimuthalEqualArea: azimuthalEqualArea,
@@ -19386,7 +19855,7 @@ var index = /*#__PURE__*/Object.freeze({
   geoIdentity: identity$5,
   geoProjection: projection,
   geoProjectionMutator: projectionMutator,
-  geoMercator: geoMercator,
+  geoMercator: mercator,
   geoMercatorRaw: mercatorRaw,
   geoNaturalEarth1: naturalEarth1,
   geoNaturalEarth1Raw: naturalEarth1Raw,
@@ -19401,6 +19870,7 @@ var index = /*#__PURE__*/Object.freeze({
   geoTransform: transform$2,
   cluster: cluster,
   hierarchy: hierarchy,
+  Node: Node$1,
   pack: index$2,
   packSiblings: siblings,
   packEnclose: enclose,
@@ -19638,19 +20108,19 @@ var index = /*#__PURE__*/Object.freeze({
   stackOrderNone: none,
   stackOrderReverse: reverse$2,
   timeInterval: newInterval,
-  timeMillisecond: millisecond,
+  timeMillisecond: millisecond$1,
   timeMilliseconds: milliseconds,
-  utcMillisecond: millisecond,
+  utcMillisecond: millisecond$1,
   utcMilliseconds: milliseconds,
-  timeSecond: second,
+  timeSecond: utcSecond,
   timeSeconds: seconds,
-  utcSecond: second,
+  utcSecond: utcSecond,
   utcSeconds: seconds,
-  timeMinute: minute,
+  timeMinute: timeMinute,
   timeMinutes: minutes,
-  timeHour: hour,
+  timeHour: timeHour,
   timeHours: hours,
-  timeDay: day,
+  timeDay: timeDay,
   timeDays: days,
   timeWeek: sunday,
   timeWeeks: sundays,
@@ -19668,15 +20138,15 @@ var index = /*#__PURE__*/Object.freeze({
   timeFridays: fridays,
   timeSaturday: saturday,
   timeSaturdays: saturdays,
-  timeMonth: month,
+  timeMonth: timeMonth,
   timeMonths: months,
-  timeYear: year,
+  timeYear: timeYear,
   timeYears: years,
-  utcMinute: utcMinute,
+  utcMinute: utcMinute$1,
   utcMinutes: utcMinutes,
-  utcHour: utcHour,
+  utcHour: utcHour$1,
   utcHours: utcHours,
-  utcDay: utcDay,
+  utcDay: utcDay$1,
   utcDays: utcDays,
   utcWeek: utcSunday,
   utcWeeks: utcSundays,
@@ -19694,18 +20164,22 @@ var index = /*#__PURE__*/Object.freeze({
   utcFridays: utcFridays,
   utcSaturday: utcSaturday,
   utcSaturdays: utcSaturdays,
-  utcMonth: utcMonth,
+  utcMonth: utcMonth$1,
   utcMonths: utcMonths,
-  utcYear: utcYear,
+  utcYear: utcYear$1,
   utcYears: utcYears,
+  utcTicks: utcTicks,
+  utcTickInterval: utcTickInterval,
+  timeTicks: timeTicks,
+  timeTickInterval: timeTickInterval,
   timeFormatDefaultLocale: defaultLocale,
   get timeFormat () { return timeFormat; },
   get timeParse () { return timeParse; },
   get utcFormat () { return utcFormat; },
   get utcParse () { return utcParse; },
   timeFormatLocale: formatLocale,
-  isoFormat: formatIso$1,
-  isoParse: parseIso,
+  isoFormat: formatIso$2,
+  isoParse: parseIso$1,
   now: now,
   timer: timer,
   timerFlush: timerFlush,
@@ -19716,8 +20190,95 @@ var index = /*#__PURE__*/Object.freeze({
   interrupt: interrupt,
   zoom: zoom,
   zoomTransform: transform$1,
-  zoomIdentity: identity$1
+  zoomIdentity: identity$1,
+  ZoomTransform: Transform
 });
+
+/**
+ * Returns `true` if the given value not evaluates to false and is not 0. false else.
+ * @param value The value to check.
+ * @returns {boolean} A Boolean value indicating whether the given value is valid.
+ */
+function isValue(value) {
+  return Boolean(value || value === 0);
+}
+
+function isString(value) {
+  return value && typeof value === "string";
+}
+
+function isFunction(value) {
+  return value && typeof value === "function";
+}
+
+function isNumber(value) {
+  return typeof value === "number";
+}
+
+function isEmpty(value) {
+  return value ? value.length === 0 : false;
+}
+
+function copy(object) {
+  return JSON.parse(JSON.stringify(object));
+}
+
+// https://stackoverflow.com/questions/70579/what-are-valid-values-for-the-id-attribute-in-html
+// ids must not contain whitespaces
+// ids should avoid ".", ":" and "/"
+
+/**
+ * @param {*} id The id to escape from invalid characters
+ * @returns A safe to use version of the id
+ */
+function safeId(id) {
+  return id
+    .split(` `)
+    .join(`-`)
+    .split(`/`)
+    .join(`-`)
+    .split(`.`)
+    .join(`-`)
+    .split(`:`)
+    .join(`-`);
+}
+
+/**
+ * Creates and returns a unique generated string.
+ */
+const uniqueId = (function () {
+  var prefix = "ltv";
+  var unique = 0;
+  var random = () => Math.random().toString(36).substring(2, 8);
+
+  return function (type = "id") {
+    return [prefix, type, "" + unique++, random()].join("-");
+  };
+})();
+
+const MAX_FILENAME_LENGTH_OS = 255;
+
+const MAX_FILENAME_LENGTH = MAX_FILENAME_LENGTH_OS - 30;
+
+function trim(input) {
+  return input.length >= MAX_FILENAME_LENGTH
+    ? input.substring(0, MAX_FILENAME_LENGTH)
+    : input;
+}
+
+/**
+ * The default filename creator.
+ * @param {*} data
+ * @param {*} dc
+ * @returns
+ */
+const FILENAME_GENERATOR = function (data, dc) {
+  let comps = isEmpty(data.stacks) ? data.labels : data.stacks;
+  let amount = comps.length;
+  let joined = comps.map((c) => safeId(c)).join(";");
+  let short = trim(joined) + "---+" + amount + "";
+  return short;
+};
 
 const formatGerman = "%d.%m.%Y";
 const formatIso = "%Y-%m-%d";
@@ -19776,78 +20337,492 @@ var date_ordinator = /*#__PURE__*/Object.freeze({
   WEEKDAY_ORDINATOR: WEEKDAY_ORDINATOR
 });
 
-const colorScheme = category10;
-const tintColor = color();
+function darker(color) {
+  return color.darker().darker();
+}
+
+function random(till) {
+  return Math.floor(Math.random() * till);
+}
+
+// constants
+
+/**
+ * The default colors used by lotivis.
+ */
+const DATA_COLORS = []
+  .concat(Tableau10)
+  .concat(category10)
+  .concat(Dark2);
+
+/**
+ * The default tint color used by lotivis.
+ */
+const TINT_COLOR = DATA_COLORS[0];
+
+/**
+ * The default random colors.
+ */
+(() => {
+  let cs = Array.from(DATA_COLORS),
+    n = [];
+  while (cs.length > 0) n.push(cs.splice(random(cs.length), 1));
+  return n;
+})();
 
 class ColorGenerator {
   constructor(data) {
-    let stacksToLabels = group(
-      data,
-      (d) => d.stack || d.label,
-      (d) => d.label
-    );
+    let dataColors = DATA_COLORS,
+      stackToColor,
+      labelToColor;
 
-    let stacks = Array.from(stacksToLabels.keys());
+    function initialize() {
+      stackToColor = new Map();
+      labelToColor = new Map();
 
-    function stackLabels(stack) {
-      return Array.from(stacksToLabels.get(stack).keys() || []);
-    }
+      let stacksToLabels = group(
+        data,
+        (d) => d.stack || d.label,
+        (d) => d.label
+      );
 
-    function stackColor(stack) {
-      return colorScheme[stacks.indexOf(stack) % colorScheme.length];
-    }
+      let stacks = Array.from(stacksToLabels.keys());
 
-    // let colorScheme = d3.schemeCategory10;
-
-    let stackToColor = new Map();
-    let labelToColor = new Map();
-    for (let i = 0; i < stacks.length; i++) {
-      let stack = stacks[i];
-      let labels = stackLabels(stack);
-      let c1 = color(stackColor(stack));
-      let c2 = c1.darker().darker();
-      let generator = linear()
-        .domain([0, labels.length])
-        .range([c1, c2]);
-
-      stackToColor.set(stack, c1);
-
-      for (let j = 0; j < labels.length; j++) {
-        let label = labels[j];
-        let color = generator(j);
-        labelToColor.set(label, color);
+      function stackLabels(stack) {
+        return Array.from((stacksToLabels.get(stack) || []).keys());
       }
+
+      function stackColor(stack) {
+        return dataColors[stacks.indexOf(stack) % dataColors.length];
+      }
+
+      stacks.forEach((stack) => {
+        let labels = stackLabels(stack);
+        let c1 = color(stackColor(stack));
+        let colors = ColorScale(labels.length, [c1, darker(c1)]);
+
+        stackToColor.set(stack, c1);
+
+        labels.forEach((label, index) => {
+          labelToColor.set(label, colors(index));
+        });
+      });
     }
 
+    // public api
+
+    /**
+     * Returns the color for the given stack.
+     *
+     * @param {stack} stack The stack
+     * @returns The d3.color for the stack
+     * @public
+     */
     this.stack = function (stack) {
-      return stackToColor.get(stack) || tintColor;
+      return stackToColor ? stackToColor.get(stack) || TINT_COLOR : TINT_COLOR;
     };
 
+    /**
+     * Returns the color for the given label.
+     *
+     * @param {label} label The label
+     * @returns The d3.color for the label
+     * @public
+     */
     this.label = function (label) {
-      return labelToColor.get(label) || tintColor;
+      return labelToColor ? labelToColor.get(label) || TINT_COLOR : TINT_COLOR;
     };
 
-    this.stackColors = function (stack) {
-      let c1 = color(this.stack(stack));
-      let c2 = c1.darker().darker();
-      let size = stacksToLabels.get(stack).size;
-      let generator = linear().domain([0, size]).range([c1, c2]);
-      let colors = sequence(0, size).map(generator);
-      return colors;
-    };
+    initialize();
   }
 }
 
-function MapColors(till) {
+function MapColors(max) {
   return linear()
-    .domain([0, (1 / 3) * till, (2 / 3) * till, till])
+    .domain([0, (1 / 3) * max, (2 / 3) * max, max])
     .range(["yellow", "orange", "red", "purple"]);
 }
 
-function PlotColors(till) {
+function PlotColors(max) {
+  return ColorScale(max, ["yellow", "orange", "red", "purple"]);
+}
+
+function ColorScale(max, colors) {
   return linear()
-    .domain([0, (1 / 3) * till, (2 / 3) * till, till])
-    .range(["yellow", "orange", "red", "purple"]);
+    .domain(colors.map((c, i) => (i / (colors.length - 1)) * max))
+    .range(colors);
+}
+
+const DEFAULT_COLUMNS = ["label", "location", "date", "value", "stack"];
+
+function csvParse(text) {
+  return new DataController(csvParse$1(text, autoType));
+}
+
+async function csv(path) {
+  return fetch(path).then((csv) => csvParse(csv));
+}
+
+function csvRender(data, columns = DEFAULT_COLUMNS) {
+  return csvFormat(data.data ? data.data : data, columns);
+}
+
+function baseChart(state) {
+  if (!state) throw new Error("no state passed");
+
+  // Private attributes
+  var chart = {},
+    calc = {},
+    disp = dispatch("sel"),
+    state = state;
+
+  if (!state.id) state.id = uniqueId("chart");
+  if (!state.selector) state.selector = "body";
+  if (!state.debug) state.debug = false;
+
+  // Iterate state keys and create access function for each
+  Object.keys(state).forEach((key) => {
+    // do not override existing functions
+    if (chart[key] && isFunction(chart[key])) return;
+    chart[key] = function (_) {
+      return arguments.length ? ((state[key] = _), this) : state[key];
+    };
+  });
+
+  // public
+
+  /**
+   * Return the property for the given name if it exists, else
+   * the given fallback value.
+   *
+   * @param {string} name The name of the requested property
+   * @param {any} fb The fallback value
+   *
+   * @returns The property for the given name or the fallback.
+   */
+  state.get = function (name, fb) {
+    return state.hasOwnProperty(name) ? state[name] || fb : fb;
+  };
+
+  // private
+
+  function filterUpdate(filterName, item, sender) {
+    console.log("filterUpdate", item, sender.id());
+
+    if (chart === sender) return;
+    if (!chart.handleFilterName(filterName)) return;
+
+    if (!isString(state.selector))
+      throw new Error("invalid selector: " + state.selector);
+
+    var selector = state.selector;
+    var selection = selectAll(selector);
+
+    selection.each(function scope() {
+      // Receive container
+      var container = select(this);
+      if (typeof chart.update === "function")
+        chart.update(container, state, calc);
+    });
+  }
+
+  // public
+  chart.on = function (name, callback) {
+    disp.on(name, callback);
+  };
+
+  chart.call = function (name, ...args) {
+    disp.call(name, this, ...args);
+  };
+
+  // Define state getter and setter function
+  chart.state = function (_) {
+    return arguments.length ? (Object.assign(state, _), this) : state;
+  };
+
+  chart.handleFilterName = function (filterName) {
+    return true;
+  };
+
+  /**
+   * Returns the chart's id.
+   * @returns {string} The chart's id.
+   * @public
+   */
+  chart.id = function () {
+    return state.id;
+  };
+
+  /**
+   * Gets or sets the data controller.
+   *
+   * @param {dataController} _ The data controller
+   * @returns {dataController || this} The data controller or the chart itself
+   */
+  chart.dataController = function (_) {
+    if (!arguments.length) return state.dataController;
+    let name = "filter." + chart.id();
+
+    if (state.dataController) state.dataController.on(name, null);
+
+    state.dataController = _;
+    state.dataController.on(name, filterUpdate);
+
+    return chart;
+  };
+
+  // syntatic sugar
+
+  /**
+   * Gets or sets a margins object of the chart.
+   *
+   * @param {*} _ The object with margins to set
+   * @returns {margins | this} The margins object or the chart itself
+   */
+  chart.margin = function (_) {
+    if (!arguments.length) {
+      return {
+        left: state.marginLeft,
+        top: state.marginTop,
+        right: state.marginRight,
+        bottom: state.marginBottom,
+      };
+    }
+    if (_ && _["left"]) this.state({ marginLeft: _["left"] });
+    if (_ && _["top"]) this.state({ marginTop: _["top"] });
+    if (_ && _["right"]) this.state({ marginRight: _["right"] });
+    if (_ && _["bottom"]) this.state({ marginBottom: _["bottom"] });
+    return chart;
+  };
+
+  // life cycle
+
+  /**
+   * Calculates and returns the data view for a bar chart from
+   * the passed data controller.
+   *
+   * @param {dc} dc The data controller
+   * @returns {DataView} dv The calculated data view
+   */
+  chart.dataView = function (dc) {
+    return {};
+  };
+
+  /**
+   * Clears the content of the passed container. May be overriden
+   * by extending charts. Default implementation selects and
+   * removes everything from the conainter.
+   *
+   * @param {d3.Selection} container The selected container
+   * @param {*} calc The calc obj
+   * @param {*} dv The data view
+   * @returns {this} The chart itself (chainable)
+   */
+  chart.clear = function (container, calc, dv) {
+    return container.selectAll("*").remove(), this;
+  };
+
+  /**
+   * Renders the chart in the passed container. *Should* be overriden
+   * by extending charts. Default implementation does nothing and only
+   * returns the chart itself.
+   *
+   * @param {d3.Selection} container The selected container
+   * @param {*} calc The calc obj
+   * @param {*} dv The data view
+   * @returns {this} The chart itself (chainable)
+   */
+  chart.render = function (container, calc, dv) {
+    return this;
+  };
+
+  /**
+   * Runs the render chain. For each selected element by the selector
+   * of the chart.
+   *
+   * @param {dc} dc A (optional) data controller
+   * @returns {this} The chart itself (chainable)
+   */
+  chart.run = function (dc) {
+    if (dc) chart.dataController(dc);
+    else dc = state.dataController;
+
+    if (!state.selector) throw new Error("no selector");
+    if (!dc) throw new Error("no data controller");
+
+    let selection = selectAll(state.selector);
+    if (selection.size() === 0)
+      throw new Error("empty selection: " + state.selector);
+
+    let dv = chart.dataView(dc);
+    if (state.debug === true) console.log("dv", dv);
+
+    selection.each(function scope() {
+      // receive container
+      let container = select(this);
+      chart.clear(container, calc, dv);
+      chart.render(container, calc, dv);
+    });
+
+    return chart;
+  };
+
+  // return generated chart
+  return chart;
+}
+
+function datatext() {
+  let text;
+  let state = {
+    // the id of the data preview
+    id: uniqueId("datatext"),
+
+    // max height
+    height: 800,
+
+    // margin
+    marginLeft: 10,
+    marginTop: 5,
+    marginRight: 10,
+    marginBottom: 5,
+
+    // whether the datatext is enabled
+    enabled: true,
+
+    // (optional) title of the datatext
+    title: (chart) => "Data",
+
+    // the border style of the datatext
+    border: "solid 1px lightgray",
+
+    // the content type, "json", "csv" or a custom function
+    content: "csv",
+
+    // the data controller
+    dataController: null,
+  };
+
+  // expose state
+  let chart = baseChart(state);
+
+  // private
+
+  function dataText(data) {
+    switch (state.content) {
+      case "json":
+        return JSON.stringify(data, null, 2);
+      case "csv":
+        return csvRender(data);
+      default:
+        return isFunction(state.content)
+          ? state.content(data, this, state.dataController)
+          : "Unknown content type: ";
+    }
+  }
+
+  function inCodeTags(value) {
+    return '<code class="ltv-datatext-code">' + value + "</code>";
+  }
+
+  function html(text) {
+    return text.split("\n").map(inCodeTags).join("");
+  }
+
+  function unwrap(value) {
+    return typeof value === "function" ? value(chart) : value;
+  }
+
+  // public
+
+  /**
+   * Initiates a download of the content.
+   *
+   * @returns this The chart itself
+   * @public
+   */
+  chart.download = function () {
+    let blob = new Blob([text], { type: "text/" + state.content });
+    let filename = state.dataController.filename(state.content);
+    download(blob, filename);
+    return chart;
+  };
+
+  /**
+   * Calculates and returns the data view for the datatext.
+   * @param {*} dc The data controller
+   * @returns dv The generated data view
+   * @public
+   */
+  chart.dataView = function (dc) {
+    let dv = {};
+
+    dv.data = dc.data;
+    dv.labels = dc.labels();
+    dv.stacks = dc.stacks();
+    dv.locations = dc.locations();
+    dv.dates = dc.dates();
+    dv.text = dataText(dc.data);
+    text = dv.text;
+
+    return dv;
+  };
+
+  /**
+   *
+   * @param {*} container The container
+   * @param {*} calc The calc obj
+   * @param {*} dv The data view
+   * @returns this The chart itself
+   * @public
+   */
+  chart.render = function (container, calc, dv) {
+    calc.div = container
+      .append("div")
+      .classed("ltv-datatext", true)
+      .attr("id", state.id)
+      .style("border", state.border)
+      .style("padding-left", state.marginLeft + "px")
+      .style("padding-top", state.marginTop + "px")
+      .style("padding-right", state.marginRight + "px")
+      .style("padding-bottom", state.marginBottom + "px");
+
+    let title = unwrap(state.title);
+    let contentType = isString(state.content)
+      ? state.content
+      : typeof state.content;
+
+    if (isString(title)) {
+      calc.title = calc.div
+        .append("div")
+        .classed("ltv-datatext-title", true)
+        .text(title + " (" + contentType + ")")
+        .style("cursor", state.enabled ? "pointer" : null)
+        .on("click", state.enabled ? chart.download : null);
+    }
+
+    calc.pre = calc.div
+      .append("pre")
+      .classed("ltv-datatext-pre", true)
+      .html(html(dv.text));
+
+    if (isString(state.height) || isNumber(state.height)) {
+      calc.pre
+        .style("height", append(state.height, "px"))
+        .style("overflow", "scroll");
+    }
+
+    if (LOTIVIS_CONFIG.debug) {
+      calc.footer = calc.div
+        .append("div")
+        .classed("ltv-datatext-title", true)
+        .text(state.dataController.filename());
+    }
+
+    return chart;
+  };
+
+  // return generated chart
+  return chart;
 }
 
 const DEFAULT_NUMBER_FORMAT = new Intl.NumberFormat("en-EN", {
@@ -19858,7 +20833,7 @@ const GERMAN_NUMBER_FORMAT = new Intl.NumberFormat("de-DE", {
   maximumFractionDigits: 3,
 }).format;
 
-var LOTIVIS_CONFIG$1 = {
+var LOTIVIS_CONFIG = {
   // The default margin to use for charts.
   defaultMargin: 60,
   // The default offset for the space between an object an the toolbar.
@@ -19875,17 +20850,42 @@ var LOTIVIS_CONFIG$1 = {
   unknown: "LOTIVIS_UNKNOWN",
   // The default number formatter used by all charts.
   numberFormat: GERMAN_NUMBER_FORMAT,
+
+  // the border style
+  defaultBorder: "solid 1px lightgray",
+
+  selectionOpacity: 0.1,
 };
 
-const DEFAULT_MARGIN = {
-  top: LOTIVIS_CONFIG$1.defaultMargin,
-  right: LOTIVIS_CONFIG$1.defaultMargin,
-  bottom: LOTIVIS_CONFIG$1.defaultMargin,
-  left: LOTIVIS_CONFIG$1.defaultMargin,
-};
+/**
+ * Appends the passed value in appendix to the passed value of string if string not
+ * already ends with appendix.
+ *
+ * @param {*} string
+ * @param {*} appendix
+ * @returns {string} The passed string having the passed appendix
+ */
+function append(string, appendix) {
+  return ("" + string).endsWith(appendix) ? string : string + appendix;
+}
 
-/** lotivis-wide global variable for enabling debug logging */
-var D_LOG = false;
+/**
+ * Initiates a download of the passed blob with the passed name.
+ * @param {*} blob The blob to download
+ * @param {*} filename The name of the downloaded file
+ */
+function download(blob, filename) {
+  if (window.navigator.msSaveOrOpenBlob) {
+    window.navigator.msSaveBlob(blob, filename);
+  } else {
+    let a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    a.click();
+  }
+}
+
+// DEBUG
 
 /**
  * Sets whether lotivis prints debug log messages to the console.
@@ -19893,68 +20893,49 @@ var D_LOG = false;
  * @param printConfig A Boolean value indicating whether to print the global lotivis configuration.  Default is false.
  */
 function debug(enabled) {
-  LOTIVIS_CONFIG$1.debug = enabled;
-  D_LOG = enabled;
+  LOTIVIS_CONFIG.debug = enabled;
   console.log(`[ltv]  ${enabled ? "En" : "Dis"}abled debug mode.`);
 }
 
 /**
- * Return a Boolean value indicating whether the given
- * value is a string.
- *
- * @param {*} v The value to check.
- * @returns true if given value is a string
- */
-function isString(v) {
-  return typeof v === "string" || v instanceof String;
+ * Returns a Boolean value indicating whether lotivis
+ * runs in the browser (else it will probably run in an
+ * environment like Node.js)
+ * */
+function runsInBrowser() {
+  return !(typeof document === "undefined");
 }
 
-function set_data_preview(v) {
-  if (!v || !LOTIVIS_CONFIG$1.debug) return;
-  if (typeof document === "undefined") return;
-  let s = isString(v) ? v : JSON.stringify(v, null, 2);
-  let e = document.getElementById("ltv-data-preview");
-  if (e) e.textContent = s;
+function data_preview(dc) {
+  if (!dc || !LOTIVIS_CONFIG.debug || !runsInBrowser()) return;
+  if (!document.getElementById("ltv-data")) return;
+  datatext().selector("#ltv-data").dataController(dc).run();
 }
 
-function isFunction(value) {
-  return value && typeof value === "function";
-}
-
-class State {
-  constructor(state, config) {
-    if (!state) throw new Error("no state passed");
-
-    // private
-    // Declare initial chart state attributes
-    const _state = state;
-
-    Object.keys(_state).forEach((key) => {
-      // do not override (custom) existing functions
-      if (isFunction(this[key])) return;
-      this[key] = function (_) {
-        return arguments.length ? ((_state[key] = _), this) : _state[key];
-      };
-    });
-
-    // if exists overwrite state from passed config
-    Object.keys(_state).forEach((key) => {
-      if (config && config[key]) _state[key] = config[key];
-    });
-
-    // public
-
-    // Define state getter and setter function
-    this.state = function (_) {
-      return arguments.length ? (Object.assign(_state, _), this) : _state;
-    };
-
-    this.stateItem = function (name, fb) {
-      return _state.hasOwnProperty(name) ? _state[name] || fb : fb;
-    };
-
-    if (isFunction(this.didConstruct)) this.didConstruct();
+class DataUnqualifiedError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = "DataUnqualifiedError";
   }
+}
+
+function Data(data) {
+  if (!Array.isArray(data))
+    throw new DataUnqualifiedError("not an array", data);
+
+  data.sum = sum$2(data, (d) => d.value);
+  data.max = max$3(data, (d) => d.value);
+  data.min = min$2(data, (d) => d.value);
+  data.byLabel = group(data, (d) => d.label);
+  data.byStack = group(data, (d) => d.stack || d.label);
+  data.byLocation = group(data, (d) => d.location);
+  data.byDate = group(data, (d) => d.date);
+  data.labels = Array.from(data.byLabel.keys());
+  data.stacks = Array.from(data.byStack.keys());
+  data.locations = Array.from(data.byLocation.keys());
+  data.dates = Array.from(data.byDate.keys());
+
+  return data;
 }
 
 /**
@@ -19978,47 +20959,40 @@ Array.prototype.remove = function (item) {
   return i !== -1 ? this.splice(i, 1) : false;
 };
 
-class DataController extends State {
-  constructor(data, config) {
+class DataController {
+  constructor(data) {
     if (!Array.isArray(data)) throw new Error("data not an array.");
 
-    super(
-      // public state
-      {
-        data: data,
-        original: data,
-        dateAccess: DEFAULT_DATE_ORDINATOR,
-        colorGenerator: new ColorGenerator(data),
-      },
-      config
-    );
+    let _data = Data(data),
+      filenameGen = FILENAME_GENERATOR,
+      dateAccess = DEFAULT_DATE_ORDINATOR,
+      colorGenerator = new ColorGenerator(_data),
+      disp = dispatch("filter", "change"),
+      debug = true;
 
-    // private properties
-    var _disp = dispatch("filter", "change");
-
-    this.data = data;
-
-    // private sate
-    this.state({ calc: {}, cache: {} });
-
-    // filters
-    this.filtersDidChange.bind(this);
+    this.data = Data(data);
     this.filters = { labels: [], locations: [], dates: [], stacks: [] };
 
+    // private
+    function callFilterChange(name, item, sender) {
+      if (!sender) throw new Error("missing sender");
+      if (debug) console.log("filter", name, item);
+      return disp.call("filter", this, name, item, sender), this;
+    }
+
+    // public api
+
     this.on = function (name, callback) {
-      return _disp.on(name, callback), this;
+      return disp.on(name, callback), this;
     };
 
-    this.call = function (name, that, type, sender) {
-      return _disp.call(name, that, type, sender), this;
-    };
-
+    /**
+     * Removes all callbacks from the dispatcher.
+     * @returns {this} The chart itself
+     */
     this.removeAllListeners = function () {
-      return (_disp = dispatch("filter", "change")), this;
+      return (disp = dispatch("filter", "change")), this;
     };
-
-    if (LOTIVIS_CONFIG$1.debug) console.log("[ltv] ", this);
-    if (this.original && this.original()) set_data_preview(this.original());
 
     // # FILTERS
 
@@ -20027,47 +21001,68 @@ class DataController extends State {
       this.filters.locations.clear();
       this.filters.labels.clear();
       this.filters.stacks.clear();
-      this.call("filter", this, null, sender);
+      callFilterChange("all", null, sender);
+    };
+
+    this.clearLabelFilters = function (sender) {
+      if (!isEmpty(this.filters.labels))
+        (this.filters.labels = []), callFilterChange("label", null, sender);
+    };
+
+    this.clearStackFilters = function (sender) {
+      if (!isEmpty(this.filters.stacks))
+        (this.filters.stacks = []), callFilterChange("stack", null, sender);
+    };
+
+    this.clearLocationFilters = function (sender) {
+      if (!isEmpty(this.filters.locations))
+        (this.filters.locations = []),
+          callFilterChange("location", null, sender);
+    };
+
+    this.clearDateFilters = function (sender) {
+      if (!isEmpty(this.filters.dates))
+        (this.filters.dates = []), callFilterChange("date", null, sender);
     };
 
     this.addLocationFilter = function (location, sender) {
       if (this.filters.locations.add(location, sender))
-        this.call("filter", this, location, sender);
+        callFilterChange("location", location, sender);
     };
 
     this.removeLocationFilter = function (location, sender) {
       if (this.filters.locations.remove(location, sender))
-        this.call("filter", this, location, sender);
+        callFilterChange("location", location, sender);
     };
 
     this.addDateFilter = function (date, sender) {
       if (this.filters.dates.add(date, sender))
-        this.call("filter", this, date, sender);
+        callFilterChange("date", date, sender);
     };
 
     this.removeDateFilter = function (date, sender) {
       if (this.filters.dates.remove(date, sender))
-        this.call("filter", this, date, sender);
+        callFilterChange("date", date, sender);
     };
 
     this.addLabelFilter = function (label, sender) {
       if (this.filters.labels.add(label, sender))
-        this.call("filter", this, label, sender);
+        callFilterChange("label", label, sender);
     };
 
     this.removeLabelFilter = function (label, sender) {
       if (this.filters.labels.remove(label, sender))
-        this.call("filter", this, label, sender);
+        callFilterChange("label", label, sender);
     };
 
     this.addStackFilter = function (stack, sender) {
       if (this.filters.stacks.add(stack, sender))
-        this.call("filter", this, stack, sender);
+        callFilterChange("stack", stack, sender);
     };
 
     this.removeStackFilter = function (stack, sender) {
       if (this.filters.stacks.remove(stack, sender))
-        this.call("filter", this, stack, sender);
+        callFilterChange("stack", stack, sender);
     };
 
     this.locationFilters = function () {
@@ -20126,13 +21121,38 @@ class DataController extends State {
         : this.addStackFilter(stack, sender);
     };
 
-    return this;
-  }
+    /**
+     * Gets or sets the filename generator.
+     *
+     * @param {*} _
+     * @returns {filenameGen | this}
+     */
+    this.filenameGenerator = function (_) {
+      return arguments.length ? ((filenameGen = _), this) : filenameGen;
+    };
 
-  filtersDidChange(name, reason, item, sender) {
-    // console.log("filtersDidChange", name, reason, item, sender);
-    this.calculateSnapshot();
-    this.emit("change", this, name, reason, sender, item);
+    this.dateAccess = function (_) {
+      return arguments.length ? ((dateAccess = _), this) : dateAccess;
+    };
+
+    this.colorGenerator = function (_) {
+      return arguments.length ? ((colorGenerator = _), this) : colorGenerator;
+    };
+
+    this.debug = function (_) {
+      return arguments.length ? ((debug = _), this) : debug;
+    };
+
+    this.labelColor = colorGenerator.label;
+    this.stackColor = colorGenerator.stack;
+
+    this.calculateSnapshot.bind(this)();
+    // console.timeEnd("DataController");
+
+    if (LOTIVIS_CONFIG.debug && this.debug) console.log("[ltv] ", this);
+    data_preview(this);
+
+    return this;
   }
 
   /** Returns entries with valid value. */
@@ -20189,23 +21209,23 @@ class DataController extends State {
   }
 
   sumOfStack(s) {
-    return sum$1(this.dataStack(s), (d) => d.value);
+    return sum$2(this.dataStack(s), (d) => d.value);
   }
 
   sumOfLabel(l) {
-    return sum$1(this.dataLabel(l), (d) => d.value);
+    return sum$2(this.dataLabel(l), (d) => d.value);
   }
 
   sumOfLocation(l) {
-    return sum$1(this.dataLocation(l), (d) => d.value);
+    return sum$2(this.dataLocation(l), (d) => d.value);
   }
 
   sumOfDate(d) {
-    return sum$1(this.dataDate(s), (d) => d.value);
+    return sum$2(this.dataDate(s), (d) => d.value);
   }
 
   sum() {
-    return sum$1(this.data, (d) => d.value);
+    return sum$2(this.data, (d) => d.value);
   }
 
   max() {
@@ -20216,7 +21236,21 @@ class DataController extends State {
     return min$2(this.data, (item) => item.value);
   }
 
-  /** Returns a string _this can be used as filename for downloads. */
+  /**
+   *
+   * @param {string} ext
+   * @param {string} prefix
+   * @returns The generated filename
+   */
+  filename(ext, prefix) {
+    let generator = this.filenameGenerator() || FILENAME_GENERATOR;
+    let name = generator(this.data, this);
+    if (prefix) name = prefix + "-" + name;
+    if (ext) name = append(name, ".") + ext;
+    return generator(this.data, this, prefix, ext);
+  }
+
+  /** Returns a string that can be used as filename for downloads. */
   getFilename() {
     if (!this.labels) return "Unknown";
     let labels = this.labels.map((label) => label.split(` `).join(`-`));
@@ -20229,57 +21263,31 @@ class DataController extends State {
   // # SNAPSHOT
 
   calculateSnapshot() {
+    // console.time("calculateSnapshot");
     let f = this.filters;
     let snapshot = filter$1(this.data, (d) => {
       return !(
-        (d.location && f.locations.contains(d.location)) ||
-        (d.date && f.dates.contains(d.date)) ||
-        (d.label && f.labels.contains(d.label)) ||
-        (d.stack && f.stacks.contains(d.stack))
+        f.locations.indexOf(d.location) !== -1 ||
+        f.dates.indexOf(d.dateAccess) !== -1 ||
+        f.labels.indexOf(d.label) !== -1 ||
+        f.stacks.indexOf(d.stack) !== -1
       );
     });
-    return this.state({ snapshot });
+    return (this.snapshotData = snapshot), this;
   }
 
   snapshot() {
-    return this.stateItem("snapshot", null);
+    return this.snapshotData;
   }
 
   snapshotOrData() {
-    return this.stateItem("snapshot", this.stateItem("data", null));
+    return this.snapshotData ?? this.data;
   }
-}
-
-const DEFAULT_COLUMNS = ["label", "location", "date", "value", "stack"];
-
-function csvParse(text) {
-  return new DataController(csvParse$1(text, autoType));
-}
-
-async function csv(path) {
-  return fetch(path).then((csv) => csvParse(csv));
-}
-
-function csvRender(data, columns = DEFAULT_COLUMNS) {
-  return csvFormat(data.data ? data.data : data, columns);
-}
-
-class DataUnqualifiedError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = "DataUnqualifiedError";
-  }
-}
-
-function parseDataset(d) {
-  return new DataController(flatDataset(d));
-}
-
-function parseDatasets(d) {
-  return new DataController(flatDatasets(d));
 }
 
 function flatDataset(d) {
+  if (Array.isArray(d)) throw new Error("expecting object. found array");
+  if (!d || !d.data) throw new Error("dataset has no data");
   return d.data.map(function (i) {
     return {
       label: d.label,
@@ -20291,12 +21299,25 @@ function flatDataset(d) {
   });
 }
 
+/**
+ * Flattens the given datasets.
+ * @param {*} ds
+ * @returns {Array} The flat version
+ */
 function flatDatasets(ds) {
   return ds.reduce((memo, d) => memo.concat(flatDataset(d)), []);
 }
 
+function parseDataset(d) {
+  return parseDatasets([d]);
+}
+
+function parseDatasets(d) {
+  return new DataController(flatDatasets(d));
+}
+
 function json(path) {
-  return d3json(path).then((json) => {
+  return json$1(path).then((json) => {
     if (!Array.isArray(json)) throw new DataUnqualifiedError();
     let flat = flatDatasets(json);
     let controller = new DataController(flat, { original: json });
@@ -20304,832 +21325,110 @@ function json(path) {
   });
 }
 
-// Code from:
-// https://www.freecodecamp.org/news/how-to-code-your-own-event-emitter-in-node-js-a-step-by-step-guide-e13b7e7908e1/
-
-class EventEmitter {
-  listeners = {};
-
-  addListener(eventName, fn) {
-    this.listeners[eventName] = this.listeners[eventName] || [];
-    this.listeners[eventName].push(fn);
-    return this;
-  }
-
-  on(eventName, fn) {
-    return this.addListener(eventName, fn);
-  }
-
-  once(eventName, fn) {
-    this.listeners[eventName] = this.listeners[eventName] || [];
-    const onceWrapper = () => {
-      fn();
-      this.off(eventName, onceWrapper);
-    };
-    this.listeners[eventName].push(onceWrapper);
-    return this;
-  }
-
-  off(eventName, fn) {
-    return this.removeListener(eventName, fn);
-  }
-
-  removeListener(eventName, fn) {
-    let lis = this.listeners[eventName];
-    if (!lis) return this;
-    for (let i = lis.length; i > 0; i--) {
-      if (lis[i] === fn) {
-        lis.splice(i, 1);
-        break;
-      }
-    }
-    return this;
-  }
-
-  emit(eventName, ...args) {
-    let fns = this.listeners[eventName];
-    if (!fns) return false;
-    fns.forEach((f) => {
-      f(...args);
-    });
-    return true;
-  }
-
-  listenerCount(eventName) {
-    let fns = this.listeners[eventName] || [];
-    return fns.length;
-  }
-
-  rawListeners(eventName) {
-    return this.listeners[eventName];
-  }
-
-  removeAllListeners() {
-    this.listeners = {};
-  }
+function jsonFlat(path) {
+  return json$1(path).then((json) => {
+    if (!Array.isArray(json)) throw new DataUnqualifiedError();
+    let controller = new DataController(json, { original: json });
+    return controller;
+  });
 }
 
-class Component extends EventEmitter {
-  constructor(selector) {
-    if (!selector) throw new Error("no selector specified");
-    super();
-    this.selector = selector;
-    this.element = select("#" + selector);
-    if (this.element.empty())
-      throw new Error('invalid selector "' + selector + '"');
-    this.element.attr("id", this.selector);
-  }
+/**
+ * Reusable Tooltip API class that renders a
+ * simple and configurable tooltip.
+ *
+ * @requires d3
+ *
+ * @example
+ *
+ * var tooltip = tooltip()
+ *    .container(chart)
+ *    .html("Hello World")
+ *    .run();
+ *
+ */
+function tooltip() {
+  let state = {
+    // the id of the tooltip
+    id: uniqueId("tooltip"),
 
-  // MARK: - Functions
-
-  show() {
-    if (this.element) this.element.style("display", "");
-  }
-
-  hide() {
-    if (this.element) this.element.style("display", "none");
-  }
-
-  get isVisible() {
-    return !this.element ? this.element.style("display") !== "none" : false;
-  }
-
-  getElementEffectiveSize() {
-    if (!this.element) return [0, 0];
-    let width = this.element.style("width").replace("px", "");
-    let height = this.element.style("height").replace("px", "");
-    return [Number(width), Number(height)];
-  }
-
-  getElementPosition() {
-    let element = document.getElementById(this.selector);
-    if (!element) return [0, 0];
-    let rect = element.getBoundingClientRect();
-    let xPosition = rect.x + window.scrollX;
-    let yPosition = rect.y + window.scrollY;
-    return [xPosition, yPosition];
-  }
-
-  toString() {
-    return "[" + getClassname() + ", id: " + this.selector + "]";
-  }
-
-  getClassname() {
-    return !this.constructor || !this.constructor.name
-      ? typeof this
-      : this.constructor.name;
-  }
-}
-
-const genId = (function () {
-  var prefix = "ltv";
-  var unique = 0;
-
-  function random() {
-    return Math.random().toString(36).substring(2, 8);
-  }
-
-  return function (type = "id") {
-    return [prefix, type, "" + unique++, random()].join("-");
+    // the tooltips margin
+    marginLeft: 0,
+    marginTop: 0,
+    marginRight: 0,
+    marginBottom: 0,
   };
-})();
 
-const create_id = genId;
+  let main = baseChart(state),
+    container,
+    div;
 
-class Chart extends Component {
-  constructor(selector, config) {
-    super(selector);
-
-    this.svgSelector = (this.selector || create_id()) + "-svg";
-    this.config = config || {};
-    this.renderers = [];
-    this.updateSensible = true;
-
-    this.createSVG();
-    this.initialize();
-    this.addRenderers();
-
-    // check for data controller in config
-    if (this.config.dataController instanceof DataController) {
-      this.setController(this.config.dataController);
-      delete this.config.dataController;
-    }
+  // private
+  function withPixels(value) {
+    return typeof value === "string" && value.endsWith("px")
+      ? value
+      : value + "px";
   }
 
-  initialize() {}
+  // public api
 
-  addRenderers() {}
+  main.container = function (_container) {
+    return arguments.length ? ((container = _container), main) : container;
+  };
 
-  dataView() {}
+  main.html = function (_html) {
+    if (!div) throw new Error("no div of tooltip");
+    return arguments.length ? (div.html(_html), main) : div.attr("x");
+  };
 
-  createSVG() {
-    this.svg = this.element
-      .append("svg")
-      .attr("id", this.svgSelector)
-      .attr("class", "ltv-chart-svg");
-  }
+  main.show = function (html) {
+    if (!div) throw new Error("no div of tooltip");
+    return div.style("opacity", 1), main;
+  };
 
-  remove(c) {
-    this.removeAllListeners();
-    this.svg.selectAll("*").remove();
-  }
+  main.hide = function () {
+    if (!div) throw new Error("no div of tooltip");
+    return div.style("opacity", 0), main;
+  };
 
-  prepare(c) {
-    // empty
-  }
+  main.top = function (_top) {
+    if (!div) throw new Error("no div of tooltip");
+    if (!arguments.length) return div.style("top");
+    div.style("top", withPixels(_top));
+    return main;
+  };
 
-  draw() {
-    this.renderers.forEach((r) =>
-      r.render(this, this.controller, this.dataView)
-    );
-  }
+  main.left = function (_left) {
+    if (!div) throw new Error("no div of tooltip");
+    if (!arguments.length) return div.style("left");
+    div.style("left", withPixels(_left));
+    return main;
+  };
 
-  redraw() {
-    if (this.controller) this.update(this.controller, "redraw");
-  }
+  main.size = function () {
+    if (!div) throw new Error("no div of tooltip");
+    let domRect = div.node().getBoundingClientRect();
+    return [domRect.width, domRect.height];
+  };
 
-  makeUpdateInsensible() {
-    this.updateSensible = false;
-  }
+  main.run = function () {
+    // remove any previous rendered tooltip
+    // if (div) div.remove();
 
-  makeUpdateSensible() {
-    this.updateSensible = true;
-  }
-
-  update(controller, filter, reason, sender) {
-    // console.log("update", filter, reason, sender);
-    if (!this.updateSensible) return;
-    if (!this.controller) return;
-    this.dataView = this.createDataView();
-    this.remove();
-    this.prepare();
-    this.draw();
-  }
-
-  setController(dc) {
-    this.controller = dc;
-    this.controller.on("change", (d, f, r, s) => this.update(d, r, f, s));
-    this.update(dc, "registration");
-  }
-}
-
-const BAR_CHART_TYPE = {
-  stacks: "stacks",
-  combine: "combine",
-};
-
-const DATE_ACCESS = function (d) {
-  return d;
-};
-
-const BAR_CHART_CONFIG = {
-  width: 1000,
-  height: 600,
-  margin: DEFAULT_MARGIN,
-  type: "stacks",
-  labels: false,
-  selectable: true,
-  dateAccess: DATE_ACCESS,
-};
-
-class Renderer {
-  render() {}
-}
-
-class BarAxisRender extends Renderer {
-  render(chart, controller) {
-    let height = chart.config.height;
-    let margin = chart.config.margin;
-
-    // left axis
-    chart.svg
-      .append("g")
-      .call(axisLeft(chart.yChart))
-      .attr("transform", () => `translate(${margin.left},0)`);
-
-    // bottom axis
-    chart.svg
-      .append("g")
-      .call(axisBottom(chart.xChartScale))
-      .attr("transform", () => `translate(0,${height - margin.bottom})`);
-  }
-}
-
-class BarLabelsRenderer extends Renderer {
-  render(chart, controller) {
-    if (!chart.config.labels) return;
-
-    function translate(x, y) {
-      return `translate(${x},${y})rotate(-60)`;
-    }
-
-    let dates = chart.dataView.dates;
-    let byDateStack = chart.dataView.byDateStack;
-
-    let xChartScale = chart.xChartScale;
-    let yChart = chart.yChart;
-    let xStack = chart.xStack;
-    let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
-    let width = chart.xStack.bandwidth() / 2;
-
-    let labels = chart.svg.append("g").selectAll("g").data(dates).enter();
-
-    labels
-      .append("g")
-      .attr("transform", (date) => `translate(${xChartScale(date)},0)`)
-      .selectAll(".text")
-      .data((date) => byDateStack.get(date) || [])
-      .enter()
-      .append("text")
-      .attr("class", "ltv-bar-chart-label")
-      .attr("transform", (d) => {
-        let stack = d[0];
-        let value = d[1];
-        return translate((xStack(stack) || 0) + width, yChart(value) - 5);
-      })
-      .text((d) => (d[1] === 0 ? "" : numberFormat(d[1])))
-      .raise();
-  }
-}
-
-class BarLegendRenderer extends Renderer {
-  render(chart, controller, dataView) {
-    return;
-  }
-}
-
-class BarBarsRenderer extends Renderer {
-  render(chart, controller) {
-    let radius = chart.config.barRadius || LOTIVIS_CONFIG$1.barRadius;
-    let colors = controller.colorGenerator();
-    let barWidth = chart.xStack.bandwidth();
-    let yChart = chart.yChart;
-    let height = chart.yChart(0);
-    let selectionOpacity = 0.3;
-
-    function opacity(date) {
-      return controller.filters.dates.contains(date) ? selectionOpacity : 1;
-    }
-
-    function redraw() {
-      chart.svg
-        .selectAll(`.ltv-bar-chart-dates-area`)
-        .attr(`opacity`, (d) => opacity(d[0]))
-        .raise();
-    }
-
-    chart.on("click-date", redraw);
-
-    function combined() {
-      chart.svg
-        .append("g")
-        .selectAll("g")
-        .data(chart.dataView.byDateStack)
-        .enter()
-        .append("g")
-        .attr("transform", (d) => `translate(${chart.xChartScale(d[0])},0)`)
-        .attr("opacity", (d) => opacity(d[0]))
-        .attr("class", "ltv-bar-chart-dates-area")
-        .selectAll("rect")
-        .data((d) => d[1]) // map to by stack
-        .enter()
-        .append("rect")
-        .attr("class", "ltv-bar-chart-bar")
-        .attr("fill", (d) => colors.stack(d[0]))
-        .attr("x", (d) => chart.xStack(d[0]))
-        .attr("y", (d) => chart.yChart(d[1]))
-        .attr("width", barWidth)
-        .attr("height", (d) => height - chart.yChart(d[1]))
-        .attr("rx", radius)
-        .attr("ry", radius)
-        .raise();
-    }
-
-    function stacked() {
-      chart.svg
-        .append("g")
-        .selectAll("g")
-        .data(chart.dataView.byDatesStackSeries)
-        .enter()
-        .append("g")
-        .attr("transform", (d) => `translate(${chart.xChartScale(d[0])},0)`)
-        .attr("opacity", (d) => opacity(d[0]))
-        .attr("class", "ltv-bar-chart-dates-area")
-        .selectAll("rect")
-        .data((d) => d[1]) // map to by stack
-        .enter()
-        .append("g")
-        .attr("transform", (d) => `translate(${chart.xStack(d[0])},0)`)
-        .selectAll("rect")
-        .data((d) => d[1]) // map to series
-        .enter()
-        .append("rect")
-        .attr("y", (d) => yChart(d[1]))
-        .attr("width", barWidth)
-        .attr("height", (d) => (!d[1] ? 0 : yChart(d[0]) - yChart(d[1])))
-        .attr("class", "ltv-bar-chart-bar")
-        .attr("fill", (d) => colors.label(d[2]))
-        .attr("rx", radius)
-        .attr("ry", radius)
-        .raise();
-    }
-
-    if (chart.config.type === BAR_CHART_TYPE.combine) {
-      combined();
-    } else {
-      stacked();
-    }
-  }
-}
-
-class BarTooltipRenderer extends Renderer {
-  render(chart, controller, dataView) {
-    let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
-
-    chart.element.select(".ltv-tooltip").remove();
-    const tooltip = chart.element
+    // render the div of the tooltip
+    div = container
       .append("div")
       .attr("class", "ltv-tooltip")
-      .attr("rx", 5) // corner radius
-      .attr("ry", 5)
       .style("opacity", 0);
 
-    function getTooltipSize() {
-      let tooltipWidth = Number(tooltip.style("width").replace("px", ""));
-      let tooltipHeight = Number(tooltip.style("height").replace("px", ""));
-      return [tooltipWidth, tooltipHeight];
-    }
-
-    function getTop(factor, offset, tooltipSize) {
-      let top = chart.config.margin.top * factor;
-      top += (chart.graphHeight * factor - tooltipSize[1]) / 2;
-      top += offset[1] - 10;
-      return top;
-    }
-
-    function getXLeft(date, factor, offset, tooltipSize) {
-      let x = chart.xChartScalePadding(date) * factor;
-      return x + offset[0] - tooltipSize[0] - 22 - LOTIVIS_CONFIG$1.tooltipOffset;
-    }
-
-    function getXRight(date, factor, offset) {
-      let x =
-        chart.xChartScalePadding(date) + chart.xChartScalePadding.bandwidth();
-      x *= factor;
-      x += offset[0] + LOTIVIS_CONFIG$1.tooltipOffset;
-      return x;
-    }
-
-    function getHTMLForDate(date) {
-      let byDateLabel = dataView.byDateLabel;
-      let filtered = byDateLabel.get(date);
-      if (!filtered) return "No Data";
-
-      let title = `${date}`;
-      let sum = 0;
-      let dataHTML = Array.from(filtered.keys())
-        .map(function (label) {
-          let value = filtered.get(label);
-          if (!value) return undefined;
-          let colorGenerator = chart.controller.colorGenerator();
-          let color = colorGenerator.label(label);
-          let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
-          let valueFormatted = numberFormat(value);
-          sum += value;
-          return `${divHTML} ${label}: <b>${valueFormatted}</b>`;
-        })
-        .filter((d) => d)
-        .join("<br>");
-
-      let sumFormatted = numberFormat(sum);
-      return `<b>${title}</b><br>${dataHTML}<br><br>Sum: <b>${sumFormatted}</b>`;
-    }
-
-    function showTooltip(event, date) {
-      // set content before positioning the tooltip cause the size is
-      // calculated based on the content
-      const html = getHTMLForDate(date);
-      tooltip.html(html);
-
-      // position tooltip
-      let tooltipSize = getTooltipSize();
-      let factor = chart.getElementEffectiveSize()[0] / chart.config.width;
-      let offset = chart.getElementPosition();
-      let top = getTop(factor, offset, tooltipSize);
-      let left = chart.xChartScalePadding(date);
-
-      // differ tooltip position on bar position
-      if (left > chart.config.width / 2) {
-        left = getXLeft(date, factor, offset, tooltipSize);
-      } else {
-        left = getXRight(date, factor, offset);
-      }
-
-      // update position and opacity of tooltip
-      tooltip
-        .style("left", `${left}px`)
-        .style("top", `${top}px`)
-        .style("opacity", 1);
-    }
-
-    function hideTooltip() {
-      if (+tooltip.style("opacity") === 0) return;
-      tooltip.style("opacity", 0);
-    }
-
-    chart.on("mouseenter", showTooltip);
-    chart.on("mouseout", hideTooltip);
-  }
-}
-
-// https://stackoverflow.com/questions/70579/what-are-valid-values-for-the-id-attribute-in-html
-// ids must not contain whitespaces
-// ids should avoid ".", ":" and "/"
-
-function safeId(id) {
-  return id
-    .split(` `)
-    .join(`-`)
-    .split(`/`)
-    .join(`-`)
-    .split(`.`)
-    .join(`-`)
-    .split(`:`)
-    .join(`-`);
-}
-
-class BarSelectionRenderer extends Renderer {
-  render(chart, controller) {
-    let selectionOpacity = 0.1;
-
-    function opacity(date) {
-      return controller.filters.dates.contains(date) ? selectionOpacity : 0;
-    }
-
-    function createID(date) {
-      return `ltv-bar-chart-selection-rect-id-${safeId(String(date))}`;
-    }
-
-    function redraw() {
-      chart.svg
-        .selectAll(`.ltv-bar-chart-selection-rect`)
-        .attr(`opacity`, (date) => opacity(date))
-        .raise();
-    }
-
-    chart.on("click-date", redraw);
-
-    let margin = chart.config.margin;
-    let dates = chart.config.dates || chart.dataView.dates;
-    chart.svg
-      .append("g")
-      .selectAll("rect")
-      .data(dates)
-      .enter()
-      .append("rect")
-      .attr("class", "ltv-bar-chart-selection-rect")
-      .attr("id", (date) => createID(date))
-      .attr("x", (date) => chart.xChartScale(date))
-      .attr("y", margin.top)
-      .attr("opacity", (date) => opacity(date))
-      .attr("width", chart.xChartScale.bandwidth())
-      .attr("height", chart.config.height - margin.bottom - margin.top)
-      .raise();
-  }
-}
-
-class BarHoverRenderer extends Renderer {
-  render(chart, controller) {
-    let selectionOpacity = 0.3;
-
-    function createID(date) {
-      return `ltv-bar-chart-hover-bar-id-${safeId(String(date))}`;
-    }
-
-    function hideAll() {
-      chart.svg
-        .selectAll(`.ltv-bar-chart-hover-bar`)
-        .attr("opacity", 0)
-        .raise();
-    }
-
-    function onMouseEnter(event, date) {
-      hideAll();
-      chart.svg.select(`#${createID(date)}`).attr("opacity", selectionOpacity);
-      chart.emit("mouseenter", event, date);
-    }
-
-    function onMouserOut(event, date) {
-      hideAll();
-      chart.emit("mouseout", event, date);
-
-      // check for mouse down
-      if (event.buttons === 1) {
-        onMouseClick(event, date);
-      }
-    }
-
-    function onMouseClick(event, date) {
-      if (chart.config.selectable) {
-        chart.makeUpdateInsensible();
-        controller.filters.dates.toggle(date);
-        chart.makeUpdateSensible();
-      }
-      chart.emit("click-date", event, date);
-    }
-
-    let config = chart.config;
-    let margin = config.margin;
-    let dates = chart.config.dates || chart.dataView.dates;
-
-    chart.svg
-      .append("g")
-      .selectAll("rect")
-      .data(dates)
-      .enter()
-      .append("rect")
-      .attr("class", "ltv-bar-chart-hover-bar")
-      .attr("id", (date) => createID(date))
-      .attr("opacity", 0)
-      .attr("x", (d) => chart.xChartScale(d))
-      .attr("y", margin.top)
-      .attr("width", chart.xChartScale.bandwidth())
-      .attr("height", config.height - margin.bottom - margin.top)
-      .on("mouseenter", onMouseEnter)
-      .on("mouseout", onMouserOut)
-      .on("mousedrag", onMouserOut)
-      .on("click", onMouseClick)
-      .raise();
-  }
-}
-
-class BarGridRenderer extends Renderer {
-  render(chart, controller) {
-    let xAxisGrid = axisBottom(chart.xChartScale)
-      .tickSize(-chart.graphHeight)
-      .tickFormat("");
-
-    let yAxisGrid = axisLeft(chart.yChart)
-      .tickSize(-chart.graphWidth)
-      .tickFormat("")
-      .ticks(20);
-
-    let config = chart.config;
-    let marginBottom = config.height - config.margin.bottom;
-
-    chart.svg
-      .append("g")
-      .attr("class", "ltv-bar-chart-grid ltv-bar-chart-grid-x")
-      .attr("transform", "translate(0," + marginBottom + ")")
-      .call(xAxisGrid);
-
-    chart.svg
-      .append("g")
-      .attr("class", "ltv-bar-chart-grid ltv-bar-chart-grid-y")
-      .attr("transform", `translate(${config.margin.left},0)`)
-      .call(yAxisGrid);
-  }
-}
-
-class BarBackgroundRenderer extends Renderer {
-  render(chart, controller) {
-    function click(e, b) {
-      if (controller) controller.filters.dates.clear();
-    }
-
-    chart.on("click-background", click);
-
-    chart.svg
-      .append("g")
-      .append("rect")
-      .attr("width", chart.config.width)
-      .attr("height", chart.config.height)
-      .attr("fill", "white")
-      .attr("opacity", 0)
-      .attr("cursor", "pointer")
-      .on("click", (e, b) => chart.emit("click-background", e, b));
-  }
-}
-
-/**
- * Returns `true` if the given value not evaluates to false and is not 0. false else.
- * @param value The value to check.
- * @returns {boolean} A Boolean value indicating whether the given value is valid.
- */
-function isValue(value) {
-  return Boolean(value || value === 0);
-}
-
-function dataViewBar(dataController) {
-  let snapshot = dataController.snapshot();
-  let data = snapshot || dataController.data;
-
-  let byDateStackOriginal = rollup(
-    dataController.data,
-    (v) => sum$1(v, (d) => d.value),
-    (d) => d.date,
-    (d) => d.stack || d.label
-  );
-
-  let maxTotal = max$3(byDateStackOriginal, (d) => max$3(d[1], (d) => d[1]));
-  let dates = dataController.dates();
-  let stacks = dataController.stacks();
-  let labels = dataController.labels();
-  let enabledStacks = dataController.stacks();
-
-  let byDateLabel = rollup(
-    data,
-    (v) => sum$1(v, (d) => d.value),
-    (d) => d.date,
-    (d) => d.label
-  );
-
-  let byDateStack = rollup(
-    data,
-    (v) => sum$1(v, (d) => d.value),
-    (d) => d.date,
-    (d) => d.stack || d.label
-  );
-
-  let byDateStackLabel = rollup(
-    data,
-    (v) => sum$1(v, (d) => d.value),
-    (d) => d.date,
-    (d) => d.stack || d.label,
-    (d) => d.label
-  );
-
-  let byDatesStackSeries = new InternMap();
-  dates.forEach((date) => {
-    let byStackLabel = byDateStackLabel.get(date);
-    if (!byStackLabel) return;
-    byDatesStackSeries.set(date, new InternMap());
-
-    stacks.forEach((stack) => {
-      let byLabel = byStackLabel.get(stack);
-      if (!byLabel) return;
-      let value = 0;
-      let series = Array.from(byLabel)
-        .reverse()
-        .map((item) => [value, (value += item[1]), item[0]]);
-      byDatesStackSeries.get(date).set(stack, series);
-    });
-  });
-
-  let max = max$3(byDateStack, (d) => max$3(d[1], (d) => d[1]));
-
-  return {
-    dates,
-    stacks,
-    enabledStacks,
-    byDateLabel,
-    byDateStack,
-    byDatesStackSeries,
-    labels,
-    max,
-    maxTotal,
+    return main;
   };
+
+  // return generated chart
+  return main;
 }
 
-class BarChart extends Chart {
-  static Type = BAR_CHART_TYPE;
-
-  initialize() {
-    let margin, config;
-    margin = Object.assign({}, BAR_CHART_CONFIG.margin);
-    margin = Object.assign(margin, this.config.margin);
-    config = Object.assign({}, BAR_CHART_CONFIG);
-    this.config = Object.assign(config, this.config);
-    this.config.margin = margin;
-  }
-
-  addRenderers() {
-    this.renderers.push(new BarBackgroundRenderer());
-    this.renderers.push(new BarAxisRender());
-    this.renderers.push(new BarGridRenderer());
-    this.renderers.push(new BarSelectionRenderer());
-    this.renderers.push(new BarHoverRenderer());
-    this.renderers.push(new BarBarsRenderer());
-    this.renderers.push(new BarLabelsRenderer());
-    this.renderers.push(new BarTooltipRenderer());
-    this.renderers.push(new BarLegendRenderer());
-  }
-
-  createDataView() {
-    return dataViewBar(this.controller);
-  }
-
-  prepare() {
-    this.svg
-      .attr("class", "ltv-bar-chart-svg")
-      .attr("preserveAspectRatio", "xMidYMid meet")
-      .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`);
-
-    let config = this.config;
-    let margin = config.margin;
-    this.graphWidth = config.width - margin.left - margin.right;
-    this.graphHeight = config.height - margin.top - margin.bottom;
-
-    this.dataView = this.createDataView();
-    this.createScales();
-  }
-
-  draw() {
-    this.graph = this.svg
-      .append("g")
-      .attr("width", this.graphWidth)
-      .attr("height", this.graphHeight)
-      .attr(
-        "transform",
-        `translate(${this.config.margin.left},${this.config.margin.top})`
-      );
-    this.renderers.forEach((r) =>
-      r.render(this, this.controller, this.dataView)
-    );
-  }
-
-  createScales() {
-    if (!this.dataView) return;
-
-    let config = this.config;
-    let margin = config.margin;
-
-    /*
-     * Prefer dates specified by configuration. Fallback to dates of datasets.
-     */
-    let dates = config.dates || this.dataView.dates;
-    let stacks = this.dataView.enabledStacks;
-
-    let dateAccess = config.dateAccess;
-    dates = dates.sort((a, b) => dateAccess(a) - dateAccess(b));
-
-    this.xChartScale = band()
-      .domain(dates)
-      .rangeRound([margin.left, config.width - margin.right]);
-
-    this.xChartScalePadding = band()
-      .domain(dates)
-      .rangeRound([margin.left, config.width - margin.right])
-      .paddingInner(0.2);
-
-    this.xStack = band()
-      .domain(stacks)
-      .rangeRound([0, this.xChartScale.bandwidth()])
-      .padding(0.05);
-
-    this.yChart = linear()
-      .domain([0, this.dataView.maxTotal])
-      .nice()
-      .rangeRound([config.height - margin.bottom, margin.top]);
-  }
-}
-
-/**
- * Returns the hash of the given string.
- * @param aString The string to create the hash of.
- * @returns {number} The hash of the given string.
- */
-function hash_str(s) {
+function hashString(s) {
   let hash = 0,
     i,
     chr;
@@ -21141,68 +21440,1360 @@ function hash_str(s) {
   return hash;
 }
 
-function hash_obj(o) {
-  return hash_str(JSON.stringify(o));
+/**
+ * Generates a hash from the given value.
+ *
+ * @param {string | *} input An input value to hash
+ * @returns {number} The generated hash
+ * @public
+ */
+function hash$1(input) {
+  return hashString(isString(input) ? input : JSON.stringify(input));
 }
 
-const FEATURE_ID_ACCESSOR = function (f) {
-  if (f.id || f.id === 0) return f.id;
-  if (f.properties && isValue(f.properties.id)) return f.properties.id;
-  if (f.properties && isValue(f.properties.code)) return f.properties.code;
-  return f.properties ? hash_obj(f.properties) : hash_obj(f);
+function transX(x) {
+  return "translate(" + x + ",0)";
+}
+
+function transY(y) {
+  return "translate(0," + y + ")";
+}
+
+const DATE_ACCESS = function (d) {
+  return d;
 };
 
-const FEATURE_NAME_ACCESSOR = function (f) {
-  if (isValue(f.name)) return f.name;
-  if (f.properties && isValue(f.properties.name)) return f.properties.name;
-  if (f.properties && isValue(f.properties.nom)) return f.properties.nom;
-  return FEATURE_ID_ACCESSOR(f);
-};
+const PLOT_SORT = {
+  /**
+   * Sorts datasets alphabetically.
+   */
+  alphabetically: (left, right) => left.label < right.label,
 
-const MAP_CHART_CONFIG = {
-  width: 1000,
-  height: 1000,
-  margin: DEFAULT_MARGIN,
-  isShowLabels: true,
-  geoJSON: null,
-  departementsData: [],
-  exclude: [],
-  // exclude: [],
-  // include: [], || filter: []
-  drawRectangleAroundSelection: true,
-  selectable: true,
-  featureIDAccessor: FEATURE_ID_ACCESSOR,
-  featureNameAccessor: FEATURE_NAME_ACCESSOR,
+  /**
+   * Sorts datasets by duration.
+   */
+  duration: (left, right) => left.duration - right.duration,
+
+  /**
+   * Sorts datasets by intensity.
+   */
+  intensity: (left, right) => left.sum - right.sum,
+
+  /**
+   * Sorts datasets by first date.
+   */
+  firstDate: (left, right) => left.firstDate - right.firstDate,
 };
 
 /**
- * Returns a copy of the passed object.  The copy is created by using the
- * JSON's `parse` and `stringify` functions.
- * @param object The java script object to copy.
- * @returns {any} The copy of the object.
+ * Reusable Plot Chart API class that renders a
+ * simple and configurable plot chart.
+ *
+ * @requires d3
+ *
+ * @example
+ * var chart = lotivis
+ *    .plot()
+ *    .selector(".css-selector")
+ *    .dataController(dc)
+ *    .run();
+ *
  */
-function copy(object) {
-  return JSON.parse(JSON.stringify(object));
+function plot() {
+  let state = {
+    id: uniqueId("plot"),
+
+    // width of the svg
+    width: 1000,
+
+    // height of a bar
+    barHeight: 30,
+
+    // margin
+    marginLeft: 20,
+    marginTop: 20,
+    marginRight: 20,
+    marginBottom: 20,
+
+    // bar radius
+    radius: 5,
+
+    // the plot's style, "gradient" or "fraction"
+    style: "gradient",
+
+    // the plot's color mode, "single" or "multi"
+    colorMode: "multi",
+
+    // Whether the chart is selectable.
+    selectable: true,
+
+    // the border style of the data preview
+    border: LOTIVIS_CONFIG.defaultBorder,
+
+    // transformes a given date into a numeric value.
+    dateAccess: DATE_ACCESS,
+
+    // format for displayed numbers
+    numberFormat: DEFAULT_NUMBER_FORMAT,
+
+    // sort, "alphabetically"
+    sort: null,
+
+    // displayed dates
+    dates: null,
+
+    // whether to draw the bottom axis
+    drawBottomAxis: false,
+
+    // whether to draw labels on chart
+    labels: true,
+
+    // whether to show the tooltip
+    tooltip: true,
+
+    // the data controller.
+    dataController: null,
+
+    // the data view.
+    dataView: null,
+  };
+
+  // create new underlying chart with the specified state
+  let chart = baseChart(state);
+
+  // private
+
+  /**
+   * Creates the scales used by the plot chart.
+   *
+   * @param {calc} calc The calc object
+   * @param {dataView} dv The data view
+   * @private
+   */
+  function createScales(calc, dv) {
+    // preferre dates from state if specified. fallback to
+    // dates of data view
+    let dates = Array.isArray(state.dates) ? state.dates : dv.dates;
+
+    // Sort date according to access function
+    dates = dates.sort((a, b) => state.dateAccess(a) - state.dateAccess(b));
+
+    calc.xChart = band()
+      .domain(dates)
+      .rangeRound([state.marginLeft, calc.graphRight])
+      .paddingInner(0.1);
+
+    calc.yChartPadding = band()
+      .domain(dv.labels)
+      .rangeRound([calc.graphBottom, state.marginTop])
+      .paddingInner(0.1);
+
+    calc.yChart = band()
+      .domain(dv.labels)
+      .rangeRound([calc.graphBottom, state.marginTop]);
+
+    calc.xAxisGrid = axisBottom(calc.xChart)
+      .tickSize(-calc.graphHeight)
+      .tickFormat("");
+
+    calc.yAxisGrid = axisLeft(calc.yChart)
+      .tickSize(-calc.graphWidth)
+      .tickFormat("");
+
+    calc.yBandwidth = calc.yChart.bandwidth();
+  }
+
+  /**
+   * Renders the main svg of the chart.
+   *
+   * @param {calc} calc The calc object.
+   * @private
+   */
+  function renderSVG(calc) {
+    calc.svg = calc.container
+      .append("svg")
+      .attr("class", "ltv-chart-svg ltv-bar-chart-svg")
+      .attr("preserveAspectRatio", "xMidYMid meet")
+      .attr("viewBox", `0 0 ${state.width} ${calc.height}`);
+  }
+
+  /**
+   * Renders the axis of the chart.
+   *
+   * @param {calc} calc The calc object.
+   * @private
+   */
+  function renderAxis(calc) {
+    // top
+    calc.svg
+      .append("g")
+      .call(axisTop(calc.xChart))
+      .attr("transform", transY(state.marginTop));
+
+    // left
+    calc.svg
+      .append("g")
+      .call(axisLeft(calc.yChart))
+      .attr("transform", transX(state.marginLeft));
+
+    // bottom
+    if (state.drawBottomAxis) {
+      calc.svg
+        .append("g")
+        .call(axisBottom(calc.xChart))
+        .attr("transform", transY(calc.height - state.marginBottom));
+    }
+  }
+
+  /**
+   * Renders the grid of the plot chart.
+   *
+   * @param {calc} calc The calc object.
+   * @private
+   */
+  function renderGrid(calc) {
+    calc.svg
+      .append("g")
+      .classed("ltv-plot-grid ltv-plot-grid-x", true)
+      .attr("transform", transY(calc.height - state.marginBottom))
+      .call(calc.xAxisGrid);
+
+    calc.svg
+      .append("g")
+      .classed("ltv-plot-grid ltv-plot-grid-y", true)
+      .attr("transform", transX(state.marginLeft))
+      .call(calc.yAxisGrid);
+  }
+
+  /**
+   * Renders the selction bars of the plot chart.
+   *
+   * @param {calc} calc The calc object.
+   * @param {*} dv The data view
+   * @private
+   */
+  function renderSelection(calc, dv) {
+    calc.svg
+      .append("g")
+      .selectAll("g")
+      .data(dv.datasets)
+      .enter()
+      .append("rect")
+      .attr("class", "ltv-plot-chart-selection-rect")
+      .attr(`opacity`, 0)
+      .attr("x", state.marginLeft)
+      .attr("y", (d) => calc.yChart(d.label))
+      .attr("width", calc.graphWidth)
+      .attr("height", calc.yChart.bandwidth())
+      .on("mouseenter", (e, d) => showTooltip(calc, d))
+      .on("mouseout", (e, d) => calc.tooltip.hide())
+      .on("click", (e, d) => {
+        state.dataController.toggleLabel(d.label, chart);
+        calc.svg
+          .selectAll(".ltv-plot-chart-selection-rect")
+          .classed("ltv-selected", (d) =>
+            state.dataController.isFilterLabel(d.label)
+          );
+      });
+  }
+
+  /**
+   * Renders the bars of of the chart for style "fraction".
+   *
+   * @param {calc} calc The calc object.
+   * @param {*} dv The data view
+   */
+  function renderBarsFraction(calc, dv) {
+    let colors = PlotColors(dv.max);
+    let brush = dv.max / 2;
+    let colorGenerator = state.dataController.colorGenerator();
+    let isSingle = state.colorMode === "single";
+
+    calc.barsData = calc.svg
+      .append("g")
+      .selectAll("g")
+      .data(dv.byLabelDate)
+      .enter();
+
+    calc.bars = calc.barsData
+      .append("g")
+      .attr("transform", (d) => transY(calc.yChartPadding(d[0])))
+      .attr("id", (d) => "ltv-plot-rect-" + hash$1(d[0]))
+      .attr(`fill`, (d) => (isSingle ? colorGenerator.label(d[0]) : null))
+      .selectAll(".rect")
+      .data((d) => d[1]) // map to dates data
+      .enter()
+      .filter((d) => d[1] > 0)
+      .append("rect")
+      .attr("class", "ltv-plot-bar")
+      .attr("x", (d) => calc.xChart(d[0]))
+      .attr("y", 0)
+      .attr("width", calc.xChart.bandwidth())
+      .attr("height", calc.yChartPadding.bandwidth())
+      .attr(`fill`, (d) => (isSingle ? null : colors(d[1])))
+      .attr("opacity", (d) =>
+        isSingle ? (d[1] + brush) / (dv.max + brush) : 1
+      )
+      .attr("rx", state.radius)
+      .attr("ry", state.radius);
+
+    if (state.labels === true) {
+      calc.labels = calc.barsData
+        .append("g")
+        .attr("transform", (d) => `translate(0,${calc.yChartPadding(d[0])})`)
+        .attr("id", (d) => "rect-" + hash$1(d[0]))
+        .selectAll(".text")
+        .data((d) => d[1]) // map to dates data
+        .enter()
+        .filter((d) => d[1] > 0)
+        .append("text")
+        .attr("class", "ltv-plot-label")
+        .attr("y", (d) => calc.yBandwidth / 2)
+        .attr("x", (d) => calc.xChart(d[0]) + 4)
+        .text((d) => (d.sum === 0 ? null : state.numberFormat(d[1])));
+    }
+  }
+
+  /**
+   *
+   * @param {calc} calc The calc object.
+   * @param {*} dv
+   * @param {*} dc
+   */
+  function renderBarsGradient(calc, dv, dc) {
+    let plotColors = PlotColors(dv.max);
+    calc.definitions = calc.svg.append("defs");
+
+    for (let index = 0; index < dv.datasets.length; index++) {
+      createGradient(dv.datasets[index], dv, calc, plotColors);
+    }
+
+    calc.barsData = calc.svg
+      .append("g")
+      .selectAll("g")
+      .data(dv.datasets)
+      .enter();
+
+    calc.bars = calc.barsData
+      .append("rect")
+      .attr("transform", (d) => `translate(0,${calc.yChartPadding(d.label)})`)
+      .attr("fill", (d) => `url(#${state.id}-${hash$1(d.label)})`)
+      .attr("class", "ltv-plot-bar")
+      .attr("rx", state.radius)
+      .attr("ry", state.radius)
+      .attr("x", (d) =>
+        calc.xChart(d.duration < 0 ? d.lastDate : d.firstDate || 0)
+      )
+      .attr("height", calc.yChartPadding.bandwidth())
+      .attr("width", (d) => {
+        if (!d.firstDate || !d.lastDate) return 0;
+        return (
+          calc.xChart(d.lastDate) -
+          calc.xChart(d.firstDate) +
+          calc.xChart.bandwidth()
+        );
+      });
+
+    if (state.labels === true) {
+      calc.labels = calc.barsData
+        .append("text")
+        .attr("transform", `translate(0,${calc.yBandwidth / 2 + 4})`)
+        .attr("class", "ltv-plot-label")
+        .attr("id", (d) => "rect-" + hash$1(d.label))
+        .attr("x", (d) => calc.xChart(d.firstDate) + calc.yBandwidth / 2)
+        .attr("y", (d) => calc.yChart(d.label))
+        .attr("height", calc.yChartPadding.bandwidth())
+        .attr(
+          "width",
+          (d) =>
+            calc.xChart(d.lastDate) - calc.xChart(d.firstDate) + calc.yBandwidth
+        )
+        .text(function (dataset) {
+          if (dataset.sum === 0) return;
+          return `${state.numberFormat(
+            dataset.sum
+          )} (${dataset.duration + 1} years)`;
+        });
+    }
+  }
+
+  /**
+   *
+   * @param {*} ds
+   * @param {*} dv
+   * @param {*} calc
+   * @param {*} plotColors
+   * @returns
+   */
+  function createGradient(ds, dv, calc, plotColors) {
+    let gradient = calc.definitions
+      .append("linearGradient")
+      .attr("id", state.id + "-" + hash$1(ds.label))
+      .attr("x1", "0%")
+      .attr("x2", "100%")
+      .attr("y1", "0%")
+      .attr("y2", "0%");
+
+    if (!ds.data || ds.data.length === 0) return;
+
+    let count = ds.data.length;
+    let latestDate = ds.lastDate;
+
+    let dataController = chart.dataController();
+    let colorGenerator = dataController.colorGenerator();
+    let isSingle = state.colorMode === "single";
+    let colors = isSingle ? colorGenerator.label : plotColors;
+
+    function append(value, percent) {
+      gradient
+        .append("stop")
+        .attr("offset", percent + "%")
+        .attr("stop-color", colors(isSingle ? ds.label : value))
+        .attr("stop-opacity", isSingle ? value / dv.max : 1);
+    }
+
+    if (ds.duration === 0) {
+      append(ds.data[0].value, 100);
+    } else {
+      for (let i = 0; i < count; i++) {
+        let diff = latestDate - ds.data[i].date;
+        let opacity = diff / ds.duration;
+        let percent = (1 - opacity) * 100;
+        append(ds.data[i].value, percent);
+      }
+    }
+  }
+
+  /**
+   *
+   * @param {*} calc
+   * @param {*} ds
+   */
+  function showTooltip(calc, ds) {
+    if (!state.tooltip) return;
+    calc.tooltip.html(tooltipHTML(ds));
+
+    // position tooltip
+    let domRect = calc.svg.node().getBoundingClientRect();
+    let factor = domRect.width / state.width;
+    let offset = [domRect.x + window.scrollX, domRect.y + window.scrollY];
+
+    let top =
+      calc.yChart(ds.label) * factor +
+      offset[1] +
+      state.barHeight * factor +
+      LOTIVIS_CONFIG.tooltipOffset;
+
+    calc.tooltip
+      .left(calc.xChart(ds.firstDate) * factor + offset[0])
+      .top(top)
+      .show();
+  }
+
+  // Auxiliary
+
+  /**
+   * Returns the tooltip text for the given dataset.
+   *
+   * @param {*} ds The dataset
+   * @returns The generated HTML as string
+   * @private
+   */
+  function tooltipHTML(ds) {
+    let filtered = ds.data.filter((item) => item.value !== 0);
+    let sum = sum$2(ds.data, (d) => d.value);
+    let comps = [
+      "Label: " + ds.label,
+      "",
+      "Start: " + ds.firstDate,
+      "End: " + ds.lastDate,
+      "",
+      "Sum: " + state.numberFormat(sum),
+      "",
+    ];
+
+    for (let i = 0; i < filtered.length; i++) {
+      let entry = filtered[i];
+      let frmt = state.numberFormat(entry.value);
+      comps.push(`${entry.date}: ${frmt}`);
+    }
+
+    return comps.join("<br/>");
+  }
+
+  /**
+   * Calculates the data view for the bar chart.
+   *
+   * @param {*} calc The calc object
+   * @returns The generated data view
+   *
+   * @public
+   */
+  chart.dataView = function (dc) {
+    var dv = {};
+    dv.dates = dc.dates().sort();
+    dv.data = dc.snapshotOrData();
+    dv.byLabelDate = rollups(
+      dv.data,
+      (v) => sum$2(v, (d) => d.value),
+      (d) => d.label,
+      (d) => d.date
+    );
+
+    dv.datasets = dv.byLabelDate.map((d) => {
+      let label = d[0];
+      let data = d[1]
+        .filter((d) => d[1] > 0)
+        .map((d) => {
+          return { date: d[0], value: d[1] };
+        })
+        .sort((a, b) => a.date - b.date);
+
+      let sum = sum$2(data, (d) => d.value);
+      let firstDate = (data[0] || {}).date;
+      let lastDate = (data[data.length - 1] || {}).date;
+      let duration = dv.dates.indexOf(lastDate) - dv.dates.indexOf(firstDate);
+
+      return { label, data, sum, firstDate, lastDate, duration };
+    });
+
+    switch (state.sort) {
+      case "alphabetically":
+        dv.datasets = dv.datasets.sort(PLOT_SORT.alphabetically);
+        break;
+      case "duration":
+        dv.datasets = dv.datasets.sort(PLOT_SORT.duration);
+        break;
+      case "intensity":
+        dv.datasets = dv.datasets.sort(PLOT_SORT.intensity);
+        break;
+      case "firstDate":
+        dv.datasets = dv.datasets.sort(PLOT_SORT.firstDate);
+        break;
+      default:
+        dv.datasets = dv.datasets.reverse();
+        break;
+    }
+
+    dv.labels = dv.datasets.map((d) => d.label);
+    dv.firstDate = dv.dates[0];
+    dv.lastDate = dv.dates[dv.dates.length - 1];
+    dv.max = max$3(dv.datasets, (d) => max$3(d.data, (i) => i.value));
+
+    return dv;
+  };
+
+  /**
+   * Renders all components of the plot chart.
+   *
+   * @param {*} container The d3 container
+   * @param {*} calc The calc objct of the chart
+   * @param {*} dv The data view
+   * @returns The chart itself
+   *
+   * @public
+   */
+  chart.render = function (container, calc, dv) {
+    // calculations
+    calc.container = container;
+    calc.graphWidth = state.width - state.marginLeft - state.marginRight;
+    calc.graphHeight = dv.labels.length * state.barHeight;
+    calc.height = calc.graphHeight + state.marginTop + state.marginBottom;
+    calc.graphLeft = state.width - state.marginLeft;
+    calc.graphTop = calc.height - state.marginTop;
+    calc.graphRight = state.width - state.marginRight;
+    calc.graphBottom = calc.height - state.marginBottom;
+
+    // scales
+    createScales(calc, dv);
+
+    // render
+    renderSVG(calc);
+    renderAxis(calc);
+    renderGrid(calc);
+    renderSelection(calc, dv);
+
+    if (state.style === "fraction") {
+      renderBarsFraction(calc, dv, state.dataController);
+    } else {
+      renderBarsGradient(calc, dv, state.dataController);
+    }
+
+    calc.tooltip = tooltip().container(container).run();
+
+    return chart;
+  };
+
+  // return generated chart
+  return chart;
 }
 
-/* returns a new generated GeoJSON without the feature specified */
-function removeFeatures(json, ids, idValue = FEATURE_ID_ACCESSOR) {
-  if (!Array.isArray(ids)) throw new Error("invalid ids. not an array");
-  if (!Array.isArray(json.features))
-    throw new Error("invalid geojson. no features");
-  let _json = copy(json);
-  _json.features = _json.features.filter((f) => !ids.includes(idValue(f)));
-  return _json;
+const LABEL_FORMAT = function (l, v, i) {
+  return `${l} (${v})`;
+};
+
+const STACK_FORMAT = function (s, v, ls, i) {
+  return `${s}`;
+};
+
+const GROUP_TITLE_FORMAT = function (s, v, ls, i) {
+  return `${i + 1}) ${s} (Sum: ${v})`;
+};
+
+// export const GROUP_TITLE_FORMAT = function (s, v, ls, i) {
+//   return `${i}) ${s} (Labels: ${ls.length}, Sum: ${v})`;
+// };
+
+function legend() {
+  let state = {
+    // the id of the legend
+    id: uniqueId("legend"),
+
+    // margin
+    marginLeft: 0,
+    marginTop: 10,
+    marginRight: 0,
+    marginBottom: 20,
+
+    // whether the legend is enabled
+    enabled: true,
+
+    // the number formatter vor values displayed
+    numberFormat: LOTIVIS_CONFIG.numberFormat,
+
+    // the format of displaying a datasets label
+    labelFormat: LABEL_FORMAT,
+
+    // the format of displaying a datasets stack
+    stackFormat: STACK_FORMAT,
+
+    // the format of displaying a group
+    groupFormat: GROUP_TITLE_FORMAT,
+
+    // (optional) title of the legend
+    title: "Legend",
+
+    // whether to display stacks instead of labels
+    stacks: false,
+
+    // whether group the legend (by stacks)
+    group: false,
+
+    // the data controller
+    dataController: null,
+  };
+
+  var chart = baseChart(state);
+
+  /**
+   * Toggles the filtered state of the passed label.
+   *
+   * @param {Event} event The event of the checkbox
+   * @param {String} label The label to be toggled
+   * @private
+   */
+  function toggleLabel(event, label) {
+    var fn = event.target.checked
+      ? state.dataController.removeLabelFilter
+      : state.dataController.addLabelFilter;
+    fn.call(state.dataController, label, chart);
+  }
+
+  /**
+   * Toggles the filtered state of the passed stack.
+   *
+   * @param {Event} event The event of the checkbox
+   * @param {String} stack The stack to be toggled
+   * @private
+   */
+  function toggleStack(event, stack) {
+    var fn = event.target.checked
+      ? state.dataController.removeStackFilter
+      : state.dataController.addStackFilter;
+    fn.call(state.dataController, stack, chart);
+  }
+
+  /**
+   * Returns the value for the "checked" attribute dependant on whether
+   * given label is filtered by the data controller.
+   *
+   * @param {*} label The label to be checked
+   * @returns {null | boolean}
+   * @private
+   */
+  function labelChecked(label) {
+    return state.dataController.isFilterLabel(label) ? null : true;
+  }
+
+  /**
+   * Returns the value for the "checked" attribute dependant on whether
+   * given stack is filtered by the data controller.
+   *
+   * @param {*} stack The stack to be checked
+   * @returns {null | boolean}
+   * @private
+   */
+  function stackChecked(stack) {
+    return state.dataController.isFilterStack(stack) ? null : true;
+  }
+
+  /**
+   * Formattes the given number.
+   *
+   * @param {Number} value The number to be formatted
+   * @returns The formatted value
+   * @private
+   */
+  function format(value) {
+    return state.numberFormat(value);
+  }
+
+  /**
+   *
+   * @param {*} label
+   * @param {*} index
+   * @param {*} dv
+   * @returns
+   */
+  function labelText(label, index, dv) {
+    if (typeof state.labelFormat !== "function") return label;
+    return state.labelFormat(label, format(dv.byLabel.get(label)), index);
+  }
+
+  function stackText(stack, index, dv) {
+    if (typeof state.stackFormat !== "function") return stack;
+    var value = format(dv.byStack.get(stack));
+    var labelsToValue = dv.byStackLabel.get(stack);
+    var labels = Array.from(labelsToValue ? labelsToValue.keys() : []);
+    return state.stackFormat(stack, value, labels, index);
+  }
+
+  function colorGenerator() {
+    return state.dataController.colorGenerator();
+  }
+
+  function disabled() {
+    return unwrap(state.enabled) ? null : true;
+  }
+
+  function isGroups() {
+    return unwrap(state.group) === true;
+  }
+
+  function isStacks() {
+    return unwrap(state.stacks) === true;
+  }
+
+  function unwrap(value) {
+    return typeof value === "function" ? value(chart) : value;
+  }
+
+  selection.prototype.div = function (aClass) {
+    return this.append("div").classed(aClass, true);
+  };
+
+  selection.prototype.error = function (text) {
+    return this.append("div").text(text);
+  };
+
+  /**
+   * Calculates the data view for the bar chart.
+   *
+   * @param {*} calc The calc object
+   * @returns The generated data view
+   *
+   * @public
+   */
+  chart.dataView = function (dc) {
+    var dv = {};
+    dv.labels = dc.labels();
+    dv.stacks = dc.stacks();
+    dv.locations = dc.locations();
+    dv.dates = dc.dates();
+
+    dv.byLabel = rollup(
+      dc.data,
+      (v) => sum$2(v, (d) => d.value),
+      (d) => d.label
+    );
+
+    dv.byStack = rollup(
+      dc.data,
+      (v) => sum$2(v, (d) => d.value),
+      (d) => d.stack || d.label
+    );
+
+    dv.byStackLabel = rollup(
+      dc.data,
+      (v) => sum$2(v, (d) => d.value),
+      (d) => d.stack || d.label,
+      (d) => d.label
+    );
+
+    return dv;
+  };
+
+  /**
+   * Renders all components of the plot chart.
+   *
+   * @param {*} container The d3 container
+   * @param {*} calc The calc objct of the chart
+   * @param {*} dv The data view
+   * @returns The chart itself
+   *
+   * @public
+   */
+  chart.render = function (container, calc, dv) {
+    calc.div = container
+      .div("ltv-legend")
+      .attr("id", state.id)
+      .style("padding-left", state.marginLeft + "px")
+      .style("padding-top", state.marginTop + "px")
+      .style("padding-right", state.marginRight + "px")
+      .style("padding-bottom", state.marginBottom + "px");
+
+    // if a title is given render div with title inside
+    if (state.title) {
+      calc.titleDiv = calc.div
+        .append("div")
+        .classed("ltv-legend-title", true)
+        .text(unwrap(state.title));
+    }
+
+    var colorFn = isStacks() ? colorGenerator().stack : colorGenerator().label;
+    var changeFn = isStacks() ? toggleStack : toggleLabel;
+    var textFn = isStacks() ? stackText : labelText;
+
+    calc.groups = calc.div
+      .selectAll(".div")
+      .data(isGroups() ? dv.stacks : [""]) // use single group when mode is not "groups"
+      .enter()
+      .div("ltv-legend-group")
+      .style("color", (s) => colorGenerator().stack(s));
+
+    // draw titles only in "groups" mode
+    if (isGroups()) {
+      calc.titles = calc.groups.append("div").text((stack, index) => {
+        var labelsToValue = dv.byStackLabel.get(stack);
+        return state.groupFormat(
+          stack,
+          format(dv.byStack.get(stack)),
+          Array.from(labelsToValue ? labelsToValue.keys() : []),
+          index
+        );
+      });
+    }
+
+    var pillsData = isGroups()
+      ? (d) => (isStacks() ? [d] : dv.byStackLabel.get(d))
+      : isStacks()
+      ? dv.stacks
+      : dv.labels;
+
+    calc.pills = calc.groups
+      .selectAll(".label")
+      .data(pillsData)
+      .enter()
+      .append("label")
+      .classed("ltv-legend-pill", true)
+      .datum((d) => (isGroups() && !isStacks() ? d[0] : d));
+
+    calc.checkboxes = calc.pills
+      .append("input")
+      .classed("ltv-legend-checkbox", true)
+      .attr("type", "checkbox")
+      .attr("checked", isStacks() ? stackChecked : labelChecked)
+      .attr("disabled", disabled())
+      .on("change", (e, d) => changeFn(e, d));
+
+    calc.spans = calc.pills
+      .append("span")
+      .classed("ltv-legend-pill-span", true)
+      .style("background-color", colorFn)
+      .text((d, i) => textFn(d, i, dv));
+
+    if (LOTIVIS_CONFIG.debug && state.debug) console.log(this);
+
+    return chart;
+  };
+
+  // Return generated chart
+  return chart;
 }
 
-/* returns a new generated GeoJSON without the feature specified */
-function filterFeatures(json, ids, idValue = FEATURE_ID_ACCESSOR) {
-  if (!Array.isArray(ids)) throw new Error("invalid ids. not an array");
-  if (!Array.isArray(json.features))
-    throw new Error("invalid geojson. no features");
-  let _json = copy(json);
-  _json.features = _json.features.filter((f) => ids.includes(idValue(f)));
-  return _json;
+/**
+ * Reusable Bar Chart API class that renders a
+ * simple and configurable bar chart.
+ *
+ * @requires d3
+ *
+ * @example
+ * var chart = lotivis
+ *    .bar()
+ *    .selector(".css-selector")
+ *    .dataController(dc)
+ *    .run();
+ *
+ */
+function bar() {
+  let state = {
+    // a unique id for this chart
+    id: uniqueId("bar"),
+
+    // the width of the chart's svg
+    width: 1000,
+
+    // the height of the chart's svg
+    height: 600,
+
+    // margin
+    marginLeft: 20,
+    marginTop: 20,
+    marginRight: 20,
+    marginBottom: 20,
+
+    // corner radius of bars
+    radius: 5,
+
+    // whether the chart is enabled.
+    enabled: true,
+
+    // whether to draw labels
+    labels: false,
+
+    legend: true,
+
+    // whether to display a tooltip.
+    tooltip: true,
+
+    style: "stacks",
+
+    // the data controller.
+    dataController: null,
+
+    // transformes a given date t a numeric value.
+    dateAccess: DEFAULT_DATE_ORDINATOR,
+
+    // the number format
+    numberFormat: DEFAULT_NUMBER_FORMAT,
+
+    // displayed dates
+    dates: null,
+  };
+
+  // Create new underlying chart with the specified state.
+  let chart = baseChart(state);
+
+  function colors() {
+    return state.dataController.colorGenerator();
+  }
+
+  /**
+   *
+   * @param {*} calc
+   * @param {*} dv
+   */
+  function createScales(calc, dv) {
+    // preferre dates from state if specified. fallback to
+    // dates of data view
+    let dates = Array.isArray(state.dates) ? state.dates : dv.dates;
+
+    // Sort date according to access function
+    dates = dates.sort((a, b) => state.dateAccess(a) - state.dateAccess(b));
+
+    calc.xChartScale = band()
+      .domain(dates)
+      .rangeRound([state.marginLeft, calc.graphRight]);
+
+    calc.xChartScalePadding = band()
+      .domain(dates)
+      .rangeRound([state.marginLeft, calc.graphRight])
+      .paddingInner(0.2);
+
+    calc.xStack = band()
+      .domain(dv.stacks)
+      .rangeRound([0, calc.xChartScale.bandwidth()])
+      .padding(0.05);
+
+    calc.yChart = linear()
+      .domain([0, dv.maxTotal])
+      .nice()
+      .rangeRound([state.height - state.marginBottom, state.marginTop]);
+  }
+
+  function renderSVG(container, calc) {
+    calc.svg = container
+      .append("svg")
+      .attr("class", "ltv-chart-svg ltv-bar-chart-svg")
+      .attr("preserveAspectRatio", "xMidYMid meet")
+      .attr("viewBox", `0 0 ${state.width} ${state.height}`);
+  }
+
+  /**
+   * Renders the axis of the chart.
+   * @param {*} calc The calc obj
+   * @private
+   */
+  function renderAxis(calc) {
+    calc.svg
+      .append("g")
+      .call(axisLeft(calc.yChart))
+      .attr("transform", () => `translate(${state.marginLeft},0)`);
+
+    // bottom axis
+    calc.svg
+      .append("g")
+      .call(axisBottom(calc.xChartScale))
+      .attr("transform", `translate(0,${state.height - state.marginBottom})`);
+  }
+
+  /**
+   * Renders the grid of the chart.
+   * @param {*} calc The calc obj
+   * @private
+   */
+  function renderGrid(calc) {
+    let xAxisGrid = axisBottom(calc.xChartScale)
+      .tickSize(-calc.graphHeight)
+      .tickFormat("");
+
+    let yAxisGrid = axisLeft(calc.yChart)
+      .tickSize(-calc.graphWidth)
+      .tickFormat("")
+      .ticks(20);
+
+    calc.svg
+      .append("g")
+      .attr("class", "ltv-bar-chart-grid ltv-bar-chart-grid-x")
+      .attr("transform", "translate(0," + calc.graphBottom + ")")
+      .call(xAxisGrid);
+
+    calc.svg
+      .append("g")
+      .attr("class", "ltv-bar-chart-grid ltv-bar-chart-grid-y")
+      .attr("transform", `translate(${state.marginLeft},0)`)
+      .call(yAxisGrid);
+  }
+
+  function renderSelection(calc, dv) {
+    calc.selection = calc.svg
+      .append("g")
+      .selectAll("rect")
+      .data(dv.dates)
+      .enter()
+      .append("rect")
+      .attr("class", "ltv-bar-chart-selection-rect")
+      .attr("id", (d) => `ltv-bar-chart-selection-rect-${safeId(String(d))}`)
+      .attr("width", calc.xChartScale.bandwidth())
+      .attr("height", calc.graphHeight)
+      .attr("x", (d) => calc.xChartScale(d))
+      .attr("y", state.marginTop)
+      .attr("opacity", (d) => (state.dataController.isFilterDate(d) ? 0.3 : 0))
+      .on("mouseenter", mouseEnter)
+      .on("mouseout", mouseOut)
+      .on("mousedrag", mouseDrag)
+      .on("click", click)
+      .raise();
+
+    // #  HANDLERS  ##############################################################
+
+    function mouseEnter(event, date) {
+      calc.svg
+        .select(`ltv-bar-chart-selection-rect-${safeId(String(date))}`)
+        .attr("opacity", 0.3);
+
+      // position tooltip
+      let tooltipSize = calc.tip.size();
+      let domRect = calc.svg.node().getBoundingClientRect();
+      let factor = domRect.width / state.width;
+      let offset = [domRect.x + window.scrollX, domRect.y + window.scrollY];
+      let top = getTop(factor, offset, tooltipSize, calc);
+      let left = calc.xChartScalePadding(date);
+
+      // differ tooltip position on bar position
+      if (left > state.width / 2) {
+        left = getXLeft(date, factor, offset, tooltipSize, calc);
+      } else {
+        left = getXRight(date, factor, offset, calc);
+      }
+
+      calc.tip
+        .html(getHTMLForDate(date, dv))
+        .top(`${top}px`)
+        .left(`${left}px`)
+        .show();
+    }
+
+    function mouseOut(event, date) {
+      calc.tip.hide();
+    }
+
+    function mouseDrag(event, date) {
+      // check for mouse down
+      if (event.buttons === 1) onMouseClick(event, date);
+    }
+
+    function click(event, date) {
+      if (!state.enabled) return;
+      var dc = state.dataController;
+      dc.toggleDate(date, chart);
+
+      calc.svg
+        .select(`#ltv-bar-chart-selection-rect-${safeId(String(date))}`)
+        .attr(`opacity`, (d) => (dc.isFilterDate(d) ? 0.3 : 0));
+
+      // calc.svg
+      //   .selectAll(`.ltv-bar-chart-dates-area`)
+      //   .attr(`opacity`, (d) => (dc.isFilterDate(d[0]) ? 1 : 0.3))
+      //   .raise();
+    }
+  }
+
+  function renderCombined(calc, dv) {
+    calc.svg
+      .append("g")
+      .selectAll("g")
+      .data(dv.byDateStack)
+      .enter()
+      .append("g")
+      .attr("transform", (d) => `translate(${calc.xChartScale(d[0])},0)`)
+      // .attr("opacity", (d) => opacity(d[0]))
+      .attr("class", "ltv-bar-chart-dates-area")
+      .selectAll("rect")
+      .data((d) => d[1]) // map to by stack
+      .enter()
+      .append("rect")
+      .attr("class", "ltv-bar-chart-bar")
+      .attr("fill", (d) => colors().stack(d[0]))
+      .attr("x", (d) => calc.xStack(d[0]))
+      .attr("y", (d) => calc.yChart(d[1]))
+      .attr("width", calc.xStack.bandwidth())
+      .attr("height", (d) => state.height - calc.yChart(d[1]))
+      .attr("rx", state.radius)
+      .attr("ry", state.radius)
+      .raise();
+  }
+
+  function renderStacked(calc, dv) {
+    calc.svg
+      .append("g")
+      .selectAll("g")
+      .data(dv.byDatesStackSeries)
+      .enter()
+      .append("g")
+      .attr("transform", (d) => `translate(${calc.xChartScale(d[0])},0)`) // translate to x of date
+      .attr("class", "ltv-bar-chart-dates-area")
+      .selectAll("rect")
+      .data((d) => d[1]) // map to by stack
+      .enter()
+      .append("g")
+      .attr("transform", (d) => `translate(${calc.xStack(d[0])},0)`)
+      .selectAll("rect")
+      .data((d) => d[1]) // map to series
+      .enter()
+      .append("rect")
+      .attr("class", "ltv-bar-chart-bar")
+      .attr("fill", (d) => colors().label(d[2]))
+      .attr("width", calc.xStack.bandwidth())
+      .attr("height", (d) =>
+        !d[1] ? 0 : calc.yChart(d[0]) - calc.yChart(d[1])
+      )
+      .attr("y", (d) => calc.yChart(d[1]))
+      .attr("rx", state.radius)
+      .attr("ry", state.radius)
+      .raise();
+  }
+
+  function renderLabels(calc, dv) {
+    calc.labels = calc.svg
+      .append("g")
+      .selectAll("g")
+      .data(dv.dates)
+      .enter()
+      .append("g")
+      .attr("transform", (d) => `translate(${calc.xChartScale(d)},0)`) // translate to x of date
+      .selectAll(".text")
+      .data((date) => dv.byDateStack.get(date) || [])
+      .enter()
+      .append("text")
+      .attr("class", "ltv-bar-chart-label")
+      .attr("transform", (d) => {
+        let stack = d[0];
+        let value = d[1];
+        let width = calc.xStack.bandwidth() / 2;
+        let x = (calc.xStack(stack) || 0) + width;
+        let y = calc.yChart(value) - 5;
+        return `translate(${x},${y})rotate(-60)`;
+      })
+      .text((d) => (d[1] === 0 ? "" : state.numberFormat(d[1])))
+      .raise();
+  }
+
+  function getTop(factor, offset, tooltipSize, calc) {
+    let top = state.marginTop * factor;
+    top += (calc.graphHeight * factor - tooltipSize[1]) / 2;
+    top += offset[1] - 10;
+    return top;
+  }
+
+  function getXLeft(date, factor, offset, tooltipSize, calc) {
+    return (
+      calc.xChartScalePadding(date) * factor +
+      offset[0] -
+      tooltipSize[0] -
+      22 -
+      LOTIVIS_CONFIG.tooltipOffset
+    );
+  }
+
+  function getXRight(date, factor, offset, calc) {
+    return (
+      (calc.xChartScalePadding(date) + calc.xChartScalePadding.bandwidth()) *
+        factor +
+      offset[0] +
+      LOTIVIS_CONFIG.tooltipOffset
+    );
+  }
+
+  function getHTMLForDate(date, dv) {
+    let filtered = dv.byDateLabel.get(date);
+    if (!filtered) return "No Data";
+
+    let title = `${date}`;
+    let sum = 0;
+    let dataHTML = Array.from(filtered.keys())
+      .map(function (label) {
+        let value = filtered.get(label);
+        if (!value) return undefined;
+        let color = colors().label(label);
+        let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
+        let valueFormatted = state.numberFormat(value);
+        sum += value;
+        return `${divHTML} ${label}: <b>${valueFormatted}</b>`;
+      })
+      .filter((d) => d)
+      .join("<br>");
+
+    let sumFormatted = state.numberFormat(sum);
+    return `<b>${title}</b><br>${dataHTML}<br><br>Sum: <b>${sumFormatted}</b>`;
+  }
+
+  /**
+   * Calculates the data view for the bar chart.
+   *
+   * @param {*} calc
+   * @returns
+   */
+  chart.dataView = function (dc) {
+    var dv = {};
+    dv.snapshot = dc.snapshot();
+    let data = dv.snapshot || dc.data;
+
+    dv.byDateStackOriginal = rollup(
+      dc.data,
+      (v) => sum$2(v, (d) => d.value),
+      (d) => d.date,
+      (d) => d.stack || d.label
+    );
+
+    dv.maxTotal = max$3(dv.byDateStackOriginal, (d) =>
+      max$3(d[1], (d) => d[1])
+    );
+    dv.dates = dc.dates();
+    dv.stacks = dc.stacks();
+    dv.labels = dc.labels();
+    dv.enabledStacks = dc.stacks();
+
+    dv.byDateLabel = rollup(
+      data,
+      (v) => sum$2(v, (d) => d.value),
+      (d) => d.date,
+      (d) => d.label
+    );
+
+    dv.byDateStack = rollup(
+      data,
+      (v) => sum$2(v, (d) => d.value),
+      (d) => d.date,
+      (d) => d.stack || d.label
+    );
+
+    dv.byDateStackLabel = rollup(
+      data,
+      (v) => sum$2(v, (d) => d.value),
+      (d) => d.date,
+      (d) => d.stack || d.label,
+      (d) => d.label
+    );
+
+    dv.byDatesStackSeries = new InternMap();
+    dv.dates.forEach((date) => {
+      let byStackLabel = dv.byDateStackLabel.get(date);
+      if (!byStackLabel) return;
+      dv.byDatesStackSeries.set(date, new InternMap());
+
+      dv.stacks.forEach((stack) => {
+        let byLabel = byStackLabel.get(stack);
+        if (!byLabel) return;
+        let value = 0;
+        let series = Array.from(byLabel)
+          .reverse()
+          .map((item) => [value, (value += item[1]), item[0]]);
+        dv.byDatesStackSeries.get(date).set(stack, series);
+      });
+    });
+
+    dv.max = max$3(dv.byDateStack, (d) => max$3(d[1], (d) => d[1]));
+
+    return dv;
+  };
+
+  /**
+   *
+   * @param {*} container
+   * @param {*} state
+   * @param {*} calc
+   * @param {*} dv
+   */
+  chart.render = function (container, calc, dv) {
+    calc.graphWidth = state.width - state.marginLeft - state.marginRight;
+    calc.graphHeight = state.height - state.marginTop - state.marginBottom;
+    calc.graphBottom = state.height - state.marginBottom;
+    calc.graphRight = state.width - state.marginRight;
+
+    console.log("state", state);
+
+    createScales(calc, dv);
+
+    renderSVG(container, calc);
+    renderAxis(calc);
+    renderGrid(calc);
+    renderSelection(calc, dv);
+
+    if (state.style === "combine") {
+      renderCombined(calc, dv);
+    } else {
+      renderStacked(calc, dv);
+    }
+
+    if (state.labels) renderLabels(calc, dv);
+
+    if (state.tooltip) calc.tip = tooltip().container(container).run();
+
+    // if render legend
+    if (state.legend) {
+      let legendId = chart.id() + "-legend";
+      container.append("div").attr("id", legendId);
+
+      legend()
+        .selector("#" + legendId)
+        .dataController(state.dataController)
+        .run();
+    }
+  };
+
+  // return generated chart
+  return chart;
 }
 
 /* returns a GeoJSON FeatureCollection object */
@@ -21341,70 +22932,6 @@ function createGeoJSON(locations) {
   }
 
   return GeoJSON(FeatureCollection(features));
-}
-
-class MapBackgroundRenderer extends Renderer {
-  render(chart, controller) {
-    chart.svg
-      .append("rect")
-      .attr("class", "ltv-map-chart-background")
-      .attr("width", chart.config.width)
-      .attr("height", chart.config.height)
-      .attr("fill", "white")
-      .on("click", (e) => {
-        chart.makeUpdateInsensible();
-        controller.filters.locations.clear();
-        chart.makeUpdateSensible();
-        chart.emit("click", event, null);
-      });
-  }
-}
-
-class MapGeojsonRenderer extends Renderer {
-  render(chart, controller) {
-    let geoJSON = chart.presentedGeoJSON;
-    if (!geoJSON) return;
-
-    function mouseEnter(event, feature) {
-      chart.emit("mouseenter", event, feature);
-    }
-
-    function mouseOut(event, feature) {
-      chart.emit("mouseout", event, feature);
-      // dragged
-      if (event.buttons === 1) mouseClick(event, feature);
-    }
-
-    function mouseClick(event, feature) {
-      if (!feature || !feature.properties) return;
-      if (!chart.controller) return;
-
-      if (chart.config.selectable) {
-        let locationID = feature.lotivisId;
-        chart.makeUpdateInsensible();
-        controller.filters.locations.toggle(locationID);
-        chart.makeUpdateSensible();
-      }
-      chart.emit("click", event, feature);
-    }
-
-    chart.areas = chart.svg
-      .selectAll(".ltv-map-chart-area")
-      .append("path")
-      .data(geoJSON.features)
-      .enter()
-      .append("path")
-      .attr("d", chart.path)
-      .classed("ltv-map-chart-area", true)
-      .attr("id", (f) => `ltv-map-chart-area-id-${f.lotivisId}`)
-      .style("stroke-dasharray", "1,4")
-      .style("fill", "white")
-      .style("fill-opacity", 1)
-      .on("click", mouseClick)
-      .on("mouseenter", mouseEnter)
-      .on("mouseout", mouseOut)
-      .raise();
-  }
 }
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -22486,22 +24013,19 @@ function mergeArcs(topology, objects) {
   };
 }
 
-/**
- * Return a newly created GeoJSON with one Feature merging
- * the border of all containing features of the given
- * collection of features.
- *
- * @param {*} input GeoJSON or array of features
- *
- * @returns A new created GeoJSON
- */
-function joinFeatures(input) {
-  let features = Array.isArray(input) ? input : input.features;
-  let topology$1 = topology(features);
-  let objects = extractObjects(topology$1);
-  let geometry = merge(topology$1, objects);
-  return FeatureCollection([Feature(geometry)]);
-}
+const FEATURE_ID_ACCESSOR = function (f) {
+  if (f.id || f.id === 0) return f.id;
+  if (f.properties && isValue(f.properties.id)) return f.properties.id;
+  if (f.properties && isValue(f.properties.code)) return f.properties.code;
+  return f.properties ? hash(f.properties) : hash(f);
+};
+
+const FEATURE_NAME_ACCESSOR = function (f) {
+  if (isValue(f.name)) return f.name;
+  if (f.properties && isValue(f.properties.name)) return f.properties.name;
+  if (f.properties && isValue(f.properties.nom)) return f.properties.nom;
+  return FEATURE_ID_ACCESSOR(f);
+};
 
 function extractObjects(topology) {
   let objects = [];
@@ -22513,1397 +24037,540 @@ function extractObjects(topology) {
   return objects;
 }
 
-class MapExteriorBorderRenderer extends Renderer {
-  render(chart, controller) {
-    let geoJSON = chart.presentedGeoJSON;
-    if (!geoJSON)
-      return D_LOG ? console.log("[ltv]  No GeoJSON to render.") : null;
-
-    let bordersGeoJSON = joinFeatures(geoJSON.features);
-    if (!bordersGeoJSON)
-      return D_LOG ? console.log("[ltv]  No borders to render.") : null;
-
-    chart.svg
-      .selectAll(".ltv-map-chart-exterior-borders")
-      .append("path")
-      .data(bordersGeoJSON.features)
-      .enter()
-      .append("path")
-      .attr("d", chart.path)
-      .attr("class", "ltv-map-chart-exterior-borders");
-  }
-}
-
-class MapLegendRenderer extends Renderer {
-  render(chart, controller, dataView) {
-    if (!dataView) return;
-    if (!chart.config.legend) return;
-
-    let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
-    let stackNames = chart.dataView.stacks;
-    let label = chart.config.label || stackNames[0];
-    let locationToSum = dataView.locationToSum || [];
-    let max = max$3(locationToSum, (item) => item[1]) || 0;
-
-    let offset = 0 * 80;
-    let labelColor = chart.controller.colorGenerator.stack(label);
-
-    let steps = 4;
-    let data = [0, (1 / 4) * max, (1 / 2) * max, (3 / 4) * max, max];
-    let generator = MapColors(max);
-
-    let legend = chart.svg
-      .append("svg")
-      .attr("class", "ltv-map-chart-legend")
-      .attr("width", chart.config.width)
-      .attr("height", 200)
-      .attr("x", 0)
-      .attr("y", 0);
-
-    chart.on("mouseenter", () => legend.raise());
-    chart.on("mouseout", () => legend.raise());
-
-    legend
-      .append("text")
-      .attr("class", "ltv-map-chart-legend-title")
-      .attr("x", offset + 10)
-      .attr("y", "20")
-      .style("fill", labelColor)
-      .text(label);
-
-    legend
-      .append("g")
-      .selectAll("text")
-      .data(["No Data"])
-      .enter()
-      .append("text")
-      .attr("class", "ltv-map-chart-legend-text")
-      .attr("x", offset + 35)
-      .attr("y", 44)
-      .text((d) => d);
-
-    legend
-      .append("g")
-      .selectAll("rect")
-      .data([0])
-      .enter()
-      .append("rect")
-      .attr("class", "ltv-map-chart-legend-rect")
-      .style("fill", "white")
-      .attr("x", offset + 10)
-      .attr("y", 30)
-      .attr("width", 18)
-      .attr("height", 18)
-      .style("stroke-dasharray", "1,3")
-      .style("stroke", "black")
-      .style("stroke-width", 1);
-
-    legend
-      .append("g")
-      .selectAll("text")
-      .data([0])
-      .enter()
-      .append("text")
-      .attr("class", "lotivis-location-chart-legend-text")
-      .attr("x", offset + 35)
-      .attr("y", 64)
-      .text((d) => d);
-
-    legend
-      .append("g")
-      .selectAll("rect")
-      .data([0])
-      .enter()
-      .append("rect")
-      .attr("class", "ltv-map-chart-legend-rect")
-      .style("fill", "WhiteSmoke")
-      .attr("x", offset + 10)
-      .attr("y", 50)
-      .attr("width", 18)
-      .attr("height", 18)
-      .style("stroke", "black")
-      .style("stroke-width", 1);
-
-    legend
-      .append("g")
-      .selectAll("rect")
-      .data(data)
-      .enter()
-      .append("rect")
-      .attr("class", "ltv-map-chart-legend-rect")
-      .style("fill", generator)
-      .attr("x", offset + 10)
-      .attr("y", (d, i) => i * 20 + 70)
-      .attr("width", 18)
-      .attr("height", 18)
-      .style("stroke", "black")
-      .style("stroke-width", 1);
-
-    legend
-      .append("g")
-      .selectAll("text")
-      .data(data)
-      .enter()
-      .append("text")
-      .attr("class", "ltv-map-chart-legend-text")
-      .attr("x", offset + 35)
-      .attr("y", (d, i) => i * 20 + 84)
-      .text(function (d, i) {
-        if (d === 0) {
-          return "> 0";
-        } else {
-          return numberFormat((i / steps) * max);
-        }
-      });
-
-    for (let index = 0; index < stackNames.length; index++) {
-      return;
-    }
-  }
-}
-
-class MapDatasetRenderer extends Renderer {
-  render(chart, controller, dataView) {
-    let generator = MapColors(1);
-    let selectionOpacity = 0.1;
-
-    function opacity(location) {
-      return controller.filters.locations.contains(location)
-        ? selectionOpacity
-        : 1;
-    }
-
-    function resetAreas() {
-      chart.svg
-        .selectAll(".ltv-map-chart-area")
-        .classed("ltv-map-chart-area-hover", false)
-        .attr("opacity", (item) => opacity(item.lotivisId));
-    }
-
-    function featureMapID(feature) {
-      return `ltv-map-chart-area-id-${feature.lotivisId}`;
-    }
-
-    function mouseEnter(event, feature) {
-      resetAreas();
-      if (!feature) return;
-
-      let mapID = featureMapID(feature);
-
-      chart.svg
-        .selectAll(`#${mapID}`)
-        .raise()
-        .classed("ltv-map-chart-area-hover", true);
-
-      chart.svg.selectAll(".ltv-location-chart-label").raise();
-    }
-
-    chart.on("mouseenter", mouseEnter);
-    chart.on("mouseout", resetAreas);
-    chart.on("click", mouseEnter);
-
-    if (!chart.geoJSON)
-      return D_LOG ? console.log("[ltv]  No GeoJSON to render.") : null;
-    if (!chart.dataView) return;
-
-    resetAreas();
-
-    let locationToSum = dataView.locationToSum;
-    let locations = Array.from(locationToSum.keys());
-    let max = max$3(locationToSum, (item) => item[1]);
-
-    for (let i = 0; i < locations.length; i++) {
-      let location = locations[i];
-      let value = locationToSum.get(location);
-      // console.log("value", value);
-
-      let opacity = Number(value / max);
-      let color = opacity === 0 ? "WhiteSmoke" : generator(opacity);
-
-      chart.svg
-        .selectAll(".ltv-map-chart-area")
-        .filter((item) => item.lotivisId === location)
-        .style("fill", () => color)
-        .raise();
-    }
-  }
-}
-
-class MapLabelsRenderer extends Renderer {
-  render(chart, controller, dataView) {
-    if (!chart.presentedGeoJSON)
-      return D_LOG ? console.log("[ltv]  No GeoJSON to render.") : null;
-    if (!dataView) return;
-    if (!chart.config.labels) return;
-
-    let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
-
-    function raise() {
-      chart.svg.selectAll(".ltv-map-chart-label").raise();
-    }
-
-    chart.on("mouseenter", raise);
-    chart.on("click", raise);
-
-    chart.svg.selectAll(".ltv-map-chart-label").remove();
-    chart.svg
-      .selectAll("text")
-      .data(chart.presentedGeoJSON.features)
-      .enter()
-      .append("text")
-      .attr("class", "ltv-map-chart-label")
-      .text((f) => {
-        let featureID = chart.config.featureIDAccessor(f);
-        let data = dataView.byLocationLabel.get(featureID);
-        if (!data) return "";
-        let labels = Array.from(data.keys());
-        let values = labels.map((label) => data.get(label));
-        let sum = sum$1(values);
-        return sum === 0 ? "" : numberFormat(sum);
-      })
-      .attr("x", (f) => chart.projection(f.center)[0])
-      .attr("y", (f) => chart.projection(f.center)[1]);
-  }
-}
-
-class MapTooltipRenderer extends Renderer {
-  render(chart, controller, dataView) {
-    var colors = controller.colorGenerator();
-
-    chart.element.select(".ltv-tooltip").remove();
-    let tooltip = chart.element
-      .append("div")
-      .attr("class", "ltv-tooltip")
-      .style("opacity", 0);
-
-    let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
-
-    function htmlTitle(features) {
-      if (features.length > 3) {
-        let featuresSlice = features.slice(0, 3);
-        let ids = featuresSlice
-          .map((feature) => `${feature.lotivisId}`)
-          .join(", ");
-        let names = featuresSlice
-          .map(chart.config.featureNameAccessor)
-          .join(", ");
-        let moreCount = features.length - 3;
-        return `IDs: ${ids} (+${moreCount})<br>Names: ${names} (+${moreCount})`;
-      } else {
-        let ids = features.map((feature) => `${feature.lotivisId}`).join(", ");
-        let names = features.map(chart.config.featureNameAccessor).join(", ");
-        return `IDs: ${ids}<br>Names: ${names}`;
-      }
-    }
-
-    function htmlValues(features) {
-      if (!chart.controller) return "";
-
-      let combinedByLabel = {};
-      for (let i = 0; i < features.length; i++) {
-        let feature = features[i];
-        let data = dataView.byLocationLabel.get(feature.lotivisId);
-        if (!data) continue;
-        let keys = Array.from(data.keys());
-
-        for (let j = 0; j < keys.length; j++) {
-          let label = keys[j];
-          if (combinedByLabel[label]) {
-            combinedByLabel[label] += data.get(label);
-          } else {
-            combinedByLabel[label] = data.get(label);
-          }
-        }
-      }
-
-      let components = [""];
-      let sum = 0;
-      for (const label in combinedByLabel) {
-        let color = colors.label(label);
-        let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
-        sum += combinedByLabel[label];
-        let value = numberFormat(combinedByLabel[label]);
-        components.push(`${divHTML} ${label}: <b>${value}</b>`);
-      }
-
-      components.push("");
-      components.push(`Sum: <b>${numberFormat(sum)}</b>`);
-
-      return components.length === 0 ? "No Data" : components.join("<br>");
-    }
-
-    function getTooltipSize() {
-      let tooltipWidth = Number(
-        tooltip.style("width").replace("px", "") || 200
-      );
-      let tooltipHeight = Number(tooltip.style("height").replace("px", ""));
-      return [tooltipWidth + 20, tooltipHeight + 20];
-    }
-
-    function positionTooltip(event, feature) {
-      // position tooltip
-      let tooltipSize = getTooltipSize();
-      let projection = chart.projection;
-      let featureBounds = geoBounds(feature);
-      let featureLowerLeft = projection(featureBounds[0]);
-      let featureUpperRight = projection(featureBounds[1]);
-      let featureBoundsWidth = featureUpperRight[0] - featureLowerLeft[0];
-
-      // svg is presented in dynamic sized view box so we need to get the actual size
-      // of the element in order to calculate a scale for the position of the tooltip.
-      let effectiveSize = chart.getElementEffectiveSize();
-      let factor = effectiveSize[0] / chart.config.width;
-      let positionOffset = chart.getElementPosition();
-
-      function getTooltipLeft() {
-        let left = featureLowerLeft[0];
-        left += featureBoundsWidth / 2;
-        left *= factor;
-        left -= tooltipSize[0] / 2;
-        left += positionOffset[0];
-        return left;
-      }
-
-      function getTooltipLocationAbove() {
-        let top = featureUpperRight[1] * factor;
-        top -= tooltipSize[1];
-        top += positionOffset[1];
-        top -= LOTIVIS_CONFIG$1.tooltipOffset;
-        return top;
-      }
-
-      function getTooltipLocationUnder() {
-        let top = featureLowerLeft[1] * factor;
-        top += positionOffset[1];
-        top += LOTIVIS_CONFIG$1.tooltipOffset;
-        return top;
-      }
-
-      let top = 0;
-      if (featureLowerLeft[1] > chart.config.height / 2) {
-        top = getTooltipLocationAbove();
-      } else {
-        top = getTooltipLocationUnder();
-      }
-
-      let left = getTooltipLeft();
-      tooltip
-        .style("left", left + "px")
-        .style("top", top + "px")
-        .style("opacity", 1)
-        .raise();
-    }
-
-    function mouseEnter(event, feature) {
-      if (!feature) return;
-      if (
-        chart.controller &&
-        chart.controller.filters.locations.includes(feature.lotivisId)
-      ) {
-        tooltip.html(
-          [
-            htmlTitle(chart.selectedFeatures),
-            htmlValues(chart.selectedFeatures),
-          ].join("<br>")
-        );
-        positionTooltip(event, chart.selectionBorderGeoJSON.features[0]);
-      } else {
-        tooltip.html(
-          [htmlTitle([feature]), htmlValues([feature])].join("<br>")
-        );
-        positionTooltip(event, feature);
-      }
-    }
-
-    function mouseOut(event, feature) {
-      tooltip.style("opacity", 0);
-    }
-
-    chart.on("mouseenter", mouseEnter);
-    chart.on("mouseout", mouseOut);
-    chart.on("click", mouseEnter);
-  }
-}
-
-class MapSelectionRenderer extends Renderer {
-  render(chart, controller, dataView) {
-    function getSelectedFeatures() {
-      if (!chart.presentedGeoJSON) return null;
-
-      let allFeatures = chart.presentedGeoJSON.features;
-      if (!chart.controller) return null;
-
-      let filteredLocations = chart.controller.filters.locations;
-      if (filteredLocations.length === 0) return [];
-      // return chart.presentedGeoJSON.features;
-      let selectedFeatures = [];
-
-      for (let index = 0; index < allFeatures.length; index++) {
-        let feature = allFeatures[index];
-        let featureID = feature.lotivisId;
-
-        if (filteredLocations.contains(featureID)) {
-          selectedFeatures.push(feature);
-        }
-      }
-
-      return selectedFeatures;
-    }
-
-    function raise() {
-      chart.svg.selectAll(".ltv-map-chart-selection-border").raise();
-    }
-
-    function _render() {
-      chart.selectedFeatures = getSelectedFeatures();
-      chart.selectionBorderGeoJSON = joinFeatures(chart.selectedFeatures);
-      if (!chart.selectionBorderGeoJSON) {
-        return D_LOG
-          ? console.log("[ltv]  No selected features to render.")
-          : null;
-      }
-      chart.svg.selectAll(".ltv-map-chart-selection-border").remove();
-      chart.svg
-        .selectAll(".ltv-map-chart-selection-border")
-        .append("path")
-        .attr("class", "ltv-map-chart-selection-border")
-        .data(chart.selectionBorderGeoJSON.features)
-        .enter()
-        .append("path")
-        .attr("d", chart.path)
-        .attr("class", "ltv-map-chart-selection-border")
-        .raise();
-    }
-
-    chart.on("mouseout", raise);
-    chart.on("click", _render);
-
-    _render();
-  }
+/**
+ * Returns a newly created GeoJSON with exactly one Feature
+ * merging the border of all containing features of the given
+ * collection of features.
+ *
+ * @param {GeoJSON | Array<Feature>} input GeoJSON or array of features
+ * @returns A new created GeoJSON
+ */
+function joinFeatures(input) {
+  let features = Array.isArray(input) ? input : input.features;
+  let topology$1 = topology(features);
+  let objects = extractObjects(topology$1);
+  let geometry = merge(topology$1, objects);
+  return FeatureCollection([Feature(geometry)]);
 }
 
 /**
- * Returns a new generated location data view for the current selected datasets.controller of datasets of this controller.
+ * Returns a new generated GeoJSON without the Feature having the ids
+ * specified.
  *
- * A location dataView has the following form:
- * ```
- * {
- *   stacks: [String],
- *   items: [
- *     {
- *       dataset: String,
- *       stack: String,
- *       location: Any,
- *       value: Number
- *     }
- *   ]
- * }
- * ```
+ * @param {GeoJSON} json The GeoJSON with Features to remove
+ * @param {Array} ids The ids of Features to remove
+ * @param {*} idValue An id accessor for the Features
+ * @returns {GeoJSON} The new generated GeoJSON
  */
-function dataViewMap(dataController) {
-  let data = dataController.snapshotOrData();
-  // console.log("data", data);
-
-  let byLocationLabel = rollup(
-    data,
-    (v) => sum$1(v, (d) => d.value),
-    (d) => d.location,
-    (d) => d.label
-  );
-
-  let byLocationStack = rollup(
-    data,
-    (v) => sum$1(v, (d) => d.value),
-    (d) => d.location,
-    (d) => d.stack
-  );
-
-  let locationToSum = rollup(
-    data,
-    (v) => sum$1(v, (d) => d.value),
-    (d) => d.location
-  );
-
-  let maxLocation = max$3(locationToSum, (item) => item[1]);
-  let maxLabel = max$3(byLocationLabel, (i) => max$3(i[1], (d) => d[1]));
-  let maxStack = max$3(byLocationStack, (i) => max$3(i[1], (d) => d[1]));
-
-  return {
-    labels: dataController.labels(),
-    stacks: dataController.stacks(),
-    locations: dataController.locations(),
-    max: maxLocation,
-    maxLabel,
-    maxStack,
-    byLocationLabel,
-    byLocationStack,
-    locationToSum,
-  };
+function removeFeatures(json, ids, idValue = FEATURE_ID_ACCESSOR) {
+  if (!Array.isArray(ids)) throw new Error("invalid ids. not an array");
+  if (!Array.isArray(json.features))
+    throw new Error("invalid geojson. no features");
+  let _json = copy(json);
+  _json.features = _json.features.filter((f) => !ids.includes(idValue(f)));
+  return _json;
 }
 
-class MapChart extends Chart {
-  initialize() {
-    let theConfig = this.config;
-    let margin;
-    margin = Object.assign({}, MAP_CHART_CONFIG.margin);
-    margin = Object.assign(margin, theConfig.margin || {});
+/**
+ * Reusable Map Chart API class that renders a
+ * simple and configurable map chart.
+ *
+ * @requires d3
+ *
+ * @example
+ * var chart = lotivis
+ *    .map()
+ *    .selector(".css-selector")
+ *    .dataController(dc)
+ *    .run();
+ *
+ */
+function map() {
+  let state = {
+    id: uniqueId("map"),
 
-    let config = Object.assign({}, MAP_CHART_CONFIG);
-    this.config = Object.assign(config, this.config);
-    this.config.margin = margin;
+    width: 1000,
+    height: 1000,
 
-    this.projection = geoMercator();
-    this.path = geoPath().projection(this.projection);
+    // margin
+    marginLeft: 20,
+    marginTop: 20,
+    marginRight: 20,
+    marginBottom: 20,
+
+    // Whether the chart is enabled.
+    enabled: true,
+
+    // whether to draw labels
+    labels: false,
+
+    // whether to draw a legend on the map
+    legend: true,
+
+    // whether to display a tooltip.
+    tooltip: true,
+
+    exclude: null,
+
+    include: null,
+
+    // the geojson wich is drawn
+    geoJSON: null,
+
+    // The data controller.
+    dataController: null,
+
+    // the number format
+    numberFormat: DEFAULT_NUMBER_FORMAT,
+
+    featureIDAccessor: FEATURE_ID_ACCESSOR,
+
+    featureNameAccessor: FEATURE_NAME_ACCESSOR,
+  };
+
+  // Create new underlying chart with the specified state.
+  let chart = baseChart(state);
+  state.projection = mercator();
+  state.path = index$3().projection(state.projection);
+
+  function colors() {
+    return state.dataController.colorGenerator();
   }
 
-  addRenderers() {
-    this.renderers.push(new MapBackgroundRenderer());
-    this.renderers.push(new MapExteriorBorderRenderer());
-    this.renderers.push(new MapGeojsonRenderer());
-    this.renderers.push(new MapDatasetRenderer());
-    this.renderers.push(new MapLegendRenderer());
-    this.renderers.push(new MapLabelsRenderer());
-    this.renderers.push(new MapTooltipRenderer());
-    this.renderers.push(new MapSelectionRenderer());
-  }
+  /**
+   * Tells the map chart that the GeoJSON has changed.
+   * @private
+   */
+  function geoJSONDidChange() {
+    let geoJSON = state.geoJSON;
+    if (!geoJSON) return;
 
-  prepare() {
-    this.svg
-      .classed("ltv-map-chart-svg", true)
-      .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`);
+    state.workGeoJSON = geoJSON;
 
-    if (this.geoJSON) return;
-    let geoJSON = createGeoJSON(this.controller.locations());
-    this.setGeoJSON(geoJSON);
-  }
-
-  createDataView() {
-    return dataViewMap(this.controller);
-  }
-
-  zoomTo(geoJSON) {
-    this.projection.fitSize(
-      [this.config.width - 20, this.config.height - 20],
-      geoJSON
-    );
-  }
-
-  setGeoJSON(newGeoJSON) {
-    if (typeof newGeoJSON === "object" && newGeoJSON.prototype === "GeoJSON") {
-      this.geoJSON = newGeoJSON;
-    } else {
-      this.geoJSON = new GeoJSON(newGeoJSON);
-    }
-    this.presentedGeoJSON = this.geoJSON;
-    this.geoJSONDidChange();
-  }
-
-  geoJSONDidChange() {
-    if (!this.geoJSON) return;
     // precalculate the center of each feature
-    this.geoJSON.features.forEach((f) => (f.center = geoCentroid(f)));
+    state.workGeoJSON.features.forEach((f) => (f.center = centroid$1(f)));
 
-    console.log("this.controller", this.controller);
-    if (!this.controller) {
-      this.controller = new DataController([]);
+    if (Array.isArray(state.exclude)) {
+      state.workGeoJSON = removeFeatures(state.workGeoJSON, state.exclude);
     }
 
-    if (this.config.exclude) {
-      this.presentedGeoJSON = removeFeatures(this.geoJSON, this.config.exclude);
-    }
-
-    if (this.config.include) {
-      this.presentedGeoJSON = filterFeatures(this.geoJSON, this.config.include);
+    if (Array.isArray(state.include)) {
+      state.workGeoJSON = filterFeatures(state.workGeoJSON, state.include);
     }
 
     // precalculate lotivis feature ids
     let feature, id;
-    for (let i = 0; i < this.presentedGeoJSON.features.length; i++) {
-      feature = this.presentedGeoJSON.features[i];
-      id = this.config.featureIDAccessor(feature);
-      this.presentedGeoJSON.features[i].lotivisId = id;
+    for (let i = 0; i < state.workGeoJSON.features.length; i++) {
+      feature = state.workGeoJSON.features[i];
+      id = state.featureIDAccessor(feature);
+      state.workGeoJSON.features[i].lotivisId = id;
     }
 
-    this.zoomTo(this.presentedGeoJSON);
-    this.update(this.controller, "geojson");
-    this.redraw();
+    chart.zoomTo(state.workGeoJSON);
+
+    if (chart.dataController() === null) {
+      chart.dataController(new DataController([]));
+    }
   }
-}
 
-/**
- * Enumeration of available style types of a plot chart.
- */
-const PLOT_CHART_TYPE = {
-  gradient: "gradient",
-  fraction: "fraction",
-};
+  /**
+   * Returns the collection of selected features.
+   * @returns {Array<feature>} The collection of selected features
+   * @private
+   */
+  function getSelectedFeatures() {
+    if (!state.workGeoJSON) return null;
 
-/**
- * Enumeration of sorts available in the plot chart.
- */
-const PLOT_CHART_SORT = {
-  none: "none",
-  alphabetically: "alphabetically",
-  duration: "duration",
-  intensity: "intensity",
-  firstDate: "firstDate",
-};
+    let allFeatures = state.workGeoJSON.features;
+    let filteredLocations = state.dataController.filters.locations;
 
-/**
- * Enumeration of color modes of a plot chart.
- */
-const PLOT_COLOR_MODE = {
-  multiple: "multiple",
-  single: "single",
-};
+    if (filteredLocations.length === 0) return [];
 
-const PLOT_CHART_CONFIG = {
-  width: 1000,
-  height: 600,
-  margin: DEFAULT_MARGIN,
-  lineHeight: 28,
-  barHeight: 30,
-  radius: 23,
-  labels: true,
-  drawGrid: true,
-  showTooltip: true,
-  selectable: true,
-  colorMode: PLOT_COLOR_MODE.multiple,
-  sort: PLOT_CHART_SORT.none,
-  type: PLOT_CHART_TYPE.gradient,
-  numberFormat: DEFAULT_NUMBER_FORMAT,
-};
+    let selectedFeatures = [];
+    for (let index = 0; index < allFeatures.length; index++) {
+      let feature = allFeatures[index];
+      let featureID = feature.lotivisId;
 
-class PlotAxisRenderer extends Renderer {
-  render(chart, conttroller) {
-    let margin = chart.config.margin;
-
-    // top
-    chart.svg
-      .append("g")
-      .call(axisTop(chart.xChart))
-      .attr("transform", () => `translate(0,${margin.top})`);
-
-    // left
-    chart.svg
-      .append("g")
-      .call(axisLeft(chart.yChart))
-      .attr("transform", () => `translate(${margin.left},0)`);
-
-    // bottom
-    chart.svg
-      .append("g")
-      .call(axisBottom(chart.xChart))
-      .attr("transform", () => `translate(0,${chart.height - margin.bottom})`);
-  }
-}
-
-class PlotTooltipRenderer extends Renderer {
-  render(chart, controller) {
-    let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG$1.numberFormat;
-    chart.element.select(".ltv-tooltip").remove();
-    const tooltip = chart.element
-      .append("div")
-      .attr("class", "ltv-tooltip")
-      .attr("rx", 5) // corner radius
-      .attr("ry", 5)
-      .style("opacity", 0);
-
-    function getHTMLContentForDataset(dataset) {
-      // console.log("dataset", dataset);
-
-      let components = [];
-
-      let sum = dataset.data
-        .map((item) => item.value)
-        .reduce((acc, next) => +acc + +next, 0);
-      let formatted = numberFormat(sum);
-
-      components.push("Label: " + dataset.label);
-      components.push("");
-      components.push("Start: " + dataset.firstDate);
-      components.push("End: " + dataset.lastDate);
-      components.push("");
-      components.push("Items: " + formatted);
-      components.push("");
-
-      let filtered = dataset.data.filter((item) => item.value !== 0);
-      for (let index = 0; index < filtered.length; index++) {
-        let entry = filtered[index];
-        let formatted = numberFormat(entry.value);
-        components.push(`${entry.date}: ${formatted}`);
+      if (filteredLocations.contains(featureID)) {
+        selectedFeatures.push(feature);
       }
-
-      return components.join("<br/>");
     }
 
-    function getTooltipLeftForDataset(dataset, factor, offset) {
-      let left = chart.xChart(dataset.firstDate);
-      left *= factor;
-      left += offset[0];
-      return left;
+    return selectedFeatures;
+  }
+
+  function htmlTitle(features) {
+    if (features.length > 3) {
+      let featuresSlice = features.slice(0, 3);
+      let ids = featuresSlice
+        .map((feature) => `${feature.lotivisId}`)
+        .join(", ");
+      let names = featuresSlice.map(state.featureNameAccessor).join(", ");
+      let moreCount = features.length - 3;
+      return `IDs: ${ids} (+${moreCount})<br>Names: ${names} (+${moreCount})`;
+    } else {
+      let ids = features.map((feature) => `${feature.lotivisId}`).join(", ");
+      let names = features.map(state.featureNameAccessor).join(", ");
+      return `IDs: ${ids}<br>Names: ${names}`;
+    }
+  }
+
+  function htmlValues(features, dv) {
+    if (!chart.controller) return "";
+
+    let combinedByLabel = {};
+    for (let i = 0; i < features.length; i++) {
+      let feature = features[i];
+      let data = dv.byLocationLabel.get(feature.lotivisId);
+      if (!data) continue;
+      let keys = Array.from(data.keys());
+
+      for (let j = 0; j < keys.length; j++) {
+        let label = keys[j];
+        if (combinedByLabel[label]) {
+          combinedByLabel[label] += data.get(label);
+        } else {
+          combinedByLabel[label] = data.get(label);
+        }
+      }
     }
 
-    function showTooltip(event, dataset) {
-      if (!chart.config.showTooltip) return;
-      tooltip.html(getHTMLContentForDataset(dataset));
+    let components = [""];
+    let sum = 0;
+    for (const label in combinedByLabel) {
+      let color = colors.label(label);
+      let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
+      sum += combinedByLabel[label];
+      let value = numberFormat(combinedByLabel[label]);
+      components.push(`${divHTML} ${label}: <b>${value}</b>`);
+    }
 
-      // position tooltip
-      let tooltipHeight = Number(tooltip.style("height").replace("px", ""));
-      let factor = chart.getElementEffectiveSize()[0] / chart.config.width;
-      let offset = chart.getElementPosition();
+    components.push("");
+    components.push(`Sum: <b>${numberFormat(sum)}</b>`);
 
-      let top = chart.yChart(dataset.label) * factor;
-      top += offset[1];
+    return components.length === 0 ? "No Data" : components.join("<br>");
+  }
 
-      if (
-        chart.yChart(dataset.label) - chart.config.margin.top <=
-        chart.graphHeight / 2
-      ) {
-        top += chart.config.lineHeight * factor + LOTIVIS_CONFIG$1.tooltipOffset;
+  function positionTooltip(event, feature, calc) {
+    // position tooltip
+    let size = calc.tooltip.size();
+    let tOff = LOTIVIS_CONFIG.tooltipOffset;
+    let projection = state.projection;
+
+    let fBounds = bounds$1(feature);
+    let fLowerLeft = projection(fBounds[0]);
+    let fUpperRight = projection(fBounds[1]);
+    let fWidth = fUpperRight[0] - fLowerLeft[0];
+
+    // svg is presented in dynamic sized view box so we need to get the actual size
+    // of the element in order to calculate a scale for the position of the tooltip.
+    let domRect = calc.svg.node().getBoundingClientRect();
+    let factor = domRect.width / state.width;
+    let offset = [domRect.x + window.scrollX, domRect.y + window.scrollY];
+
+    function getTooltipLeft() {
+      return (fLowerLeft[0] + fWidth / 2) * factor - size[0] / 2 + offset[0];
+    }
+
+    function tooltipTop() {
+      return fLowerLeft[1] > state.height / 2
+        ? fUpperRight[1] * factor - size[1] + offset[1] - tOff
+        : fLowerLeft[1] * factor + offset[1] + tOff;
+    }
+
+    calc.tooltip.left(getTooltipLeft()).top(tooltipTop()).show();
+  }
+
+  /**
+   *
+   * @param {*} container
+   * @param {*} calc
+   */
+  function renderSVG(container, calc) {
+    calc.svg = container
+      .append("svg")
+      .attr("class", "ltv-chart-svg ltv-map-svg")
+      .attr("viewBox", `0 0 ${state.width} ${state.height}`);
+  }
+
+  function renderBackground(calc, dv) {
+    calc.svg
+      .append("rect")
+      .attr("class", "ltv-map-background")
+      .attr("width", state.width)
+      .attr("height", state.height)
+      .on("click", state.dataController.clearLocationsFilter);
+  }
+
+  function renderExteriorBorders(calc, dv) {
+    let geoJSON = state.workGeoJSON;
+    if (!geoJSON) return console.log("[ltv]  No GeoJSON to render");
+
+    let bordersGeoJSON = joinFeatures(geoJSON.features);
+    if (!bordersGeoJSON) return console.log("[ltv]  No borders to render.");
+
+    calc.borders = calc.svg
+      .selectAll(".ltv-map-exterior-borders")
+      .append("path")
+      .data(bordersGeoJSON.features)
+      .enter()
+      .append("path")
+      .attr("d", state.path)
+      .attr("class", "ltv-map-exterior-borders");
+  }
+
+  function filterLocation(location) {
+    return state.dataController.isFilterLocation(location);
+  }
+
+  function renderFeatures(calc, dv) {
+    function opacity(location) {
+      return filterLocation(location) ? LOTIVIS_CONFIG.selectionOpacity : 1;
+    }
+
+    function featureMapID(f) {
+      return `ltv-map-area-id-${f.lotivisId}`;
+    }
+
+    function resetHover() {
+      calc.svg
+        .selectAll(".ltv-map-area")
+        .classed("ltv-map-area-hover", false)
+        .attr("opacity", (f) => opacity(f.lotivisId));
+    }
+
+    function mouseEnter(event, feature) {
+      calc.svg
+        .selectAll(`#${featureMapID(feature)}`)
+        .raise()
+        .classed("ltv-map-area-hover", true);
+
+      calc.svg.selectAll(".ltv-map-label").raise();
+
+      calc.tooltip.show();
+
+      if (filterLocation(feature.lotivisId)) {
+        calc.tooltip.html(
+          [
+            htmlTitle(calc.selectedFeatures),
+            htmlValues(calc.selectedFeatures),
+          ].join("<br>")
+        );
+        positionTooltip(event, calc.selectionBorderGeoJSON.features[0], calc);
       } else {
-        top -= tooltipHeight + 20; // subtract padding
-        top -= LOTIVIS_CONFIG$1.tooltipOffset;
+        calc.tooltip.html(
+          [htmlTitle([feature]), htmlValues([feature])].join("<br>")
+        );
+        positionTooltip(event, feature, calc);
       }
-
-      let left = getTooltipLeftForDataset(dataset, factor, offset);
-
-      tooltip
-        .style("left", left + "px")
-        .style("top", top + "px")
-        .style("opacity", 1);
     }
 
-    function hideTooltip() {
-      let controller = chart.controller;
-      let filters = controller.datasetFilters;
-
-      if (filters && filters.length !== 0) {
-        controller.resetFilters();
-      }
-
-      if (+tooltip.style("opacity") === 0) return;
-      tooltip.style("opacity", 0);
+    function mouseOut(event, feature) {
+      resetHover();
+      calc.tooltip.hide();
+      // chart.emit("mouseout", event, feature);
+      // dragged
+      if (event.buttons === 1) mouseClick(event, feature);
     }
 
-    chart.on("mouseenter", showTooltip);
-    chart.on("mouseout", hideTooltip);
-  }
-}
-
-class PlotLabelRenderer extends Renderer {
-  render(chart, controller) {
-    if (chart.config.type !== PLOT_CHART_TYPE.gradient) return;
-    if (!chart.config.labels) return;
-
-    let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
-    let xBandwidth = chart.yChart.bandwidth();
-    let xChart = chart.xChart;
-
-    chart.labels = chart.barsData
-      .append("text")
-      .attr("transform", `translate(0,${xBandwidth / 2 + 4})`)
-      .attr("class", "ltv-plot-label")
-      .attr("id", (d) => "rect-" + hash_str(d.label))
-      .attr("x", (d) => xChart(d.firstDate) + xBandwidth / 2)
-      .attr("y", (d) => chart.yChart(d.label))
-      .attr("height", chart.yChartPadding.bandwidth())
-      .attr(
-        "width",
-        (d) => xChart(d.lastDate) - xChart(d.firstDate) + xBandwidth
-      )
-      .text(function (dataset) {
-        if (dataset.sum === 0) return;
-        return `${numberFormat(dataset.sum)} (${dataset.duration + 1} years)`;
-      });
-  }
-}
-
-class PlotGridRenderer extends Renderer {
-  render(chart, controller) {
-    if (!chart) return;
-    if (!chart.config.drawGrid) return;
-
-    chart.svg
-      .append("g")
-      .attr("class", "ltv-plot-grid ltv-plot-grid-x")
-      .attr(
-        "transform",
-        "translate(0," +
-          (chart.preferredHeight - chart.config.margin.bottom) +
-          ")"
-      )
-      .call(chart.xAxisGrid);
-
-    chart.svg
-      .append("g")
-      .attr("class", "ltv-plot-grid ltv-plot-grid-y")
-      .attr("transform", `translate(${chart.config.margin.left},0)`)
-      .call(chart.yAxisGrid);
-  }
-}
-
-class PlotBackgroundRenderer extends Renderer {
-  render(chart, controller) {
-    chart.svg
-      .append("rect")
-      .attr("width", chart.width || chart.config.width)
-      .attr("height", chart.height)
-      .attr("class", `ltv-plot-chart-background`)
-      .on("click", (e, b) => {
-        chart.controller.filters.labels.clear();
-        chart.emit("click", e, null);
-      });
-  }
-}
-
-class PlotHoverBarsRenderer extends Renderer {
-  render(chart, controller) {
-    function createID(dataset) {
-      return `ltv-plot-chart-hover-bar-id-${hash_str(dataset.label)}`;
+    function mouseClick(event, feature) {
+      console.log("click", feature);
+      if (!state.enabled) return;
+      if (!feature || !feature.properties) return;
+      state.dataController.toggleLocation(feature.lotivisId, chart);
+      // chart.emit("click", event, feature);
     }
 
-    function hideAll() {
-      chart.svg.selectAll(".ltv-plot-chart-hover-bar").attr("opacity", 0);
-    }
+    let locationToSum = dv.locationToSum;
+    let max = max$3(locationToSum, (item) => item[1]);
+    let generator = MapColors(1);
 
-    function mouseEnter(event, dataset) {
-      hideAll();
-
-      let id = createID(dataset);
-      chart.svg.select(`#${id}`).attr("opacity", 0.3);
-
-      chart.emit("mouseenter", event, dataset);
-    }
-
-    function mouseOut(event, dataset) {
-      hideAll();
-
-      if (event.buttons === 1) {
-        mouseClick(event, dataset);
-      }
-      chart.emit("mouseout", event, dataset);
-    }
-
-    function mouseClick(event, dataset) {
-      if (chart.config.selectable) {
-        chart.makeUpdateInsensible();
-        chart.controller.filters.labels.toggle(dataset.label);
-        chart.makeUpdateSensible();
-      }
-      chart.emit("click", event, dataset);
-    }
-
-    let datasets = chart.dataView.datasets;
-    let graphWidth = chart.graphWidth;
-
-    chart.backgrounBarsData = chart.svg
-      .append("g")
-      .selectAll("g")
-      .data(datasets)
-      .enter();
-
-    chart.backgrounBars = chart.backgrounBarsData
-      .append("rect")
-      .attr("id", (d) => createID(d))
-      .attr("class", "ltv-plot-chart-hover-bar")
-      .attr(`opacity`, 0)
-      .attr("x", chart.config.margin.left)
-      .attr("y", (d) => chart.yChart(d.label))
-      .attr("height", chart.yChart.bandwidth())
-      .attr("width", graphWidth)
+    calc.areas = calc.svg
+      .selectAll(".ltv-map-area")
+      .append("path")
+      .data(state.workGeoJSON.features)
+      .enter()
+      .append("path")
+      .attr("d", state.path)
+      .classed("ltv-map-area", true)
+      .attr("id", (f) => featureMapID(f))
+      .style("stroke-dasharray", "1,4")
+      .style("fill", (f) => {
+        let value = locationToSum.get(f.lotivisId);
+        let opacity = Number(value / max);
+        return opacity === 0 ? "WhiteSmoke" : generator(opacity);
+      })
+      .style("fill-opacity", 1)
+      .on("click", mouseClick)
       .on("mouseenter", mouseEnter)
       .on("mouseout", mouseOut)
-      .on("click", mouseClick);
+      .raise();
   }
-}
 
-class PlotBarsFractionsRenderer extends Renderer {
-  render(chart, controller) {
-    if (chart.config.type !== PLOT_CHART_TYPE.fraction) return;
-
-    let radius = LOTIVIS_CONFIG$1.barRadius;
-    let max = chart.dataView.max;
-    let data = chart.dataView.byLabelDate;
-
-    let colors = PlotColors(max);
-    let brush = max / 2;
-    let colorGenerator = controller.colorGenerator();
-    let colorMode = chart.config.colorMode;
-
-    chart.barsData = chart.svg.append("g").selectAll("g").data(data).enter();
-
-    chart.bars = chart.barsData
-      .append("g")
-      .attr("transform", (d) => `translate(0,${chart.yChartPadding(d[0])})`)
-      .attr("id", (d) => "ltv-plot-rect-" + hash_str(d[0]))
-      .attr(`fill`, (d) =>
-        colorMode === PLOT_COLOR_MODE.single ? colorGenerator.label(d[0]) : null
-      )
-      .selectAll(".rect")
-      .data((d) => d[1]) // map to dates data
+  function renderLabels(calc, dv) {
+    // calc.svg.selectAll(".ltv-map-label").remove();
+    calc.svg
+      .selectAll("text")
+      .data(state.workGeoJSON.features)
       .enter()
-      .filter((d) => d[1] > 0)
-      .append("rect")
-      .attr("class", "ltv-plot-bar")
-      .attr(`fill`, (d) =>
-        colorMode === PLOT_COLOR_MODE.single ? null : colors(d[1])
-      )
-      .attr("opacity", (d) =>
-        colorMode === PLOT_COLOR_MODE.single
-          ? (d[1] + brush) / (max + brush)
-          : 1
-      )
-      .attr("rx", radius)
-      .attr("ry", radius)
-      .attr("x", (d) => chart.xChart(d[0]))
-      .attr("width", chart.xChart.bandwidth())
-      .attr("height", chart.yChartPadding.bandwidth());
-  }
-}
-
-class PlotBarsGradientCreator {
-  constructor(chart, controller, dataView) {
-    this.chart = chart;
-    this.controller = controller;
-    this.dataView = dataView;
-    this.plotColors = PlotColors(dataView.max);
-  }
-
-  createGradient(dataset) {
-    let max = this.chart.dataView.max;
-    let gradient = this.chart.definitions
-      .append("linearGradient")
-      .attr("id", this.chart.selector + "-" + hash_str(dataset.label))
-      .attr("x1", "0%")
-      .attr("x2", "100%")
-      .attr("y1", "0%")
-      .attr("y2", "0%");
-
-    let data = dataset.data;
-    if (!data || data.length === 0) return;
-
-    let count = data.length;
-    let latestDate = dataset.lastDate;
-
-    let plotColors = this.plotColors;
-    let brush = max / 2;
-    let colorGenerator = this.controller.colorGenerator();
-    let colorMode = this.chart.config.colorMode;
-
-    function append(value, percent) {
-      gradient
-        .append("stop")
-        .attr("offset", percent + "%")
-        .attr(
-          "stop-color",
-          colorMode === PLOT_COLOR_MODE.single
-            ? colorGenerator.label(dataset.label)
-            : plotColors(value)
-        )
-        .attr(
-          "stop-opacity",
-          colorMode === PLOT_COLOR_MODE.single
-            ? (value + brush) / (max + brush)
-            : 1
-        );
-    }
-
-    if (dataset.duration === 0) {
-      append(data[0].value, 100);
-    } else {
-      for (let i = 0; i < count; i++) {
-        let diff = latestDate - data[i].date;
-        let opacity = diff / dataset.duration;
-        let percent = (1 - opacity) * 100;
-        append(data[i].value, percent);
-      }
-    }
-  }
-}
-
-class PlotBarsGradientRenderer extends Renderer {
-  render(chart, controller, dataView) {
-    if (chart.config.type !== PLOT_CHART_TYPE.gradient) return;
-
-    // constant for the radius of the drawn bars.
-    let radius = LOTIVIS_CONFIG$1.barRadius;
-
-    this.gradientCreator = new PlotBarsGradientCreator(
-      chart,
-      controller,
-      dataView
-    );
-
-    let datasets = chart.dataView.datasets;
-    chart.definitions = chart.svg.append("defs");
-
-    for (let index = 0; index < datasets.length; index++) {
-      this.gradientCreator.createGradient(datasets[index]);
-    }
-
-    chart.barsData = chart.svg
-      .append("g")
-      .selectAll("g")
-      .data(datasets)
-      .enter();
-
-    chart.bars = chart.barsData
-      .append("rect")
-      .attr("transform", (d) => `translate(0,${chart.yChartPadding(d.label)})`)
-      .attr("fill", (d) => `url(#${chart.selector}-${hash_str(d.label)})`)
-      .attr("class", "ltv-plot-bar")
-      .attr("rx", radius)
-      .attr("ry", radius)
-      .attr("x", (d) =>
-        chart.xChart(d.duration < 0 ? d.lastDate : d.firstDate || 0)
-      )
-      // .attr("y", (d) => chart.yChartPadding(d.label))
-      .attr("height", chart.yChartPadding.bandwidth())
-      .attr("id", (d) => "ltv-plot-rect-" + hash_str(d.label))
-      .attr("width", (d) => {
-        if (!d.firstDate || !d.lastDate) return 0;
-        return (
-          chart.xChart(d.lastDate) -
-          chart.xChart(d.firstDate) +
-          chart.xChart.bandwidth()
-        );
-      });
-  }
-}
-
-class PlotLabelsFractionsRenderer extends Renderer {
-  render(chart, controller) {
-    if (chart.config.type !== PLOT_CHART_TYPE.fraction) return;
-    if (!chart.config.labels) return;
-
-    let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
-    let yBandwidth = chart.yChart.bandwidth() / 2;
-
-    chart.labels = chart.barsData
-      .append("g")
-      .attr("transform", (d) => `translate(0,${chart.yChartPadding(d[0])})`)
-      .attr("id", (d) => "rect-" + hash_str(d[0]))
-      .selectAll(".text")
-      .data((d) => d[1]) // map to dates data
-      .enter()
-      .filter((d) => d[1] > 0)
       .append("text")
-      .attr("class", "ltv-plot-label")
-      .attr("y", (d) => yBandwidth)
-      .attr("x", (d) => chart.xChart(d[0]) + 4)
-      .text((d) => (d.sum === 0 ? null : numberFormat(d[1])));
-  }
-}
-
-class PlotChartSelectionRenderer extends Renderer {
-  render(chart, controller) {
-    function createID(dataset) {
-      return `ltv-plot-chart-selection-rect-id-${hash_str(dataset.label)}`;
-    }
-
-    function update() {
-      let filter = chart.controller.filters.labels || [];
-      chart.svg
-        .selectAll(`.ltv-plot-chart-selection-rect`)
-        .attr(`opacity`, (d) => (filter.includes(d.label) ? 0.3 : 0));
-    }
-
-    function _render() {
-      let datasets = chart.dataView.datasets;
-      let graphWidth = chart.graphWidth;
-
-      chart.selectionBarsData = chart.svg
-        .append("g")
-        .selectAll("g")
-        .data(datasets)
-        .enter();
-
-      chart.selectionBars = chart.selectionBarsData
-        .append("rect")
-        .attr("id", (d) => createID(d))
-        .attr("class", "ltv-plot-chart-selection-rect")
-        .attr(`opacity`, 0)
-        .attr("x", chart.config.margin.left)
-        .attr("y", (d) => chart.yChart(d.label))
-        .attr("height", chart.yChart.bandwidth())
-        .attr("width", graphWidth);
-
-      update();
-    }
-
-    chart.on("click", update);
-
-    _render();
-  }
-}
-
-function dataViewPlot(dataController) {
-  let dates = dataController.dates().sort();
-  let data = dataController.snapshotOrData();
-
-  let byLabelDate = rollups(
-    data,
-    (v) => sum$1(v, (d) => d.value),
-    (d) => d.label,
-    (d) => d.date
-  );
-
-  let datasets = byLabelDate.map((d) => {
-    let label = d[0];
-    let data = d[1]
-      .filter((d) => d[1] > 0)
-      .map((d) => {
-        return { date: d[0], value: d[1] };
+      .attr("class", "ltv-map-label")
+      .text((f) => {
+        let featureID = state.featureIDAccessor(f);
+        let data = dv.byLocationLabel.get(featureID);
+        if (!data) return "";
+        let labels = Array.from(data.keys());
+        let values = labels.map((label) => data.get(label));
+        let sum = sum$2(values);
+        return sum === 0 ? "" : state.numberFormat(sum);
       })
-      .sort((a, b) => a.date - b.date);
+      .attr("x", (f) => state.projection(f.center)[0])
+      .attr("y", (f) => state.projection(f.center)[1]);
+  }
 
-    let sum = sum$1(data, (d) => d.value);
-    let firstDate = (data[0] || {}).date;
-    let lastDate = (data[data.length - 1] || {}).date;
-    let duration = dates.indexOf(lastDate) - dates.indexOf(firstDate);
+  function renderSelection(calc, dv) {
+    calc.selectedFeatures = getSelectedFeatures();
+    calc.selectionBorderGeoJSON = joinFeatures(calc.selectedFeatures);
+    if (!calc.selectionBorderGeoJSON) {
+      return D_LOG
+        ? console.log("[ltv]  No selected features to render.")
+        : null;
+    }
+    calc.svg.selectAll(".ltv-map-selection-border").remove();
+    calc.svg
+      .selectAll(".ltv-map-selection-border")
+      .append("path")
+      .attr("class", "ltv-map-selection-border")
+      .data(calc.selectionBorderGeoJSON.features)
+      .enter()
+      .append("path")
+      .attr("d", state.path)
+      .attr("class", "ltv-map-selection-border")
+      .raise();
+  }
 
-    return { label, data, sum, firstDate, lastDate, duration };
-  });
+  // public
 
-  return {
-    datasets,
-    dates,
-    byLabelDate,
-    firstDate: dates[0],
-    lastDate: dates[dates.length - 1],
-    labels: dataController.labels(),
-    max: max$3(datasets, (d) => max$3(d.data, (i) => i.value)),
+  chart.zoomTo = function (geoJSON) {
+    if (state.projection)
+      state.projection.fitSize([state.width - 20, state.height - 20], geoJSON);
   };
-}
 
-class PlotChart extends Chart {
-  static Type = PLOT_CHART_TYPE;
-  static Sort = PLOT_CHART_SORT;
+  chart.geoJSON = function (_) {
+    return arguments.length
+      ? (((state.geoJSON = _), geoJSONDidChange()), this)
+      : state.geoJSON;
+  };
 
-  initialize() {
-    this.config;
-    let margin;
-    margin = Object.assign({}, PLOT_CHART_CONFIG.margin);
-    margin = Object.assign(margin, this.config.margin);
+  /**
+   * Calculates the data view for the bar chart.
+   *
+   * @param {*} calc
+   * @returns
+   */
+  chart.dataView = function (dc) {
+    var dv = {};
 
-    let config = Object.assign({}, PLOT_CHART_CONFIG);
-    this.config = Object.assign(config, this.config);
-    this.config.margin = margin;
-  }
+    dv.snapshot = dc.snapshot();
+    dv.data = dc.snapshotOrData();
+    dv.labels = dc.data.labels;
+    dv.stacks = dc.data.stacks;
+    dv.locations = dc.data.locations;
 
-  addRenderers() {
-    this.renderers.push(new PlotBackgroundRenderer());
-    this.renderers.push(new PlotAxisRenderer());
-    this.renderers.push(new PlotGridRenderer());
-    this.renderers.push(new PlotChartSelectionRenderer());
-    this.renderers.push(new PlotHoverBarsRenderer());
-    this.renderers.push(new PlotBarsFractionsRenderer());
-    this.renderers.push(new PlotBarsGradientRenderer());
-    this.renderers.push(new PlotLabelRenderer());
-    this.renderers.push(new PlotLabelsFractionsRenderer());
-    this.renderers.push(new PlotTooltipRenderer());
-  }
-
-  createDataView() {
-    return dataViewPlot(this.controller);
-  }
-
-  prepare() {
-    this.svg
-      .classed("ltv-plot-chart-svg", true)
-      .attr("preserveAspectRatio", "xMidYMid meet")
-      .attr("viewBox", `0 0 ${this.config.width} ${this.config.height}`);
-
-    let margin = this.config.margin;
-    let barsCount = this.dataView.labels.length || 0;
-
-    this.graphWidth = this.config.width - margin.left - margin.right;
-    this.graphHeight = barsCount * this.config.lineHeight;
-    this.height = this.graphHeight + margin.top + margin.bottom;
-    this.preferredHeight = this.height;
-
-    this.svg.attr(
-      "viewBox",
-      `0 0 ${this.config.width} ${this.preferredHeight}`
+    dv.byLocationLabel = rollup(
+      dv.data,
+      (v) => sum$2(v, (d) => d.value),
+      (d) => d.location,
+      (d) => d.label
     );
 
-    this.sortDatasets();
-    this.createScales();
-  }
+    dv.byLocationStack = rollup(
+      dv.data,
+      (v) => sum$2(v, (d) => d.value),
+      (d) => d.location,
+      (d) => d.stack
+    );
 
-  createScales() {
-    let dates = this.config.dates || this.config.dates || this.dataView.dates;
-    dates = dates.sort();
-    let labels = this.dataView.labels || [];
+    dv.locationToSum = rollup(
+      dv.data,
+      (v) => sum$2(v, (d) => d.value),
+      (d) => d.location
+    );
 
-    this.xChart = band()
-      .domain(dates)
-      .rangeRound([
-        this.config.margin.left,
-        this.config.width - this.config.margin.right,
-      ])
-      .paddingInner(0.1);
+    dv.maxLocation = max$3(dv.locationToSum, (item) => item[1]);
+    dv.maxLabel = max$3(dv.byLocationLabel, (i) => max$3(i[1], (d) => d[1]));
+    dv.maxStack = max$3(dv.byLocationStack, (i) => max$3(i[1], (d) => d[1]));
 
-    this.yChartPadding = band()
-      .domain(labels)
-      .rangeRound([
-        this.height - this.config.margin.bottom,
-        this.config.margin.top,
-      ])
-      .paddingInner(0.1);
+    return dv;
+  };
 
-    this.yChart = band()
-      .domain(labels)
-      .rangeRound([
-        this.height - this.config.margin.bottom,
-        this.config.margin.top,
-      ]);
+  /**
+   *
+   * @param {*} container
+   * @param {*} state
+   * @param {*} calc
+   * @param {*} dv
+   */
+  chart.render = function (container, calc, dv) {
+    calc.graphWidth = state.width - state.marginLeft - state.marginRight;
+    calc.graphHeight = state.height - state.marginTop - state.marginBottom;
+    calc.graphBottom = state.height - state.marginBottom;
+    calc.graphRight = state.width - state.marginRight;
 
-    this.xAxisGrid = axisBottom(this.xChart)
-      .tickSize(-this.graphHeight)
-      .tickFormat("");
-
-    this.yAxisGrid = axisLeft(this.yChart)
-      .tickSize(-this.graphWidth)
-      .tickFormat("");
-  }
-
-  sortDatasets() {
-    // console.log("this.dataView", this.dataView);
-    let datasets = this.dataView.datasets;
-    let sortedDatasets = [];
-    switch (this.config.sort) {
-      case PLOT_CHART_SORT.alphabetically:
-        sortedDatasets = datasets.sort((set1, set2) => set1.label > set2.label);
-        break;
-      case PLOT_CHART_SORT.duration:
-        sortedDatasets = datasets.sort(
-          (set1, set2) => set1.duration < set2.duration
-        );
-        break;
-      case PLOT_CHART_SORT.intensity:
-        sortedDatasets = datasets.sort((set1, set2) => set1.sum < set2.sum);
-        break;
-      case PLOT_CHART_SORT.firstDate:
-        sortedDatasets = datasets.sort(
-          (set1, set2) => set1.firstDate > set2.firstDate
-        );
-        break;
-      default:
-        sortedDatasets = datasets;
-        break;
+    if (!state.geoJSON) {
+      chart.geoJSON(createGeoJSON(dv.locations));
     }
 
-    this.dataView.labels = sortedDatasets
-      .map((dataset) => String(dataset.label))
-      .reverse();
-    this.dataView.datasetsSorted = this.dataView.labels;
-  }
-}
+    renderSVG(container, calc);
+    renderBackground(calc);
+    renderExteriorBorders(calc);
+    renderFeatures(calc, dv);
+    renderSelection(calc);
+    renderLabels(calc, dv);
 
-class UrlParameters {
-  static getInstance() {
-    if (!UrlParameters.instance) {
-      UrlParameters.instance = new UrlParameters();
-    }
-    return UrlParameters.instance;
-  }
-
-  getURL() {
-    return new URL(window.location.href);
-  }
-
-  getBoolean(parameter, defaultValue = false) {
-    let value = this.getURL().searchParams.get(parameter);
-    return value ? value === "true" : defaultValue;
-  }
-
-  getString(parameter, defaultValue = "") {
-    return this.getURL().searchParams.get(parameter) || defaultValue;
-  }
-
-  set(parameter, newValue) {
-    const url = this.getURL();
-
-    if (newValue === false) {
-      url.searchParams.delete(parameter);
-    } else {
-      url.searchParams.set(parameter, newValue);
+    if (state.labels) {
+      renderLabels(calc, dv);
     }
 
-    window.history.replaceState(null, null, url);
-    this.updateCurrentPageFooter();
-  }
+    if (state.tooltip) {
+      calc.tooltip = tooltip().container(container).run();
+    }
+  };
 
-  setWithoutDeleting(parameter, newValue) {
-    const url = this.getURL();
-    url.searchParams.set(parameter, newValue);
-    window.history.replaceState(null, null, url);
-    this.updateCurrentPageFooter();
-  }
-
-  clear() {
-    const url = this.getURL();
-    const newPath = url.protocol + url.host;
-    const newURL = new URL(newPath);
-    window.history.replaceState(null, null, newURL);
-    this.updateCurrentPageFooter();
-  }
-
-  updateCurrentPageFooter() {
-    if (typeof document === "undefined") return;
-    let urlContainer = document.getElementById("lotivis-url-container");
-    if (urlContainer) urlContainer.innerText = this.getURL();
-  }
+  // return generated chart
+  return chart;
 }
 
-UrlParameters.language = "language";
-UrlParameters.page = "page";
-UrlParameters.query = "query";
-UrlParameters.searchViewMode = "search-view-mode";
-UrlParameters.chartType = "chart-type";
-UrlParameters.chartShowLabels = "chart-show-labels";
-UrlParameters.chartCombineStacks = "combine-stacks";
-UrlParameters.contentType = "content-type";
-UrlParameters.valueType = "value-type";
-UrlParameters.searchSensitivity = "search-sensitivity";
-UrlParameters.startYear = "start-year";
-UrlParameters.endYear = "end-year";
-UrlParameters.showTestData = "show-samples";
-
-/**
- * Returns the value if it evaluates to true or is 0.  Returns `LOTIVIS_CONFIG.unknown` else.
- *
- * @param value The value to check.
- * @returns The value or `LOTIVIS_CONFIG.unknown`.
- */
-function toValue(value) {
-  return value || (value === 0 ? 0 : LOTIVIS_CONFIG$1.unknown);
-}
-
-exports.BarChart = BarChart;
 exports.DataController = DataController;
 exports.DateOrdinator = date_ordinator;
-exports.MapChart = MapChart;
-exports.PlotChart = PlotChart;
-exports.UrlParameters = UrlParameters;
-exports.config = LOTIVIS_CONFIG$1;
+exports.LOTIVIS_CONFIG = LOTIVIS_CONFIG;
+exports.append = append;
+exports.bar = bar;
+exports.copy = copy;
 exports.createGeoJSON = createGeoJSON;
 exports.csv = csv;
 exports.csvParse = csvParse;
 exports.csvRender = csvRender;
 exports.d3 = index;
+exports.data_preview = data_preview;
+exports.datatext = datatext;
 exports.debug = debug;
-exports.extractObjects = extractObjects;
-exports.flatDataset = flatDataset;
-exports.flatDatasets = flatDatasets;
+exports.download = download;
+exports.isEmpty = isEmpty;
+exports.isFunction = isFunction;
+exports.isNumber = isNumber;
+exports.isString = isString;
 exports.isValue = isValue;
 exports.joinFeatures = joinFeatures;
 exports.json = json;
+exports.jsonFlat = jsonFlat;
+exports.legend = legend;
+exports.map = map;
 exports.parseDataset = parseDataset;
 exports.parseDatasets = parseDatasets;
+exports.plot = plot;
 exports.removeFeatures = removeFeatures;
+exports.runsInBrowser = runsInBrowser;
 exports.safeId = safeId;
-exports.toValue = toValue;
+exports.uniqueId = uniqueId;
 //# sourceMappingURL=lotivis.test.js.map

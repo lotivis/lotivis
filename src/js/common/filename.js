@@ -1,24 +1,27 @@
-import { LOTIVIS_CONFIG } from "./config";
+import { isEmpty } from "./values";
+import { safeId } from "./identifiers";
+
+const MAX_FILENAME_LENGTH_OS = 255;
+
+const MAX_FILENAME_LENGTH = MAX_FILENAME_LENGTH_OS - 30;
+
+function trim(input) {
+  return input.length >= MAX_FILENAME_LENGTH
+    ? input.substring(0, MAX_FILENAME_LENGTH)
+    : input;
+}
 
 /**
- * Appends the given string in extension to the given string filename if filename not already ends with this extension.
- *
- * @param filename A string with or without an extension.
- * @param extension The extension the filename will end with.
- *
- * @returns {*|string} The filename with the given extension.
+ * The default filename creator.
+ * @param {*} data
+ * @param {*} dc
+ * @returns
  */
-export function appendExtensionIfNeeded(filename, extension) {
-  if (extension === "" || extension === ".") return filename;
-  extension = extension.startsWith(".") ? extension : `.${extension}`;
-  return filename.endsWith(extension) ? filename : `${filename}${extension}`;
-}
-
-export function createDownloadFilename() {
-  let components = [LOTIVIS_CONFIG.downloadFilePrefix];
-  let separator = LOTIVIS_CONFIG.filenameSeparator;
-  for (let i = 0; i < arguments.length; i++) {
-    components.push(String(arguments[i]));
-  }
-  return components.join(separator);
-}
+export const FILENAME_GENERATOR = function (data, dc) {
+  let name = "";
+  let comps = isEmpty(data.stacks) ? data.labels : data.stacks;
+  let amount = comps.length;
+  let joined = comps.map((c) => safeId(c)).join(";");
+  let short = trim(joined) + "---+" + amount + "";
+  return short;
+};

@@ -1,9 +1,6 @@
-/**
- * Returns the hash of the given string.
- * @param aString The string to create the hash of.
- * @returns {number} The hash of the given string.
- */
-export function hash_str(s) {
+import { isString } from "./values";
+
+function hashString(s) {
   let hash = 0,
     i,
     chr;
@@ -15,6 +12,13 @@ export function hash_str(s) {
   return hash;
 }
 
-export function hash_obj(o) {
-  return hash_str(JSON.stringify(o));
+/**
+ * Generates a hash from the given value.
+ *
+ * @param {string | *} input An input value to hash
+ * @returns {number} The generated hash
+ * @public
+ */
+export function hash(input) {
+  return hashString(isString(input) ? input : JSON.stringify(input));
 }

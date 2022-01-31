@@ -1,7 +1,6 @@
 import * as d3 from "d3";
-import { ltv_chart } from "./common/lotivis.chart";
-import { uniqueId } from "./common/create.id";
-import "./common/d3selection.js";
+import { baseChart } from "./chart";
+import { uniqueId } from "./common/identifiers";
 
 /**
  * Reusable Tooltip API class that renders a
@@ -18,28 +17,29 @@ import "./common/d3selection.js";
  *
  */
 export function tooltip() {
-  let ltvId = uniqueId("legend"),
-    marginLeft = 0,
-    marginTop = 0,
-    marginRight = 0,
-    marginBottom = 0,
+  let state = {
+    // the id of the tooltip
+    id: uniqueId("tooltip"),
+
+    // the tooltips margin
+    marginLeft: 0,
+    marginTop: 0,
+    marginRight: 0,
+    marginBottom: 0,
+  };
+
+  let main = baseChart(state),
     container,
     div;
 
-  var main = ltv_chart({});
+  // private
+  function withPixels(value) {
+    return typeof value === "string" && value.endsWith("px")
+      ? value
+      : value + "px";
+  }
 
-  main.run = function () {
-    // remove any previous rendered tooltip
-    if (div) div.remove();
-
-    // render the div of the tooltip
-    div = container
-      .append("div")
-      .attr("class", "ltv-tooltip")
-      .style("opacity", 0);
-
-    return main;
-  };
+  // public api
 
   main.container = function (_container) {
     return arguments.length ? ((container = _container), main) : container;
@@ -80,12 +80,18 @@ export function tooltip() {
     return [domRect.width, domRect.height];
   };
 
-  // auxiliary
-  function withPixels(value) {
-    return typeof value === "string" && value.endsWith("px")
-      ? value
-      : value + "px";
-  }
+  main.run = function () {
+    // remove any previous rendered tooltip
+    // if (div) div.remove();
+
+    // render the div of the tooltip
+    div = container
+      .append("div")
+      .attr("class", "ltv-tooltip")
+      .style("opacity", 0);
+
+    return main;
+  };
 
   // return generated chart
   return main;

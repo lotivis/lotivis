@@ -24,17 +24,17 @@
         <div class="col-8 text-center">
           <h1>Bar Chart Stacked</h1>
         </div>
-        <div class="col-8">
+        <div class="col-12">
           <h5>BarChart</h5>
-          <div id="bar-chart">
+          <div id="bar">
             <!-- Bar Chart Code Here -->
           </div>
-        </div>
-        <div class="col-4">
-          Data:
-          <pre id="ltv-data-preview">
-            <!-- Data Here -->
-          </pre>
+          <div id="legend">
+            <!-- legend here -->
+          </div>
+          <div id="ltv-data">
+            <!-- legend here -->
+          </div>
         </div>
       </div>
     </div>
@@ -245,10 +245,21 @@
       ];
 
       let dataController = lotivis.parseDatasets(datasets);
-      let chart = new lotivis.BarChart("bar-chart", {
-        dataController,
-        labels: true,
-      });
+
+      lotivis
+        .bar()
+        .selector("#bar")
+        .enabled(false)
+        .labels(true)
+        .dataController(dataController)
+        .run();
+
+      lotivis
+        .legend()
+        .selector("#legend")
+        .title("Legend")
+        .dataController(dataController)
+        .run();
     </script>
   </body>
 </html>

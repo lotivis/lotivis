@@ -51,35 +51,41 @@
       // enable debug mode
       lotivis.debug(true);
 
-      let barChart = new lotivis.BarChart("bar-chart");
+      let bar = lotivis.bar().selector("#bar-chart");
 
-      let mapChart = new lotivis.MapChart("map-chart", {
-        exclude: ["2A", "2B"],
-        featureIDAccessor: (f) => "" + f.properties.code,
-        featureNameAccessor: (f) => f.properties.nom,
-      });
+      let map = lotivis
+        .map()
+        .selector("#map-chart")
+        .exclude(["2A", "2B"])
+        .featureIDAccessor((f) => "" + f.properties.code)
+        .featureNameAccessor((f) => f.properties.nom);
 
-      let plotChart = new lotivis.PlotChart("plot-chart");
+      let plot = lotivis.plot().selector("#plot-chart");
 
       Promise.all([
         lotivis.d3.json("./assets/departements.geojson"),
         lotivis.d3.json("./assets/corpus.overview.tracks.json"),
       ]).then(function (results) {
         let geoJSON = results[0];
-        let datasets = results[1];
-        let dataController = lotivis.parseDataset(datasets);
+        let dataController = lotivis.parseDataset(results[1]);
 
-        mapChart.setGeoJSON(geoJSON);
+        map.geoJSON(geoJSON);
 
-        barChart.setController(dataController);
-        mapChart.setController(dataController);
-        plotChart.setController(dataController);
+        bar.dataController(dataController).run();
+        map.dataController(dataController).run();
+        plot.dataController(dataController).run();
 
-        dataController.addListener({
-          update: (controller, reason) => {
-            console.log("reason", reason);
-          },
+        dataController.on("filter", (obj, a, b) => {
+          console.log("obj", obj);
+          console.log("a", a);
+          console.log("b", b);
         });
+
+        // dataController.addListener({
+        //   update: (controller, reason) => {
+        //     console.log("reason", reason);
+        //   },
+        // });
       });
     </script>
   </body>
