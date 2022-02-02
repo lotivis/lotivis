@@ -1,6 +1,8 @@
 import * as d3 from "d3";
-import { isFunction, isString } from "./common/values";
+import { isFunction } from "./common/values";
 import { uniqueId } from "./common/identifiers.js";
+import { ltv_debug } from "./common/debug";
+import { pngDownload } from "./common/download";
 
 export function baseChart(state) {
   if (!state) throw new Error("no state passed");
@@ -41,24 +43,26 @@ export function baseChart(state) {
 
   // private
 
-  function filterUpdate(filterName, item, sender) {
-    console.log("filterUpdate", item, sender.id());
+  function filterUpdate(sender, filterName, action, item) {
+    if (chart === sender) return ltv_debug(chart.id(), "is sender");
+    else if (!chart.handleFilterName(filterName, action, item))
+      return ltv_debug(chart.id(), "skip update", "filter:", filterName);
+    else ltv_debug("filter", "in:", chart.id(), "sender:", sender.id());
 
-    if (chart === sender) return;
-    if (!chart.handleFilterName(filterName)) return;
+    return chart.run();
 
-    if (!isString(state.selector))
-      throw new Error("invalid selector: " + state.selector);
+    // if (!isString(state.selector))
+    //   throw new Error("invalid selector: " + state.selector);
 
-    var selector = state.selector;
-    var selection = d3.selectAll(selector);
+    // var selector = state.selector;
+    // var selection = d3.selectAll(selector);
 
-    selection.each(function scope() {
-      // Receive container
-      var container = d3.select(this);
-      if (typeof chart.update === "function")
-        chart.update(container, state, calc);
-    });
+    // selection.each(function scope() {
+    //   // Receive container
+    //   var container = d3.select(this);
+    //   if (typeof chart.update === "function")
+    //     chart.update(container, state, calc);
+    // });
   }
 
   // public
@@ -75,18 +79,44 @@ export function baseChart(state) {
     return arguments.length ? (Object.assign(state, _), this) : state;
   };
 
-  chart.handleFilterName = function (filterName) {
+  /**
+   * Returns whether this chart should rerender for a change of the
+   * passed filter name.
+   * @param {String} filter The filter that has changed
+   * @param {String} action The filter action
+   * @param {String} action The item that was involed (optional)
+   * @returns {Boolean} Whether to handle the filter change
+   */
+  chart.handleFilterName = function (filter, action, item) {
     return true;
   };
 
   /**
-   * Returns the chart's id.
-   * @returns {string} The chart's id.
+   * Returns the chart id.
+   * @returns {string} The chart id.
    * @public
    */
   chart.id = function () {
     return state.id;
   };
+
+  /**
+   * Generates and downloads a PNG.
+   */
+  chart.pngDownload = function (callback) {
+    if (!state.dataController) throw new Error("no data controller");
+    if (!state.id) throw new Error("no id");
+    if (!state.selector) throw new Error("no selector");
+
+    let type = state.id.split("-")[1];
+    let filename = state.dataController.filename(".png", type);
+
+    pngDownload(state.selector, filename, callback);
+  };
+
+  chart.svgDownload = function (callback) {};
+
+  // getter and setter
 
   /**
    * Gets or sets the data controller.
@@ -96,17 +126,15 @@ export function baseChart(state) {
    */
   chart.dataController = function (_) {
     if (!arguments.length) return state.dataController;
-    let name = "filter." + chart.id();
 
-    if (state.dataController) state.dataController.on(name, null);
+    // remove callback from existing controller
+    if (state.dataController) state.dataController.onFilter(chart.id(), null);
 
     state.dataController = _;
-    state.dataController.on(name, filterUpdate);
+    state.dataController.onFilter(chart.id(), filterUpdate);
 
     return chart;
   };
-
-  // syntatic sugar
 
   /**
    * Gets or sets a margins object of the chart.
@@ -190,11 +218,11 @@ export function baseChart(state) {
       throw new Error("empty selection: " + state.selector);
 
     let dv = chart.dataView(dc);
-    if (state.debug === true) console.log("dv", dv);
 
     selection.each(function scope() {
       // receive container
       let container = d3.select(this);
+
       chart.clear(container, calc, dv);
       chart.render(container, calc, dv);
     });

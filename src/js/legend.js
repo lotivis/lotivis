@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import { baseChart } from "./chart";
-import { LOTIVIS_CONFIG } from "./common/config";
+import { CONFIG } from "./common/config";
 import { uniqueId } from "./common/identifiers";
 
 export const LABEL_FORMAT = function (l, v, i) {
@@ -34,7 +34,7 @@ export function legend() {
     enabled: true,
 
     // the number formatter vor values displayed
-    numberFormat: LOTIVIS_CONFIG.numberFormat,
+    numberFormat: CONFIG.numberFormat,
 
     // the format of displaying a datasets label
     labelFormat: LABEL_FORMAT,
@@ -68,10 +68,9 @@ export function legend() {
    * @private
    */
   function toggleLabel(event, label) {
-    var fn = event.target.checked
-      ? state.dataController.removeLabelFilter
-      : state.dataController.addLabelFilter;
-    fn.call(state.dataController, label, chart);
+    event.target.checked
+      ? state.dataController.removeFilter("labels", label, chart)
+      : state.dataController.addFilter("labels", label, chart);
   }
 
   /**
@@ -82,10 +81,9 @@ export function legend() {
    * @private
    */
   function toggleStack(event, stack) {
-    var fn = event.target.checked
-      ? state.dataController.removeStackFilter
-      : state.dataController.addStackFilter;
-    fn.call(state.dataController, stack, chart);
+    event.target.checked
+      ? state.dataController.removeFilter("stacks", stack, chart)
+      : state.dataController.addFilter("stacks", stack, chart);
   }
 
   /**
@@ -97,7 +95,7 @@ export function legend() {
    * @private
    */
   function labelChecked(label) {
-    return state.dataController.isFilterLabel(label) ? null : true;
+    return state.dataController.isFilter("labels", label) ? null : true;
   }
 
   /**
@@ -109,7 +107,7 @@ export function legend() {
    * @private
    */
   function stackChecked(stack) {
-    return state.dataController.isFilterStack(stack) ? null : true;
+    return state.dataController.isFilter("stacks", stack) ? null : true;
   }
 
   /**
@@ -143,8 +141,8 @@ export function legend() {
     return state.stackFormat(stack, value, labels, index);
   }
 
-  function colorGenerator() {
-    return state.dataController.colorGenerator();
+  function dataColors() {
+    return state.dataController.dataColors();
   }
 
   function disabled() {
@@ -187,19 +185,19 @@ export function legend() {
     dv.dates = dc.dates();
 
     dv.byLabel = d3.rollup(
-      dc.data,
+      dc.data(),
       (v) => d3.sum(v, (d) => d.value),
       (d) => d.label
     );
 
     dv.byStack = d3.rollup(
-      dc.data,
+      dc.data(),
       (v) => d3.sum(v, (d) => d.value),
       (d) => d.stack || d.label
     );
 
     dv.byStackLabel = d3.rollup(
-      dc.data,
+      dc.data(),
       (v) => d3.sum(v, (d) => d.value),
       (d) => d.stack || d.label,
       (d) => d.label
@@ -235,7 +233,7 @@ export function legend() {
         .text(unwrap(state.title));
     }
 
-    var colorFn = isStacks() ? colorGenerator().stack : colorGenerator().label;
+    var colorFn = isStacks() ? dataColors().stack : dataColors().label;
     var changeFn = isStacks() ? toggleStack : toggleLabel;
     var textFn = isStacks() ? stackText : labelText;
 
@@ -244,7 +242,7 @@ export function legend() {
       .data(isGroups() ? dv.stacks : [""]) // use single group when mode is not "groups"
       .enter()
       .div("ltv-legend-group")
-      .style("color", (s) => colorGenerator().stack(s));
+      .style("color", (s) => dataColors().stack(s));
 
     // draw titles only in "groups" mode
     if (isGroups()) {
@@ -287,7 +285,7 @@ export function legend() {
       .style("background-color", colorFn)
       .text((d, i) => textFn(d, i, dv));
 
-    if (LOTIVIS_CONFIG.debug && state.debug) console.log(this);
+    if (CONFIG.debug && state.debug) console.log(this);
 
     return chart;
   };

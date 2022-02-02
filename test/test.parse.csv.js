@@ -11,7 +11,7 @@ describe("parse csv", function () {
   });
 
   it("data has correct length", function () {
-    assert.strictEqual(dataController.data.length, 9);
+    assert.strictEqual(dataController.data().length, 9);
   });
 });
 

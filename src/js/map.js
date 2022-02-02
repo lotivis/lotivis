@@ -1,17 +1,22 @@
 import * as d3 from "d3";
 import { baseChart } from "./chart";
-import { LOTIVIS_CONFIG } from "./common/config";
+import { CONFIG } from "./common/config";
 import { uniqueId } from "./common/identifiers";
 import { tooltip } from "./tooltip";
 import { createGeoJSON } from "./geojson/from.data";
-import { joinFeatures, removeFeatures } from "./geojson/features";
+import {
+  joinFeatures,
+  removeFeatures,
+  filterFeatures,
+} from "./geojson/features";
 import { MapColors } from "./common/colors";
 import { DataController } from "./controller";
 import { DEFAULT_NUMBER_FORMAT } from "./common/formats";
 import {
   FEATURE_ID_ACCESSOR,
   FEATURE_NAME_ACCESSOR,
-} from "./geojson/feature.values";
+} from "./geojson/feature.accessors";
+import { ltv_debug } from "./common/debug";
 
 /**
  * Reusable Map Chart API class that renders a
@@ -76,7 +81,7 @@ export function map() {
   state.path = d3.geoPath().projection(state.projection);
 
   function colors() {
-    return state.dataController.colorGenerator();
+    return state.dataController.dataColors();
   }
 
   /**
@@ -123,20 +128,12 @@ export function map() {
   function getSelectedFeatures() {
     if (!state.workGeoJSON) return null;
 
-    let allFeatures = state.workGeoJSON.features;
-    let filteredLocations = state.dataController.filters.locations;
+    let filtered = state.dataController.filters("locations");
+    if (filtered.length === 0) return [];
 
-    if (filteredLocations.length === 0) return [];
-
-    let selectedFeatures = [];
-    for (let index = 0; index < allFeatures.length; index++) {
-      let feature = allFeatures[index];
-      let featureID = feature.lotivisId;
-
-      if (filteredLocations.contains(featureID)) {
-        selectedFeatures.push(feature);
-      }
-    }
+    let selectedFeatures = state.workGeoJSON.features.filter(
+      (f) => filtered.indexOf(f.lotivisId) !== -1
+    );
 
     return selectedFeatures;
   }
@@ -196,7 +193,7 @@ export function map() {
   function positionTooltip(event, feature, calc) {
     // position tooltip
     let size = calc.tooltip.size();
-    let tOff = LOTIVIS_CONFIG.tooltipOffset;
+    let tOff = CONFIG.tooltipOffset;
     let projection = state.projection;
 
     let fBounds = d3.geoBounds(feature);
@@ -241,7 +238,7 @@ export function map() {
       .attr("class", "ltv-map-background")
       .attr("width", state.width)
       .attr("height", state.height)
-      .on("click", state.dataController.clearLocationsFilter);
+      .on("click", () => state.dataController.clear("locations", chart));
   }
 
   function renderExteriorBorders(calc, dv) {
@@ -262,12 +259,12 @@ export function map() {
   }
 
   function filterLocation(location) {
-    return state.dataController.isFilterLocation(location);
+    return state.dataController.isFilter("locations", location);
   }
 
   function renderFeatures(calc, dv) {
     function opacity(location) {
-      return filterLocation(location) ? LOTIVIS_CONFIG.selectionOpacity : 1;
+      return filterLocation(location) ? CONFIG.selectionOpacity : 1;
     }
 
     function featureMapID(f) {
@@ -316,10 +313,9 @@ export function map() {
     }
 
     function mouseClick(event, feature) {
-      console.log("click", feature);
       if (!state.enabled) return;
       if (!feature || !feature.properties) return;
-      state.dataController.toggleLocation(feature.lotivisId, chart);
+      state.dataController.toggleFilter("locations", feature.lotivisId, chart);
       // chart.emit("click", event, feature);
     }
 
@@ -373,11 +369,9 @@ export function map() {
   function renderSelection(calc, dv) {
     calc.selectedFeatures = getSelectedFeatures();
     calc.selectionBorderGeoJSON = joinFeatures(calc.selectedFeatures);
-    if (!calc.selectionBorderGeoJSON) {
-      return D_LOG
-        ? console.log("[ltv]  No selected features to render.")
-        : null;
-    }
+    if (!calc.selectionBorderGeoJSON)
+      return ltv_debug("no features selected", chart.id());
+
     calc.svg.selectAll(".ltv-map-selection-border").remove();
     calc.svg
       .selectAll(".ltv-map-selection-border")
@@ -392,7 +386,7 @@ export function map() {
   }
 
   function renderLegend(calc, dv) {
-    let numberFormat = chart.config.numberFormat || LOTIVIS_CONFIG.numberFormat;
+    let numberFormat = chart.config.numberFormat || CONFIG.numberFormat;
     let stackNames = chart.dataView.stacks;
     let label = chart.config.label || stackNames[0];
     let locationToSum = dataView.locationToSum || [];
@@ -533,10 +527,10 @@ export function map() {
     var dv = {};
 
     dv.snapshot = dc.snapshot();
-    dv.data = dc.snapshotOrData();
-    dv.labels = dc.data.labels;
-    dv.stacks = dc.data.stacks;
-    dv.locations = dc.data.locations;
+    dv.data = dc.snapshot();
+    dv.labels = dc.data().labels;
+    dv.stacks = dc.data().stacks;
+    dv.locations = dc.data().locations;
 
     dv.byLocationLabel = d3.rollup(
       dv.data,

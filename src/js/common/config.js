@@ -1,81 +1,110 @@
-import { datatext } from "../datatext";
+import { ltv_debug } from "./debug";
 import { GERMAN_NUMBER_FORMAT } from "./formats";
 
-export var LOTIVIS_CONFIG = {
-  // The default margin to use for charts.
-  defaultMargin: 60,
-  // The default offset for the space between an object an the toolbar.
-  tooltipOffset: 7,
-  // The default radius to use for bars drawn on a chart.
-  barRadius: 5,
-  // A Boolean value indicating whether the debug logging is enabled.
-  debug: true,
-  // A string which is used as prefix for download.
-  downloadFilePrefix: "lotivis",
-  // A string which is used as separator between components when creating a file name.
-  filenameSeparator: "_",
-  // A string which is used for unknown values.
+/**
+ * lotivis wide default values
+ */
+export const DEFAULTS = {
+  /**
+   * A string which is used for unknown values
+   */
   unknown: "LOTIVIS_UNKNOWN",
-  // The default number formatter used by all charts.
+
+  /**
+   * The border style
+   */
+  borderStyle: "solid 1px lightgray",
+
+  /**
+   * The default number formatter used by all charts.
+   */
   numberFormat: GERMAN_NUMBER_FORMAT,
 
-  // the border style
-  defaultBorder: "solid 1px lightgray",
+  /**
+   * The default margin to use for charts
+   */
+  margin: 60,
 
-  selectionOpacity: 0.1,
+  /**
+   *  The default offset for the space between an object an the toolbar
+   */
+  tooltipOffset: 7,
+
+  /**
+   * The default radius to use for bars drawn on a chart
+   */
+  barRadius: 5,
+
+  /**
+   * A string which is used as prefix for download.
+   */
+  downloadFilePrefix: "ltv",
+
+  /**
+   * The deault filename generator.
+   */
+  // filenameGenerator: FILENAME_GENERATOR,
 };
 
 /**
- * Appends the passed value in appendix to the passed value of string if string not
- * already ends with appendix.
- *
- * @param {*} string
- * @param {*} appendix
- * @returns {string} The passed string having the passed appendix
+ * lotivis wide configuration
  */
-export function append(string, appendix) {
-  return ("" + string).endsWith(appendix) ? string : string + appendix;
-}
+export const CONFIG = {
+  /**  A Boolean value indicating whether the debug logging is enabled */
+  debug: true,
+
+  /** The default margin to use for charts */
+  defaultMargin: DEFAULTS.margin,
+
+  /** The default offset for the space between an object an the toolbar */
+  tooltipOffset: DEFAULTS.tooltipOffset,
+
+  /** The default radius to use for bars drawn on a chart */
+  barRadius: DEFAULTS.barRadius,
+
+  /** The opacity to use for selection. */
+  selectionOpacity: 0.1,
+
+  /** A string which is used as prefix for download. */
+  downloadFilePrefix: DEFAULTS.downloadFilePrefix,
+
+  /** A string which is used as separator between components when creating a file name. */
+  filenameSeparator: DEFAULTS.filenameSeparator,
+
+  /** The default number formatter used by all charts. */
+  numberFormat: DEFAULTS.numberFormat,
+
+  /** The default id for a container displying the current url */
+  debugURLDivId: "DEBUG-ltv-url-DEBUG",
+
+  debugDataDivId: "DEBUG-ltv-data-DEBUG",
+
+  /**
+   * The deault filename generator.
+   */
+  // filenameGenerator: DEFAULTS.filenameGenerator,
+};
 
 /**
- * Initiates a download of the passed blob with the passed name.
- * @param {*} blob The blob to download
- * @param {*} filename The name of the downloaded file
+ * Gets or sets the configuration of lotivis.
+ * @param {*} input
  */
-export function download(blob, filename) {
-  if (window.navigator.msSaveOrOpenBlob) {
-    window.navigator.msSaveBlob(blob, filename);
-  } else {
-    let a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = filename;
-    a.click();
+export function config(input) {
+  // return config object for no arguments
+  if (!arguments.length) return CONFIG;
+
+  // return the value for the given key if input is string
+  if (arguments.length === 1 && typeof input === "string")
+    return Object.hasOwnProperty.call(CONFIG, input) ? CONFIG[input] : null;
+
+  // iterate values of input, add them to lotivis config
+  for (const key in input) {
+    if (!Object.hasOwnProperty.call(input, key)) continue;
+    if (Object.hasOwnProperty.call(CONFIG, key)) {
+      CONFIG[key] = input[key];
+      ltv_debug("update config", key, " = ", CONFIG[key]);
+    } else {
+      ltv_debug("unknown config key", key);
+    }
   }
-}
-
-// DEBUG
-
-/**
- * Sets whether lotivis prints debug log messages to the console.
- * @param enabled A Boolean value indicating whether to enable debug logging.
- * @param printConfig A Boolean value indicating whether to print the global lotivis configuration.  Default is false.
- */
-export function debug(enabled) {
-  LOTIVIS_CONFIG.debug = enabled;
-  console.log(`[ltv]  ${enabled ? "En" : "Dis"}abled debug mode.`);
-}
-
-/**
- * Returns a Boolean value indicating whether lotivis
- * runs in the browser (else it will probably run in an
- * environment like Node.js)
- * */
-export function runsInBrowser() {
-  return !(typeof document === "undefined");
-}
-
-export function data_preview(dc) {
-  if (!dc || !LOTIVIS_CONFIG.debug || !runsInBrowser()) return;
-  if (!document.getElementById("ltv-data")) return;
-  datatext().selector("#ltv-data").dataController(dc).run();
 }

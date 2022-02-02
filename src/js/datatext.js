@@ -1,35 +1,51 @@
-import { append, download, LOTIVIS_CONFIG } from "./common/config";
+import { CONFIG } from "./common/config";
+import { downloadBlob } from "./common/download.js";
 import { isString, isNumber, isFunction } from "./common/values";
+import { postfix } from "./common/affix.js";
 import { uniqueId } from "./common/identifiers";
 import { csvRender } from "./parse/parse.csv.js";
 import { baseChart } from "./chart";
+import { ltv_debug } from "./common/debug";
+
+const DATATEXT_TITLE = function (chart, dv) {
+  return "Data";
+};
+
+const JSON_TEXT = function (chart, dv) {
+  return JSON.stringify(dv.data, null, 2);
+};
+
+const JSON_TEXT_DATA_VIEW = function (chart, dv) {
+  return JSON.stringify(dv, null, 2);
+};
+
+const CSV_TEXT = function (chart, dv) {
+  return csvRender(dv.data);
+};
 
 export function datatext() {
   let text;
   let state = {
-    // the id of the data preview
+    // the id of the datatext
     id: uniqueId("datatext"),
 
     // max height
     height: 800,
 
     // margin
-    marginLeft: 10,
-    marginTop: 5,
-    marginRight: 10,
-    marginBottom: 5,
+    marginLeft: 0,
+    marginTop: 0,
+    marginRight: 0,
+    marginBottom: 0,
 
     // whether the datatext is enabled
     enabled: true,
 
     // (optional) title of the datatext
-    title: (chart) => "Data",
+    title: DATATEXT_TITLE,
 
-    // the border style of the datatext
-    border: "solid 1px lightgray",
-
-    // the content type, "json", "csv" or a custom function
-    content: "csv",
+    // the text to display for the data
+    text: JSON_TEXT_DATA_VIEW,
 
     // the data controller
     dataController: null,
@@ -40,19 +56,6 @@ export function datatext() {
 
   // private
 
-  function dataText(data) {
-    switch (state.content) {
-      case "json":
-        return JSON.stringify(data, null, 2);
-      case "csv":
-        return csvRender(data);
-      default:
-        return isFunction(state.content)
-          ? state.content(data, this, state.dataController)
-          : "Unknown content type: ";
-    }
-  }
-
   function inCodeTags(value) {
     return '<code class="ltv-datatext-code">' + value + "</code>";
   }
@@ -61,22 +64,32 @@ export function datatext() {
     return text.split("\n").map(inCodeTags).join("");
   }
 
-  function unwrap(value) {
-    return typeof value === "function" ? value(chart) : value;
+  function unwrap(value, ...args) {
+    return typeof value === "function" ? value(...args) : value;
   }
 
   // public
 
   /**
-   * Initiates a download of the content.
+   * Initiates a download of the displayed text.
    *
    * @returns this The chart itself
    * @public
    */
   chart.download = function () {
-    let blob = new Blob([text], { type: "text/" + state.content });
-    let filename = state.dataController.filename(state.content);
-    download(blob, filename);
+    let type;
+
+    if (state.text === CSV_TEXT) {
+      type = "text/csv";
+    } else if (state.text === JSON_TEXT || state.text === JSON_TEXT_DATA_VIEW) {
+      type = "text/json";
+    } else {
+      type = "text/text";
+    }
+
+    let blob = new Blob([text], { type: type });
+    let filename = state.dataController.filename(state.text, "datatext");
+    downloadBlob(blob, filename);
     return chart;
   };
 
@@ -89,13 +102,11 @@ export function datatext() {
   chart.dataView = function (dc) {
     let dv = {};
 
-    dv.data = dc.data;
+    dv.data = dc.data();
     dv.labels = dc.labels();
     dv.stacks = dc.stacks();
     dv.locations = dc.locations();
     dv.dates = dc.dates();
-    dv.text = dataText(dc.data);
-    text = dv.text;
 
     return dv;
   };
@@ -113,46 +124,36 @@ export function datatext() {
       .append("div")
       .classed("ltv-datatext", true)
       .attr("id", state.id)
-      .style("border", state.border)
       .style("padding-left", state.marginLeft + "px")
       .style("padding-top", state.marginTop + "px")
       .style("padding-right", state.marginRight + "px")
       .style("padding-bottom", state.marginBottom + "px");
 
-    let title = unwrap(state.title);
-    let contentType = isString(state.content)
-      ? state.content
-      : typeof state.content;
-
-    if (isString(title)) {
+    if (state.title) {
       calc.title = calc.div
         .append("div")
         .classed("ltv-datatext-title", true)
-        .text(title + " (" + contentType + ")")
+        .text(unwrap(state.title, chart, dv))
         .style("cursor", state.enabled ? "pointer" : null)
         .on("click", state.enabled ? chart.download : null);
     }
 
+    text = unwrap(state.text, chart, dv);
     calc.pre = calc.div
       .append("pre")
       .classed("ltv-datatext-pre", true)
-      .html(html(dv.text));
+      .html(html(text));
 
     if (isString(state.height) || isNumber(state.height)) {
       calc.pre
-        .style("height", append(state.height, "px"))
+        .style("height", postfix(state.height, "px"))
         .style("overflow", "scroll");
-    }
-
-    if (LOTIVIS_CONFIG.debug) {
-      calc.footer = calc.div
-        .append("div")
-        .classed("ltv-datatext-title", true)
-        .text(state.dataController.filename());
     }
 
     return chart;
   };
+
+  // ltv_debug("datatext", chart.id());
 
   // return generated chart
   return chart;

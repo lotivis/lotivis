@@ -1,27 +1,55 @@
+import * as d3 from "d3";
+import { randomString } from "./identifiers";
 import { isEmpty } from "./values";
-import { safeId } from "./identifiers";
+import { prefix, postfix } from "./affix";
+import { CONFIG } from "./config";
 
 const MAX_FILENAME_LENGTH_OS = 255;
 
-const MAX_FILENAME_LENGTH = MAX_FILENAME_LENGTH_OS - 30;
+const MAX_FILENAME_LENGTH = 120;
 
-function trim(input) {
-  return input.length >= MAX_FILENAME_LENGTH
-    ? input.substring(0, MAX_FILENAME_LENGTH)
-    : input;
+const separator = " ";
+
+const formatTime = d3.timeFormat("%Y-%m-%d" + separator + "%H-%M-%S");
+
+/**
+ * Removes invalid characters of filenames.
+ * @param {string} filename The filename to make safe
+ * @returns {string} A safe-to-use filename
+ */
+function safe(name) {
+  return name.split(` `).join(`-`).split(`/`).join(`-`).split(`:`).join(`-`);
 }
 
 /**
  * The default filename creator.
- * @param {*} data
- * @param {*} dc
+ * @param {*} dc The data controller
+ * @param {*} data The data
+ * @param {*} extension An optional extension
+ * @param {*} suf An optional suffix
  * @returns
  */
-export const FILENAME_GENERATOR = function (data, dc) {
-  let name = "";
-  let comps = isEmpty(data.stacks) ? data.labels : data.stacks;
-  let amount = comps.length;
-  let joined = comps.map((c) => safeId(c)).join(";");
-  let short = trim(joined) + "---+" + amount + "";
-  return short;
+export const FILENAME_GENERATOR = function (dc, data, extension, suf) {
+  let trimmed = data.labels
+    .map(safe)
+    .join(separator)
+    .substring(0, MAX_FILENAME_LENGTH);
+
+  let labelsCount = data.labels.length;
+  let stacksCount = data.stacks.length;
+  let dateString = formatTime(new Date());
+
+  let name = [
+    CONFIG.downloadFilePrefix,
+    trimmed,
+    labelsCount ? labelsCount + "L" : null,
+    stacksCount ? stacksCount + "S" : null,
+    dateString,
+    // Math.random().toString(36).substring(2, 8), // random
+    suf,
+  ].join(separator);
+
+  if (extension) name = name + prefix(extension, ".");
+
+  return name;
 };

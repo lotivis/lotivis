@@ -7,7 +7,7 @@ describe("parse flat data", function () {
   let dataController = new lotivis.DataController(json);
 
   it("should have the right length", function () {
-    assert.strictEqual(dataController.data.length, 9);
+    assert.strictEqual(dataController.data().length, 9);
   });
 
   it("has the right labels", function () {

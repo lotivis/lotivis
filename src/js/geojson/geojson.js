@@ -18,9 +18,9 @@ export function Geometry(type, coordinates) {
 /* returns a GeoJSON object */
 export function GeoJSON(source) {
   let geoJSON = copy(source);
+
   geoJSON.getCenter = function () {
     let allCoordinates = this.extractAllCoordinates();
-    console.log("allCoordinates.length: " + allCoordinates.length);
     let latitudeSum = 0;
     let longitudeSum = 0;
 

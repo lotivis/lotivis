@@ -4,10 +4,6 @@ function darker(color) {
   return color.darker().darker();
 }
 
-function random(till) {
-  return Math.floor(Math.random() * till);
-}
-
 // constants
 
 /**
@@ -24,80 +20,66 @@ export const DATA_COLORS = []
 export const TINT_COLOR = DATA_COLORS[0];
 
 /**
- * The default random colors.
+ *
+ * @param {*} data The data to generate colors for
+ * @return {DataColors} A data colors object
  */
-export const DATA_COLORS_RANDOM = (() => {
-  let cs = Array.from(DATA_COLORS),
-    n = [];
-  while (cs.length > 0) n.push(cs.splice(random(cs.length), 1));
-  return n;
-})();
+export function DataColors(data) {
+  let baseColors = DATA_COLORS,
+    stackColors = new Map(),
+    labelColors = new Map(),
+    stacksToLabels = d3.group(
+      data,
+      (d) => d.stack || d.label,
+      (d) => d.label
+    ),
+    stacks = Array.from(stacksToLabels.keys());
 
-export class ColorGenerator {
-  constructor(data) {
-    let dataColors = DATA_COLORS,
-      stackToColor,
-      labelToColor;
-
-    function initialize() {
-      stackToColor = new Map();
-      labelToColor = new Map();
-
-      let stacksToLabels = d3.group(
-        data,
-        (d) => d.stack || d.label,
-        (d) => d.label
-      );
-
-      let stacks = Array.from(stacksToLabels.keys());
-
-      function stackLabels(stack) {
-        return Array.from((stacksToLabels.get(stack) || []).keys());
-      }
-
-      function stackColor(stack) {
-        return dataColors[stacks.indexOf(stack) % dataColors.length];
-      }
-
-      stacks.forEach((stack) => {
-        let labels = stackLabels(stack);
-        let c1 = d3.color(stackColor(stack));
-        let colors = ColorScale(labels.length, [c1, darker(c1)]);
-
-        stackToColor.set(stack, c1);
-
-        labels.forEach((label, index) => {
-          labelToColor.set(label, colors(index));
-        });
-      });
-    }
-
-    // public api
-
-    /**
-     * Returns the color for the given stack.
-     *
-     * @param {stack} stack The stack
-     * @returns The d3.color for the stack
-     * @public
-     */
-    this.stack = function (stack) {
-      return stackToColor ? stackToColor.get(stack) || TINT_COLOR : TINT_COLOR;
-    };
-
-    /**
-     * Returns the color for the given label.
-     *
-     * @param {label} label The label
-     * @returns The d3.color for the label
-     * @public
-     */
-    this.label = function (label) {
-      return labelToColor ? labelToColor.get(label) || TINT_COLOR : TINT_COLOR;
-    };
-
-    initialize();
+  function stackLabels(stack) {
+    return Array.from((stacksToLabels.get(stack) || []).keys());
   }
+
+  function stackColor(stack) {
+    return baseColors[stacks.indexOf(stack) % baseColors.length];
+  }
+
+  stacks.forEach((stack) => {
+    let labels = stackLabels(stack);
+    let c1 = d3.color(stackColor(stack));
+    let colors = ColorScale(labels.length, [c1, darker(c1)]);
+
+    stackColors.set(stack, c1);
+
+    labels.forEach((label, index) => {
+      labelColors.set(label, colors(index));
+    });
+  });
+
+  function main() {}
+
+  /**
+   * Returns the color for the given stack.
+   *
+   * @param {stack} stack The stack
+   * @returns The d3.color for the stack
+   * @public
+   */
+  main.stack = function (stack) {
+    return stackColors ? stackColors.get(stack) || TINT_COLOR : TINT_COLOR;
+  };
+
+  /**
+   * Returns the color for the given label.
+   *
+   * @param {label} label The label
+   * @returns The d3.color for the label
+   * @public
+   */
+  main.label = function (label) {
+    return labelColors ? labelColors.get(label) || TINT_COLOR : TINT_COLOR;
+  };
+
+  return main;
 }
 
 export function MapColors(max) {

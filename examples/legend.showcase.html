@@ -55,148 +55,8 @@
     <script src="../dist/lotivis.js"></script>
 
     <script>
-      let datasets = [
-        {
-          label: "dataset_1",
-          stack: "dataset_1",
-          data: [
-            {
-              date: 2000,
-              value: 0.123456789123456789,
-            },
-            {
-              date: 2000,
-              value: 2,
-            },
-            {
-              date: 2001,
-              value: 1,
-            },
-            {
-              date: 2001,
-              value: 3,
-            },
-            {
-              date: 2002,
-              value: 2,
-            },
-            {
-              date: 2002,
-              value: 4,
-            },
-            {
-              date: 2003,
-              value: 3,
-            },
-            {
-              date: 2003,
-              value: 5,
-            },
-            {
-              date: 2004,
-              value: 4,
-            },
-            {
-              date: 2004,
-              value: 6,
-            },
-          ],
-        },
-        {
-          label: "dataset_2",
-          stack: "dataset_2, dataset_3",
-          data: [
-            {
-              date: 2000,
-              value: 5,
-            },
-            {
-              date: 2000,
-              value: 8,
-            },
-            {
-              date: 2001,
-              value: 5,
-            },
-            {
-              date: 2001,
-              value: 7,
-            },
-            {
-              date: 2002,
-              value: 5,
-            },
-            {
-              date: 2002,
-              value: 6,
-            },
-            {
-              date: 2003,
-              value: 5,
-            },
-            {
-              date: 2003,
-              value: 5,
-            },
-            {
-              date: 2004,
-              value: 5,
-            },
-            {
-              date: 2004,
-              value: 4,
-            },
-          ],
-        },
-        {
-          label: "dataset_3",
-          stack: "dataset_2, dataset_3",
-          data: [
-            {
-              date: 2000,
-              value: 5,
-            },
-            {
-              date: 2000,
-              value: 5,
-            },
-            {
-              date: 2001,
-              value: 4,
-            },
-            {
-              date: 2001,
-              value: 6,
-            },
-            {
-              date: 2002,
-              value: 3,
-            },
-            {
-              date: 2002,
-              value: 7,
-            },
-            {
-              date: 2003,
-              value: 2,
-            },
-            {
-              date: 2003,
-              value: 8,
-            },
-            {
-              date: 2004,
-              value: 1,
-            },
-            {
-              date: 2004,
-              value: 9,
-            },
-          ],
-        },
-      ];
-
       lotivis.debug(true);
+      lotivis.config({ downloadFilePrefix: "frcv" });
 
       let legendGroupLabels = lotivis
         .legend()
@@ -235,7 +95,7 @@
           legendLabels.dataController(dc).run();
           legendStacks.dataController(dc).run();
         })
-        .catch(alert);
+        .catch(console.error);
     </script>
   </body>
 </html>

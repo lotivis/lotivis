@@ -1,8 +1,8 @@
 import * as topojsonServer from "topojson-server";
 import * as topojsonClient from "topojson-client";
 import { FeatureCollection, Feature } from "./geojson";
+import { FEATURE_ID_ACCESSOR } from "./feature.accessors";
 import { copy } from "../common/values";
-import { FEATURE_ID_ACCESSOR } from "./feature.values";
 
 function extractObjects(topology) {
   let objects = [];
@@ -30,6 +30,15 @@ export function joinFeatures(input) {
   return FeatureCollection([Feature(geometry)]);
 }
 
+function geojsonCopy(json, ids, featuresFilter) {
+  if (!Array.isArray(ids)) throw new Error("invalid ids. not an array");
+  if (!Array.isArray(json.features))
+    throw new Error("invalid geojson. no features");
+  let theCopy = copy(json);
+  theCopy.features = theCopy.features.filter(featuresFilter);
+  return theCopy;
+}
+
 /**
  * Returns a new generated GeoJSON without the Feature having the ids
  * specified.
@@ -40,10 +49,18 @@ export function joinFeatures(input) {
  * @returns {GeoJSON} The new generated GeoJSON
  */
 export function removeFeatures(json, ids, idValue = FEATURE_ID_ACCESSOR) {
-  if (!Array.isArray(ids)) throw new Error("invalid ids. not an array");
-  if (!Array.isArray(json.features))
-    throw new Error("invalid geojson. no features");
-  let _json = copy(json);
-  _json.features = _json.features.filter((f) => !ids.includes(idValue(f)));
-  return _json;
+  return geojsonCopy(json, ids, (f) => !ids.includes(idValue(f)));
+}
+
+/**
+ * Returns a new generated GeoJSON containing only the Features having the
+ * ids specified.
+ *
+ * @param {GeoJSON} json The GeoJSON with Features to remove
+ * @param {Array} ids The ids of Features to remove
+ * @param {*} idValue An id accessor for the Features
+ * @returns {GeoJSON} The new generated GeoJSON
+ */
+export function filterFeatures(json, ids, idValue = FEATURE_ID_ACCESSOR) {
+  return geojsonCopy(json, ids, (f) => ids.includes(idValue(f)));
 }

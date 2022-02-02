@@ -1,6 +1,8 @@
 // http://bl.ocks.org/Rokotyan/0556f8facbaf344507cdc45dc3622177
 import * as d3 from "d3";
-import { download } from "./config";
+import { postfix } from "./affix";
+import { downloadURL, element } from "./download.js";
+import { ltv_debug, runsInBrowser } from "./debug";
 
 /**
  * Parses a String from the given (D3.js) SVG node.
@@ -8,7 +10,8 @@ import { download } from "./config";
  * @param svgNode The node of the SVG.
  * @returns {string} The parsed String.
  */
-export function getSVGString(svgNode) {
+function svgString(svgNode) {
+  console.log("svgNode", svgNode);
   svgNode.setAttribute("xlink", "http://www.w3.org/1999/xlink");
   let cssStyleText = getCSSStyles(svgNode);
   appendCSS(cssStyleText, svgNode);
@@ -87,14 +90,7 @@ export function getSVGString(svgNode) {
   }
 }
 
-/**
- *
- * @param svgString
- * @param width
- * @param height
- * @param callback
- */
-export function svgString2Image(svgString, width, height, callback) {
+function svgString2Image(svgString, width, height, callback) {
   // Convert SVG string to samples URL
   let imageSource =
     "data:image/svg+xml;base64," +
@@ -104,14 +100,12 @@ export function svgString2Image(svgString, width, height, callback) {
   canvas.width = width;
   canvas.height = height;
 
-  let context = canvas.getContext("2d");
+  let ctx = canvas.getContext("2d");
   let image = new Image();
   image.onload = function () {
-    context.clearRect(0, 0, width, height);
-    context.drawImage(image, 0, 0, width, height);
-
-    let data = canvas.toDataURL("image/png");
-    if (callback) callback(data);
+    ctx.clearRect(0, 0, width, height);
+    ctx.drawImage(image, 0, 0, width, height);
+    if (callback) callback(canvas.toDataURL("image/png"));
   };
 
   image.src = imageSource;
@@ -123,12 +117,12 @@ export function svgString2Image(svgString, width, height, callback) {
  * @param svgElement The svg element.
  * @returns {number[]} The size [width, height].
  */
-export function getOriginalSizeOfSVG(svgElement) {
+function svgOriginalSize(svgElement) {
   if (!svgElement || !svgElement.viewBox)
     return console.log("missing viewBox: " + svgElement);
-  let viewBoxBaseValue = svgElement.viewBox.baseVal;
-  if (viewBoxBaseValue.width !== 0 && viewBoxBaseValue.height !== 0) {
-    return [viewBoxBaseValue.width, viewBoxBaseValue.height];
+  let vBBV = svgElement.viewBox.baseVal;
+  if (vBBV.width !== 0 && vBBV.height !== 0) {
+    return [vBBV.width, vBBV.height];
   } else {
     return [svgElement.width.baseVal.value, svgElement.height.baseVal.value];
   }
@@ -140,28 +134,18 @@ export function getOriginalSizeOfSVG(svgElement) {
  * @param selector The id of the SVG element to create the image of.
  * @param filename The name of the file which is been downloaded.
  */
-export function svgExport(selector, filename) {
-  // console.log('selector:' + selector);
-  // console.log('filename:' + filename);
-  let svgElement = d3.select("#" + selector);
-  if (svgElement.size() === 0)
-    return console.info("no element for selector: " + selector);
+export function svgDownload(selector, filename, callback) {
+  let el = element(selector);
+  let size = svgOriginalSize(el);
+  let svgRaw = svgString(el);
 
-  let node = svgElement.node();
-  let size = getOriginalSizeOfSVG(node);
-  let svgString = getSVGString(node);
-  let _filename = filename || "image";
-
-  svgString2Image(svgString, 2 * size[0], 2 * size[1], function (dataURL) {
-    // console.log('dataURL:' + dataURL);
-    fetch(dataURL)
-      .then((res) => res.blob())
-      .then(function (dataBlob) {
-        let saveFilename = append(_filename, ".png");
-
-        // console.log('saveFilename:' + saveFilename);
-
-        download(dataBlob, saveFilename);
-      });
+  svgString2Image(svgRaw, 2 * size[0], 2 * size[1], function (dataURL) {
+    downloadURL(dataURL, postfix(filename || "image", ".png"));
+    if (callback) callback();
+    // fetch(dataURL)
+    //   .then((res) => res.blob())
+    //   .then(function (dataBlob) {
+    //     download(dataBlob, filename);
+    //   });
   });
 }

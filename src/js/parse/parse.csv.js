@@ -12,5 +12,5 @@ export async function csv(path) {
 }
 
 export function csvRender(data, columns = DEFAULT_COLUMNS) {
-  return d3.csvFormat(data.data ? data.data : data, columns);
+  return d3.csvFormat(data.data ? data.data() : data, columns);
 }

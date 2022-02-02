@@ -2,6 +2,8 @@
 // ids must not contain whitespaces
 // ids should avoid ".", ":" and "/"
 
+import { ltv_debug } from "./debug";
+
 /**
  * @param {*} id The id to escape from invalid characters
  * @returns A safe to use version of the id
@@ -18,15 +20,18 @@ export function safeId(id) {
     .join(`-`);
 }
 
+export function randomString() {
+  return Math.random().toString(36).substring(2, 8);
+}
+
 /**
  * Creates and returns a unique generated string.
  */
 export const uniqueId = (function () {
   var prefix = "ltv";
-  var unique = 0;
-  var random = () => Math.random().toString(36).substring(2, 8);
+  var counter = 0;
 
-  return function (type = "id") {
-    return [prefix, type, "" + unique++, random()].join("-");
+  return function (type) {
+    return [prefix, type || "id", ++counter].join("-");
   };
 })();

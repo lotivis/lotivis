@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import { baseChart } from "./chart";
-import { LOTIVIS_CONFIG } from "./common/config";
+import { CONFIG } from "./common/config";
 import { uniqueId } from "./common/identifiers";
 import { tooltip } from "./tooltip";
 import { hash } from "./common/hash";
@@ -89,7 +89,7 @@ export function plot() {
     selectable: true,
 
     // the border style of the data preview
-    border: LOTIVIS_CONFIG.defaultBorder,
+    border: CONFIG.defaultBorder,
 
     // transformes a given date into a numeric value.
     dateAccess: DATE_ACCESS,
@@ -258,7 +258,7 @@ export function plot() {
         calc.svg
           .selectAll(".ltv-plot-chart-selection-rect")
           .classed("ltv-selected", (d) =>
-            state.dataController.isFilterLabel(d.label)
+            state.dataController.isFilter("labels", d.label)
           );
       });
   }
@@ -272,7 +272,7 @@ export function plot() {
   function renderBarsFraction(calc, dv) {
     let colors = PlotColors(dv.max);
     let brush = dv.max / 2;
-    let colorGenerator = state.dataController.colorGenerator();
+    let dataColors = state.dataController.dataColors();
     let isSingle = state.colorMode === "single";
 
     calc.barsData = calc.svg
@@ -285,7 +285,7 @@ export function plot() {
       .append("g")
       .attr("transform", (d) => transY(calc.yChartPadding(d[0])))
       .attr("id", (d) => "ltv-plot-rect-" + hash(d[0]))
-      .attr(`fill`, (d) => (isSingle ? colorGenerator.label(d[0]) : null))
+      .attr(`fill`, (d) => (isSingle ? dataColors.label(d[0]) : null))
       .selectAll(".rect")
       .data((d) => d[1]) // map to dates data
       .enter()
@@ -406,9 +406,9 @@ export function plot() {
     let latestDate = ds.lastDate;
 
     let dataController = chart.dataController();
-    let colorGenerator = dataController.colorGenerator();
+    let dataColors = dataController.dataColors();
     let isSingle = state.colorMode === "single";
-    let colors = isSingle ? colorGenerator.label : plotColors;
+    let colors = isSingle ? dataColors.label : plotColors;
 
     function append(value, percent) {
       gradient
@@ -448,7 +448,7 @@ export function plot() {
       calc.yChart(ds.label) * factor +
       offset[1] +
       state.barHeight * factor +
-      LOTIVIS_CONFIG.tooltipOffset;
+      CONFIG.tooltipOffset;
 
     calc.tooltip
       .left(calc.xChart(ds.firstDate) * factor + offset[0])
@@ -487,6 +487,10 @@ export function plot() {
     return comps.join("<br/>");
   }
 
+  chart.handleFilterName = function (filter) {
+    return filter !== "label";
+  };
+
   /**
    * Calculates the data view for the bar chart.
    *
@@ -498,7 +502,7 @@ export function plot() {
   chart.dataView = function (dc) {
     var dv = {};
     dv.dates = dc.dates().sort();
-    dv.data = dc.snapshotOrData();
+    dv.data = dc.snapshot();
     dv.byLabelDate = d3.rollups(
       dv.data,
       (v) => d3.sum(v, (d) => d.value),

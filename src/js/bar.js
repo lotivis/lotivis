@@ -1,10 +1,9 @@
 import * as d3 from "d3";
 import { baseChart } from "./chart";
-import { LOTIVIS_CONFIG } from "./common/config";
+import { CONFIG } from "./common/config";
 import { uniqueId } from "./common/identifiers";
 import { safeId } from "./common/identifiers";
 import { tooltip } from "./tooltip";
-import { legend } from "./legend.js";
 import { DEFAULT_NUMBER_FORMAT } from "./common/formats";
 import { DEFAULT_DATE_ORDINATOR } from "./common/date.ordinator";
 
@@ -48,8 +47,6 @@ export function bar() {
     // whether to draw labels
     labels: false,
 
-    legend: true,
-
     // whether to display a tooltip.
     tooltip: true,
 
@@ -72,7 +69,7 @@ export function bar() {
   let chart = baseChart(state);
 
   function colors() {
-    return state.dataController.colorGenerator();
+    return state.dataController.dataColors();
   }
 
   /**
@@ -181,7 +178,9 @@ export function bar() {
       .attr("height", calc.graphHeight)
       .attr("x", (d) => calc.xChartScale(d))
       .attr("y", state.marginTop)
-      .attr("opacity", (d) => (state.dataController.isFilterDate(d) ? 0.3 : 0))
+      .attr("opacity", (d) =>
+        state.dataController.isFilter("dates", d) ? 0.3 : 0
+      )
       .on("mouseenter", mouseEnter)
       .on("mouseout", mouseOut)
       .on("mousedrag", mouseDrag)
@@ -229,11 +228,11 @@ export function bar() {
     function click(event, date) {
       if (!state.enabled) return;
       var dc = state.dataController;
-      dc.toggleDate(date, chart);
+      dc.toggleFilter("dates", date, chart);
 
       calc.svg
         .select(`#ltv-bar-chart-selection-rect-${safeId(String(date))}`)
-        .attr(`opacity`, (d) => (dc.isFilterDate(d) ? 0.3 : 0));
+        .attr(`opacity`, (d) => (dc.isFilter("dates", d) ? 0.3 : 0));
 
       // calc.svg
       //   .selectAll(`.ltv-bar-chart-dates-area`)
@@ -335,7 +334,7 @@ export function bar() {
       offset[0] -
       tooltipSize[0] -
       22 -
-      LOTIVIS_CONFIG.tooltipOffset
+      CONFIG.tooltipOffset
     );
   }
 
@@ -344,7 +343,7 @@ export function bar() {
       (calc.xChartScalePadding(date) + calc.xChartScalePadding.bandwidth()) *
         factor +
       offset[0] +
-      LOTIVIS_CONFIG.tooltipOffset
+      CONFIG.tooltipOffset
     );
   }
 
@@ -380,10 +379,10 @@ export function bar() {
   chart.dataView = function (dc) {
     var dv = {};
     dv.snapshot = dc.snapshot();
-    let data = dv.snapshot || dc.data;
+    let data = dc.snapshot();
 
     dv.byDateStackOriginal = d3.rollup(
-      dc.data,
+      dc.data(),
       (v) => d3.sum(v, (d) => d.value),
       (d) => d.date,
       (d) => d.stack || d.label
@@ -454,8 +453,6 @@ export function bar() {
     calc.graphBottom = state.height - state.marginBottom;
     calc.graphRight = state.width - state.marginRight;
 
-    console.log("state", state);
-
     createScales(calc, dv);
 
     renderSVG(container, calc);
@@ -472,17 +469,6 @@ export function bar() {
     if (state.labels) renderLabels(calc, dv);
 
     if (state.tooltip) calc.tip = tooltip().container(container).run();
-
-    // if render legend
-    if (state.legend) {
-      let legendId = chart.id() + "-legend";
-      container.append("div").attr("id", legendId);
-
-      legend()
-        .selector("#" + legendId)
-        .dataController(state.dataController)
-        .run();
-    }
   };
 
   // return generated chart
