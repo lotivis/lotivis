@@ -61,6 +61,19 @@ $ npm run develop:example
 $ npm run test
 ```
 
+### Repository management
+
+```bash
+# make sure working dir is clean
+
+# patch version of project
+npm version patch
+
+# puch version update
+git push --follow-tags
+
+```
+
 ## Dependency
 
 - [D3.js](https://github.com/mbostock/d3) `^5.0.0`
