@@ -1,6 +1,6 @@
 const assert = require("assert");
 const samples = require("./sample.data");
-const lotivis = require("../dist/lotivis.test");
+const lotivis = require("./lotivis.test.js");
 
 // describe("dataView.date", function () {
 //   describe("sample.dataset.1.json", function () {

@@ -1,8 +1,10 @@
 .ltv-legend {
   display: block;
+  text-align: left;
 
   .ltv-legend-title {
     font-size: 12px;
+    padding-bottom: 5px;
   }
 
   .ltv-pill-span {
@@ -39,7 +41,7 @@
 .ltv-legend-pill-span {
   font-size: 10px;
   display: inline-block;
-  padding: 0 7px;
+  padding: 2px 7px;
   margin-right: 5px;
   border-radius: 999999px;
   color: white;
@@ -47,9 +49,9 @@
 }
 
 // /* On mouse-over, add a grey background color */
-// .ltv-pill-checkbox:hover input ~ .ltv-pill-checkbox-span {
-//   opacity: 0.8;
-// }
+.ltv-legend-pill input:hover ~ .ltv-pill-pill-span {
+  opacity: 0.8;
+}
 
 /* When the checkbox is checked, add a blue background */
 .ltv-legend-pill input:checked ~ .ltv-legend-pill-span {

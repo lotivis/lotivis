@@ -1,25 +1,30 @@
 import { CONFIG } from "./common/config";
 import { downloadBlob } from "./common/download.js";
-import { isString, isNumber, isFunction } from "./common/values";
+
 import { postfix } from "./common/affix.js";
 import { uniqueId } from "./common/identifiers";
 import { csvRender } from "./parse/parse.csv.js";
 import { baseChart } from "./chart";
-import { ltv_debug } from "./common/debug";
 
-const DATATEXT_TITLE = function (chart, dv) {
+const DATATEXT_TITLE = function (dt, dv) {
     return "Data";
 };
 
-const JSON_TEXT = function (chart, dv) {
+/**
+ * Returns the JSON string from the passed data view.
+ * @param {datatext} dt The
+ * @param {dataview} dv
+ * @returns {string} JSON the passed data view.
+ */
+const JSON_TEXT = function (dt, dv) {
     return JSON.stringify(dv.data, null, 2);
 };
 
-const JSON_TEXT_DATA_VIEW = function (chart, dv) {
+const JSON_TEXT_DATA_VIEW = function (dt, dv) {
     return JSON.stringify(dv, null, 2);
 };
 
-const CSV_TEXT = function (chart, dv) {
+const CSV_TEXT = function (dt, dv) {
     return csvRender(dv.data);
 };
 
@@ -45,7 +50,7 @@ export function datatext() {
         title: DATATEXT_TITLE,
 
         // the text to display for the data
-        text: JSON_TEXT_DATA_VIEW,
+        text: CSV_TEXT,
 
         // the data controller
         dataController: null,
@@ -56,16 +61,22 @@ export function datatext() {
 
     // private
 
+    function isType(obj, ...types) {
+        return types.indexOf(typeof obj) !== -1;
+    }
+
     function inCodeTags(value) {
         return '<code class="ltv-datatext-code">' + value + "</code>";
     }
 
     function html(text) {
-        return text.split("\n").map(inCodeTags).join("");
+        return isType(text, "string")
+            ? "" + text.split("\n").map(inCodeTags).join("")
+            : "" + text;
     }
 
     function unwrap(value, ...args) {
-        return typeof value === "function" ? value(...args) : value;
+        return isType(value, "function") ? value(...args) : value;
     }
 
     // public
@@ -93,6 +104,7 @@ export function datatext() {
         let blob = new Blob([text], { type: type });
         let filename = state.dataController.filename(state.text, "datatext");
 
+        down(blob, filename, type);
         downloadBlob(blob, filename);
         return chart;
     };
@@ -148,7 +160,7 @@ export function datatext() {
             .classed("ltv-datatext-pre", true)
             .html(html(text));
 
-        if (isString(state.height) || isNumber(state.height)) {
+        if (isType(state.height, "string", "number")) {
             calc.pre
                 .style("height", postfix(state.height, "px"))
                 .style("overflow", "scroll");

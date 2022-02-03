@@ -1,231 +1,231 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
-      crossorigin="anonymous"
-    />
-    <link rel="stylesheet" href="../dist/lotivis.css" />
-    <title>Lotivis - Plot Chart Showcase</title>
-  </head>
-  <body>
-    <div class="container mt-3">
-      <div class="row">
-        <div class="col-2">
-          <a href="../index.html"> Back </a>
-        </div>
-        <div class="col-8 text-center">
-          <h1>Plot Chart Showcase</h1>
-        </div>
-        <div class="col-2"></div>
-        <div class="col-6">
-          gradient-single
-          <div id="gradient-single">
-            <!-- Plot Chart -->
-          </div>
-          gradient-multi-alphabetically
-          <div id="gradient-multi-alphabetically">
-            <!-- Plot Chart -->
-          </div>
-          gradient-multi-duration
-          <div id="gradient-multi-duration">
-            <!-- Plot Chart -->
-          </div>
-          gradient-multi-intensity
-          <div id="gradient-multi-intensity">
-            <!-- Plot Chart -->
-          </div>
-          gradient-multi-firstDate
-          <div id="gradient-multi-firstDate">
-            <!-- Plot Chart -->
-          </div>
-        </div>
-        <div class="col-6">
-          fraction-single
-          <div id="fraction-single">
-            <!-- Plot Chart -->
-          </div>
-          fraction-multi-alphabetically
-          <div id="fraction-multi-alphabetically">
-            <!-- Plot Chart -->
-          </div>
-          fraction-multi-duration
-          <div id="fraction-multi-duration">
-            <!-- Plot Chart -->
-          </div>
-          fraction-multi-intensity
-          <div id="fraction-multi-intensity">
-            <!-- Plot Chart -->
-          </div>
-          fraction-multi-firstDate
-          <div id="fraction-multi-firstDate">
-            <!-- Plot Chart -->
-          </div>
-        </div>
-        <div class="col-6">
-          <pre id="ltv-data-preview">
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"
+        />
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+            crossorigin="anonymous"
+        />
+        <link rel="stylesheet" href="./dist/lotivis.css" />
+        <title>Lotivis - Plot Chart Showcase</title>
+    </head>
+    <body>
+        <div class="container mt-3">
+            <div class="row">
+                <div class="col-2">
+                    <a href="../index.html"> Back </a>
+                </div>
+                <div class="col-8 text-center">
+                    <h1>Plot Chart Showcase</h1>
+                </div>
+                <div class="col-2"></div>
+                <div class="col-6">
+                    gradient-single
+                    <div id="gradient-single">
+                        <!-- Plot Chart -->
+                    </div>
+                    gradient-multi-alphabetically
+                    <div id="gradient-multi-alphabetically">
+                        <!-- Plot Chart -->
+                    </div>
+                    gradient-multi-duration
+                    <div id="gradient-multi-duration">
+                        <!-- Plot Chart -->
+                    </div>
+                    gradient-multi-intensity
+                    <div id="gradient-multi-intensity">
+                        <!-- Plot Chart -->
+                    </div>
+                    gradient-multi-firstDate
+                    <div id="gradient-multi-firstDate">
+                        <!-- Plot Chart -->
+                    </div>
+                </div>
+                <div class="col-6">
+                    fraction-single
+                    <div id="fraction-single">
+                        <!-- Plot Chart -->
+                    </div>
+                    fraction-multi-alphabetically
+                    <div id="fraction-multi-alphabetically">
+                        <!-- Plot Chart -->
+                    </div>
+                    fraction-multi-duration
+                    <div id="fraction-multi-duration">
+                        <!-- Plot Chart -->
+                    </div>
+                    fraction-multi-intensity
+                    <div id="fraction-multi-intensity">
+                        <!-- Plot Chart -->
+                    </div>
+                    fraction-multi-firstDate
+                    <div id="fraction-multi-firstDate">
+                        <!-- Plot Chart -->
+                    </div>
+                </div>
+                <div class="col-6">
+                    <pre id="ltv-data-preview">
             <!-- Datasets JSON Card Here -->
           </pre>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
 
-    <script src="../dist/lotivis.js"></script>
+        <script src="./dist/lotivis.js"></script>
 
-    <script>
-      let datasets = [
-        {
-          label: "dataset_1",
-          data: [
-            {
-              location: 1,
-              date: 2000,
-              value: 0,
-            },
-            {
-              location: 1,
-              date: 2001,
-              value: 1,
-            },
-            {
-              location: 1,
-              date: 2002,
-              value: 2,
-            },
-            {
-              location: 1,
-              date: 2003,
-              value: 3,
-            },
-            {
-              location: 1,
-              date: 2004,
-              value: 4,
-            },
-          ],
-        },
-        {
-          label: "dataset_2",
-          data: [
-            {
-              location: 1,
-              date: 2000,
-              value: 0,
-            },
-            {
-              location: 1,
-              date: 2001,
-              value: 2,
-            },
-            {
-              location: 1,
-              date: 2002,
-              value: 4,
-            },
-            {
-              location: 1,
-              date: 2003,
-              value: 2,
-            },
-            {
-              location: 1,
-              date: 2004,
-              value: 0,
-            },
-          ],
-        },
-        {
-          label: "dataset_3",
-          data: [
-            {
-              location: 1,
-              date: 2000,
-              value: 5,
-            },
-            {
-              location: 1,
-              date: 2001,
-              value: 4,
-            },
-            {
-              location: 1,
-              date: 2002,
-              value: 3,
-            },
-            {
-              location: 1,
-              date: 2003,
-              value: 2,
-            },
-            {
-              location: 1,
-              date: 2004,
-              value: 0,
-            },
-          ],
-        },
-        {
-          label: "dataset_4",
-          data: [
-            {
-              location: 1,
-              date: 2000,
-              value: 3,
-            },
-          ],
-        },
-        {
-          label: "dataset_5",
-          data: [
-            {
-              location: 1,
-              date: 2003,
-              value: 5,
-            },
-          ],
-        },
-        {
-          label: "dataset_6",
-          data: [],
-        },
-      ];
+        <script>
+            let datasets = [
+                {
+                    label: "dataset_1",
+                    data: [
+                        {
+                            location: 1,
+                            date: 2000,
+                            value: 0,
+                        },
+                        {
+                            location: 1,
+                            date: 2001,
+                            value: 1,
+                        },
+                        {
+                            location: 1,
+                            date: 2002,
+                            value: 2,
+                        },
+                        {
+                            location: 1,
+                            date: 2003,
+                            value: 3,
+                        },
+                        {
+                            location: 1,
+                            date: 2004,
+                            value: 4,
+                        },
+                    ],
+                },
+                {
+                    label: "dataset_2",
+                    data: [
+                        {
+                            location: 1,
+                            date: 2000,
+                            value: 0,
+                        },
+                        {
+                            location: 1,
+                            date: 2001,
+                            value: 2,
+                        },
+                        {
+                            location: 1,
+                            date: 2002,
+                            value: 4,
+                        },
+                        {
+                            location: 1,
+                            date: 2003,
+                            value: 2,
+                        },
+                        {
+                            location: 1,
+                            date: 2004,
+                            value: 0,
+                        },
+                    ],
+                },
+                {
+                    label: "dataset_3",
+                    data: [
+                        {
+                            location: 1,
+                            date: 2000,
+                            value: 5,
+                        },
+                        {
+                            location: 1,
+                            date: 2001,
+                            value: 4,
+                        },
+                        {
+                            location: 1,
+                            date: 2002,
+                            value: 3,
+                        },
+                        {
+                            location: 1,
+                            date: 2003,
+                            value: 2,
+                        },
+                        {
+                            location: 1,
+                            date: 2004,
+                            value: 0,
+                        },
+                    ],
+                },
+                {
+                    label: "dataset_4",
+                    data: [
+                        {
+                            location: 1,
+                            date: 2000,
+                            value: 3,
+                        },
+                    ],
+                },
+                {
+                    label: "dataset_5",
+                    data: [
+                        {
+                            location: 1,
+                            date: 2003,
+                            value: 5,
+                        },
+                    ],
+                },
+                {
+                    label: "dataset_6",
+                    data: [],
+                },
+            ];
 
-      // enable debug messages
-      lotivis.debug(true);
+            // enable debug messages
+            lotivis.debug(true);
 
-      let dataController = lotivis.parseDatasets(datasets);
+            let dataController = lotivis.parseDatasets(datasets);
 
-      function plot(id) {
-        let comps = id.split("-");
-        lotivis
-          .plot()
-          .selector("#" + id)
-          .marginLeft(100)
-          .style(comps[0])
-          .colorMode(comps[1])
-          .sort(comps[2] || "alphabetically")
-          .dataController(dataController)
-          .run();
-      }
+            function plot(id) {
+                let comps = id.split("-");
+                lotivis
+                    .plot()
+                    .selector("#" + id)
+                    .marginLeft(100)
+                    .style(comps[0])
+                    .colorMode(comps[1])
+                    .sort(comps[2] || "alphabetically")
+                    .dataController(dataController)
+                    .run();
+            }
 
-      plot("gradient-single");
-      plot("gradient-multi-alphabetically");
-      plot("gradient-multi-duration");
-      plot("gradient-multi-intensity");
-      plot("gradient-multi-firstDate");
+            plot("gradient-single");
+            plot("gradient-multi-alphabetically");
+            plot("gradient-multi-duration");
+            plot("gradient-multi-intensity");
+            plot("gradient-multi-firstDate");
 
-      plot("fraction-single");
-      plot("fraction-multi-alphabetically");
-      plot("fraction-multi-duration");
-      plot("fraction-multi-intensity");
-      plot("fraction-multi-firstDate");
-    </script>
-  </body>
+            plot("fraction-single");
+            plot("fraction-multi-alphabetically");
+            plot("fraction-multi-duration");
+            plot("fraction-multi-intensity");
+            plot("fraction-multi-firstDate");
+        </script>
+    </body>
 </html>

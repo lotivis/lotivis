@@ -1,6 +1,6 @@
 const assert = require("assert");
 const samples = require("./sample.data");
-const lotivis = require("../dist/lotivis.test");
+const lotivis = require("./lotivis.test.js");
 
 // describe("parseCSVDate", function () {
 //   it("parses a csv file", function () {

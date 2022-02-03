@@ -9,41 +9,40 @@ const banner = `/*!
  */`;
 
 export default [
-  // UMD builds
-  {
-    input: "src/index.js",
-    plugins: [resolve(), execute("npm run scss")],
-    output: [
-      {
-        sourcemap: true,
-        name: "lotivis",
-        file: "dist/lotivis.js",
-        banner,
-        format: "umd",
-      },
-      {
-        sourcemap: true,
-        name: pkg.name,
-        file: pkg.module,
-        banner,
-        format: "esm",
-      },
-    ],
-  },
-  // CJS for tests
-  {
-    input: "src/index.test.js",
-    plugins: [
-      resolve({
-        jsnext: true,
-      }),
-      execute("npm run test"),
-    ],
-    output: {
-      name: "lotivis.test",
-      file: "dist/lotivis.test.js",
-      format: "cjs",
-      sourcemap: true,
+    {
+        input: "src/index.js",
+        plugins: [resolve(), execute("npm run scss")],
+        output: [
+            {
+                sourcemap: true,
+                name: "lotivis",
+                file: pkg.main,
+                banner,
+                format: "umd",
+            },
+            {
+                sourcemap: true,
+                name: pkg.name,
+                file: pkg.module,
+                banner,
+                format: "esm",
+            },
+        ],
     },
-  },
+    // CJS for tests
+    {
+        input: "src/index.test.js",
+        plugins: [
+            resolve({
+                jsnext: true,
+            }),
+            execute("npm run test"),
+        ],
+        output: {
+            name: "lotivis.test",
+            file: "test/lotivis.test.js",
+            format: "cjs",
+            sourcemap: true,
+        },
+    },
 ];

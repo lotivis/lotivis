@@ -11,27 +11,6 @@ import { CONFIG } from "./common/config";
 import { URLParams } from "./common/url.parameters.js";
 import { isEmpty } from "./common/values.js";
 
-/**
- * Adds the item if it not already exists in the array.
- *
- * @param {*} item The item to add
- * @returns Whether the item was added
- */
-Array.prototype.add = function (item) {
-    return this.indexOf(item) === -1 ? this.push(item) : false;
-};
-
-/**
- * Removes the item.
- *
- * @param {*} item The item to remove
- * @returns Whether the given item was removed
- */
-Array.prototype.remove = function (item) {
-    let i = this.indexOf(item);
-    return i !== -1 ? this.splice(i, 1) : false;
-};
-
 export class DataController {
     constructor(data) {
         if (!Array.isArray(data)) throw new Error("data not an array.");
@@ -65,20 +44,15 @@ export class DataController {
         function calculateSnapshot() {
             if (CONFIG.debug) console.time("calculateSnapshot");
             let f = attr.filters;
-            if (
-                isEmpty(f.labels) &&
-                isEmpty(f.stacks) &&
-                isEmpty(f.locations) &&
-                isEmpty(f.dates)
-            )
-                attr.snapshot = d3.filter(attr.data, (d) => {
-                    return !(
-                        f.locations.indexOf(d.location) !== -1 ||
-                        f.dates.indexOf(d.date) !== -1 ||
-                        f.labels.indexOf(d.label) !== -1 ||
-                        f.stacks.indexOf(d.stack) !== -1
-                    );
-                });
+            attr.snapshot = d3.filter(attr.data, (d) => {
+                return !(
+                    f.locations.indexOf(d.location) !== -1 ||
+                    f.dates.indexOf(d.date) !== -1 ||
+                    f.labels.indexOf(d.label) !== -1 ||
+                    f.stacks.indexOf(d.stack) !== -1
+                );
+            });
+
             if (CONFIG.debug) console.timeEnd("calculateSnapshot");
             return attr.snapshot;
         }
@@ -87,7 +61,6 @@ export class DataController {
             let fromURL = URLParams.object(id + "-filters");
 
             if (fromURL) {
-                ltv_debug("found filters in URL", fromURL);
                 ["labels", "stacks", "locations", "dates"].forEach((name) =>
                     Array.isArray(fromURL[name])
                         ? (attr.filters[name] = fromURL[name])
@@ -144,12 +117,23 @@ export class DataController {
             disp.call("filter", this, sender, name, action, item);
         };
 
+        /**
+         * Returns either the filters object containing all filter list if no
+         * argument is passed, or the filter list for the passed name.
+         * @param {*} name The name of the filter list
+         * @returns The filters object or a single list
+         */
         this.filters = function (name) {
             if (!arguments.length) return attr.filters;
             if (!attr.filters[name]) throw new Error("invalid name: " + name);
             return attr.filters[name];
         };
 
+        /**
+         *
+         * @param {*} name
+         * @returns
+         */
         this.hasFilters = function (name) {
             return arguments.length
                 ? this.filters(name).length > 0
@@ -235,10 +219,20 @@ export class DataController {
                 : attr.snapshot ?? attr.data;
         };
 
+        /**
+         * Returns the color for the data with the passed label.
+         * @param {String} label The label of the data
+         * @returns {d3.Color} The color of the label
+         */
         this.labelColor = function (label) {
             return attr.dataColors.label(label);
         };
 
+        /**
+         * Returns the color for the passed stack.
+         * @param {String} stack The stack of the data
+         * @returns {d3.Color} The color of the stack
+         */
         this.stackColor = function (stack) {
             return attr.dataColors.stack(stack);
         };
@@ -359,3 +353,24 @@ export class DataController {
     //   return d3.min(this.data, (item) => item.value);
     // }
 }
+
+/**
+ * Adds the item if it not already exists in the array.
+ *
+ * @param {*} item The item to add
+ * @returns Whether the item was added
+ */
+Array.prototype.add = function (item) {
+    return this.indexOf(item) === -1 ? this.push(item) : false;
+};
+
+/**
+ * Removes the item.
+ *
+ * @param {*} item The item to remove
+ * @returns Whether the given item was removed
+ */
+Array.prototype.remove = function (item) {
+    let i = this.indexOf(item);
+    return i !== -1 ? this.splice(i, 1) : false;
+};

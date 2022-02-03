@@ -1,56 +1,56 @@
 {
-  "name": "lotivis.js",
-  "version": "1.0.95",
-  "description": "Location and time data visualization",
-  "license": "MIT",
-  "author": "Lukas Danckwerth",
-  "keywords": [
-    "location",
-    "time",
-    "data",
-    "visualization"
-  ],
-  "homepage": "https://github.com/lukasdanckwerth/lotivis#readme",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lukasdanckwerth/lotivis.git"
-  },
-  "bugs": {
-    "url": "https://github.com/lukasdanckwerth/lotivis/issues"
-  },
-  "main": "dist/lotivis.js",
-  "module": "dist/lotivis.esm.js",
-  "jsdelivr": [
-    "dist/lotivis.css",
-    "dist/lotivis.min.css",
-    "dist/lotivis.js",
-    "dist/lotivis.js.map"
-  ],
-  "scripts": {
-    "build:watch": "rollup --config --watch",
-    "build": "rollup --config",
-    "scss": "sass src/index.scss > dist/lotivis.css && sass --style compressed src/index.scss > dist/lotivis.min.css",
-    "test": "mocha 'test/**/test.*.js'",
-    "serve": "http-server",
-    "copy": "cp dist/lotivis.js ../frc-visualization/public/js/lib && cp dist/lotivis.js.map ../frc-visualization/public/js/lib && cp dist/lotivis.css ../frc-visualization/public/css"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.16.7",
-    "@babel/plugin-transform-runtime": "^7.16.7",
-    "@babel/preset-env": "^7.16.7",
-    "@rollup/plugin-babel": "^5.3.0",
-    "@rollup/plugin-node-resolve": "^11.1.1",
-    "lint": "^1.1.2",
-    "mocha": "^8.3.0",
-    "rollup": "^2.39.0",
-    "rollup-plugin-execute": "^1.1.1",
-    "sass": "^1.32.8"
-  },
-  "dependencies": {
-    "d3": "7.1.0",
-    "downloadjs": "^1.4.7",
-    "topojson-client": "^3.1.0",
-    "topojson-server": "^3.0.1",
-    "topojson-simplify": "^3.0.3"
-  }
+    "name": "lotivis.js",
+    "version": "1.0.95",
+    "description": "Location and time data visualization",
+    "license": "MIT",
+    "author": "Lukas Danckwerth",
+    "keywords": [
+        "location",
+        "time",
+        "data",
+        "visualization"
+    ],
+    "homepage": "https://github.com/lukasdanckwerth/lotivis#readme",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/lukasdanckwerth/lotivis.git"
+    },
+    "bugs": {
+        "url": "https://github.com/lukasdanckwerth/lotivis/issues"
+    },
+    "main": "examples/dist/lotivis.js",
+    "module": "examples/dist/lotivis.esm.js",
+    "jsdelivr": [
+        "examples/dist/lotivis.css",
+        "examples/dist/lotivis.min.css",
+        "examples/dist/lotivis.js",
+        "examples/dist/lotivis.js.map"
+    ],
+    "scripts": {
+        "build:watch": "rollup --config --watch",
+        "build": "rollup --config",
+        "scss": "sass src/index.scss > examples/dist/lotivis.css && sass --style compressed src/index.scss > examples/dist/lotivis.min.css",
+        "test": "mocha 'test/**/test.*.js'",
+        "serve": "http-server",
+        "copy": "cp dist/lotivis.js ../frc-visualization/public/js/lib && cp dist/lotivis.js.map ../frc-visualization/public/js/lib && cp dist/lotivis.css ../frc-visualization/public/css"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.16.7",
+        "@babel/plugin-transform-runtime": "^7.16.7",
+        "@babel/preset-env": "^7.16.7",
+        "@rollup/plugin-babel": "^5.3.0",
+        "@rollup/plugin-node-resolve": "^11.1.1",
+        "lint": "^1.1.2",
+        "mocha": "^8.3.0",
+        "rollup": "^2.39.0",
+        "rollup-plugin-execute": "^1.1.1",
+        "sass": "^1.32.8"
+    },
+    "dependencies": {
+        "d3": "7.1.0",
+        "downloadjs": "^1.4.7",
+        "topojson-client": "^3.1.0",
+        "topojson-server": "^3.0.1",
+        "topojson-simplify": "^3.0.3"
+    }
 }

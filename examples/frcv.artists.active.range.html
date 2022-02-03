@@ -1,72 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta
-      name="viewport"
-      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"
-    />
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-      integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
-      crossorigin="anonymous"
-    />
-    <link rel="stylesheet" href="../dist/lotivis.css" />
-    <title>Lotivis - Plot Data Example</title>
-  </head>
-  <body>
-    <div class="container mt-3">
-      <div class="row">
-        <div class="col-2">
-          <a href="../index.html"> Back </a>
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"
+        />
+        <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3"
+            crossorigin="anonymous"
+        />
+        <link rel="stylesheet" href="./dist/lotivis.css" />
+        <title>Lotivis - Plot Data Example</title>
+    </head>
+    <body>
+        <div class="container mt-3">
+            <div class="row">
+                <div class="col-2">
+                    <a href="../index.html"> Back </a>
+                </div>
+                <div class="col-8 text-center">
+                    <h1>Plot Data</h1>
+                </div>
+                <div class="col-2">
+                    <select id="dataSelection" onchange="dataChange()">
+                        <option>All</option>
+                        <option>Female</option>
+                        <option>Male</option>
+                        <option>Types</option>
+                        <option>Group</option>
+                    </select>
+                </div>
+                <div class="col-8">
+                    <div id="plot-chart">
+                        <!-- Plot Chart Here -->
+                    </div>
+                </div>
+                <div class="col-4" id="ltv-data"></div>
+            </div>
         </div>
-        <div class="col-8 text-center">
-          <h1>Plot Data</h1>
-        </div>
-        <div class="col-2">
-          <select id="dataSelection" onchange="dataChange()">
-            <option>All</option>
-            <option>Female</option>
-            <option>Male</option>
-            <option>Types</option>
-            <option>Group</option>
-          </select>
-        </div>
-        <div class="col-8">
-          <div id="plot-chart">
-            <!-- Plot Chart Here -->
-          </div>
-        </div>
-        <div class="col-4" id="ltv-data"></div>
-      </div>
-    </div>
 
-    <script src="../dist/lotivis.js"></script>
+        <script src="./dist/lotivis.js"></script>
 
-    <script>
-      lotivis.debug(true);
+        <script>
+            lotivis.debug(true);
 
-      let datasets = [];
-      let plot = lotivis.plot().selector("#plot-chart").marginLeft(140);
+            let datasets = [];
+            let plot = lotivis.plot().selector("#plot-chart").marginLeft(140);
 
-      function setIndex(index) {
-        plot.dataController(lotivis.parseDatasets(datasets[index])).run();
-      }
+            function setIndex(index) {
+                plot.dataController(
+                    lotivis.parseDatasets(datasets[index])
+                ).run();
+            }
 
-      function dataChange() {
-        setIndex(document.getElementById("dataSelection").selectedIndex);
-      }
+            function dataChange() {
+                setIndex(
+                    document.getElementById("dataSelection").selectedIndex
+                );
+            }
 
-      Promise.all([
-        lotivis.d3.json("./assets/artists-active-range.json"),
-        lotivis.d3.json("./assets/artists-active-range-female.json"),
-        lotivis.d3.json("./assets/artists-active-range-male.json"),
-        lotivis.d3.json("./assets/artists-active-range-groups.json"),
-      ]).then((all) => {
-        datasets = all;
-        setIndex(0);
-      });
-    </script>
-  </body>
+            Promise.all([
+                lotivis.d3.json("./assets/artists-active-range.json"),
+                lotivis.d3.json("./assets/artists-active-range-female.json"),
+                lotivis.d3.json("./assets/artists-active-range-male.json"),
+                lotivis.d3.json("./assets/artists-active-range-groups.json"),
+            ]).then((all) => {
+                datasets = all;
+                setIndex(0);
+            });
+        </script>
+    </body>
 </html>
