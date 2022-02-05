@@ -4,6 +4,7 @@ import { CONFIG } from "./common/config";
 import { uniqueId } from "./common/identifiers";
 import { safeId } from "./common/identifiers";
 import { tooltip } from "./tooltip";
+import { legend } from "./legend";
 import { DEFAULT_NUMBER_FORMAT } from "./common/formats";
 import { DEFAULT_DATE_ORDINATOR } from "./common/date.ordinator";
 
@@ -46,6 +47,8 @@ export function bar() {
 
         // whether to draw labels
         labels: false,
+
+        legend: legend(),
 
         // whether to display a tooltip.
         tooltip: true,
@@ -403,9 +406,9 @@ export function bar() {
             d3.max(d[1], (d) => d[1])
         );
         dv.dates = dc.dates();
-        dv.stacks = dc.stacks();
-        dv.labels = dc.labels();
-        dv.enabledStacks = dc.stacks();
+        dv.stacks = dv.snapshot.stacks;
+        dv.labels = dv.snapshot.labels;
+        dv.enabledStacks = dv.snapshot.stacks;
 
         dv.byDateLabel = d3.rollup(
             dv.snapshot,
@@ -480,6 +483,14 @@ export function bar() {
         if (state.labels) renderLabels(calc, dv);
 
         if (state.tooltip) calc.tip = tooltip().container(container).run();
+
+        if (state.legend) {
+            let dc = state.dataController;
+            let dv = state.legend.dataView(dc);
+            let calc = {};
+            state.legend.skipFilterUpdate = () => true;
+            state.legend.dataController(dc).render(container, calc, dv);
+        }
     };
 
     // return generated chart

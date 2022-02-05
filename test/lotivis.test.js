@@ -21225,10 +21225,13 @@ class DataController {
 
         // private
 
+        /**
+         *
+         * @returns
+         */
         function calculateSnapshot() {
-            if (CONFIG.debug) console.time("calculateSnapshot");
             let f = attr.filters;
-            attr.snapshot = filter$1(attr.data, (d) => {
+            let snapshot = filter$1(attr.data, (d) => {
                 return !(
                     f.locations.indexOf(d.location) !== -1 ||
                     f.dates.indexOf(d.date) !== -1 ||
@@ -21236,21 +21239,9 @@ class DataController {
                     f.stacks.indexOf(d.stack) !== -1
                 );
             });
+            attr.snapshot = Data(snapshot);
 
-            if (CONFIG.debug) console.timeEnd("calculateSnapshot");
             return attr.snapshot;
-        }
-
-        function applyURLParameters() {
-            let fromURL = URLParams.object(id + "-filters");
-
-            if (fromURL) {
-                ["labels", "stacks", "locations", "dates"].forEach((name) =>
-                    Array.isArray(fromURL[name])
-                        ? (attr.filters[name] = fromURL[name])
-                        : null
-                );
-            }
         }
 
         // listeners
@@ -21292,6 +21283,9 @@ class DataController {
             // do calculations
             calculateSnapshot();
 
+            console.log("this.hasFilters()", this.hasFilters());
+            console.log("attr.filters", attr.filters);
+
             URLParams.object(
                 this.id + "-filters",
                 this.hasFilters() ? this.filters() : null
@@ -21299,6 +21293,7 @@ class DataController {
 
             // call listeners
             disp.call("filter", this, sender, name, action, item);
+            return this;
         };
 
         /**
@@ -21391,6 +21386,31 @@ class DataController {
                 : this.addFilter(name, item, sender);
         };
 
+        this.filteredData = function () {
+            let f = attr.filters;
+            return attr.data.filter(
+                (d) =>
+                    !(
+                        f.locations.indexOf(d.location) !== -1 ||
+                        f.dates.indexOf(d.date) !== -1 ||
+                        f.labels.indexOf(d.label) !== -1 ||
+                        f.stacks.indexOf(d.stack) !== -1
+                    )
+            );
+        };
+
+        /**
+         * Gets or sets the data.
+         * @param {*} _data
+         * @returns {data|this}
+         */
+        this.data = function (_data) {
+            if (!arguments.length) return attr.data;
+            attr.data = Data(_data);
+            this.filtersDidChange();
+            return this;
+        };
+
         /**
          * Gets or sets the snapshot attribute. When getting and snapshot is null
          * will fallback on data attribute.
@@ -21444,9 +21464,6 @@ class DataController {
                 .dataController(this)
                 .run();
         };
-
-        // initialize
-        applyURLParameters();
         calculateSnapshot();
 
         // debug
@@ -21827,9 +21844,6 @@ function plot() {
 
         // the data controller.
         dataController: null,
-
-        // the data view.
-        dataView: null,
     };
 
     // create new underlying chart with the specified state
@@ -21962,7 +21976,7 @@ function plot() {
             .on("mouseenter", (e, d) => showTooltip(calc, d))
             .on("mouseout", (e, d) => calc.tooltip.hide())
             .on("click", (e, d) => {
-                state.dataController.toggleLabel(d.label, chart);
+                state.dataController.toggleFilter("labels", d.label, chart);
                 calc.svg
                     .selectAll(".ltv-plot-chart-selection-rect")
                     .classed("ltv-selected", (d) =>
@@ -22121,13 +22135,12 @@ function plot() {
 
         if (!ds.data || ds.data.length === 0) return;
 
-        let count = ds.data.length;
-        let latestDate = ds.lastDate;
-
-        let dataController = chart.dataController();
-        let dataColors = dataController.dataColors();
-        let isSingle = state.colorMode === "single";
-        let colors = isSingle ? dataColors.label : plotColors;
+        let count = ds.data.length,
+            latestDate = ds.lastDate,
+            dataController = chart.dataController(),
+            dataColors = dataController.dataColors(),
+            isSingle = state.colorMode === "single",
+            colors = isSingle ? dataColors.label : plotColors;
 
         function append(value, percent) {
             gradient
@@ -22159,9 +22172,9 @@ function plot() {
         calc.tooltip.html(tooltipHTML(ds));
 
         // position tooltip
-        let domRect = calc.svg.node().getBoundingClientRect();
-        let factor = domRect.width / state.width;
-        let offset = [domRect.x + window.scrollX, domRect.y + window.scrollY];
+        let domRect = calc.svg.node().getBoundingClientRect(),
+            factor = domRect.width / state.width,
+            offset = [domRect.x + window.scrollX, domRect.y + window.scrollY];
 
         let top =
             calc.yChart(ds.label) * factor +
@@ -22185,17 +22198,17 @@ function plot() {
      * @private
      */
     function tooltipHTML(ds) {
-        let filtered = ds.data.filter((item) => item.value !== 0);
-        let sum = sum$2(ds.data, (d) => d.value);
-        let comps = [
-            "Label: " + ds.label,
-            "",
-            "Start: " + ds.firstDate,
-            "End: " + ds.lastDate,
-            "",
-            "Sum: " + state.numberFormat(sum),
-            "",
-        ];
+        let filtered = ds.data.filter((item) => item.value !== 0),
+            sum = sum$2(ds.data, (d) => d.value),
+            comps = [
+                "Label: " + ds.label,
+                "",
+                "Start: " + ds.firstDate,
+                "End: " + ds.lastDate,
+                "",
+                "Sum: " + state.numberFormat(sum),
+                "",
+            ];
 
         for (let i = 0; i < filtered.length; i++) {
             let entry = filtered[i];
@@ -22318,6 +22331,298 @@ function plot() {
     return chart;
 }
 
+const LABEL_FORMAT = function (l, v, i) {
+    return `${l} (${v})`;
+};
+
+const STACK_FORMAT = function (s, v, ls, i) {
+    return `${s}`;
+};
+
+const GROUP_TITLE_FORMAT = function (s, v, ls, i) {
+    return `${i + 1}) ${s} (Sum: ${v})`;
+};
+
+// export const GROUP_TITLE_FORMAT = function (s, v, ls, i) {
+//   return `${i}) ${s} (Labels: ${ls.length}, Sum: ${v})`;
+// };
+
+function legend() {
+    let state = {
+        // the id of the legend
+        id: uniqueId("legend"),
+
+        // margin
+        marginLeft: 0,
+        marginTop: 10,
+        marginRight: 0,
+        marginBottom: 20,
+
+        // whether the legend is enabled
+        enabled: true,
+
+        // the number formatter vor values displayed
+        numberFormat: CONFIG.numberFormat,
+
+        // the format of displaying a datasets label
+        labelFormat: LABEL_FORMAT,
+
+        // the format of displaying a datasets stack
+        stackFormat: STACK_FORMAT,
+
+        // the format of displaying a group
+        groupFormat: GROUP_TITLE_FORMAT,
+
+        // (optional) title of the legend
+        title: "Legend",
+
+        // whether to display stacks instead of labels
+        stacks: false,
+
+        // whether group the legend (by stacks)
+        group: false,
+
+        // the data controller
+        dataController: null,
+    };
+
+    var chart = baseChart(state);
+
+    /**
+     * Toggles the filtered state of the passed label.
+     *
+     * @param {Event} event The event of the checkbox
+     * @param {String} label The label to be toggled
+     * @private
+     */
+    function toggleLabel(event, label) {
+        event.target.checked
+            ? state.dataController.removeFilter("labels", label, chart)
+            : state.dataController.addFilter("labels", label, chart);
+    }
+
+    /**
+     * Toggles the filtered state of the passed stack.
+     *
+     * @param {Event} event The event of the checkbox
+     * @param {String} stack The stack to be toggled
+     * @private
+     */
+    function toggleStack(event, stack) {
+        event.target.checked
+            ? state.dataController.removeFilter("stacks", stack, chart)
+            : state.dataController.addFilter("stacks", stack, chart);
+    }
+
+    /**
+     * Returns the value for the "checked" attribute dependant on whether
+     * given label is filtered by the data controller.
+     *
+     * @param {*} label The label to be checked
+     * @returns {null | boolean}
+     * @private
+     */
+    function labelChecked(label) {
+        return state.dataController.isFilter("labels", label) ? null : true;
+    }
+
+    /**
+     * Returns the value for the "checked" attribute dependant on whether
+     * given stack is filtered by the data controller.
+     *
+     * @param {*} stack The stack to be checked
+     * @returns {null | boolean}
+     * @private
+     */
+    function stackChecked(stack) {
+        return state.dataController.isFilter("stacks", stack) ? null : true;
+    }
+
+    /**
+     * Formattes the given number.
+     *
+     * @param {Number} value The number to be formatted
+     * @returns The formatted value
+     * @private
+     */
+    function format(value) {
+        return state.numberFormat(value);
+    }
+
+    /**
+     *
+     * @param {*} label
+     * @param {*} index
+     * @param {*} dv
+     * @returns
+     */
+    function labelText(label, index, dv) {
+        if (typeof state.labelFormat !== "function") return label;
+        return state.labelFormat(label, format(dv.byLabel.get(label)), index);
+    }
+
+    function stackText(stack, index, dv) {
+        if (typeof state.stackFormat !== "function") return stack;
+        var value = format(dv.byStack.get(stack));
+        var labelsToValue = dv.byStackLabel.get(stack);
+        var labels = Array.from(labelsToValue ? labelsToValue.keys() : []);
+        return state.stackFormat(stack, value, labels, index);
+    }
+
+    function dataColors() {
+        return state.dataController.dataColors();
+    }
+
+    function disabled() {
+        return unwrap(state.enabled) ? null : true;
+    }
+
+    function isGroups() {
+        return unwrap(state.group) === true;
+    }
+
+    function isStacks() {
+        return unwrap(state.stacks) === true;
+    }
+
+    function unwrap(value) {
+        return typeof value === "function" ? value(chart) : value;
+    }
+
+    selection.prototype.div = function (aClass) {
+        return this.append("div").classed(aClass, true);
+    };
+
+    selection.prototype.error = function (text) {
+        return this.append("div").text(text);
+    };
+
+    /**
+     * Calculates the data view for the bar chart.
+     *
+     * @param {*} calc The calc object
+     * @returns The generated data view
+     *
+     * @public
+     */
+    chart.dataView = function (dc) {
+        var dv = {};
+        dv.labels = dc.labels();
+        dv.stacks = dc.stacks();
+        dv.locations = dc.locations();
+        dv.dates = dc.dates();
+
+        dv.byLabel = rollup(
+            dc.data(),
+            (v) => sum$2(v, (d) => d.value),
+            (d) => d.label
+        );
+
+        dv.byStack = rollup(
+            dc.data(),
+            (v) => sum$2(v, (d) => d.value),
+            (d) => d.stack || d.label
+        );
+
+        dv.byStackLabel = rollup(
+            dc.data(),
+            (v) => sum$2(v, (d) => d.value),
+            (d) => d.stack || d.label,
+            (d) => d.label
+        );
+
+        return dv;
+    };
+
+    /**
+     * Renders all components of the plot chart.
+     *
+     * @param {*} container The d3 container
+     * @param {*} calc The calc objct of the chart
+     * @param {*} dv The data view
+     * @returns The chart itself
+     *
+     * @public
+     */
+    chart.render = function (container, calc, dv) {
+        calc.div = container
+            .append("div")
+            .div("ltv-legend")
+            .attr("id", state.id)
+            .style("padding-left", state.marginLeft + "px")
+            .style("padding-top", state.marginTop + "px")
+            .style("padding-right", state.marginRight + "px")
+            .style("padding-bottom", state.marginBottom + "px");
+
+        // if a title is given render div with title inside
+        if (state.title) {
+            calc.titleDiv = calc.div
+                .append("div")
+                .classed("ltv-legend-title", true)
+                .text(unwrap(state.title));
+        }
+
+        var colorFn = isStacks() ? dataColors().stack : dataColors().label;
+        var changeFn = isStacks() ? toggleStack : toggleLabel;
+        var textFn = isStacks() ? stackText : labelText;
+
+        calc.groups = calc.div
+            .selectAll(".div")
+            .data(isGroups() ? dv.stacks : [""]) // use single group when mode is not "groups"
+            .enter()
+            .div("ltv-legend-group")
+            .style("color", (s) => dataColors().stack(s));
+
+        // draw titles only in "groups" mode
+        if (isGroups()) {
+            calc.titles = calc.groups.append("div").text((stack, index) => {
+                var labelsToValue = dv.byStackLabel.get(stack);
+                return state.groupFormat(
+                    stack,
+                    format(dv.byStack.get(stack)),
+                    Array.from(labelsToValue ? labelsToValue.keys() : []),
+                    index
+                );
+            });
+        }
+
+        var pillsData = isGroups()
+            ? (d) => (isStacks() ? [d] : dv.byStackLabel.get(d))
+            : isStacks()
+            ? dv.stacks
+            : dv.labels;
+
+        calc.pills = calc.groups
+            .selectAll(".label")
+            .data(pillsData)
+            .enter()
+            .append("label")
+            .classed("ltv-legend-pill", true)
+            .datum((d) => (isGroups() && !isStacks() ? d[0] : d));
+
+        calc.checkboxes = calc.pills
+            .append("input")
+            .classed("ltv-legend-checkbox", true)
+            .attr("type", "checkbox")
+            .attr("checked", isStacks() ? stackChecked : labelChecked)
+            .attr("disabled", disabled())
+            .on("change", (e, d) => changeFn(e, d));
+
+        calc.spans = calc.pills
+            .append("span")
+            .classed("ltv-legend-pill-span", true)
+            .style("background-color", colorFn)
+            .text((d, i) => textFn(d, i, dv));
+
+        if (CONFIG.debug && state.debug) console.log(this);
+
+        return chart;
+    };
+
+    // Return generated chart
+    return chart;
+}
+
 /**
  * Reusable Bar Chart API class that renders a
  * simple and configurable bar chart.
@@ -22357,6 +22662,8 @@ function bar() {
 
         // whether to draw labels
         labels: false,
+
+        legend: legend(),
 
         // whether to display a tooltip.
         tooltip: true,
@@ -22708,9 +23015,9 @@ function bar() {
             max$3(d[1], (d) => d[1])
         );
         dv.dates = dc.dates();
-        dv.stacks = dc.stacks();
-        dv.labels = dc.labels();
-        dv.enabledStacks = dc.stacks();
+        dv.stacks = dv.snapshot.stacks;
+        dv.labels = dv.snapshot.labels;
+        dv.enabledStacks = dv.snapshot.stacks;
 
         dv.byDateLabel = rollup(
             dv.snapshot,
@@ -22785,6 +23092,14 @@ function bar() {
         if (state.labels) renderLabels(calc, dv);
 
         if (state.tooltip) calc.tip = tooltip().container(container).run();
+
+        if (state.legend) {
+            let dc = state.dataController;
+            let dv = state.legend.dataView(dc);
+            let calc = {};
+            state.legend.skipFilterUpdate = () => true;
+            state.legend.dataController(dc).render(container, calc, dv);
+        }
     };
 
     // return generated chart
@@ -24110,738 +24425,540 @@ function filterFeatures(json, ids, idValue = FEATURE_ID_ACCESSOR) {
  *
  */
 function map() {
-  let state = {
-    id: uniqueId("map"),
-
-    width: 1000,
-    height: 1000,
-
-    // margin
-    marginLeft: 20,
-    marginTop: 20,
-    marginRight: 20,
-    marginBottom: 20,
-
-    // Whether the chart is enabled.
-    enabled: true,
-
-    // whether to draw labels
-    labels: false,
-
-    // whether to draw a legend on the map
-    legend: true,
-
-    // whether to display a tooltip.
-    tooltip: true,
-
-    exclude: null,
-
-    include: null,
-
-    // the geojson wich is drawn
-    geoJSON: null,
-
-    // The data controller.
-    dataController: null,
-
-    // the number format
-    numberFormat: DEFAULT_NUMBER_FORMAT,
-
-    featureIDAccessor: FEATURE_ID_ACCESSOR,
-
-    featureNameAccessor: FEATURE_NAME_ACCESSOR,
-  };
-
-  // Create new underlying chart with the specified state.
-  let chart = baseChart(state);
-  state.projection = mercator();
-  state.path = index$3().projection(state.projection);
-
-  function colors() {
-    return state.dataController.dataColors();
-  }
-
-  /**
-   * Tells the map chart that the GeoJSON has changed.
-   * @private
-   */
-  function geoJSONDidChange() {
-    let geoJSON = state.geoJSON;
-    if (!geoJSON) return;
-
-    state.workGeoJSON = geoJSON;
-
-    // precalculate the center of each feature
-    state.workGeoJSON.features.forEach((f) => (f.center = centroid$1(f)));
-
-    if (Array.isArray(state.exclude)) {
-      state.workGeoJSON = removeFeatures(state.workGeoJSON, state.exclude);
-    }
-
-    if (Array.isArray(state.include)) {
-      state.workGeoJSON = filterFeatures(state.workGeoJSON, state.include);
-    }
-
-    // precalculate lotivis feature ids
-    let feature, id;
-    for (let i = 0; i < state.workGeoJSON.features.length; i++) {
-      feature = state.workGeoJSON.features[i];
-      id = state.featureIDAccessor(feature);
-      state.workGeoJSON.features[i].lotivisId = id;
-    }
-
-    chart.zoomTo(state.workGeoJSON);
-
-    if (chart.dataController() === null) {
-      chart.dataController(new DataController([]));
-    }
-  }
-
-  /**
-   * Returns the collection of selected features.
-   * @returns {Array<feature>} The collection of selected features
-   * @private
-   */
-  function getSelectedFeatures() {
-    if (!state.workGeoJSON) return null;
-
-    let filtered = state.dataController.filters("locations");
-    if (filtered.length === 0) return [];
-
-    let selectedFeatures = state.workGeoJSON.features.filter(
-      (f) => filtered.indexOf(f.lotivisId) !== -1
-    );
-
-    return selectedFeatures;
-  }
-
-  function htmlTitle(features) {
-    if (features.length > 3) {
-      let featuresSlice = features.slice(0, 3);
-      let ids = featuresSlice
-        .map((feature) => `${feature.lotivisId}`)
-        .join(", ");
-      let names = featuresSlice.map(state.featureNameAccessor).join(", ");
-      let moreCount = features.length - 3;
-      return `IDs: ${ids} (+${moreCount})<br>Names: ${names} (+${moreCount})`;
-    } else {
-      let ids = features.map((feature) => `${feature.lotivisId}`).join(", ");
-      let names = features.map(state.featureNameAccessor).join(", ");
-      return `IDs: ${ids}<br>Names: ${names}`;
-    }
-  }
-
-  function htmlValues(features, dv) {
-    if (!chart.controller) return "";
-
-    let combinedByLabel = {};
-    for (let i = 0; i < features.length; i++) {
-      let feature = features[i];
-      let data = dv.byLocationLabel.get(feature.lotivisId);
-      if (!data) continue;
-      let keys = Array.from(data.keys());
-
-      for (let j = 0; j < keys.length; j++) {
-        let label = keys[j];
-        if (combinedByLabel[label]) {
-          combinedByLabel[label] += data.get(label);
-        } else {
-          combinedByLabel[label] = data.get(label);
-        }
-      }
-    }
-
-    let components = [""];
-    let sum = 0;
-    for (const label in combinedByLabel) {
-      let color = colors.label(label);
-      let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
-      sum += combinedByLabel[label];
-      let value = numberFormat(combinedByLabel[label]);
-      components.push(`${divHTML} ${label}: <b>${value}</b>`);
-    }
-
-    components.push("");
-    components.push(`Sum: <b>${numberFormat(sum)}</b>`);
-
-    return components.length === 0 ? "No Data" : components.join("<br>");
-  }
-
-  function positionTooltip(event, feature, calc) {
-    // position tooltip
-    let size = calc.tooltip.size();
-    let tOff = CONFIG.tooltipOffset;
-    let projection = state.projection;
-
-    let fBounds = bounds$1(feature);
-    let fLowerLeft = projection(fBounds[0]);
-    let fUpperRight = projection(fBounds[1]);
-    let fWidth = fUpperRight[0] - fLowerLeft[0];
-
-    // svg is presented in dynamic sized view box so we need to get the actual size
-    // of the element in order to calculate a scale for the position of the tooltip.
-    let domRect = calc.svg.node().getBoundingClientRect();
-    let factor = domRect.width / state.width;
-    let offset = [domRect.x + window.scrollX, domRect.y + window.scrollY];
-
-    function getTooltipLeft() {
-      return (fLowerLeft[0] + fWidth / 2) * factor - size[0] / 2 + offset[0];
-    }
-
-    function tooltipTop() {
-      return fLowerLeft[1] > state.height / 2
-        ? fUpperRight[1] * factor - size[1] + offset[1] - tOff
-        : fLowerLeft[1] * factor + offset[1] + tOff;
-    }
-
-    calc.tooltip.left(getTooltipLeft()).top(tooltipTop()).show();
-  }
-
-  /**
-   *
-   * @param {*} container
-   * @param {*} calc
-   */
-  function renderSVG(container, calc) {
-    calc.svg = container
-      .append("svg")
-      .attr("class", "ltv-chart-svg ltv-map-svg")
-      .attr("viewBox", `0 0 ${state.width} ${state.height}`);
-  }
-
-  function renderBackground(calc, dv) {
-    calc.svg
-      .append("rect")
-      .attr("class", "ltv-map-background")
-      .attr("width", state.width)
-      .attr("height", state.height)
-      .on("click", () => state.dataController.clear("locations", chart));
-  }
-
-  function renderExteriorBorders(calc, dv) {
-    let geoJSON = state.workGeoJSON;
-    if (!geoJSON) return console.log("[ltv]  No GeoJSON to render");
-
-    let bordersGeoJSON = joinFeatures(geoJSON.features);
-    if (!bordersGeoJSON) return console.log("[ltv]  No borders to render.");
-
-    calc.borders = calc.svg
-      .selectAll(".ltv-map-exterior-borders")
-      .append("path")
-      .data(bordersGeoJSON.features)
-      .enter()
-      .append("path")
-      .attr("d", state.path)
-      .attr("class", "ltv-map-exterior-borders");
-  }
-
-  function filterLocation(location) {
-    return state.dataController.isFilter("locations", location);
-  }
-
-  function renderFeatures(calc, dv) {
-    function opacity(location) {
-      return filterLocation(location) ? CONFIG.selectionOpacity : 1;
-    }
-
-    function featureMapID(f) {
-      return `ltv-map-area-id-${f.lotivisId}`;
-    }
-
-    function resetHover() {
-      calc.svg
-        .selectAll(".ltv-map-area")
-        .classed("ltv-map-area-hover", false)
-        .attr("opacity", (f) => opacity(f.lotivisId));
-    }
-
-    function mouseEnter(event, feature) {
-      calc.svg
-        .selectAll(`#${featureMapID(feature)}`)
-        .raise()
-        .classed("ltv-map-area-hover", true);
-
-      calc.svg.selectAll(".ltv-map-label").raise();
-
-      calc.tooltip.show();
-
-      if (filterLocation(feature.lotivisId)) {
-        calc.tooltip.html(
-          [
-            htmlTitle(calc.selectedFeatures),
-            htmlValues(calc.selectedFeatures),
-          ].join("<br>")
-        );
-        positionTooltip(event, calc.selectionBorderGeoJSON.features[0], calc);
-      } else {
-        calc.tooltip.html(
-          [htmlTitle([feature]), htmlValues([feature])].join("<br>")
-        );
-        positionTooltip(event, feature, calc);
-      }
-    }
-
-    function mouseOut(event, feature) {
-      resetHover();
-      calc.tooltip.hide();
-      // chart.emit("mouseout", event, feature);
-      // dragged
-      if (event.buttons === 1) mouseClick(event, feature);
-    }
-
-    function mouseClick(event, feature) {
-      if (!state.enabled) return;
-      if (!feature || !feature.properties) return;
-      state.dataController.toggleFilter("locations", feature.lotivisId, chart);
-      // chart.emit("click", event, feature);
-    }
-
-    let locationToSum = dv.locationToSum;
-    let max = max$3(locationToSum, (item) => item[1]);
-    let generator = MapColors(1);
-
-    calc.areas = calc.svg
-      .selectAll(".ltv-map-area")
-      .append("path")
-      .data(state.workGeoJSON.features)
-      .enter()
-      .append("path")
-      .attr("d", state.path)
-      .classed("ltv-map-area", true)
-      .attr("id", (f) => featureMapID(f))
-      .style("stroke-dasharray", "1,4")
-      .style("fill", (f) => {
-        let value = locationToSum.get(f.lotivisId);
-        let opacity = Number(value / max);
-        return opacity === 0 ? "WhiteSmoke" : generator(opacity);
-      })
-      .style("fill-opacity", 1)
-      .on("click", mouseClick)
-      .on("mouseenter", mouseEnter)
-      .on("mouseout", mouseOut)
-      .raise();
-  }
-
-  function renderLabels(calc, dv) {
-    // calc.svg.selectAll(".ltv-map-label").remove();
-    calc.svg
-      .selectAll("text")
-      .data(state.workGeoJSON.features)
-      .enter()
-      .append("text")
-      .attr("class", "ltv-map-label")
-      .text((f) => {
-        let featureID = state.featureIDAccessor(f);
-        let data = dv.byLocationLabel.get(featureID);
-        if (!data) return "";
-        let labels = Array.from(data.keys());
-        let values = labels.map((label) => data.get(label));
-        let sum = sum$2(values);
-        return sum === 0 ? "" : state.numberFormat(sum);
-      })
-      .attr("x", (f) => state.projection(f.center)[0])
-      .attr("y", (f) => state.projection(f.center)[1]);
-  }
-
-  function renderSelection(calc, dv) {
-    calc.selectedFeatures = getSelectedFeatures();
-    calc.selectionBorderGeoJSON = joinFeatures(calc.selectedFeatures);
-    if (!calc.selectionBorderGeoJSON)
-      return ltv_debug("no features selected", chart.id());
-
-    calc.svg.selectAll(".ltv-map-selection-border").remove();
-    calc.svg
-      .selectAll(".ltv-map-selection-border")
-      .append("path")
-      .attr("class", "ltv-map-selection-border")
-      .data(calc.selectionBorderGeoJSON.features)
-      .enter()
-      .append("path")
-      .attr("d", state.path)
-      .attr("class", "ltv-map-selection-border")
-      .raise();
-  }
-
-  // public
-
-  chart.zoomTo = function (geoJSON) {
-    if (state.projection)
-      state.projection.fitSize([state.width - 20, state.height - 20], geoJSON);
-  };
-
-  chart.geoJSON = function (_) {
-    return arguments.length
-      ? (((state.geoJSON = _), geoJSONDidChange()), this)
-      : state.geoJSON;
-  };
-
-  /**
-   * Calculates the data view for the bar chart.
-   *
-   * @param {*} calc
-   * @returns
-   */
-  chart.dataView = function (dc) {
-    var dv = {};
-
-    dv.snapshot = dc.snapshot();
-    dv.data = dc.snapshot();
-    dv.labels = dc.data().labels;
-    dv.stacks = dc.data().stacks;
-    dv.locations = dc.data().locations;
-
-    dv.byLocationLabel = rollup(
-      dv.data,
-      (v) => sum$2(v, (d) => d.value),
-      (d) => d.location,
-      (d) => d.label
-    );
-
-    dv.byLocationStack = rollup(
-      dv.data,
-      (v) => sum$2(v, (d) => d.value),
-      (d) => d.location,
-      (d) => d.stack
-    );
-
-    dv.locationToSum = rollup(
-      dv.data,
-      (v) => sum$2(v, (d) => d.value),
-      (d) => d.location
-    );
-
-    dv.maxLocation = max$3(dv.locationToSum, (item) => item[1]);
-    dv.maxLabel = max$3(dv.byLocationLabel, (i) => max$3(i[1], (d) => d[1]));
-    dv.maxStack = max$3(dv.byLocationStack, (i) => max$3(i[1], (d) => d[1]));
-
-    return dv;
-  };
-
-  /**
-   *
-   * @param {*} container
-   * @param {*} state
-   * @param {*} calc
-   * @param {*} dv
-   */
-  chart.render = function (container, calc, dv) {
-    calc.graphWidth = state.width - state.marginLeft - state.marginRight;
-    calc.graphHeight = state.height - state.marginTop - state.marginBottom;
-    calc.graphBottom = state.height - state.marginBottom;
-    calc.graphRight = state.width - state.marginRight;
-
-    if (!state.geoJSON) {
-      chart.geoJSON(createGeoJSON(dv.locations));
-    }
-
-    renderSVG(container, calc);
-    renderBackground(calc);
-    renderExteriorBorders(calc);
-    renderFeatures(calc, dv);
-    renderSelection(calc);
-    renderLabels(calc, dv);
-
-    if (state.labels) {
-      renderLabels(calc, dv);
-    }
-
-    if (state.tooltip) {
-      calc.tooltip = tooltip().container(container).run();
-    }
-  };
-
-  // return generated chart
-  return chart;
-}
-
-const LABEL_FORMAT = function (l, v, i) {
-    return `${l} (${v})`;
-};
-
-const STACK_FORMAT = function (s, v, ls, i) {
-    return `${s}`;
-};
-
-const GROUP_TITLE_FORMAT = function (s, v, ls, i) {
-    return `${i + 1}) ${s} (Sum: ${v})`;
-};
-
-// export const GROUP_TITLE_FORMAT = function (s, v, ls, i) {
-//   return `${i}) ${s} (Labels: ${ls.length}, Sum: ${v})`;
-// };
-
-function legend() {
     let state = {
-        // the id of the legend
-        id: uniqueId("legend"),
+        id: uniqueId("map"),
+
+        width: 1000,
+        height: 1000,
 
         // margin
-        marginLeft: 0,
-        marginTop: 10,
-        marginRight: 0,
+        marginLeft: 20,
+        marginTop: 20,
+        marginRight: 20,
         marginBottom: 20,
 
-        // whether the legend is enabled
+        // Whether the chart is enabled.
         enabled: true,
 
-        // the number formatter vor values displayed
-        numberFormat: CONFIG.numberFormat,
+        // whether to draw labels
+        labels: false,
 
-        // the format of displaying a datasets label
-        labelFormat: LABEL_FORMAT,
+        // whether to draw a legend on the map
+        legend: true,
 
-        // the format of displaying a datasets stack
-        stackFormat: STACK_FORMAT,
+        // whether to display a tooltip.
+        tooltip: true,
 
-        // the format of displaying a group
-        groupFormat: GROUP_TITLE_FORMAT,
+        exclude: null,
 
-        // (optional) title of the legend
-        title: "Legend",
+        include: null,
 
-        // whether to display stacks instead of labels
-        stacks: false,
+        // the geojson wich is drawn
+        geoJSON: null,
 
-        // whether group the legend (by stacks)
-        group: false,
-
-        // the data controller
+        // The data controller.
         dataController: null,
+
+        // the number format
+        numberFormat: DEFAULT_NUMBER_FORMAT,
+
+        featureIDAccessor: FEATURE_ID_ACCESSOR,
+
+        featureNameAccessor: FEATURE_NAME_ACCESSOR,
     };
 
-    var chart = baseChart(state);
+    // Create new underlying chart with the specified state.
+    let chart = baseChart(state);
+    state.projection = mercator();
+    state.path = index$3().projection(state.projection);
 
-    /**
-     * Toggles the filtered state of the passed label.
-     *
-     * @param {Event} event The event of the checkbox
-     * @param {String} label The label to be toggled
-     * @private
-     */
-    function toggleLabel(event, label) {
-        event.target.checked
-            ? state.dataController.removeFilter("labels", label, chart)
-            : state.dataController.addFilter("labels", label, chart);
-    }
-
-    /**
-     * Toggles the filtered state of the passed stack.
-     *
-     * @param {Event} event The event of the checkbox
-     * @param {String} stack The stack to be toggled
-     * @private
-     */
-    function toggleStack(event, stack) {
-        event.target.checked
-            ? state.dataController.removeFilter("stacks", stack, chart)
-            : state.dataController.addFilter("stacks", stack, chart);
-    }
-
-    /**
-     * Returns the value for the "checked" attribute dependant on whether
-     * given label is filtered by the data controller.
-     *
-     * @param {*} label The label to be checked
-     * @returns {null | boolean}
-     * @private
-     */
-    function labelChecked(label) {
-        return state.dataController.isFilter("labels", label) ? null : true;
-    }
-
-    /**
-     * Returns the value for the "checked" attribute dependant on whether
-     * given stack is filtered by the data controller.
-     *
-     * @param {*} stack The stack to be checked
-     * @returns {null | boolean}
-     * @private
-     */
-    function stackChecked(stack) {
-        return state.dataController.isFilter("stacks", stack) ? null : true;
-    }
-
-    /**
-     * Formattes the given number.
-     *
-     * @param {Number} value The number to be formatted
-     * @returns The formatted value
-     * @private
-     */
-    function format(value) {
-        return state.numberFormat(value);
-    }
-
-    /**
-     *
-     * @param {*} label
-     * @param {*} index
-     * @param {*} dv
-     * @returns
-     */
-    function labelText(label, index, dv) {
-        if (typeof state.labelFormat !== "function") return label;
-        return state.labelFormat(label, format(dv.byLabel.get(label)), index);
-    }
-
-    function stackText(stack, index, dv) {
-        if (typeof state.stackFormat !== "function") return stack;
-        var value = format(dv.byStack.get(stack));
-        var labelsToValue = dv.byStackLabel.get(stack);
-        var labels = Array.from(labelsToValue ? labelsToValue.keys() : []);
-        return state.stackFormat(stack, value, labels, index);
-    }
-
-    function dataColors() {
+    function colors() {
         return state.dataController.dataColors();
     }
 
-    function disabled() {
-        return unwrap(state.enabled) ? null : true;
+    /**
+     * Tells the map chart that the GeoJSON has changed.
+     * @private
+     */
+    function geoJSONDidChange() {
+        let geoJSON = state.geoJSON;
+        if (!geoJSON) return;
+
+        state.workGeoJSON = geoJSON;
+
+        // precalculate the center of each feature
+        state.workGeoJSON.features.forEach(
+            (f) => (f.center = centroid$1(f))
+        );
+
+        if (Array.isArray(state.exclude)) {
+            state.workGeoJSON = removeFeatures(
+                state.workGeoJSON,
+                state.exclude
+            );
+        }
+
+        if (Array.isArray(state.include)) {
+            state.workGeoJSON = filterFeatures(
+                state.workGeoJSON,
+                state.include
+            );
+        }
+
+        // precalculate lotivis feature ids
+        let feature, id;
+        for (let i = 0; i < state.workGeoJSON.features.length; i++) {
+            feature = state.workGeoJSON.features[i];
+            id = state.featureIDAccessor(feature);
+            state.workGeoJSON.features[i].lotivisId = id;
+        }
+
+        chart.zoomTo(state.workGeoJSON);
+
+        if (chart.dataController() === null) {
+            chart.dataController(new DataController([]));
+        }
     }
 
-    function isGroups() {
-        return unwrap(state.group) === true;
+    /**
+     * Returns the collection of selected features.
+     * @returns {Array<feature>} The collection of selected features
+     * @private
+     */
+    function getSelectedFeatures() {
+        if (!state.workGeoJSON) return null;
+
+        let filtered = state.dataController.filters("locations");
+        if (filtered.length === 0) return [];
+
+        return state.workGeoJSON.features.filter(
+            (f) => filtered.indexOf(f.lotivisId) !== -1
+        );
     }
 
-    function isStacks() {
-        return unwrap(state.stacks) === true;
+    function htmlTitle(features) {
+        if (features.length > 3) {
+            let featuresSlice = features.slice(0, 3);
+            let ids = featuresSlice
+                .map((feature) => `${feature.lotivisId}`)
+                .join(", ");
+            let names = featuresSlice.map(state.featureNameAccessor).join(", ");
+            let moreCount = features.length - 3;
+            return `IDs: ${ids} (+${moreCount})<br>Names: ${names} (+${moreCount})`;
+        } else {
+            let ids = features
+                .map((feature) => `${feature.lotivisId}`)
+                .join(", ");
+            let names = features.map(state.featureNameAccessor).join(", ");
+            return `IDs: ${ids}<br>Names: ${names}`;
+        }
     }
 
-    function unwrap(value) {
-        return typeof value === "function" ? value(chart) : value;
+    function htmlValues(features, dv) {
+        if (!chart.controller) return "";
+
+        let combinedByLabel = {};
+        for (let i = 0; i < features.length; i++) {
+            let feature = features[i];
+            let data = dv.byLocationLabel.get(feature.lotivisId);
+            if (!data) continue;
+            let keys = Array.from(data.keys());
+
+            for (let j = 0; j < keys.length; j++) {
+                let label = keys[j];
+                if (combinedByLabel[label]) {
+                    combinedByLabel[label] += data.get(label);
+                } else {
+                    combinedByLabel[label] = data.get(label);
+                }
+            }
+        }
+
+        let components = [""];
+        let sum = 0;
+        for (const label in combinedByLabel) {
+            let color = colors.label(label);
+            let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
+            sum += combinedByLabel[label];
+            let value = numberFormat(combinedByLabel[label]);
+            components.push(`${divHTML} ${label}: <b>${value}</b>`);
+        }
+
+        components.push("");
+        components.push(`Sum: <b>${numberFormat(sum)}</b>`);
+
+        return components.length === 0 ? "No Data" : components.join("<br>");
     }
 
-    selection.prototype.div = function (aClass) {
-        return this.append("div").classed(aClass, true);
+    function positionTooltip(event, feature, calc) {
+        // position tooltip
+        let size = calc.tooltip.size(),
+            tOff = CONFIG.tooltipOffset,
+            projection = state.projection,
+            fBounds = bounds$1(feature),
+            fLowerLeft = projection(fBounds[0]),
+            fUpperRight = projection(fBounds[1]),
+            fWidth = fUpperRight[0] - fLowerLeft[0];
+
+        // svg is presented in dynamic sized view box so we need to get the actual size
+        // of the element in order to calculate a scale for the position of the tooltip.
+        let domRect = calc.svg.node().getBoundingClientRect(),
+            factor = domRect.width / state.width,
+            off = [domRect.x + window.scrollX, domRect.y + window.scrollY];
+
+        let top = fLowerLeft[1] * factor + off[1] + tOff,
+            left = (fLowerLeft[0] + fWidth / 2) * factor - size[0] / 2 + off[0];
+
+        calc.tooltip.left(left).top(top).show();
+    }
+
+    /**
+     *
+     * @param {*} container
+     * @param {*} calc
+     */
+    function renderSVG(container, calc) {
+        calc.svg = container
+            .append("svg")
+            .attr("class", "ltv-chart-svg ltv-map-svg")
+            .attr("viewBox", `0 0 ${state.width} ${state.height}`);
+    }
+
+    function renderBackground(calc, dv) {
+        calc.svg
+            .append("rect")
+            .attr("class", "ltv-map-background")
+            .attr("width", state.width)
+            .attr("height", state.height)
+            .on("click", () => state.dataController.clear("locations", chart));
+    }
+
+    function renderExteriorBorders(calc, dv) {
+        let geoJSON = state.workGeoJSON;
+        if (!geoJSON) return console.log("[ltv]  No GeoJSON to render");
+
+        let bordersGeoJSON = joinFeatures(geoJSON.features);
+        if (!bordersGeoJSON) return console.log("[ltv]  No borders to render.");
+
+        calc.borders = calc.svg
+            .selectAll(".ltv-map-exterior-borders")
+            .append("path")
+            .data(bordersGeoJSON.features)
+            .enter()
+            .append("path")
+            .attr("d", state.path)
+            .attr("class", "ltv-map-exterior-borders");
+    }
+
+    function filterLocation(location) {
+        return state.dataController.isFilter("locations", location);
+    }
+
+    function renderFeatures(calc, dv) {
+        function opacity(location) {
+            return filterLocation(location) ? CONFIG.selectionOpacity : 1;
+        }
+
+        function featureMapID(f) {
+            return `ltv-map-area-id-${f.lotivisId}`;
+        }
+
+        function resetHover() {
+            calc.svg
+                .selectAll(".ltv-map-area")
+                .classed("ltv-map-area-hover", false)
+                .attr("opacity", (f) => opacity(f.lotivisId));
+        }
+
+        function mouseEnter(event, feature) {
+            calc.svg
+                .selectAll(`#${featureMapID(feature)}`)
+                .classed("ltv-map-area-hover", true);
+
+            if (filterLocation(feature.lotivisId)) {
+                calc.tooltip.html(
+                    [
+                        htmlTitle(calc.selectedFeatures),
+                        htmlValues(calc.selectedFeatures),
+                    ].join("<br>")
+                );
+                positionTooltip(
+                    event,
+                    calc.selectionBorderGeoJSON.features[0],
+                    calc
+                );
+            } else {
+                calc.tooltip.html(
+                    [htmlTitle([feature]), htmlValues([feature])].join("<br>")
+                );
+                positionTooltip(event, feature, calc);
+            }
+
+            calc.tooltip.show();
+        }
+
+        function mouseOut(event, feature) {
+            resetHover();
+            calc.tooltip.hide();
+            // dragged
+            if (event.buttons === 1) mouseClick(event, feature);
+        }
+
+        function mouseClick(event, feature) {
+            if (!state.enabled) return;
+            if (!feature || !feature.properties) return;
+            state.dataController.toggleFilter(
+                "locations",
+                feature.lotivisId,
+                chart
+            );
+            // chart.emit("click", event, feature);
+        }
+
+        let locationToSum = dv.locationToSum;
+        let max = max$3(locationToSum, (item) => item[1]);
+        let generator = MapColors(1);
+
+        calc.areas = calc.svg
+            .selectAll(".ltv-map-area")
+            .append("path")
+            .data(state.workGeoJSON.features)
+            .enter()
+            .append("path")
+            .attr("d", state.path)
+            .classed("ltv-map-area", true)
+            .attr("id", (f) => featureMapID(f))
+            .style("stroke-dasharray", "1,4")
+            .style("fill", (f) => {
+                let value = locationToSum.get(f.lotivisId);
+                let opacity = Number(value / max);
+                return opacity === 0 ? "WhiteSmoke" : generator(opacity);
+            })
+            .style("fill-opacity", 1)
+            .on("click", mouseClick)
+            .on("mouseenter", mouseEnter)
+            .on("mouseout", mouseOut)
+            .raise();
+    }
+
+    function renderLabels(calc, dv) {
+        // calc.svg.selectAll(".ltv-map-label").remove();
+        calc.svg
+            .selectAll("text")
+            .data(state.workGeoJSON.features)
+            .enter()
+            .append("text")
+            .attr("class", "ltv-map-label")
+            .text((f) => {
+                let featureID = state.featureIDAccessor(f);
+                let data = dv.byLocationLabel.get(featureID);
+                if (!data) return "";
+                let labels = Array.from(data.keys());
+                let values = labels.map((label) => data.get(label));
+                let sum = sum$2(values);
+                return sum === 0 ? "" : state.numberFormat(sum);
+            })
+            .attr("x", (f) => state.projection(f.center)[0])
+            .attr("y", (f) => state.projection(f.center)[1]);
+    }
+
+    function renderSelection(calc, dv) {
+        calc.selectedFeatures = getSelectedFeatures();
+        calc.selectionBorderGeoJSON = joinFeatures(calc.selectedFeatures);
+        if (!calc.selectionBorderGeoJSON)
+            return ltv_debug("no features selected", chart.id());
+
+        calc.svg.selectAll(".ltv-map-selection-border").remove();
+        calc.svg
+            .selectAll(".ltv-map-selection-border")
+            .append("path")
+            .attr("class", "ltv-map-selection-border")
+            .data(calc.selectionBorderGeoJSON.features)
+            .enter()
+            .append("path")
+            .attr("d", state.path)
+            .attr("class", "ltv-map-selection-border")
+            .raise();
+    }
+
+    function renderLegend(calc, dv) {
+        let stackNames = dv.stacks;
+        let label = state.label || stackNames[0];
+        let locationToSum = dv.locationToSum || [];
+        let max = max$3(locationToSum, (item) => item[1]) || 0;
+
+        let xOff = 10 + state.marginLeft;
+        let labelColor = state.dataController.stackColor(label);
+
+        let mapColors = MapColors(max);
+        let allData = [
+            "No Data",
+            "> 0",
+            0,
+            (1 / 4) * max,
+            (1 / 2) * max,
+            (3 / 4) * max,
+            max,
+        ];
+
+        console.log("allData", allData);
+
+        let legend = calc.svg
+            .append("svg")
+            .attr("class", "ltv-map-legend")
+            .attr("width", state.width)
+            .attr("height", 200)
+            .attr("x", 0)
+            .attr("y", 0);
+
+        // data label title
+        legend
+            .append("text")
+            .attr("class", "ltv-map-legend-title")
+            .attr("x", xOff)
+            .attr("y", "20")
+            .style("fill", labelColor)
+            .text(label);
+
+        // rects
+        legend
+            .append("g")
+            .selectAll("rect")
+            .data(allData)
+            .enter()
+            .append("rect")
+            .attr("class", "ltv-map-legend-rect")
+            .style("fill", (d, i) => {
+                return i === 0
+                    ? "white"
+                    : i === 1
+                    ? "whitesmoke"
+                    : mapColors(d);
+            })
+            .attr("x", xOff)
+            .attr("y", (d, i) => i * 20 + 30)
+            .attr("width", 18)
+            .attr("height", 18)
+            .style("stroke-dasharray", (d, i) => (i === 0 ? "1,3" : null));
+
+        legend
+            .append("g")
+            .selectAll("text")
+            .data(allData)
+            .enter()
+            .append("text")
+            .attr("class", "ltv-map-legend-text")
+            .attr("x", xOff + 24)
+            .attr("y", (d, i) => i * 20 + 30 + 14)
+            .text((d) => d);
+
+        return;
+    }
+
+    // public
+
+    chart.zoomTo = function (geoJSON) {
+        if (state.projection)
+            state.projection.fitSize(
+                [state.width - 20, state.height - 20],
+                geoJSON
+            );
     };
 
-    selection.prototype.error = function (text) {
-        return this.append("div").text(text);
+    /**
+     * Gets or sets the presented GeoJSON.
+     * @param {GeoJSON} _
+     * @returns
+     */
+    chart.geoJSON = function (_) {
+        return arguments.length
+            ? (((state.geoJSON = _), geoJSONDidChange()), this)
+            : state.geoJSON;
     };
 
     /**
      * Calculates the data view for the bar chart.
-     *
-     * @param {*} calc The calc object
-     * @returns The generated data view
-     *
-     * @public
+     * @param {*} calc
+     * @returns
      */
     chart.dataView = function (dc) {
         var dv = {};
-        dv.labels = dc.labels();
-        dv.stacks = dc.stacks();
-        dv.locations = dc.locations();
-        dv.dates = dc.dates();
 
-        dv.byLabel = rollup(
-            dc.data(),
+        dv.snapshot = dc.snapshot();
+        dv.data = dc.snapshot();
+        dv.labels = dc.data().labels;
+        dv.stacks = dc.data().stacks;
+        dv.locations = dc.data().locations;
+
+        dv.byLocationLabel = rollup(
+            dv.data,
             (v) => sum$2(v, (d) => d.value),
+            (d) => d.location,
             (d) => d.label
         );
 
-        dv.byStack = rollup(
-            dc.data(),
+        dv.byLocationStack = rollup(
+            dv.data,
             (v) => sum$2(v, (d) => d.value),
-            (d) => d.stack || d.label
+            (d) => d.location,
+            (d) => d.stack
         );
 
-        dv.byStackLabel = rollup(
-            dc.data(),
+        dv.locationToSum = rollup(
+            dv.data,
             (v) => sum$2(v, (d) => d.value),
-            (d) => d.stack || d.label,
-            (d) => d.label
+            (d) => d.location
+        );
+
+        dv.maxLocation = max$3(dv.locationToSum, (item) => item[1]);
+        dv.maxLabel = max$3(dv.byLocationLabel, (i) =>
+            max$3(i[1], (d) => d[1])
+        );
+        dv.maxStack = max$3(dv.byLocationStack, (i) =>
+            max$3(i[1], (d) => d[1])
         );
 
         return dv;
     };
 
     /**
-     * Renders all components of the plot chart.
      *
-     * @param {*} container The d3 container
-     * @param {*} calc The calc objct of the chart
-     * @param {*} dv The data view
-     * @returns The chart itself
-     *
-     * @public
+     * @param {*} container
+     * @param {*} state
+     * @param {*} calc
+     * @param {*} dv
      */
     chart.render = function (container, calc, dv) {
-        calc.div = container
-            .div("ltv-legend")
-            .attr("id", state.id)
-            .style("padding-left", state.marginLeft + "px")
-            .style("padding-top", state.marginTop + "px")
-            .style("padding-right", state.marginRight + "px")
-            .style("padding-bottom", state.marginBottom + "px");
+        calc.graphWidth = state.width - state.marginLeft - state.marginRight;
+        calc.graphHeight = state.height - state.marginTop - state.marginBottom;
+        calc.graphBottom = state.height - state.marginBottom;
+        calc.graphRight = state.width - state.marginRight;
 
-        // if a title is given render div with title inside
-        if (state.title) {
-            calc.titleDiv = calc.div
-                .append("div")
-                .classed("ltv-legend-title", true)
-                .text(unwrap(state.title));
+        if (!state.geoJSON) {
+            chart.geoJSON(createGeoJSON(dv.locations));
         }
 
-        var colorFn = isStacks() ? dataColors().stack : dataColors().label;
-        var changeFn = isStacks() ? toggleStack : toggleLabel;
-        var textFn = isStacks() ? stackText : labelText;
+        renderSVG(container, calc);
+        renderBackground(calc);
+        renderExteriorBorders(calc);
+        renderFeatures(calc, dv);
+        renderSelection(calc);
+        renderLabels(calc, dv);
 
-        calc.groups = calc.div
-            .selectAll(".div")
-            .data(isGroups() ? dv.stacks : [""]) // use single group when mode is not "groups"
-            .enter()
-            .div("ltv-legend-group")
-            .style("color", (s) => dataColors().stack(s));
-
-        // draw titles only in "groups" mode
-        if (isGroups()) {
-            calc.titles = calc.groups.append("div").text((stack, index) => {
-                var labelsToValue = dv.byStackLabel.get(stack);
-                return state.groupFormat(
-                    stack,
-                    format(dv.byStack.get(stack)),
-                    Array.from(labelsToValue ? labelsToValue.keys() : []),
-                    index
-                );
-            });
+        if (state.labels) {
+            renderLabels(calc, dv);
         }
 
-        var pillsData = isGroups()
-            ? (d) => (isStacks() ? [d] : dv.byStackLabel.get(d))
-            : isStacks()
-            ? dv.stacks
-            : dv.labels;
+        if (state.tooltip) {
+            calc.tooltip = tooltip().container(container).run();
+        }
 
-        calc.pills = calc.groups
-            .selectAll(".label")
-            .data(pillsData)
-            .enter()
-            .append("label")
-            .classed("ltv-legend-pill", true)
-            .datum((d) => (isGroups() && !isStacks() ? d[0] : d));
-
-        calc.checkboxes = calc.pills
-            .append("input")
-            .classed("ltv-legend-checkbox", true)
-            .attr("type", "checkbox")
-            .attr("checked", isStacks() ? stackChecked : labelChecked)
-            .attr("disabled", disabled())
-            .on("change", (e, d) => changeFn(e, d));
-
-        calc.spans = calc.pills
-            .append("span")
-            .classed("ltv-legend-pill-span", true)
-            .style("background-color", colorFn)
-            .text((d, i) => textFn(d, i, dv));
-
-        if (CONFIG.debug && state.debug) console.log(this);
-
-        return chart;
+        if (state.legend) {
+            renderLegend(calc, dv);
+        }
     };
 
-    // Return generated chart
+    // return generated chart
     return chart;
 }
 

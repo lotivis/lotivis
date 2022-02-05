@@ -7,9 +7,7 @@ import { data_preview, ltv_debug } from "./common/debug.js";
 import { uniqueId } from "./common/identifiers.js";
 import { prefix } from "./common/affix";
 import { datatext } from "./datatext";
-import { CONFIG } from "./common/config";
 import { URLParams } from "./common/url.parameters.js";
-import { isEmpty } from "./common/values.js";
 
 export class DataController {
     constructor(data) {
@@ -41,10 +39,13 @@ export class DataController {
 
         // private
 
+        /**
+         *
+         * @returns
+         */
         function calculateSnapshot() {
-            if (CONFIG.debug) console.time("calculateSnapshot");
             let f = attr.filters;
-            attr.snapshot = d3.filter(attr.data, (d) => {
+            let snapshot = d3.filter(attr.data, (d) => {
                 return !(
                     f.locations.indexOf(d.location) !== -1 ||
                     f.dates.indexOf(d.date) !== -1 ||
@@ -52,8 +53,8 @@ export class DataController {
                     f.stacks.indexOf(d.stack) !== -1
                 );
             });
+            attr.snapshot = Data(snapshot);
 
-            if (CONFIG.debug) console.timeEnd("calculateSnapshot");
             return attr.snapshot;
         }
 
@@ -108,6 +109,9 @@ export class DataController {
             // do calculations
             calculateSnapshot();
 
+            console.log("this.hasFilters()", this.hasFilters());
+            console.log("attr.filters", attr.filters);
+
             URLParams.object(
                 this.id + "-filters",
                 this.hasFilters() ? this.filters() : null
@@ -115,6 +119,7 @@ export class DataController {
 
             // call listeners
             disp.call("filter", this, sender, name, action, item);
+            return this;
         };
 
         /**
@@ -207,6 +212,31 @@ export class DataController {
                 : this.addFilter(name, item, sender);
         };
 
+        this.filteredData = function () {
+            let f = attr.filters;
+            return attr.data.filter(
+                (d) =>
+                    !(
+                        f.locations.indexOf(d.location) !== -1 ||
+                        f.dates.indexOf(d.date) !== -1 ||
+                        f.labels.indexOf(d.label) !== -1 ||
+                        f.stacks.indexOf(d.stack) !== -1
+                    )
+            );
+        };
+
+        /**
+         * Gets or sets the data.
+         * @param {*} _data
+         * @returns {data|this}
+         */
+        this.data = function (_data) {
+            if (!arguments.length) return attr.data;
+            attr.data = Data(_data);
+            this.filtersDidChange();
+            return this;
+        };
+
         /**
          * Gets or sets the snapshot attribute. When getting and snapshot is null
          * will fallback on data attribute.
@@ -262,7 +292,7 @@ export class DataController {
         };
 
         // initialize
-        applyURLParameters();
+        if (false) applyURLParameters();
         calculateSnapshot();
 
         // debug

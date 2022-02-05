@@ -57,9 +57,6 @@ export const PLOT_SORT = {
  */
 export function plot() {
     // Private
-    let svg;
-    let dc;
-    let dv;
     let calc = {};
     let state = {
         id: uniqueId("plot"),
@@ -114,9 +111,6 @@ export function plot() {
 
         // the data controller.
         dataController: null,
-
-        // the data view.
-        dataView: null,
     };
 
     // create new underlying chart with the specified state
@@ -254,7 +248,7 @@ export function plot() {
             .on("mouseenter", (e, d) => showTooltip(calc, d))
             .on("mouseout", (e, d) => calc.tooltip.hide())
             .on("click", (e, d) => {
-                state.dataController.toggleLabel(d.label, chart);
+                state.dataController.toggleFilter("labels", d.label, chart);
                 calc.svg
                     .selectAll(".ltv-plot-chart-selection-rect")
                     .classed("ltv-selected", (d) =>
@@ -413,13 +407,12 @@ export function plot() {
 
         if (!ds.data || ds.data.length === 0) return;
 
-        let count = ds.data.length;
-        let latestDate = ds.lastDate;
-
-        let dataController = chart.dataController();
-        let dataColors = dataController.dataColors();
-        let isSingle = state.colorMode === "single";
-        let colors = isSingle ? dataColors.label : plotColors;
+        let count = ds.data.length,
+            latestDate = ds.lastDate,
+            dataController = chart.dataController(),
+            dataColors = dataController.dataColors(),
+            isSingle = state.colorMode === "single",
+            colors = isSingle ? dataColors.label : plotColors;
 
         function append(value, percent) {
             gradient
@@ -451,9 +444,9 @@ export function plot() {
         calc.tooltip.html(tooltipHTML(ds));
 
         // position tooltip
-        let domRect = calc.svg.node().getBoundingClientRect();
-        let factor = domRect.width / state.width;
-        let offset = [domRect.x + window.scrollX, domRect.y + window.scrollY];
+        let domRect = calc.svg.node().getBoundingClientRect(),
+            factor = domRect.width / state.width,
+            offset = [domRect.x + window.scrollX, domRect.y + window.scrollY];
 
         let top =
             calc.yChart(ds.label) * factor +
@@ -477,17 +470,17 @@ export function plot() {
      * @private
      */
     function tooltipHTML(ds) {
-        let filtered = ds.data.filter((item) => item.value !== 0);
-        let sum = d3.sum(ds.data, (d) => d.value);
-        let comps = [
-            "Label: " + ds.label,
-            "",
-            "Start: " + ds.firstDate,
-            "End: " + ds.lastDate,
-            "",
-            "Sum: " + state.numberFormat(sum),
-            "",
-        ];
+        let filtered = ds.data.filter((item) => item.value !== 0),
+            sum = d3.sum(ds.data, (d) => d.value),
+            comps = [
+                "Label: " + ds.label,
+                "",
+                "Start: " + ds.firstDate,
+                "End: " + ds.lastDate,
+                "",
+                "Sum: " + state.numberFormat(sum),
+                "",
+            ];
 
         for (let i = 0; i < filtered.length; i++) {
             let entry = filtered[i];

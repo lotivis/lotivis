@@ -218,6 +218,7 @@ export function legend() {
      */
     chart.render = function (container, calc, dv) {
         calc.div = container
+            .append("div")
             .div("ltv-legend")
             .attr("id", state.id)
             .style("padding-left", state.marginLeft + "px")
