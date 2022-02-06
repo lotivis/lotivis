@@ -260,8 +260,7 @@ export function bar() {
             .data(dv.byDateStack)
             .enter()
             .append("g")
-            .attr("transform", (d) => `translate(${calc.xChartScale(d[0])},0)`)
-            // .attr("opacity", (d) => opacity(d[0]))
+            .attr("transform", (d) => `translate(${calc.xChartScale(d[0])},0)`) // x for date
             .attr("class", "ltv-bar-chart-dates-area")
             .selectAll("rect")
             .data((d) => d[1]) // map to by stack
@@ -272,7 +271,7 @@ export function bar() {
             .attr("x", (d) => calc.xStack(d[0]))
             .attr("y", (d) => calc.yChart(d[1]))
             .attr("width", calc.xStack.bandwidth())
-            .attr("height", (d) => state.height - calc.yChart(d[1]))
+            .attr("height", (d) => calc.graphBottom - calc.yChart(d[1]))
             .attr("rx", state.radius)
             .attr("ry", state.radius)
             .raise();

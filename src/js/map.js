@@ -357,17 +357,17 @@ export function map() {
             .enter()
             .append("text")
             .attr("class", "ltv-map-label")
-            .text((f) => {
-                let featureID = state.featureIDAccessor(f);
-                let data = dv.byLocationLabel.get(featureID);
-                if (!data) return "";
-                let labels = Array.from(data.keys());
-                let values = labels.map((label) => data.get(label));
-                let sum = d3.sum(values);
-                return sum === 0 ? "" : state.numberFormat(sum);
-            })
             .attr("x", (f) => state.projection(f.center)[0])
-            .attr("y", (f) => state.projection(f.center)[1]);
+            .attr("y", (f) => state.projection(f.center)[1])
+            .text((f) => {
+                let featureID = state.featureIDAccessor(f),
+                    data = dv.byLocationLabel.get(featureID);
+                if (!data) return "";
+                let labels = Array.from(data.keys()),
+                    values = labels.map((label) => data.get(label)),
+                    sum = d3.sum(values);
+                return sum === 0 ? "" : state.numberFormat(sum);
+            });
     }
 
     function renderSelection(calc, dv) {
@@ -408,8 +408,6 @@ export function map() {
             (3 / 4) * max,
             max,
         ];
-
-        console.log("allData", allData);
 
         let legend = calc.svg
             .append("svg")
@@ -551,7 +549,6 @@ export function map() {
         renderExteriorBorders(calc, dv);
         renderFeatures(calc, dv);
         renderSelection(calc, dv);
-        renderLabels(calc, dv);
 
         if (state.labels) {
             renderLabels(calc, dv);
