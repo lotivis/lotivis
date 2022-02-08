@@ -23081,6 +23081,9 @@ function map() {
         // whether to draw labels
         labels: false,
 
+        // a collection of ids NOT to show a label for
+        labelsExclude: null,
+
         // whether to draw a legend on the map
         legend: true,
 
@@ -23250,6 +23253,10 @@ function map() {
         calc.tooltip.left(left).top(top).show();
     }
 
+    function contains(arr, obj) {
+        return Array.isArray(arr) && arr.indexOf(obj) !== -1;
+    }
+
     /**
      *
      * @param {*} container
@@ -23390,8 +23397,9 @@ function map() {
             .attr("x", (f) => state.projection(f.center)[0])
             .attr("y", (f) => state.projection(f.center)[1])
             .text((f) => {
-                let featureID = state.featureIDAccessor(f),
-                    data = dv.byLocationLabel.get(featureID);
+                let featureID = state.featureIDAccessor(f);
+                if (contains(state.labelsExclude, featureID)) return "";
+                let data = dv.byLocationLabel.get(featureID);
                 if (!data) return "";
                 let labels = Array.from(data.keys()),
                     values = labels.map((label) => data.get(label)),
