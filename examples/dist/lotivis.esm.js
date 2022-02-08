@@ -20345,7 +20345,7 @@ function pngDownload(selector, filename, callback) {
     if (typeof html2canvas !== "undefined") return;
     var script = document.createElement("script");
     script.onload = comletion;
-    script.src = "http://html2canvas.hertzen.com/dist/html2canvas.js";
+    script.src = "https://html2canvas.hertzen.com/dist/html2canvas.js";
     document.head.appendChild(script);
 })();
 
