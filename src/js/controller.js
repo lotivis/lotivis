@@ -246,7 +246,7 @@ export class DataController {
         this.snapshot = function (_) {
             return arguments.length
                 ? ((attr.snapshot = _), this)
-                : attr.snapshot ?? attr.data;
+                : attr.snapshot || attr.data;
         };
 
         /**
