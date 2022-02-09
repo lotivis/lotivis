@@ -26,6 +26,12 @@
         "examples/dist/lotivis.js",
         "examples/dist/lotivis.js.map"
     ],
+    "files": [
+        "examples/dist/lotivis.css",
+        "examples/dist/lotivis.min.css",
+        "examples/dist/lotivis.js",
+        "examples/dist/lotivis.js.map"
+    ],
     "scripts": {
         "build:watch": "rollup --config --watch",
         "build": "rollup --config",
