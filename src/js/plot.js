@@ -38,7 +38,7 @@ export const PLOT_SORT = {
     /**
      * Sorts datasets by first date.
      */
-    firstDate: (left, right) => left.firstDate - right.firstDate,
+    firstDate: (left, right) => right.firstDate - left.firstDate,
 };
 
 /**

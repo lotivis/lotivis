@@ -398,8 +398,7 @@ export function map() {
     }
 
     function renderLegend(calc, dv) {
-        let stackNames = dv.stacks;
-        let label = state.label || stackNames[0];
+        let label = state.label || dv.stacks[0];
         let locationToSum = dv.locationToSum || [];
         let max = d3.max(locationToSum, (item) => item[1]) || 0;
 
@@ -409,8 +408,8 @@ export function map() {
         let mapColors = MapColors(max);
         let allData = [
             "No Data",
+            "0",
             "> 0",
-            0,
             (1 / 4) * max,
             (1 / 2) * max,
             (3 / 4) * max,
@@ -447,7 +446,7 @@ export function map() {
                     ? "white"
                     : i === 1
                     ? "whitesmoke"
-                    : mapColors(d);
+                    : mapColors(i === 2 ? 0 : d);
             })
             .attr("x", xOff)
             .attr("y", (d, i) => i * 20 + 30)
@@ -464,7 +463,7 @@ export function map() {
             .attr("class", "ltv-map-legend-text")
             .attr("x", xOff + 24)
             .attr("y", (d, i) => i * 20 + 30 + 14)
-            .text((d) => d);
+            .text((d) => (typeof d === "number" ? state.numberFormat(d) : d));
 
         return;
     }
