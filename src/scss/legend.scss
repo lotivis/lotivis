@@ -21,7 +21,6 @@
   cursor: pointer;
   -webkit-user-select: none;
   -moz-user-select: none;
-  -ms-user-select: none;
   user-select: none;
 }
 
@@ -45,12 +44,18 @@
   opacity: 0.2;
 }
 
+
+
 // /* On mouse-over, add a grey background color */
-.ltv-legend-pill input:hover ~ .ltv-pill-pill-span {
+.ltv-legend-pill input[type="checkbox"]:hover ~ .ltv-pill-pill-span {
   opacity: 0.8;
 }
 
 /* When the checkbox is checked, add a blue background */
-.ltv-legend-pill input:checked ~ .ltv-legend-pill-span {
+.ltv-legend-pill input[type="checkbox"]:checked ~ .ltv-legend-pill-span {
   opacity: 1;
 }
+
+.ltv-legend-pill input[type="radio"]:checked ~ .ltv-legend-pill-span {
+    opacity: 1;
+  }

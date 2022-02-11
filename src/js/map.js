@@ -17,6 +17,7 @@ import {
     FEATURE_NAME_ACCESSOR,
 } from "./geojson/feature.accessors";
 import { ltv_debug } from "./common/debug";
+import { cut } from "./common/affix";
 
 /**
  * Reusable Map Chart API class that renders a
@@ -69,6 +70,9 @@ export function map() {
 
         // The data controller.
         dataController: null,
+
+        // presented stack
+        stack: null,
 
         // the number format
         numberFormat: DEFAULT_NUMBER_FORMAT,
@@ -166,8 +170,6 @@ export function map() {
     }
 
     function htmlValues(features, dv) {
-        if (!chart.controller) return "";
-
         let combinedByLabel = {};
         for (let i = 0; i < features.length; i++) {
             let feature = features[i];
@@ -188,15 +190,15 @@ export function map() {
         let components = [""];
         let sum = 0;
         for (const label in combinedByLabel) {
-            let color = colors.label(label);
+            let color = colors().label(label);
             let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
             sum += combinedByLabel[label];
-            let value = numberFormat(combinedByLabel[label]);
+            let value = state.numberFormat(combinedByLabel[label]);
             components.push(`${divHTML} ${label}: <b>${value}</b>`);
         }
 
         components.push("");
-        components.push(`Sum: <b>${numberFormat(sum)}</b>`);
+        components.push(`Sum: <b>${state.numberFormat(sum)}</b>`);
 
         return components.length === 0 ? "No Data" : components.join("<br>");
     }
@@ -294,7 +296,7 @@ export function map() {
                 calc.tooltip.html(
                     [
                         htmlTitle(calc.selectedFeatures),
-                        htmlValues(calc.selectedFeatures),
+                        htmlValues(calc.selectedFeatures, dv),
                     ].join("<br>")
                 );
                 positionTooltip(
@@ -304,7 +306,9 @@ export function map() {
                 );
             } else {
                 calc.tooltip.html(
-                    [htmlTitle([feature]), htmlValues([feature])].join("<br>")
+                    [htmlTitle([feature]), htmlValues([feature], dv)].join(
+                        "<br>"
+                    )
                 );
                 positionTooltip(event, feature, calc);
             }
@@ -398,7 +402,7 @@ export function map() {
     }
 
     function renderLegend(calc, dv) {
-        let label = state.label || dv.stacks[0];
+        let label = state.selectedStack || dv.stacks[0];
         let locationToSum = dv.locationToSum || [];
         let max = d3.max(locationToSum, (item) => item[1]) || 0;
 
@@ -431,7 +435,7 @@ export function map() {
             .attr("x", xOff)
             .attr("y", "20")
             .style("fill", labelColor)
-            .text(label);
+            .text(cut(label, 20));
 
         // rects
         legend
@@ -466,6 +470,46 @@ export function map() {
             .text((d) => (typeof d === "number" ? state.numberFormat(d) : d));
 
         return;
+    }
+
+    function renderLegendPanel(calc, dv) {
+        let stacks = dv.stacks;
+        let selectedStack = state.selectedStack || stacks[0];
+        let radioName = state.id + "-radio";
+
+        calc.legendPanel = calc.container
+            .append("div")
+            .classed("frc-legend", true)
+            .style("padding-left", state.marginLeft + "px")
+            .style("padding-top", state.marginTop + "px")
+            .style("padding-right", state.marginRight + "px")
+            .style("padding-bottom", state.marginBottom + "px");
+
+        calc.legendPanelPills = calc.legendPanel
+            .selectAll(".label")
+            .data(stacks)
+            .enter()
+            .append("label")
+            .classed("ltv-legend-pill", true);
+
+        calc.legendPanelRadios = calc.legendPanelPills
+            .append("input")
+            .classed("ltv-legend-radio", true)
+            .attr("type", "radio")
+            .attr("name", radioName)
+            .attr("value", (stack) => stack)
+            .attr("checked", (stack) => (stack == selectedStack ? true : null))
+            .on("change", (event, stack) => {
+                if (selectedStack == stack) return;
+                state.selectedStack = stack;
+                chart.run();
+            });
+
+        calc.legendPanelCpans = calc.legendPanelPills
+            .append("span")
+            .classed("ltv-legend-pill-span", true)
+            .style("background-color", (stack) => colors().stack(stack))
+            .text((d, i) => cut(d, 20));
     }
 
     // public
@@ -503,22 +547,30 @@ export function map() {
         dv.stacks = dc.data().stacks;
         dv.locations = dc.data().locations;
 
+        if (!dv.stacks.includes(state.selectedStack))
+            state.selectedStack = null;
+
+        dv.selectedStack = state.selectedStack || dv.stacks[0];
+        dv.selectedStackData = dv.data.filter(
+            (d) => (d.stack || d.label) == dv.selectedStack
+        );
+
         dv.byLocationLabel = d3.rollup(
-            dv.data,
+            dv.selectedStackData,
             (v) => d3.sum(v, (d) => d.value),
             (d) => d.location,
             (d) => d.label
         );
 
         dv.byLocationStack = d3.rollup(
-            dv.data,
+            dv.selectedStackData,
             (v) => d3.sum(v, (d) => d.value),
             (d) => d.location,
             (d) => d.stack
         );
 
         dv.locationToSum = d3.rollup(
-            dv.data,
+            dv.selectedStackData,
             (v) => d3.sum(v, (d) => d.value),
             (d) => d.location
         );
@@ -542,6 +594,7 @@ export function map() {
      * @param {*} dv
      */
     chart.render = function (container, calc, dv) {
+        calc.container = container;
         calc.graphWidth = state.width - state.marginLeft - state.marginRight;
         calc.graphHeight = state.height - state.marginTop - state.marginBottom;
         calc.graphBottom = state.height - state.marginBottom;
@@ -568,6 +621,8 @@ export function map() {
         if (state.legend) {
             renderLegend(calc, dv);
         }
+
+        renderLegendPanel(calc, dv);
     };
 
     // return generated chart

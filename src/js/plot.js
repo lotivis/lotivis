@@ -4,16 +4,9 @@ import { CONFIG } from "./common/config";
 import { uniqueId } from "./common/identifiers";
 import { tooltip } from "./tooltip";
 import { hash } from "./common/hash";
+import { transX, transY } from "./common/helpers";
 import { PlotColors } from "./common/colors";
 import { DEFAULT_NUMBER_FORMAT } from "./common/formats";
-
-function transX(x) {
-    return "translate(" + x + ",0)";
-}
-
-function transY(y) {
-    return "translate(0," + y + ")";
-}
 
 export const DATE_ACCESS = function (d) {
     return d;

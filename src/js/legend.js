@@ -46,7 +46,7 @@ export function legend() {
         groupFormat: GROUP_TITLE_FORMAT,
 
         // (optional) title of the legend
-        title: "Legend",
+        title: null,
 
         // whether to display stacks instead of labels
         stacks: false,

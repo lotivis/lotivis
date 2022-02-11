@@ -5,6 +5,7 @@ import { uniqueId } from "./common/identifiers";
 import { safeId } from "./common/identifiers";
 import { tooltip } from "./tooltip";
 import { legend } from "./legend";
+import { transX, transY } from "./common/helpers";
 import { DEFAULT_NUMBER_FORMAT } from "./common/formats";
 import { DEFAULT_DATE_ORDINATOR } from "./common/date.ordinator";
 
@@ -48,7 +49,13 @@ export function bar() {
         // whether to draw labels
         labels: false,
 
+        labelRotation: -90,
+
         legend: legend(),
+
+        xAxis: true,
+
+        yAxis: false,
 
         // whether to display a tooltip.
         tooltip: true,
@@ -88,22 +95,25 @@ export function bar() {
         // Sort date according to access function
         dates = dates.sort((a, b) => state.dateAccess(a) - state.dateAccess(b));
 
+        let padding = 0.1;
+
         calc.xChartScale = d3
             .scaleBand()
             .domain(dates)
-            .rangeRound([state.marginLeft, calc.graphRight]);
+            .rangeRound([state.marginLeft, calc.graphRight])
+            .paddingInner(padding);
 
         calc.xChartScalePadding = d3
             .scaleBand()
             .domain(dates)
             .rangeRound([state.marginLeft, calc.graphRight])
-            .paddingInner(0.2);
+            .paddingInner(padding);
 
         calc.xStack = d3
             .scaleBand()
             .domain(dv.stacks)
             .rangeRound([0, calc.xChartScale.bandwidth()])
-            .padding(0.05);
+            .padding(0.01);
 
         calc.yChart = d3
             .scaleLinear()
@@ -126,19 +136,19 @@ export function bar() {
      * @private
      */
     function renderAxis(calc) {
+        // left axis
         calc.svg
             .append("g")
             .call(d3.axisLeft(calc.yChart))
-            .attr("transform", () => `translate(${state.marginLeft},0)`);
+            .attr("transform", transX(state.marginLeft))
+            .attr("class", "ltv-bar-chart-axis-label");
 
         // bottom axis
         calc.svg
             .append("g")
             .call(d3.axisBottom(calc.xChartScale))
-            .attr(
-                "transform",
-                `translate(0,${state.height - state.marginBottom})`
-            );
+            .attr("transform", transY(state.height - state.marginBottom))
+            .attr("class", "ltv-bar-chart-axis-label");
     }
 
     /**
@@ -147,28 +157,32 @@ export function bar() {
      * @private
      */
     function renderGrid(calc) {
-        let xAxisGrid = d3
-            .axisBottom(calc.xChartScale)
-            .tickSize(-calc.graphHeight)
-            .tickFormat("");
+        if (state.xAxis) {
+            let xAxisGrid = d3
+                .axisLeft(calc.yChart)
+                .tickSize(-calc.graphWidth)
+                .tickFormat("")
+                .ticks(20);
 
-        let yAxisGrid = d3
-            .axisLeft(calc.yChart)
-            .tickSize(-calc.graphWidth)
-            .tickFormat("")
-            .ticks(20);
+            calc.svg
+                .append("g")
+                .attr("class", "ltv-bar-chart-grid ltv-bar-chart-grid-x")
+                .attr("transform", transX(state.marginLeft))
+                .call(xAxisGrid);
+        }
 
-        calc.svg
-            .append("g")
-            .attr("class", "ltv-bar-chart-grid ltv-bar-chart-grid-x")
-            .attr("transform", "translate(0," + calc.graphBottom + ")")
-            .call(xAxisGrid);
+        if (state.yAxis) {
+            let yAxisGrid = d3
+                .axisBottom(calc.xChartScale)
+                .tickSize(-calc.graphHeight)
+                .tickFormat("");
 
-        calc.svg
-            .append("g")
-            .attr("class", "ltv-bar-chart-grid ltv-bar-chart-grid-y")
-            .attr("transform", `translate(${state.marginLeft},0)`)
-            .call(yAxisGrid);
+            calc.svg
+                .append("g")
+                .attr("class", "ltv-bar-chart-grid ltv-bar-chart-grid-y")
+                .attr("transform", transY(calc.graphBottom))
+                .call(yAxisGrid);
+        }
     }
 
     function renderSelection(calc, dv) {
@@ -260,7 +274,7 @@ export function bar() {
             .data(dv.byDateStack)
             .enter()
             .append("g")
-            .attr("transform", (d) => `translate(${calc.xChartScale(d[0])},0)`) // x for date
+            .attr("transform", (d) => transX(calc.xChartScale(d[0]))) // x for date
             .attr("class", "ltv-bar-chart-dates-area")
             .selectAll("rect")
             .data((d) => d[1]) // map to by stack
@@ -284,13 +298,13 @@ export function bar() {
             .data(dv.byDatesStackSeries)
             .enter()
             .append("g")
-            .attr("transform", (d) => `translate(${calc.xChartScale(d[0])},0)`) // translate to x of date
+            .attr("transform", (d) => transX(calc.xChartScale(d[0]))) // translate to x of date
             .attr("class", "ltv-bar-chart-dates-area")
             .selectAll("rect")
             .data((d) => d[1]) // map to by stack
             .enter()
             .append("g")
-            .attr("transform", (d) => `translate(${calc.xStack(d[0])},0)`)
+            .attr("transform", (d) => transX(calc.xStack(d[0])))
             .selectAll("rect")
             .data((d) => d[1]) // map to series
             .enter()
@@ -326,7 +340,8 @@ export function bar() {
                 let width = calc.xStack.bandwidth() / 2;
                 let x = (calc.xStack(stack) || 0) + width;
                 let y = calc.yChart(value) - 5;
-                return `translate(${x},${y})rotate(-60)`;
+                let deg = state.labelRotation || -60;
+                return `translate(${x},${y})rotate(${deg})`;
             })
             .text((d) => (d[1] === 0 ? "" : state.numberFormat(d[1])))
             .raise();

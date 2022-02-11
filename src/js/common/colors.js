@@ -9,8 +9,8 @@ function darker(color) {
 
 /** The default colors used by lotivis. */
 export const DATA_COLORS = []
-    .concat(d3.schemeTableau10)
     .concat(d3.schemeCategory10)
+    .concat(d3.schemeTableau10)
     .concat(d3.schemeDark2);
 
 /** The default tint color used by lotivis. */

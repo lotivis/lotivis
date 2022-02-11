@@ -1,5 +1,5 @@
 /*!
- * lotivis 1.0.100
+ * lotivis 1.0.101
  * Copyright (c) 2022 Lukas Danckwerth
  * Released under MIT License
  */
@@ -20468,15 +20468,21 @@ function pngDownload(selector, filename, callback) {
 // }
 
 function str(src) {
-  return "" + src;
+    return "" + src;
 }
 
 function prefix(src, pre) {
-  return (src = str(src)), src.startsWith(pre || "") ? src : pre + src;
+    return (src = str(src)), src.startsWith(pre || "") ? src : pre + src;
 }
 
 function postfix(src, post) {
-  return (src = str(src)), src.endsWith(post || "") ? src : src + post;
+    return (src = str(src)), src.endsWith(post || "") ? src : src + post;
+}
+
+function cut$1(src, max) {
+    return ((src = str(src)), src.length <= max)
+        ? src
+        : postfix(src.substring(0, max), "...");
 }
 
 const DEFAULT_COLUMNS = ["label", "location", "date", "value", "stack"];
@@ -21084,8 +21090,8 @@ function darker(color) {
 
 /** The default colors used by lotivis. */
 const DATA_COLORS = []
-    .concat(Tableau10)
     .concat(category10)
+    .concat(Tableau10)
     .concat(Dark2);
 
 /** The default tint color used by lotivis. */
@@ -23206,6 +23212,9 @@ function map() {
         // The data controller.
         dataController: null,
 
+        // presented stack
+        stack: null,
+
         // the number format
         numberFormat: DEFAULT_NUMBER_FORMAT,
 
@@ -23302,8 +23311,6 @@ function map() {
     }
 
     function htmlValues(features, dv) {
-        if (!chart.controller) return "";
-
         let combinedByLabel = {};
         for (let i = 0; i < features.length; i++) {
             let feature = features[i];
@@ -23324,15 +23331,15 @@ function map() {
         let components = [""];
         let sum = 0;
         for (const label in combinedByLabel) {
-            let color = colors.label(label);
+            let color = colors().label(label);
             let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
             sum += combinedByLabel[label];
-            let value = numberFormat(combinedByLabel[label]);
+            let value = state.numberFormat(combinedByLabel[label]);
             components.push(`${divHTML} ${label}: <b>${value}</b>`);
         }
 
         components.push("");
-        components.push(`Sum: <b>${numberFormat(sum)}</b>`);
+        components.push(`Sum: <b>${state.numberFormat(sum)}</b>`);
 
         return components.length === 0 ? "No Data" : components.join("<br>");
     }
@@ -23430,7 +23437,7 @@ function map() {
                 calc.tooltip.html(
                     [
                         htmlTitle(calc.selectedFeatures),
-                        htmlValues(calc.selectedFeatures),
+                        htmlValues(calc.selectedFeatures, dv),
                     ].join("<br>")
                 );
                 positionTooltip(
@@ -23440,7 +23447,9 @@ function map() {
                 );
             } else {
                 calc.tooltip.html(
-                    [htmlTitle([feature]), htmlValues([feature])].join("<br>")
+                    [htmlTitle([feature]), htmlValues([feature], dv)].join(
+                        "<br>"
+                    )
                 );
                 positionTooltip(event, feature, calc);
             }
@@ -23534,7 +23543,7 @@ function map() {
     }
 
     function renderLegend(calc, dv) {
-        let label = state.label || dv.stacks[0];
+        let label = state.selectedStack || dv.stacks[0];
         let locationToSum = dv.locationToSum || [];
         let max = max$3(locationToSum, (item) => item[1]) || 0;
 
@@ -23567,7 +23576,7 @@ function map() {
             .attr("x", xOff)
             .attr("y", "20")
             .style("fill", labelColor)
-            .text(label);
+            .text(cut$1(label, 20));
 
         // rects
         legend
@@ -23602,6 +23611,46 @@ function map() {
             .text((d) => (typeof d === "number" ? state.numberFormat(d) : d));
 
         return;
+    }
+
+    function renderLegendPanel(calc, dv) {
+        let stacks = dv.stacks;
+        let selectedStack = state.selectedStack || stacks[0];
+        let radioName = state.id + "-radio";
+
+        calc.legendPanel = calc.container
+            .append("div")
+            .classed("frc-legend", true)
+            .style("padding-left", state.marginLeft + "px")
+            .style("padding-top", state.marginTop + "px")
+            .style("padding-right", state.marginRight + "px")
+            .style("padding-bottom", state.marginBottom + "px");
+
+        calc.legendPanelPills = calc.legendPanel
+            .selectAll(".label")
+            .data(stacks)
+            .enter()
+            .append("label")
+            .classed("ltv-legend-pill", true);
+
+        calc.legendPanelRadios = calc.legendPanelPills
+            .append("input")
+            .classed("ltv-legend-radio", true)
+            .attr("type", "radio")
+            .attr("name", radioName)
+            .attr("value", (stack) => stack)
+            .attr("checked", (stack) => (stack == selectedStack ? true : null))
+            .on("change", (event, stack) => {
+                if (selectedStack == stack) return;
+                state.selectedStack = stack;
+                chart.run();
+            });
+
+        calc.legendPanelCpans = calc.legendPanelPills
+            .append("span")
+            .classed("ltv-legend-pill-span", true)
+            .style("background-color", (stack) => colors().stack(stack))
+            .text((d, i) => cut$1(d, 20));
     }
 
     // public
@@ -23639,22 +23688,30 @@ function map() {
         dv.stacks = dc.data().stacks;
         dv.locations = dc.data().locations;
 
+        if (!dv.stacks.includes(state.selectedStack))
+            state.selectedStack = null;
+
+        dv.selectedStack = state.selectedStack || dv.stacks[0];
+        dv.selectedStackData = dv.data.filter(
+            (d) => (d.stack || d.label) == dv.selectedStack
+        );
+
         dv.byLocationLabel = rollup(
-            dv.data,
+            dv.selectedStackData,
             (v) => sum$2(v, (d) => d.value),
             (d) => d.location,
             (d) => d.label
         );
 
         dv.byLocationStack = rollup(
-            dv.data,
+            dv.selectedStackData,
             (v) => sum$2(v, (d) => d.value),
             (d) => d.location,
             (d) => d.stack
         );
 
         dv.locationToSum = rollup(
-            dv.data,
+            dv.selectedStackData,
             (v) => sum$2(v, (d) => d.value),
             (d) => d.location
         );
@@ -23678,6 +23735,7 @@ function map() {
      * @param {*} dv
      */
     chart.render = function (container, calc, dv) {
+        calc.container = container;
         calc.graphWidth = state.width - state.marginLeft - state.marginRight;
         calc.graphHeight = state.height - state.marginTop - state.marginBottom;
         calc.graphBottom = state.height - state.marginBottom;
@@ -23704,6 +23762,8 @@ function map() {
         if (state.legend) {
             renderLegend(calc, dv);
         }
+
+        renderLegendPanel(calc, dv);
     };
 
     // return generated chart
@@ -23753,7 +23813,7 @@ function legend() {
         groupFormat: GROUP_TITLE_FORMAT,
 
         // (optional) title of the legend
-        title: "Legend",
+        title: null,
 
         // whether to display stacks instead of labels
         stacks: false,
@@ -24002,6 +24062,14 @@ function legend() {
     return chart;
 }
 
+function transX(x) {
+    return "translate(" + x + ",0)";
+}
+
+function transY(y) {
+    return "translate(0," + y + ")";
+}
+
 /**
  * Reusable Bar Chart API class that renders a
  * simple and configurable bar chart.
@@ -24042,7 +24110,13 @@ function bar() {
         // whether to draw labels
         labels: false,
 
+        labelRotation: -90,
+
         legend: legend(),
+
+        xAxis: true,
+
+        yAxis: false,
 
         // whether to display a tooltip.
         tooltip: true,
@@ -24082,19 +24156,22 @@ function bar() {
         // Sort date according to access function
         dates = dates.sort((a, b) => state.dateAccess(a) - state.dateAccess(b));
 
+        let padding = 0.1;
+
         calc.xChartScale = band()
             .domain(dates)
-            .rangeRound([state.marginLeft, calc.graphRight]);
+            .rangeRound([state.marginLeft, calc.graphRight])
+            .paddingInner(padding);
 
         calc.xChartScalePadding = band()
             .domain(dates)
             .rangeRound([state.marginLeft, calc.graphRight])
-            .paddingInner(0.2);
+            .paddingInner(padding);
 
         calc.xStack = band()
             .domain(dv.stacks)
             .rangeRound([0, calc.xChartScale.bandwidth()])
-            .padding(0.05);
+            .padding(0.01);
 
         calc.yChart = linear()
             .domain([0, dv.maxTotal])
@@ -24116,19 +24193,19 @@ function bar() {
      * @private
      */
     function renderAxis(calc) {
+        // left axis
         calc.svg
             .append("g")
             .call(axisLeft(calc.yChart))
-            .attr("transform", () => `translate(${state.marginLeft},0)`);
+            .attr("transform", transX(state.marginLeft))
+            .attr("class", "ltv-bar-chart-axis-label");
 
         // bottom axis
         calc.svg
             .append("g")
             .call(axisBottom(calc.xChartScale))
-            .attr(
-                "transform",
-                `translate(0,${state.height - state.marginBottom})`
-            );
+            .attr("transform", transY(state.height - state.marginBottom))
+            .attr("class", "ltv-bar-chart-axis-label");
     }
 
     /**
@@ -24137,26 +24214,30 @@ function bar() {
      * @private
      */
     function renderGrid(calc) {
-        let xAxisGrid = axisBottom(calc.xChartScale)
-            .tickSize(-calc.graphHeight)
-            .tickFormat("");
+        if (state.xAxis) {
+            let xAxisGrid = axisLeft(calc.yChart)
+                .tickSize(-calc.graphWidth)
+                .tickFormat("")
+                .ticks(20);
 
-        let yAxisGrid = axisLeft(calc.yChart)
-            .tickSize(-calc.graphWidth)
-            .tickFormat("")
-            .ticks(20);
+            calc.svg
+                .append("g")
+                .attr("class", "ltv-bar-chart-grid ltv-bar-chart-grid-x")
+                .attr("transform", transX(state.marginLeft))
+                .call(xAxisGrid);
+        }
 
-        calc.svg
-            .append("g")
-            .attr("class", "ltv-bar-chart-grid ltv-bar-chart-grid-x")
-            .attr("transform", "translate(0," + calc.graphBottom + ")")
-            .call(xAxisGrid);
+        if (state.yAxis) {
+            let yAxisGrid = axisBottom(calc.xChartScale)
+                .tickSize(-calc.graphHeight)
+                .tickFormat("");
 
-        calc.svg
-            .append("g")
-            .attr("class", "ltv-bar-chart-grid ltv-bar-chart-grid-y")
-            .attr("transform", `translate(${state.marginLeft},0)`)
-            .call(yAxisGrid);
+            calc.svg
+                .append("g")
+                .attr("class", "ltv-bar-chart-grid ltv-bar-chart-grid-y")
+                .attr("transform", transY(calc.graphBottom))
+                .call(yAxisGrid);
+        }
     }
 
     function renderSelection(calc, dv) {
@@ -24248,7 +24329,7 @@ function bar() {
             .data(dv.byDateStack)
             .enter()
             .append("g")
-            .attr("transform", (d) => `translate(${calc.xChartScale(d[0])},0)`) // x for date
+            .attr("transform", (d) => transX(calc.xChartScale(d[0]))) // x for date
             .attr("class", "ltv-bar-chart-dates-area")
             .selectAll("rect")
             .data((d) => d[1]) // map to by stack
@@ -24272,13 +24353,13 @@ function bar() {
             .data(dv.byDatesStackSeries)
             .enter()
             .append("g")
-            .attr("transform", (d) => `translate(${calc.xChartScale(d[0])},0)`) // translate to x of date
+            .attr("transform", (d) => transX(calc.xChartScale(d[0]))) // translate to x of date
             .attr("class", "ltv-bar-chart-dates-area")
             .selectAll("rect")
             .data((d) => d[1]) // map to by stack
             .enter()
             .append("g")
-            .attr("transform", (d) => `translate(${calc.xStack(d[0])},0)`)
+            .attr("transform", (d) => transX(calc.xStack(d[0])))
             .selectAll("rect")
             .data((d) => d[1]) // map to series
             .enter()
@@ -24314,7 +24395,8 @@ function bar() {
                 let width = calc.xStack.bandwidth() / 2;
                 let x = (calc.xStack(stack) || 0) + width;
                 let y = calc.yChart(value) - 5;
-                return `translate(${x},${y})rotate(-60)`;
+                let deg = state.labelRotation || -60;
+                return `translate(${x},${y})rotate(${deg})`;
             })
             .text((d) => (d[1] === 0 ? "" : state.numberFormat(d[1])))
             .raise();
@@ -24505,14 +24587,6 @@ function hashString(s) {
  */
 function hash$1(input) {
   return hashString(isString(input) ? input : JSON.stringify(input));
-}
-
-function transX(x) {
-    return "translate(" + x + ",0)";
-}
-
-function transY(y) {
-    return "translate(0," + y + ")";
 }
 
 const DATE_ACCESS = function (d) {
