@@ -25170,5 +25170,5 @@ function plot() {
     return chart;
 }
 
-export { DataController, DataItem, Dataset, date_ordinator as DateOrdinator, URLParams, bar, config, csv, csvParse, csvRender, index as d3, datatext, ltv_debug as debug, flatDatasets, json, jsonFlat, legend, map, parseDataset, parseDatasets, plot, toDataset };
+export { ColorScale, DATA_COLORS, DataColors, DataController, DataItem, Dataset, date_ordinator as DateOrdinator, MapColors, PlotColors, TINT_COLOR, URLParams, bar, config, csv, csvParse, csvRender, index as d3, datatext, ltv_debug as debug, flatDatasets, json, jsonFlat, legend, map, parseDataset, parseDatasets, plot, toDataset };
 //# sourceMappingURL=lotivis.esm.js.map
