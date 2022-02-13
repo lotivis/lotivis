@@ -5,7 +5,11 @@ import { uniqueId } from "./common/identifiers";
 import { tooltip } from "./tooltip";
 import { hash } from "./common/hash";
 import { transX, transY } from "./common/helpers";
-import { PlotColors } from "./common/colors";
+import {
+    colorScale1,
+    colorSchemeLotivis10,
+    ColorsGenerator,
+} from "./common/colors";
 import { DEFAULT_NUMBER_FORMAT } from "./common/formats";
 
 export const DATE_ACCESS = function (d) {
@@ -67,13 +71,23 @@ export function plot() {
         marginBottom: 20,
 
         // bar radius
-        radius: 5,
+        radius: CONFIG.barRadius,
+
+        // whether to draw the x axis grid
+        xGrid: true,
+
+        // whether to draw the y axis grid
+        yGrid: true,
 
         // the plot's style, "gradient" or "fraction"
         style: "gradient",
 
         // the plot's color mode, "single" or "multi"
         colorMode: "multi",
+
+        colorScale: colorScale1,
+
+        colorScheme: colorSchemeLotivis10,
 
         // Whether the chart is selectable.
         selectable: true,
@@ -186,8 +200,8 @@ export function plot() {
         // left
         calc.svg
             .append("g")
-            .call(d3.axisLeft(calc.yChart))
-            .attr("transform", transX(state.marginLeft));
+            .call(d3.axisRight(calc.yChart))
+            .attr("transform", transX(state.marginLeft + calc.graphWidth));
 
         // bottom
         if (state.drawBottomAxis) {
@@ -205,17 +219,21 @@ export function plot() {
      * @private
      */
     function renderGrid(calc) {
-        calc.svg
-            .append("g")
-            .classed("ltv-plot-grid ltv-plot-grid-x", true)
-            .attr("transform", transY(calc.height - state.marginBottom))
-            .call(calc.xAxisGrid);
+        if (state.xGrid) {
+            calc.svg
+                .append("g")
+                .classed("ltv-plot-grid ltv-plot-grid-x", true)
+                .attr("transform", transY(calc.height - state.marginBottom))
+                .call(calc.xAxisGrid);
+        }
 
-        calc.svg
-            .append("g")
-            .classed("ltv-plot-grid ltv-plot-grid-y", true)
-            .attr("transform", transX(state.marginLeft))
-            .call(calc.yAxisGrid);
+        if (state.yGrid) {
+            calc.svg
+                .append("g")
+                .classed("ltv-plot-grid ltv-plot-grid-y", true)
+                .attr("transform", transX(state.marginLeft))
+                .call(calc.yAxisGrid);
+        }
     }
 
     /**
@@ -257,9 +275,9 @@ export function plot() {
      * @param {*} dv The data view
      */
     function renderBarsFraction(calc, dv) {
-        let colors = PlotColors(dv.max);
+        let colors = state.colorScale || colorScale1;
         let brush = dv.max / 2;
-        let dataColors = state.dataController.dataColors();
+        let dataColors = calc.colors;
         let isSingle = state.colorMode === "single";
 
         calc.barsData = calc.svg
@@ -283,12 +301,11 @@ export function plot() {
             .attr("y", 0)
             .attr("width", calc.xChart.bandwidth())
             .attr("height", calc.yChartPadding.bandwidth())
-            .attr(`fill`, (d) => (isSingle ? null : colors(d[1])))
+            .attr(`fill`, (d) => (isSingle ? null : colors(d[1] / dv.max)))
             .attr("opacity", (d) =>
                 isSingle ? (d[1] + brush) / (dv.max + brush) : 1
             )
-            .attr("rx", state.radius)
-            .attr("ry", state.radius);
+            .radius(state.radius);
 
         if (state.labels === true) {
             calc.labels = calc.barsData
@@ -317,11 +334,10 @@ export function plot() {
      * @param {*} dc
      */
     function renderBarsGradient(calc, dv, dc) {
-        let plotColors = PlotColors(dv.max);
         calc.definitions = calc.svg.append("defs");
 
         for (let index = 0; index < dv.datasets.length; index++) {
-            createGradient(dv.datasets[index], dv, calc, plotColors, dc);
+            createGradient(dv.datasets[index], dv, calc, dc);
         }
 
         calc.barsData = calc.svg
@@ -338,8 +354,7 @@ export function plot() {
             )
             .attr("fill", (d) => `url(#${state.id}-${hash(d.label)})`)
             .attr("class", "ltv-plot-bar")
-            .attr("rx", state.radius)
-            .attr("ry", state.radius)
+            .radius(state.radius)
             .attr("x", (d) =>
                 calc.xChart(d.duration < 0 ? d.lastDate : d.firstDate || 0)
             )
@@ -386,10 +401,9 @@ export function plot() {
      * @param {*} ds
      * @param {*} dv
      * @param {*} calc
-     * @param {*} plotColors
      * @returns
      */
-    function createGradient(ds, dv, calc, plotColors) {
+    function createGradient(ds, dv, calc) {
         let gradient = calc.definitions
             .append("linearGradient")
             .attr("id", state.id + "-" + hash(ds.label))
@@ -405,13 +419,16 @@ export function plot() {
             dataController = chart.dataController(),
             dataColors = dataController.dataColors(),
             isSingle = state.colorMode === "single",
-            colors = isSingle ? dataColors.label : plotColors;
+            colors = isSingle ? dataColors.label : state.colorScale;
 
         function append(value, percent) {
             gradient
                 .append("stop")
                 .attr("offset", percent + "%")
-                .attr("stop-color", colors(isSingle ? ds.label : value))
+                .attr(
+                    "stop-color",
+                    colors(isSingle ? ds.label : value / dv.max)
+                )
                 .attr("stop-opacity", isSingle ? value / dv.max : 1);
         }
 
@@ -571,6 +588,7 @@ export function plot() {
         calc.graphTop = calc.height - state.marginTop;
         calc.graphRight = state.width - state.marginRight;
         calc.graphBottom = calc.height - state.marginBottom;
+        calc.colors = ColorsGenerator(state.colorScheme).data(dv.data);
 
         // scales
         createScales(calc, dv);

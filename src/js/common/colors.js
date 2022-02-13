@@ -2,19 +2,95 @@ import * as d3 from "d3";
 
 /** Returns the darker darker version of the passed color. */
 function darker(color) {
-    return color.darker().darker();
+    // return color.darker().darker();
+    return color.darker();
 }
 
 // constants
 
-/** The default colors used by lotivis. */
-export const DATA_COLORS = []
-    .concat(d3.schemeCategory10)
-    .concat(d3.schemeTableau10)
-    .concat(d3.schemeDark2);
+export const colorSchemeCategory10 = d3.schemeCategory10;
 
-/** The default tint color used by lotivis. */
-export const TINT_COLOR = DATA_COLORS[0];
+export const colorSchemeTableau10 = d3.schemeTableau10;
+
+export const colorSchemeLotivis10 = [
+    "RoyalBlue",
+    "MediumSeaGreen",
+    "MediumPurple",
+    "Violet",
+    "Orange",
+    "Tomato",
+    "Turquoise",
+    "LightGray",
+    "Gray",
+    "BurlyWood",
+];
+
+export const tintColor = colorSchemeLotivis10[0];
+
+export const colorScale1 = colorScale("Yellow", "Orange", "Red", "Purple");
+
+export const colorScale2 = colorScale("White", "MediumSeaGreen", "RoyalBlue");
+
+export function ColorsGenerator(c, d) {
+    let colors = c || colorSchemeLotivis10,
+        data = d || [],
+        stackColors,
+        labelColors,
+        stacksToLabels,
+        stacks;
+
+    function fallback() {
+        return Array.isArray(colors) && colors.length ? colors[0] : "RoyalBlue";
+    }
+
+    function generator(index) {
+        return colors[(+index || 0) % colors.length];
+    }
+
+    function calc() {
+        stackColors = new Map();
+        labelColors = new Map();
+        stacksToLabels = d3.group(
+            data,
+            (d) => d.stack || d.label,
+            (d) => d.label
+        );
+        stacks = Array.from(stacksToLabels.keys());
+
+        stacks.forEach((stack) => {
+            let labels = Array.from((stacksToLabels.get(stack) || []).keys());
+            let stackColor = colors[stacks.indexOf(stack) % colors.length];
+            let c1 = d3.color(stackColor);
+            let stackScale = colorScale(c1, darker(c1));
+
+            stackColors.set(stack, c1);
+
+            labels.forEach((label, index) => {
+                labelColors.set(label, stackScale(index / labels.length));
+            });
+        });
+
+        return generator;
+    }
+
+    generator.data = function (_) {
+        return arguments.length ? ((data = _), calc()) : data;
+    };
+
+    generator.colors = function (_) {
+        return arguments.length ? ((colors = _), calc()) : colors;
+    };
+
+    generator.stack = function (stack) {
+        return stackColors ? stackColors.get(stack) || fallback() : fallback();
+    };
+
+    generator.label = function (label) {
+        return labelColors ? labelColors.get(label) || fallback() : fallback();
+    };
+
+    return generator;
+}
 
 /**
  *
@@ -22,7 +98,7 @@ export const TINT_COLOR = DATA_COLORS[0];
  * @return {DataColors} A data colors object
  */
 export function DataColors(data) {
-    let baseColors = DATA_COLORS,
+    let baseColors = colorSchemeLotivis10,
         stackColors = new Map(),
         labelColors = new Map(),
         stacksToLabels = d3.group(
@@ -52,12 +128,12 @@ export function DataColors(data) {
     stacks.forEach((stack) => {
         let labels = stackLabels(stack);
         let c1 = d3.color(stackColor(stack));
-        let colors = ColorScale(labels.length, [c1, darker(c1)]);
+        let colors = colorScale(c1, darker(c1));
 
         stackColors.set(stack, c1);
 
         labels.forEach((label, index) => {
-            labelColors.set(label, colors(index));
+            labelColors.set(label, colors(index / labels.length));
         });
     });
 
@@ -71,7 +147,7 @@ export function DataColors(data) {
      * @public
      */
     main.stack = function (stack) {
-        return stackColors ? stackColors.get(stack) || TINT_COLOR : TINT_COLOR;
+        return stackColors ? stackColors.get(stack) || tintColor : tintColor;
     };
 
     /**
@@ -82,26 +158,16 @@ export function DataColors(data) {
      * @public
      */
     main.label = function (label) {
-        return labelColors ? labelColors.get(label) || TINT_COLOR : TINT_COLOR;
+        return labelColors ? labelColors.get(label) || tintColor : tintColor;
     };
 
     return main;
 }
 
-export function MapColors(max) {
+export function colorScale(...colors) {
+    if (!colors.length) throw new Error("no colors");
     return d3
         .scaleLinear()
-        .domain([0, (1 / 3) * max, (2 / 3) * max, max])
-        .range(["yellow", "orange", "red", "purple"]);
-}
-
-export function PlotColors(max) {
-    return ColorScale(max, ["yellow", "orange", "red", "purple"]);
-}
-
-export function ColorScale(max, colors) {
-    return d3
-        .scaleLinear()
-        .domain(colors.map((c, i) => (i / (colors.length - 1)) * max))
+        .domain(colors.map((c, i) => i / (colors.length - 1)))
         .range(colors);
 }

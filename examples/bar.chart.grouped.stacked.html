@@ -13,7 +13,15 @@
     <body>
         <div class="ltv-container">
             <h1>BarChart Grouped Stacked</h1>
-            <div id="bar-chart">
+            <div id="bar-chart-1">
+                <!-- Bar Chart Here -->
+            </div>
+
+            <div id="bar-chart-2">
+                <!-- Bar Chart Here -->
+            </div>
+
+            <div id="bar-chart-3">
                 <!-- Bar Chart Here -->
             </div>
         </div>
@@ -118,6 +126,36 @@
                         { location: 2, date: 2004, value: 9 },
                     ],
                 },
+                {
+                    label: "dataset_7",
+                    data: [
+                        { location: 1, date: 2000, value: 30 },
+                        { location: 1, date: 2001, value: 25 },
+                        { location: 1, date: 2002, value: 20 },
+                        { location: 1, date: 2003, value: 15 },
+                        { location: 1, date: 2004, value: 10 },
+                    ],
+                },
+                {
+                    label: "dataset_8",
+                    data: [
+                        { location: 1, date: 2004, value: 30 },
+                        { location: 1, date: 2003, value: 25 },
+                        { location: 1, date: 2002, value: 20 },
+                        { location: 1, date: 2001, value: 15 },
+                        { location: 1, date: 2000, value: 10 },
+                    ],
+                },
+                {
+                    label: "dataset_9",
+                    data: [
+                        { location: 1, date: 2004, value: 20 },
+                        { location: 1, date: 2003, value: 20 },
+                        { location: 1, date: 2002, value: 20 },
+                        { location: 1, date: 2001, value: 20 },
+                        { location: 1, date: 2000, value: 20 },
+                    ],
+                },
             ];
 
             // enable debug messages
@@ -125,9 +163,44 @@
 
             let dataController = lotivis.parseDatasets(datasets);
 
-            let barChart = lotivis
+            lotivis
                 .bar()
-                .selector("#bar-chart")
+                .selector("#bar-chart-1")
+                .height(300)
+                .ticks(null)
+                .colorScheme(lotivis.colorSchemeLotivis10)
+                .title("colorSchemeLotivis10")
+                .enabled(false)
+                .labels(false)
+                .dataController(dataController)
+                .run();
+
+            lotivis
+                .bar()
+                .selector("#bar-chart-2")
+                .height(300)
+                .ticks(null)
+                .colorScheme(lotivis.colorSchemeCategory10)
+                .title("colorSchemeCategory10")
+                .enabled(false)
+                .labels(false)
+                .dataController(dataController)
+                .run();
+
+            lotivis
+                .bar()
+                .selector("#bar-chart-3")
+                .height(300)
+                .ticks(null)
+                .colorScheme([
+                    "#ccccff",
+                    "#b2b2ff",
+                    "#9999ff",
+                    "#8080ff",
+                    "#6666ff",
+                    "#4d4dff",
+                ])
+                .title("custom")
                 .enabled(false)
                 .labels(false)
                 .dataController(dataController)

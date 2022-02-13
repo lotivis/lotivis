@@ -3,39 +3,39 @@
 // .ltv-plot-grid-y
 
 .ltv-selected {
-  fill: $tint-color;
-  opacity: 0.3;
+    fill: $tint-color;
+    opacity: 0.3;
 }
 
 .ltv-plot-chart-background {
-  fill: transparent;
-  cursor: pointer;
+    fill: transparent;
+    cursor: pointer;
 }
 
 .ltv-plot-bar {
-  stroke: lightgrey;
-  stroke-width: 1;
-  pointer-events: none;
+    stroke: lightgrey;
+    stroke-width: 1;
+    pointer-events: none;
 }
 
 .ltv-plot-chart-hover-bar {
-  border-radius: 10px;
-  fill: $tint-color;
+    border-radius: 10px;
+    fill: $tint-color;
 }
 
 .ltv-plot-chart-selection-rect {
-  border-radius: 10px;
-  fill: $tint-color;
+    border-radius: 10px;
+    fill: $tint-color;
 }
 
 .ltv-plot-grid {
-  color: lightgrey;
-  stroke-width: 1;
+    color: lightgrey;
+    stroke-width: 1;
 }
 
 .ltv-plot-label {
-  fill: steelblue;
-  text-anchor: start;
-  font-size: 12px;
-  pointer-events: none;
+    fill: steelblue;
+    text-anchor: start;
+    font-size: 10px;
+    pointer-events: none;
 }

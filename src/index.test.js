@@ -19,7 +19,7 @@ export * from "./js/geojson/features.js";
 
 /* common */
 export * from "./js/common/config.js";
-export * from "./js/common/affix.js";
+export * from "./js/common/helpers.js";
 export * from "./js/common/identifiers.js";
 export * from "./js/common/values.js";
 

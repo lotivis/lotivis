@@ -8,6 +8,7 @@ import { legend } from "./legend";
 import { transX, transY } from "./common/helpers";
 import { DEFAULT_NUMBER_FORMAT } from "./common/formats";
 import { DEFAULT_DATE_ORDINATOR } from "./common/date.ordinator";
+import { colorSchemeLotivis10, ColorsGenerator } from "./common/colors";
 
 /**
  * Reusable Bar Chart API class that renders a
@@ -27,6 +28,8 @@ export function bar() {
     let state = {
         // a unique id for this chart
         id: uniqueId("bar"),
+
+        title: "BarChart",
 
         // the width of the chart's svg
         width: 1000,
@@ -49,7 +52,7 @@ export function bar() {
         // whether to draw labels
         labels: false,
 
-        labelRotation: -90,
+        labelRotation: -70,
 
         legend: legend(),
 
@@ -57,10 +60,14 @@ export function bar() {
 
         yAxis: false,
 
+        ticks: 10,
+
         // whether to display a tooltip.
         tooltip: true,
 
         style: "stacks",
+
+        colorScheme: colorSchemeLotivis10,
 
         // the data controller.
         dataController: null,
@@ -113,7 +120,7 @@ export function bar() {
             .scaleBand()
             .domain(dv.stacks)
             .rangeRound([0, calc.xChartScale.bandwidth()])
-            .padding(0.01);
+            .padding(0.05);
 
         calc.yChart = d3
             .scaleLinear()
@@ -130,18 +137,59 @@ export function bar() {
             .attr("viewBox", `0 0 ${state.width} ${state.height}`);
     }
 
+    function renderTitle(calc, dv) {
+        calc.title = calc.svg
+            .append("text")
+            .attr("class", "ltv-title")
+            .attr("text-anchor", "middle")
+            .attr("x", calc.graphWidth / 2)
+            .attr("y", 10)
+            .text(state.title);
+    }
+
     /**
      * Renders the axis of the chart.
      * @param {*} calc The calc obj
      * @private
      */
-    function renderAxis(calc) {
+    function renderAxis(calc, dv) {
         // left axis
+        // let leftAxis =
+
+        if (Number.isInteger(state.ticks)) {
+            calc.svg
+                .append("g")
+                .call(d3.axisLeft(calc.yChart).ticks(state.ticks))
+                .attr("transform", transX(state.marginLeft))
+                .attr("class", "ltv-bar-chart-axis-label");
+        }
+
+        function datesLabelColor(date) {
+            return state.dataController.isFilter("dates", date)
+                ? "gray"
+                : "white";
+        }
+
+        let dc = state.dataController;
+        let dates = state.dates || dv.dates;
         calc.svg
             .append("g")
-            .call(d3.axisLeft(calc.yChart))
-            .attr("transform", transX(state.marginLeft))
-            .attr("class", "ltv-bar-chart-axis-label");
+            .attr("transform", transY(state.height - state.marginBottom + 4))
+            .selectAll("g")
+            .data(dates)
+            .enter()
+            .append("rect")
+            .attr("fill", datesLabelColor)
+            .attr("cursor", "pointer")
+            .attr("x", (d) => calc.xChartScale(d))
+            .attr("width", calc.xChartScale.bandwidth())
+            .attr("height", 20)
+            .radius(state.radius)
+            .text((d) => d)
+            .on("click", (e, d, some) => {
+                dc.toggleFilter("dates", d, chart);
+                d3.select(e.target).attr("fill", datesLabelColor);
+            });
 
         // bottom axis
         calc.svg
@@ -157,12 +205,12 @@ export function bar() {
      * @private
      */
     function renderGrid(calc) {
-        if (state.xAxis) {
+        if (state.xAxis && Number.isInteger(state.ticks)) {
             let xAxisGrid = d3
                 .axisLeft(calc.yChart)
                 .tickSize(-calc.graphWidth)
                 .tickFormat("")
-                .ticks(20);
+                .ticks(state.ticks);
 
             calc.svg
                 .append("g")
@@ -236,7 +284,7 @@ export function bar() {
             }
 
             calc.tip
-                .html(getHTMLForDate(date, dv))
+                .html(getHTMLForDate(date, dv, calc))
                 .top(`${top}px`)
                 .left(`${left}px`)
                 .show();
@@ -281,13 +329,12 @@ export function bar() {
             .enter()
             .append("rect")
             .attr("class", "ltv-bar-chart-bar")
-            .attr("fill", (d) => colors().stack(d[0]))
+            .attr("fill", (d) => calc.colors.stack(d[0]))
             .attr("x", (d) => calc.xStack(d[0]))
             .attr("y", (d) => calc.yChart(d[1]))
             .attr("width", calc.xStack.bandwidth())
             .attr("height", (d) => calc.graphBottom - calc.yChart(d[1]))
-            .attr("rx", state.radius)
-            .attr("ry", state.radius)
+            .radius(state.radius)
             .raise();
     }
 
@@ -310,14 +357,13 @@ export function bar() {
             .enter()
             .append("rect")
             .attr("class", "ltv-bar-chart-bar")
-            .attr("fill", (d) => colors().label(d[2]))
+            .attr("fill", (d) => calc.colors.label(d[2]))
             .attr("width", calc.xStack.bandwidth())
             .attr("height", (d) =>
                 !d[1] ? 0 : calc.yChart(d[0]) - calc.yChart(d[1])
             )
             .attr("y", (d) => calc.yChart(d[1]))
-            .attr("rx", state.radius)
-            .attr("ry", state.radius)
+            .radius(state.radius)
             .raise();
     }
 
@@ -374,7 +420,7 @@ export function bar() {
         );
     }
 
-    function getHTMLForDate(date, dv) {
+    function getHTMLForDate(date, dv, calc) {
         let filtered = dv.byDateLabel.get(date);
         if (!filtered) return "No Data";
 
@@ -384,7 +430,7 @@ export function bar() {
             .map(function (label) {
                 let value = filtered.get(label);
                 if (!value) return undefined;
-                let color = colors().label(label);
+                let color = calc.colors.label(label);
                 let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
                 let valueFormatted = state.numberFormat(value);
                 sum += value;
@@ -480,10 +526,14 @@ export function bar() {
         calc.graphHeight = state.height - state.marginTop - state.marginBottom;
         calc.graphBottom = state.height - state.marginBottom;
         calc.graphRight = state.width - state.marginRight;
+        calc.colors = ColorsGenerator(state.colorScheme).data(dv.data);
 
         createScales(calc, dv);
 
         renderSVG(container, calc);
+
+        if (state.title) renderTitle(calc, dv);
+
         renderAxis(calc, dv);
         renderGrid(calc, dv);
         renderSelection(calc, dv);
@@ -502,6 +552,10 @@ export function bar() {
             let dc = state.dataController;
             let dv = state.legend.dataView(dc);
             let calc = {};
+            state.legend
+                .marginLeft(state.marginLeft)
+                .marginRight(state.marginRight)
+                .colorScheme(state.colorScheme);
             state.legend.skipFilterUpdate = () => true;
             state.legend.dataController(dc).render(container, calc, dv);
         }

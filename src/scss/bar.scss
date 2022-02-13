@@ -3,46 +3,46 @@
 // .ltv-bar-chart-tooltip
 
 .ltv-bar-chart-background {
-  pointer-events: none;
+    pointer-events: none;
 }
 
 .ltv-bar-chart-grid {
-  color: lightgrey;
-  stroke-width: 1;
+    color: lightgrey;
+    stroke-width: 1;
 }
 
 // .ltv-bar-chart-grid-x
 // .ltv-bar-chart-grid-y
 
 .ltv-bar-chart-axis-label {
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .ltv-bar-chart-label {
-  pointer-events: none;
-  font-size: 20px;
+    pointer-events: none;
+    font-size: 20px;
 }
 
 .ltv-bar-chart-legend-label {
-  cursor: pointer;
-  font-size: 13px;
+    cursor: pointer;
+    font-size: 12px;
 }
 
 .ltv-bar-chart-legend-circle {
-  cursor: pointer;
-  stroke-width: 2;
+    cursor: pointer;
+    stroke-width: 2;
 }
 
 .ltv-bar-chart-bar {
-  pointer-events: none;
+    pointer-events: none;
 }
 
 .ltv-bar-chart-hover-bar {
-  cursor: pointer;
-  fill: $tint-color;
+    cursor: pointer;
+    fill: $tint-color;
 }
 
 .ltv-bar-chart-selection-rect {
-  cursor: pointer;
-  fill: gray;
+    cursor: pointer;
+    fill: gray;
 }

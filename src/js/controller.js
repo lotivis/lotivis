@@ -1,13 +1,11 @@
 import * as d3 from "d3";
 import { FILENAME_GENERATOR } from "./common/filename.js";
 import { DEFAULT_DATE_ORDINATOR } from "./common/date.ordinator";
-import { DataColors } from "./common/colors";
 import { Data } from "./data";
-import { data_preview, ltv_debug } from "./common/debug.js";
+import { ltv_debug } from "./common/config";
 import { uniqueId } from "./common/identifiers.js";
-import { prefix } from "./common/affix";
-import { datatext } from "./datatext";
-import { URLParams } from "./common/url.parameters.js";
+import { prefix } from "./common/helpers";
+import { datatext, data_preview } from "./datatext";
 
 export class DataController {
     constructor(data) {
@@ -24,7 +22,6 @@ export class DataController {
             snapshot: data,
             filters: { labels: [], locations: [], dates: [], stacks: [] },
             filenameGenerator: FILENAME_GENERATOR,
-            dataColors: DataColors(data),
             dateAccess: DEFAULT_DATE_ORDINATOR,
         };
 
@@ -56,18 +53,6 @@ export class DataController {
             attr.snapshot = Data(snapshot);
 
             return attr.snapshot;
-        }
-
-        function applyURLParameters() {
-            let fromURL = URLParams.object(id + "-filters");
-
-            if (fromURL) {
-                ["labels", "stacks", "locations", "dates"].forEach((name) =>
-                    Array.isArray(fromURL[name])
-                        ? (attr.filters[name] = fromURL[name])
-                        : null
-                );
-            }
         }
 
         // listeners
@@ -108,14 +93,6 @@ export class DataController {
 
             // do calculations
             calculateSnapshot();
-
-            console.log("this.hasFilters()", this.hasFilters());
-            console.log("attr.filters", attr.filters);
-
-            URLParams.object(
-                this.id + "-filters",
-                this.hasFilters() ? this.filters() : null
-            );
 
             // call listeners
             disp.call("filter", this, sender, name, action, item);
@@ -247,24 +224,6 @@ export class DataController {
             return arguments.length
                 ? ((attr.snapshot = _), this)
                 : attr.snapshot || attr.data;
-        };
-
-        /**
-         * Returns the color for the data with the passed label.
-         * @param {String} label The label of the data
-         * @returns {d3.Color} The color of the label
-         */
-        this.labelColor = function (label) {
-            return attr.dataColors.label(label);
-        };
-
-        /**
-         * Returns the color for the passed stack.
-         * @param {String} stack The stack of the data
-         * @returns {d3.Color} The color of the stack
-         */
-        this.stackColor = function (stack) {
-            return attr.dataColors.stack(stack);
         };
 
         /**

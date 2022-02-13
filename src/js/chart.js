@@ -1,7 +1,7 @@
 import * as d3 from "d3";
 import { isFunction } from "./common/values";
 import { uniqueId } from "./common/identifiers.js";
-import { ltv_debug } from "./common/debug";
+import { ltv_debug } from "./common/config";
 import { pngDownload } from "./common/download";
 
 export function baseChart(state) {

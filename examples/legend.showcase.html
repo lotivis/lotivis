@@ -9,9 +9,35 @@
         <link rel="stylesheet" href="./dist/lotivis.css" />
         <link rel="stylesheet" href="./examples.css" />
         <title>Lotivis Examples - Legend Showcase</title>
+        <style>
+            div {
+                vertical-align: top;
+            }
+
+            .color-scale {
+                width: 200px;
+                display: inline-block;
+            }
+        </style>
     </head>
     <body>
         <div class="ltv-container">
+            <h1>Colors Showcase</h1>
+            <div style="vertical-align: top">
+                <div id="colors-1" class="color-scale">
+                    <!-- colors-1 here -->
+                </div>
+                <div id="colors-2" class="color-scale">
+                    <!-- colors-2 here -->
+                </div>
+                <div id="colors-3" class="color-scale">
+                    <!-- colors-3 here -->
+                </div>
+                <div id="colors-4" class="color-scale">
+                    <!-- colors-4 here -->
+                </div>
+            </div>
+
             <h1>Legend Showcase</h1>
             <div id="legend-group-labels">
                 <!-- legend-group-labels here -->
@@ -32,6 +58,23 @@
         <script>
             lotivis.debug(true);
             lotivis.config({ downloadFilePrefix: "frcv" });
+
+            function fillColorScale(id, colorScheme) {
+                lotivis.d3
+                    .select("#" + id)
+                    .selectAll("div")
+                    .data(colorScheme)
+                    .enter()
+                    .append("div")
+                    .style("background", (d) => d)
+                    .style("padding", "3px")
+                    .style("margin-bottom", "2px")
+                    .text((d) => "" + d);
+            }
+
+            fillColorScale("colors-1", lotivis.colorSchemeCategory10);
+            fillColorScale("colors-2", lotivis.colorSchemeTableau10);
+            fillColorScale("colors-3", lotivis.colorSchemeLotivis10);
 
             let legendGroupLabels = lotivis
                 .legend()

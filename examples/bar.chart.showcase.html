@@ -13,20 +13,18 @@
     <body>
         <div class="ltv-container">
             <h1>BarChart Showcase</h1>
-            Default
-            <div id="bar-chart-1">
+            <!-- Default -->
+            <div id="bar-chart-1" style="width: 49%; display: inline-block">
                 <!-- Bar Chart 1 Code Here -->
             </div>
-            Combine
-            <div id="bar-chart-3">
+            <!-- Combine -->
+            <div id="bar-chart-3" style="width: 49%; display: inline-block">
                 <!-- Bar Chart 3 Code Here -->
             </div>
-            Labels
-            <div id="bar-chart-2">
+            <div id="bar-chart-2" style="width: 49%; display: inline-block">
                 <!-- Bar Chart 2 Code Here -->
             </div>
-            Combine Labels
-            <div id="bar-chart-4">
+            <div id="bar-chart-4" style="width: 49%; display: inline-block">
                 <!-- Bar Chart 4 Code Here -->
             </div>
         </div>
@@ -182,28 +180,47 @@
             lotivis
                 .bar()
                 .selector("#bar-chart-1")
+                .width(600)
+                .height(400)
+                .marginTop(40)
+                .title("stacked")
+                .colorScheme(lotivis.colorSchemeLotivis10)
                 .dataController(dataController)
                 .run();
 
             lotivis
                 .bar()
                 .selector("#bar-chart-2")
+                .width(600)
+                .height(400)
+                .marginTop(40)
                 .labels(true)
+                .title("stacked labels")
+                .colorScheme(lotivis.colorSchemeCategory10)
                 .dataController(dataController)
                 .run();
 
             lotivis
                 .bar()
                 .selector("#bar-chart-3")
+                .width(600)
+                .height(400)
+                .marginTop(40)
                 .style("combine")
+                .title("combine")
+                .colorScheme(lotivis.colorSchemeTableau10)
                 .dataController(dataController)
                 .run();
 
             lotivis
                 .bar()
                 .selector("#bar-chart-4")
+                .width(600)
+                .height(400)
+                .marginTop(40)
                 .labels(true)
                 .style("combine")
+                .title("combine labels")
                 .dataController(dataController)
                 .run();
         </script>

@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import { baseChart } from "./chart";
-import { CONFIG } from "./common/config";
+import { CONFIG, ltv_debug } from "./common/config";
 import { uniqueId } from "./common/identifiers";
 import { tooltip } from "./tooltip";
 import { createGeoJSON } from "./geojson/from.data";
@@ -9,15 +9,19 @@ import {
     removeFeatures,
     filterFeatures,
 } from "./geojson/features";
-import { MapColors } from "./common/colors";
+import {
+    colorScale2,
+    colorSchemeLotivis10,
+    ColorsGenerator,
+} from "./common/colors";
 import { DataController } from "./controller";
 import { DEFAULT_NUMBER_FORMAT } from "./common/formats";
 import {
     FEATURE_ID_ACCESSOR,
     FEATURE_NAME_ACCESSOR,
 } from "./geojson/feature.accessors";
-import { ltv_debug } from "./common/debug";
-import { cut } from "./common/affix";
+import { cut, postfix } from "./common/helpers";
+import { Events } from "./common/events";
 
 /**
  * Reusable Map Chart API class that renders a
@@ -41,10 +45,10 @@ export function map() {
         height: 1000,
 
         // margin
-        marginLeft: 20,
-        marginTop: 20,
-        marginRight: 20,
-        marginBottom: 20,
+        marginLeft: 0,
+        marginTop: 0,
+        marginRight: 0,
+        marginBottom: 0,
 
         // Whether the chart is enabled.
         enabled: true,
@@ -58,12 +62,20 @@ export function map() {
         // whether to draw a legend on the map
         legend: true,
 
+        legendPanel: true,
+
         // whether to display a tooltip.
         tooltip: true,
 
         exclude: null,
 
         include: null,
+
+        colorScale: colorScale2,
+
+        colorScheme: colorSchemeLotivis10,
+
+        radius: CONFIG.barRadius,
 
         // the geojson wich is drawn
         geoJSON: null,
@@ -86,10 +98,6 @@ export function map() {
     let chart = baseChart(state);
     state.projection = d3.geoMercator();
     state.path = d3.geoPath().projection(state.projection);
-
-    function colors() {
-        return state.dataController.dataColors();
-    }
 
     /**
      * Tells the map chart that the GeoJSON has changed.
@@ -169,7 +177,7 @@ export function map() {
         }
     }
 
-    function htmlValues(features, dv) {
+    function htmlValues(features, dv, calc) {
         let combinedByLabel = {};
         for (let i = 0; i < features.length; i++) {
             let feature = features[i];
@@ -190,7 +198,7 @@ export function map() {
         let components = [""];
         let sum = 0;
         for (const label in combinedByLabel) {
-            let color = colors().label(label);
+            let color = calc.colors.label(label);
             let divHTML = `<div style="background: ${color};color: ${color}; display: inline;">__</div>`;
             sum += combinedByLabel[label];
             let value = state.numberFormat(combinedByLabel[label]);
@@ -296,7 +304,7 @@ export function map() {
                 calc.tooltip.html(
                     [
                         htmlTitle(calc.selectedFeatures),
-                        htmlValues(calc.selectedFeatures, dv),
+                        htmlValues(calc.selectedFeatures, dv, calc),
                     ].join("<br>")
                 );
                 positionTooltip(
@@ -306,9 +314,10 @@ export function map() {
                 );
             } else {
                 calc.tooltip.html(
-                    [htmlTitle([feature]), htmlValues([feature], dv)].join(
-                        "<br>"
-                    )
+                    [
+                        htmlTitle([feature]),
+                        htmlValues([feature], dv, calc),
+                    ].join("<br>")
                 );
                 positionTooltip(event, feature, calc);
             }
@@ -336,7 +345,7 @@ export function map() {
 
         let locationToSum = dv.locationToSum;
         let max = d3.max(locationToSum, (item) => item[1]);
-        let generator = MapColors(1);
+        let generator = state.colorScale;
 
         calc.areas = calc.svg
             .selectAll(".ltv-map-area")
@@ -407,9 +416,11 @@ export function map() {
         let max = d3.max(locationToSum, (item) => item[1]) || 0;
 
         let xOff = 10 + state.marginLeft;
-        let labelColor = state.dataController.stackColor(label);
+        let labelColor = calc.colors.stack(label);
 
-        let mapColors = MapColors(max);
+        xOff = 1;
+
+        let mapColors = state.colorScale;
         let allData = [
             "No Data",
             "0",
@@ -450,7 +461,7 @@ export function map() {
                     ? "white"
                     : i === 1
                     ? "whitesmoke"
-                    : mapColors(i === 2 ? 0 : d);
+                    : mapColors(i === 2 ? 0 : d / max);
             })
             .attr("x", xOff)
             .attr("y", (d, i) => i * 20 + 30)
@@ -472,7 +483,7 @@ export function map() {
         return;
     }
 
-    function renderLegendPanel(calc, dv) {
+    function renderDataSelectionPanel(calc, dv) {
         let stacks = dv.stacks;
         let selectedStack = state.selectedStack || stacks[0];
         let radioName = state.id + "-radio";
@@ -501,14 +512,17 @@ export function map() {
             .attr("checked", (stack) => (stack == selectedStack ? true : null))
             .on("change", (event, stack) => {
                 if (selectedStack == stack) return;
+                Events.call("map-selection-will-change", chart, stack);
                 state.selectedStack = stack;
+                Events.call("map-selection-did-change", chart, stack);
                 chart.run();
             });
 
         calc.legendPanelCpans = calc.legendPanelPills
             .append("span")
             .classed("ltv-legend-pill-span", true)
-            .style("background-color", (stack) => colors().stack(stack))
+            .style("border-radius", postfix(state.radius, "px"))
+            .style("background-color", (stack) => calc.colors.stack(stack))
             .text((d, i) => cut(d, 20));
     }
 
@@ -599,6 +613,7 @@ export function map() {
         calc.graphHeight = state.height - state.marginTop - state.marginBottom;
         calc.graphBottom = state.height - state.marginBottom;
         calc.graphRight = state.width - state.marginRight;
+        calc.colors = ColorsGenerator(state.colorScheme).data(dv.data);
 
         if (!state.geoJSON) {
             chart.geoJSON(createGeoJSON(dv.locations));
@@ -622,8 +637,19 @@ export function map() {
             renderLegend(calc, dv);
         }
 
-        renderLegendPanel(calc, dv);
+        if (state.legendPanel) {
+            renderDataSelectionPanel(calc, dv);
+        }
     };
+
+    Events.on(
+        "map-selection-did-change." + chart.id(),
+        function (sender, stack, b, c) {
+            if (sender === chart) return;
+            state.selectedStack = stack;
+            chart.run();
+        }
+    );
 
     // return generated chart
     return chart;

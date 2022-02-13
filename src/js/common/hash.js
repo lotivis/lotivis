@@ -1,15 +1,15 @@
 import { isString } from "./values";
 
 function hashString(s) {
-  let hash = 0,
-    i,
-    chr;
-  for (i = 0; i < s.length; i++) {
-    chr = s.charCodeAt(i);
-    hash = (hash << 5) - hash + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
+    let hash = 0,
+        i,
+        chr;
+    for (i = 0; i < s.length; i++) {
+        chr = s.charCodeAt(i);
+        hash = (hash << 5) - hash + chr;
+        hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
 }
 
 /**
@@ -20,5 +20,5 @@ function hashString(s) {
  * @public
  */
 export function hash(input) {
-  return hashString(isString(input) ? input : JSON.stringify(input));
+    return hashString(isString(input) ? input : JSON.stringify(input));
 }

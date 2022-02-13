@@ -1,14 +1,10 @@
-import { CONFIG } from "./common/config";
 import { downloadBlob } from "./common/download.js";
 
-import { postfix } from "./common/affix.js";
+import { postfix } from "./common/helpers.js";
 import { uniqueId } from "./common/identifiers";
 import { csvRender } from "./parse/parse.csv.js";
 import { baseChart } from "./chart";
-
-const DATATEXT_TITLE = function (dt, dv) {
-    return "Data";
-};
+import { CONFIG, runsInBrowser } from "./common/config.js";
 
 /**
  * Returns the JSON string from the passed data view.
@@ -47,7 +43,7 @@ export function datatext() {
         enabled: true,
 
         // (optional) title of the datatext
-        title: DATATEXT_TITLE,
+        title: (dt, dv) => "Data",
 
         // the text to display for the data
         text: CSV_TEXT,
@@ -173,4 +169,11 @@ export function datatext() {
 
     // return generated chart
     return chart;
+}
+
+export function data_preview(dc) {
+    if (!dc || !CONFIG.debug || !runsInBrowser()) return;
+    if (!document.getElementById("ltv-data")) return;
+    if (!CONFIG.datatext) CONFIG.datatext = datatext().selector("#ltv-data");
+    CONFIG.datatext.dataController(dc).run();
 }

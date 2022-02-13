@@ -1,5 +1,6 @@
 import * as d3 from "d3";
 import { baseChart } from "./chart";
+import { colorSchemeLotivis10, ColorsGenerator } from "./common/colors";
 import { CONFIG } from "./common/config";
 import { uniqueId } from "./common/identifiers";
 
@@ -44,6 +45,8 @@ export function legend() {
 
         // the format of displaying a group
         groupFormat: GROUP_TITLE_FORMAT,
+
+        colorScheme: colorSchemeLotivis10,
 
         // (optional) title of the legend
         title: null,
@@ -141,10 +144,6 @@ export function legend() {
         return state.stackFormat(stack, value, labels, index);
     }
 
-    function dataColors() {
-        return state.dataController.dataColors();
-    }
-
     function disabled() {
         return unwrap(state.enabled) ? null : true;
     }
@@ -161,14 +160,6 @@ export function legend() {
         return typeof value === "function" ? value(chart) : value;
     }
 
-    d3.selection.prototype.div = function (aClass) {
-        return this.append("div").classed(aClass, true);
-    };
-
-    d3.selection.prototype.error = function (text) {
-        return this.append("div").text(text);
-    };
-
     /**
      * Calculates the data view for the bar chart.
      *
@@ -179,6 +170,7 @@ export function legend() {
      */
     chart.dataView = function (dc) {
         var dv = {};
+        dv.data = dc.data();
         dv.labels = dc.labels();
         dv.stacks = dc.stacks();
         dv.locations = dc.locations();
@@ -217,14 +209,15 @@ export function legend() {
      * @public
      */
     chart.render = function (container, calc, dv) {
+        calc.colors = ColorsGenerator(state.colorScheme).data(dv.data);
         calc.div = container
             .append("div")
-            .div("ltv-legend")
+            .classed("ltv-legend", true)
             .attr("id", state.id)
-            .style("padding-left", state.marginLeft + "px")
-            .style("padding-top", state.marginTop + "px")
-            .style("padding-right", state.marginRight + "px")
-            .style("padding-bottom", state.marginBottom + "px");
+            .style("margin-left", state.marginLeft + "px")
+            .style("margin-top", state.marginTop + "px")
+            .style("margin-right", state.marginRight + "px")
+            .style("margin-bottom", state.marginBottom + "px");
 
         // if a title is given render div with title inside
         if (state.title) {
@@ -234,7 +227,7 @@ export function legend() {
                 .text(unwrap(state.title));
         }
 
-        var colorFn = isStacks() ? dataColors().stack : dataColors().label;
+        var colorFn = isStacks() ? calc.colors.stack : calc.colors.label;
         var changeFn = isStacks() ? toggleStack : toggleLabel;
         var textFn = isStacks() ? stackText : labelText;
 
@@ -243,7 +236,7 @@ export function legend() {
             .data(isGroups() ? dv.stacks : [""]) // use single group when mode is not "groups"
             .enter()
             .div("ltv-legend-group")
-            .style("color", (s) => dataColors().stack(s));
+            .style("color", (s) => calc.colors.stack(s));
 
         // draw titles only in "groups" mode
         if (isGroups()) {

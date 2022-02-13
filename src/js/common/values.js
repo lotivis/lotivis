@@ -4,25 +4,25 @@
  * @returns {boolean} A Boolean value indicating whether the given value is valid.
  */
 export function isValue(value) {
-  return Boolean(value || value === 0);
+    return Boolean(value || value === 0);
 }
 
 export function isString(value) {
-  return value && typeof value === "string";
+    return value && typeof value === "string";
 }
 
 export function isFunction(value) {
-  return value && typeof value === "function";
+    return value && typeof value === "function";
 }
 
 export function isNumber(value) {
-  return typeof value === "number";
+    return typeof value === "number";
 }
 
 export function isEmpty(value) {
-  return value ? value.length === 0 : false;
+    return value ? value.length === 0 : false;
 }
 
 export function copy(object) {
-  return JSON.parse(JSON.stringify(object));
+    return JSON.parse(JSON.stringify(object));
 }

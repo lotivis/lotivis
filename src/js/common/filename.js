@@ -1,7 +1,5 @@
 import * as d3 from "d3";
-import { randomString } from "./identifiers";
-import { isEmpty } from "./values";
-import { prefix, postfix } from "./affix";
+import { prefix } from "./helpers";
 import { CONFIG } from "./config";
 
 const MAX_FILENAME_LENGTH_OS = 255;
@@ -18,7 +16,7 @@ const formatTime = d3.timeFormat("%Y-%m-%d" + separator + "%H-%M-%S");
  * @returns {string} A safe-to-use filename
  */
 function safe(name) {
-  return name.split(` `).join(`-`).split(`/`).join(`-`).split(`:`).join(`-`);
+    return name.split(` `).join(`-`).split(`/`).join(`-`).split(`:`).join(`-`);
 }
 
 /**
@@ -30,26 +28,26 @@ function safe(name) {
  * @returns
  */
 export const FILENAME_GENERATOR = function (dc, data, extension, suf) {
-  let trimmed = data.labels
-    .map(safe)
-    .join(separator)
-    .substring(0, MAX_FILENAME_LENGTH);
+    let trimmed = data.labels
+        .map(safe)
+        .join(separator)
+        .substring(0, MAX_FILENAME_LENGTH);
 
-  let labelsCount = data.labels.length;
-  let stacksCount = data.stacks.length;
-  let dateString = formatTime(new Date());
+    let labelsCount = data.labels.length;
+    let stacksCount = data.stacks.length;
+    let dateString = formatTime(new Date());
 
-  let name = [
-    CONFIG.downloadFilePrefix,
-    trimmed,
-    labelsCount ? labelsCount + "L" : null,
-    stacksCount ? stacksCount + "S" : null,
-    dateString,
-    // Math.random().toString(36).substring(2, 8), // random
-    suf,
-  ].join(separator);
+    let name = [
+        CONFIG.downloadFilePrefix,
+        trimmed,
+        labelsCount ? labelsCount + "L" : null,
+        stacksCount ? stacksCount + "S" : null,
+        dateString,
+        // Math.random().toString(36).substring(2, 8), // random
+        suf,
+    ].join(separator);
 
-  if (extension) name = name + prefix(extension, ".");
+    if (extension) name = name + prefix(extension, ".");
 
-  return name;
+    return name;
 };

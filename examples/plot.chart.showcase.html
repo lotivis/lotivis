@@ -12,64 +12,55 @@
     </head>
     <body>
         <div class="ltv-container">
-            <div class="row">
-                <div class="col-2">
-                    <a href="../index.html"> Back </a>
+            <h1>Plot Chart Showcase</h1>
+
+            <div style="width: 480px; display: inline-block">
+                gradient-single
+                <div id="gradient-single">
+                    <!-- Plot Chart -->
                 </div>
-                <div class="col-8 text-center">
-                    <h1>Plot Chart Showcase</h1>
+                gradient-multi-alphabetically
+                <div id="gradient-multi-alphabetically">
+                    <!-- Plot Chart -->
                 </div>
-                <div class="col-2"></div>
-                <div class="col-6">
-                    gradient-single
-                    <div id="gradient-single">
-                        <!-- Plot Chart -->
-                    </div>
-                    gradient-multi-alphabetically
-                    <div id="gradient-multi-alphabetically">
-                        <!-- Plot Chart -->
-                    </div>
-                    gradient-multi-duration
-                    <div id="gradient-multi-duration">
-                        <!-- Plot Chart -->
-                    </div>
-                    gradient-multi-intensity
-                    <div id="gradient-multi-intensity">
-                        <!-- Plot Chart -->
-                    </div>
-                    gradient-multi-firstDate
-                    <div id="gradient-multi-firstDate">
-                        <!-- Plot Chart -->
-                    </div>
+                gradient-multi-duration
+                <div id="gradient-multi-duration">
+                    <!-- Plot Chart -->
                 </div>
-                <div class="col-6">
-                    fraction-single
-                    <div id="fraction-single">
-                        <!-- Plot Chart -->
-                    </div>
-                    fraction-multi-alphabetically
-                    <div id="fraction-multi-alphabetically">
-                        <!-- Plot Chart -->
-                    </div>
-                    fraction-multi-duration
-                    <div id="fraction-multi-duration">
-                        <!-- Plot Chart -->
-                    </div>
-                    fraction-multi-intensity
-                    <div id="fraction-multi-intensity">
-                        <!-- Plot Chart -->
-                    </div>
-                    fraction-multi-firstDate
-                    <div id="fraction-multi-firstDate">
-                        <!-- Plot Chart -->
-                    </div>
+                gradient-multi-intensity
+                <div id="gradient-multi-intensity">
+                    <!-- Plot Chart -->
                 </div>
-                <div class="col-6">
-                    <pre id="ltv-data-preview">
-            <!-- Datasets JSON Card Here -->
-          </pre>
+                gradient-multi-firstDate
+                <div id="gradient-multi-firstDate">
+                    <!-- Plot Chart -->
                 </div>
             </div>
+
+            <div style="width: 480px; display: inline-block">
+                fraction-single
+                <div id="fraction-single">
+                    <!-- Plot Chart -->
+                </div>
+                fraction-multi-alphabetically
+                <div id="fraction-multi-alphabetically">
+                    <!-- Plot Chart -->
+                </div>
+                fraction-multi-duration
+                <div id="fraction-multi-duration">
+                    <!-- Plot Chart -->
+                </div>
+                fraction-multi-intensity
+                <div id="fraction-multi-intensity">
+                    <!-- Plot Chart -->
+                </div>
+                fraction-multi-firstDate
+                <div id="fraction-multi-firstDate">
+                    <!-- Plot Chart -->
+                </div>
+            </div>
+
+            <pre id="ltv-data"></pre>
         </div>
 
         <script src="./dist/lotivis.js"></script>
@@ -199,10 +190,11 @@
 
             function plot(id) {
                 let comps = id.split("-");
-                lotivis
+                return lotivis
                     .plot()
                     .selector("#" + id)
-                    .marginLeft(100)
+                    .width(480)
+                    .marginRight(100)
                     .style(comps[0])
                     .colorMode(comps[1])
                     .sort(comps[2] || "alphabetically")
@@ -210,16 +202,26 @@
                     .run();
             }
 
+            let customScale = lotivis.colorScale(
+                "White",
+                "CornflowerBlue",
+                "DarkBlue"
+            );
+
             plot("gradient-single");
             plot("gradient-multi-alphabetically");
-            plot("gradient-multi-duration");
-            plot("gradient-multi-intensity");
+            plot("gradient-multi-duration")
+                .colorScale(lotivis.colorScale2)
+                .run();
+            plot("gradient-multi-intensity").colorScale(customScale).run();
             plot("gradient-multi-firstDate");
 
             plot("fraction-single");
             plot("fraction-multi-alphabetically");
-            plot("fraction-multi-duration");
-            plot("fraction-multi-intensity");
+            plot("fraction-multi-duration")
+                .colorScale(lotivis.colorScale2)
+                .run();
+            plot("fraction-multi-intensity").colorScale(customScale).run();
             plot("fraction-multi-firstDate");
         </script>
     </body>

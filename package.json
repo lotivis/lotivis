@@ -38,7 +38,7 @@
         "scss": "sass src/index.scss > examples/dist/lotivis.css && sass --style compressed src/index.scss > examples/dist/lotivis.min.css",
         "test": "mocha 'test/**/test.*.js'",
         "serve": "http-server",
-        "copy": "cp examples/dist/lotivis.js ../frc-visualization/public/js/lib && cp examples/dist/lotivis.js.map ../frc-visualization/public/js/lib && cp examples/dist/lotivis.css ../frc-visualization/public/css"
+        "copy": "sass src/index.scss > examples/dist/lotivis.css && sass --style compressed src/index.scss > examples/dist/lotivis.min.css && cp examples/dist/lotivis.js ../frc-visualization/public/js/lib && cp examples/dist/lotivis.js.map ../frc-visualization/public/js/lib && cp examples/dist/lotivis.css ../frc-visualization/public/css"
     },
     "devDependencies": {
         "@babel/core": "^7.16.7",
