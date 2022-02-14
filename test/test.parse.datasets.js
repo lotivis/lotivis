@@ -1,6 +1,6 @@
-const assert = require("assert");
-const samples = require("./sample.data");
-const lotivis = require("./lotivis.test.js");
+import assert from "assert";
+import * as samples from "./sample.data.js";
+import * as lotivis from "./lotivis.test.js";
 
 // describe("datasets create", function () {
 //   it("creates an empty dataset collection for an empty flat samples list", function () {

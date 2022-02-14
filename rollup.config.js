@@ -36,12 +36,12 @@ export default [
             resolve({
                 jsnext: true,
             }),
-            execute("npm run test"),
+            execute("npm test"),
         ],
         output: {
             name: "lotivis.test",
             file: "test/lotivis.test.js",
-            format: "cjs",
+            format: "esm",
             sourcemap: true,
         },
     },

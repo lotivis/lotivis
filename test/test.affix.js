@@ -1,5 +1,5 @@
-const assert = require("assert");
-const lotivis = require("./lotivis.test.js");
+import assert from "assert";
+import * as lotivis from "./lotivis.test.js";
 
 describe("postfix", function () {
     it("appends extension if neccessarry", function () {

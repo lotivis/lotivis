@@ -1,7 +1,3 @@
-'use strict';
-
-Object.defineProperty(exports, '__esModule', { value: true });
-
 function ascending$3(a, b) {
   return a == null || b == null ? NaN : a < b ? -1 : a > b ? 1 : a >= b ? 0 : NaN;
 }
@@ -25090,40 +25086,5 @@ function map() {
     return chart;
 }
 
-exports.CONFIG = CONFIG;
-exports.DataController = DataController;
-exports.DateOrdinator = date_ordinator;
-exports.bar = bar;
-exports.config = config;
-exports.copy = copy;
-exports.createGeoJSON = createGeoJSON;
-exports.csv = csv;
-exports.csvParse = csvParse;
-exports.csvRender = csvRender;
-exports.cut = cut$1;
-exports.d3 = index;
-exports.datatext = datatext;
-exports.filterFeatures = filterFeatures;
-exports.isEmpty = isEmpty;
-exports.isFunction = isFunction;
-exports.isNumber = isNumber;
-exports.isString = isString;
-exports.isValue = isValue;
-exports.joinFeatures = joinFeatures;
-exports.json = json;
-exports.jsonFlat = jsonFlat;
-exports.legend = legend;
-exports.ltv_debug = ltv_debug;
-exports.map = map;
-exports.parseDataset = parseDataset;
-exports.parseDatasets = parseDatasets;
-exports.plot = plot;
-exports.postfix = postfix;
-exports.prefix = prefix;
-exports.removeFeatures = removeFeatures;
-exports.runsInBrowser = runsInBrowser;
-exports.safeId = safeId;
-exports.transX = transX;
-exports.transY = transY;
-exports.uniqueId = uniqueId;
+export { CONFIG, DataController, date_ordinator as DateOrdinator, bar, config, copy, createGeoJSON, csv, csvParse, csvRender, cut$1 as cut, index as d3, datatext, filterFeatures, isEmpty, isFunction, isNumber, isString, isValue, joinFeatures, json, jsonFlat, legend, ltv_debug, map, parseDataset, parseDatasets, plot, postfix, prefix, removeFeatures, runsInBrowser, safeId, transX, transY, uniqueId };
 //# sourceMappingURL=lotivis.test.js.map

@@ -1,5 +1,6 @@
-const assert = require("assert");
-const lotivis = require("./lotivis.test.js");
+import assert from "assert";
+import * as samples from "./sample.data.js";
+import * as lotivis from "./lotivis.test.js";
 
 describe("DATE_TO_NUMBER_ORDINATOR", function () {
     it("returns the correct numeric value", function () {
