@@ -44,7 +44,7 @@ export function bar() {
         marginBottom: 20,
 
         // corner radius of bars
-        radius: 5,
+        radius: CONFIG.barRadius,
 
         // whether the chart is enabled.
         enabled: true,

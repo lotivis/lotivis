@@ -247,24 +247,30 @@ export function plot() {
         calc.svg
             .append("g")
             .selectAll("g")
-            .data(dv.datasets)
+            .data(dv.labels)
             .enter()
             .append("rect")
             .attr("class", "ltv-plot-chart-selection-rect")
             .attr(`opacity`, 0)
             .attr("x", state.marginLeft)
-            .attr("y", (d) => calc.yChart(d.label))
+            .attr("y", (l) => calc.yChart(l))
             .attr("width", calc.graphWidth)
             .attr("height", calc.yChart.bandwidth())
-            .on("mouseenter", (e, d) => showTooltip(calc, d))
-            .on("mouseout", (e, d) => calc.tooltip.hide())
-            .on("click", (e, d) => {
-                state.dataController.toggleFilter("labels", d.label, chart);
-                calc.svg
-                    .selectAll(".ltv-plot-chart-selection-rect")
-                    .classed("ltv-selected", (d) =>
-                        state.dataController.isFilter("labels", d.label)
-                    );
+            .on("mouseenter", (_, l) =>
+                showTooltip(
+                    calc,
+                    dv.datasets.find((d) => d.label === l)
+                )
+            )
+            .on("mouseout", () => calc.tooltip.hide())
+            .on("click", (e, l) => {
+                state.dataController.toggleFilter("labels", l, chart);
+                chart.run();
+                // calc.svg
+                //     .selectAll(".ltv-plot-chart-selection-rect")
+                //     .classed("ltv-selected", (d) =>
+                //         state.dataController.isFilter("labels", d.label)
+                //     );
             });
     }
 
@@ -417,7 +423,7 @@ export function plot() {
         let count = ds.data.length,
             latestDate = ds.lastDate,
             dataController = chart.dataController(),
-            dataColors = dataController.dataColors(),
+            dataColors = ColorsGenerator(state.colorScheme),
             isSingle = state.colorMode === "single",
             colors = isSingle ? dataColors.label : state.colorScale;
 
@@ -450,7 +456,7 @@ export function plot() {
      * @param {*} ds
      */
     function showTooltip(calc, ds) {
-        if (!state.tooltip) return;
+        if (!state.tooltip || !ds) return;
         calc.tooltip.html(tooltipHTML(ds));
 
         // position tooltip
@@ -480,6 +486,8 @@ export function plot() {
      * @private
      */
     function tooltipHTML(ds) {
+        if (!ds) return null;
+
         let filtered = ds.data.filter((item) => item.value !== 0),
             sum = d3.sum(ds.data, (d) => d.value),
             comps = [
@@ -501,9 +509,9 @@ export function plot() {
         return comps.join("<br/>");
     }
 
-    chart.skipFilterUpdate = function (filter) {
-        return filter === "label";
-    };
+    // chart.skipFilterUpdate = function (filter) {
+    //     return filter === "labels";
+    // };
 
     /**
      * Calculates the data view for the bar chart.
@@ -516,6 +524,7 @@ export function plot() {
     chart.dataView = function (dc) {
         var dv = {};
         dv.dates = dc.dates().sort();
+        dv.labels = dc.labels();
         dv.data = dc.snapshot();
         dv.byLabelDate = d3.rollups(
             dv.data,
@@ -560,7 +569,6 @@ export function plot() {
                 break;
         }
 
-        dv.labels = dv.datasets.map((d) => d.label);
         dv.firstDate = dv.dates[0];
         dv.lastDate = dv.dates[dv.dates.length - 1];
         dv.max = d3.max(dv.datasets, (d) => d3.max(d.data, (i) => i.value));

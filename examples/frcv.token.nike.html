@@ -8,7 +8,7 @@
         />
         <link rel="stylesheet" href="./dist/lotivis.css" />
         <link rel="stylesheet" href="./examples.css" />
-        <title>Token: mif +</title>
+        <title>Token: Nike +</title>
         <style>
             .chart-wrapper {
                 display: inline-block;
@@ -19,7 +19,7 @@
     </head>
     <body>
         <div class="ltv-container">
-            <h5>Token: mif +</h5>
+            <h5>Token: Nike +</h5>
 
             <div class="chart-wrapper">
                 <div id="bar-chart">
@@ -40,7 +40,7 @@
             </div>
 
             <div class="chart-wrapper">
-                <div id="map-chart-metropole">
+                <div id="map-chart-metropole" style="width: 50%">
                     <!-- Map Chart Metropole Here -->
                 </div>
             </div>
@@ -62,8 +62,6 @@
                 .selector("#bar-chart")
                 .labels(true)
                 .dates(dates);
-
-            let legend = lotivis.legend().selector("#labels-chart");
 
             let plotChart = lotivis
                 .plot()
@@ -95,16 +93,19 @@
                 mapChart.geoJSON(json);
                 mapChartMetropole.geoJSON(json);
 
-                lotivis.d3.json("./assets/miff.json").then((json) => {
-                    let dataController = lotivis.parseDatasets(json);
+                lotivis
+                    .csv("./assets/frcv.data.nike.csv")
+                    .then((dc) => {
+                        mapChart.run(dc);
+                        mapChartMetropole.run(dc);
 
-                    mapChart.dataController(dataController).run();
-                    mapChartMetropole.dataController(dataController).run();
-
-                    barChart.dataController(dataController).run();
-                    plotChart.dataController(dataController).run();
-                    legend.dataController(dataController).run();
-                });
+                        barChart.run(dc);
+                        plotChart.run(dc);
+                    })
+                    .catch((error) => {
+                        console.error(error);
+                        alert(error);
+                    });
             });
         </script>
     </body>

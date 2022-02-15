@@ -1,4 +1,4 @@
-import { downloadBlob } from "./common/download.js";
+import { downloadBlob, downloadURL } from "./common/download.js";
 
 import { postfix } from "./common/helpers.js";
 import { uniqueId } from "./common/identifiers";
@@ -84,24 +84,30 @@ export function datatext() {
      * @public
      */
     chart.download = function () {
-        let type;
+        let type, extension;
 
         if (state.text === CSV_TEXT) {
             type = "text/csv";
+            extension = "csv";
         } else if (
             state.text === JSON_TEXT ||
             state.text === JSON_TEXT_DATA_VIEW
         ) {
             type = "text/json";
+            extension = "json";
         } else {
             type = "text/text";
+            extension = "txt";
         }
 
         let blob = new Blob([text], { type: type });
-        let filename = state.dataController.filename(state.text, "datatext");
+        let objectURL = URL.createObjectURL(blob);
+        let filename = state.dataController.filename(extension, "datatext");
 
-        down(blob, filename, type);
-        downloadBlob(blob, filename);
+        console.log("filename", filename);
+
+        downloadURL(objectURL, filename);
+
         return chart;
     };
 
