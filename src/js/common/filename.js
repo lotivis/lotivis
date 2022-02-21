@@ -1,6 +1,6 @@
 import * as d3 from "d3";
-import { prefix } from "./helpers";
-import { CONFIG } from "./config";
+import { prefix } from "./helpers.js";
+import { CONFIG } from "./config.js";
 
 const MAX_FILENAME_LENGTH_OS = 255;
 

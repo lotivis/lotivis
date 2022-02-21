@@ -1,14 +1,14 @@
 import * as d3 from "d3";
-import { baseChart } from "./chart";
-import { CONFIG } from "./common/config";
-import { uniqueId } from "./common/identifiers";
-import { safeId } from "./common/identifiers";
-import { tooltip } from "./tooltip";
-import { legend } from "./legend";
-import { transX, transY } from "./common/helpers";
-import { DEFAULT_NUMBER_FORMAT } from "./common/formats";
-import { DEFAULT_DATE_ORDINATOR } from "./common/date.ordinator";
-import { colorSchemeLotivis10, ColorsGenerator } from "./common/colors";
+import { baseChart } from "./chart.js";
+import { CONFIG } from "./common/config.js";
+import { uniqueId } from "./common/identifiers.js";
+import { safeId } from "./common/identifiers.js";
+import { tooltip } from "./tooltip.js";
+import { legend } from "./legend.js";
+import { transX, transY } from "./common/helpers.js";
+import { DEFAULT_NUMBER_FORMAT } from "./common/formats.js";
+import { DEFAULT_DATE_ORDINATOR } from "./common/date.ordinator.js";
+import { colorSchemeDefault, ColorsGenerator } from "./common/colors.js";
 
 /**
  * Reusable Bar Chart API class that renders a
@@ -67,7 +67,7 @@ export function bar() {
 
         style: "stacks",
 
-        colorScheme: colorSchemeLotivis10,
+        colorScheme: colorSchemeDefault,
 
         // the data controller.
         dataController: null,
@@ -84,10 +84,6 @@ export function bar() {
 
     // Create new underlying chart with the specified state.
     let chart = baseChart(state);
-
-    function colors() {
-        return state.dataController.dataColors();
-    }
 
     /**
      *
@@ -170,8 +166,9 @@ export function bar() {
                 : "white";
         }
 
-        let dc = state.dataController;
-        let dates = state.dates || dv.dates;
+        let dc = state.dataController,
+            dates = state.dates || dv.dates;
+
         calc.svg
             .append("g")
             .attr("transform", transY(state.height - state.marginBottom + 4))
@@ -233,25 +230,29 @@ export function bar() {
         }
     }
 
-    function renderSelection(calc, dv) {
+    function renderHoverBars(calc, dv) {
+        function rectId(date) {
+            return `ltv-bar-chart-selection-rect-${safeId(String(date))}`;
+        }
+
         calc.selection = calc.svg
             .append("g")
             .selectAll("rect")
             .data(dv.dates)
             .enter()
             .append("rect")
+            .attr("id", (d) => rectId(d))
             .attr("class", "ltv-bar-chart-selection-rect")
-            .attr(
-                "id",
-                (d) => `ltv-bar-chart-selection-rect-${safeId(String(d))}`
-            )
-            .attr("width", calc.xChartScale.bandwidth())
-            .attr("height", calc.graphHeight)
             .attr("x", (d) => calc.xChartScale(d))
             .attr("y", state.marginTop)
-            .attr("opacity", (d) =>
-                state.dataController.isFilter("dates", d) ? 0.3 : 0
-            )
+            .attr("width", calc.xChartScale.bandwidth())
+            .attr("height", calc.graphHeight)
+            // .attr("fill-opacity", 0)
+            // .attr("stroke", "blue")
+            // .attr("stroke-width", 3)
+            // .attr("opacity", (d) =>
+            //     state.dataController.isFilter("dates", d) ? 0.3 : 0
+            // )
             .on("mouseenter", mouseEnter)
             .on("mouseout", mouseOut)
             .on("mousedrag", mouseDrag)
@@ -261,20 +262,21 @@ export function bar() {
         // #  HANDLERS  ##############################################################
 
         function mouseEnter(event, date) {
-            calc.svg
-                .select(`ltv-bar-chart-selection-rect-${safeId(String(date))}`)
-                .attr("opacity", 0.3);
+            // make hover bar visible
+            d3.select(this).attr("opacity", 0.2);
+
+            // calc.svg.select(rectId(date)).attr("opacity", 0.3);
 
             // position tooltip
-            let tooltipSize = calc.tip.size();
-            let domRect = calc.svg.node().getBoundingClientRect();
-            let factor = domRect.width / state.width;
-            let offset = [
-                domRect.x + window.scrollX,
-                domRect.y + window.scrollY,
-            ];
-            let top = getTop(factor, offset, tooltipSize, calc);
-            let left = calc.xChartScalePadding(date);
+            let tooltipSize = calc.tip.size(),
+                domRect = calc.svg.node().getBoundingClientRect(),
+                factor = domRect.width / state.width,
+                offset = [
+                    domRect.x + window.scrollX,
+                    domRect.y + window.scrollY,
+                ],
+                top = getTop(factor, offset[1], tooltipSize, calc),
+                left = calc.xChartScalePadding(date);
 
             // differ tooltip position on bar position
             if (left > state.width / 2) {
@@ -291,6 +293,9 @@ export function bar() {
         }
 
         function mouseOut(event, date) {
+            // make hover bar invisible
+            d3.select(this).attr("opacity", 0);
+
             calc.tip.hide();
         }
 
@@ -305,7 +310,7 @@ export function bar() {
             dc.toggleFilter("dates", date, chart);
 
             calc.svg
-                .select(`#ltv-bar-chart-selection-rect-${safeId(String(date))}`)
+                .select(rectId(date))
                 .attr(`opacity`, (d) => (dc.isFilter("dates", d) ? 0.3 : 0));
 
             // calc.svg
@@ -315,6 +320,12 @@ export function bar() {
         }
     }
 
+    /**
+     * Renders the bars in "combined" style.
+     *
+     * @param {*} calc The calc object
+     * @param {*} dv The data view
+     */
     function renderCombined(calc, dv) {
         calc.svg
             .append("g")
@@ -338,6 +349,12 @@ export function bar() {
             .raise();
     }
 
+    /**
+     * Renders the bars in "stacked" style.
+     *
+     * @param {*} calc The calc object
+     * @param {*} dv The data view
+     */
     function renderStacked(calc, dv) {
         calc.svg
             .append("g")
@@ -381,28 +398,46 @@ export function bar() {
             .append("text")
             .attr("class", "ltv-bar-chart-label")
             .attr("transform", (d) => {
-                let stack = d[0];
-                let value = d[1];
-                let width = calc.xStack.bandwidth() / 2;
-                let x = (calc.xStack(stack) || 0) + width;
-                let y = calc.yChart(value) - 5;
-                let deg = state.labelRotation || -60;
+                let stack = d[0],
+                    value = d[1],
+                    width = calc.xStack.bandwidth() / 2,
+                    x = (calc.xStack(stack) || 0) + width,
+                    y = calc.yChart(value) - 5,
+                    deg = state.labelRotation || -60;
                 return `translate(${x},${y})rotate(${deg})`;
             })
             .text((d) => (d[1] === 0 ? "" : state.numberFormat(d[1])))
             .raise();
     }
 
-    function getTop(factor, offset, tooltipSize, calc) {
-        let top = state.marginTop * factor;
-        top += (calc.graphHeight * factor - tooltipSize[1]) / 2;
-        top += offset[1] - 10;
-        return top;
+    /**
+     *
+     * @param {*} factor
+     * @param {*} yOffset
+     * @param {*} tooltipSize
+     * @param {*} calc
+     * @returns
+     */
+    function getTop(factor, yOffset, tooltipSize, calc) {
+        return (
+            state.marginTop * factor +
+            (calc.graphHeight * factor - tooltipSize[1]) / 2 +
+            (yOffset - 10)
+        );
     }
 
+    /**
+     *
+     * @param {*} date
+     * @param {*} factor
+     * @param {*} offset
+     * @param {*} tooltipSize
+     * @param {*} calc
+     * @returns
+     */
     function getXLeft(date, factor, offset, tooltipSize, calc) {
         return (
-            calc.xChartScalePadding(date) * factor +
+            calc.xChartScale(date) * factor +
             offset[0] -
             tooltipSize[0] -
             22 -
@@ -410,16 +445,29 @@ export function bar() {
         );
     }
 
+    /**
+     *
+     * @param {*} date
+     * @param {*} factor
+     * @param {*} offset
+     * @param {*} calc
+     * @returns
+     */
     function getXRight(date, factor, offset, calc) {
         return (
-            (calc.xChartScalePadding(date) +
-                calc.xChartScalePadding.bandwidth()) *
-                factor +
+            (calc.xChartScale(date) + calc.xChartScale.bandwidth()) * factor +
             offset[0] +
             CONFIG.tooltipOffset
         );
     }
 
+    /**
+     *
+     * @param {*} date
+     * @param {*} dv
+     * @param {*} calc
+     * @returns
+     */
     function getHTMLForDate(date, dv, calc) {
         let filtered = dv.byDateLabel.get(date);
         if (!filtered) return "No Data";
@@ -532,11 +580,13 @@ export function bar() {
 
         renderSVG(container, calc);
 
-        if (state.title) renderTitle(calc, dv);
+        if (state.title) {
+            renderTitle(calc, dv);
+        }
 
         renderAxis(calc, dv);
         renderGrid(calc, dv);
-        renderSelection(calc, dv);
+        renderHoverBars(calc, dv);
 
         if (state.style === "combine") {
             renderCombined(calc, dv);
@@ -544,9 +594,14 @@ export function bar() {
             renderStacked(calc, dv);
         }
 
-        if (state.labels) renderLabels(calc, dv);
+        if (state.labels) {
+            renderLabels(calc, dv);
+        }
 
-        if (state.tooltip) calc.tip = tooltip().container(container).run();
+        if (state.tooltip) {
+            calc.tip = tooltip().container(container).run();
+            calc.tip.div().classed("ltv-bar-chart-tooltip", true);
+        }
 
         if (state.legend) {
             let dc = state.dataController;

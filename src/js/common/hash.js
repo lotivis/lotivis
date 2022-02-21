@@ -1,4 +1,4 @@
-import { isString } from "./values";
+import { isString } from "./values.js";
 
 function hashString(s) {
     let hash = 0,

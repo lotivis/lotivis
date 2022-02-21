@@ -25,14 +25,22 @@ export const colorSchemeLotivis10 = [
     "BurlyWood",
 ];
 
-export const tintColor = colorSchemeLotivis10[0];
+export const colorSchemeDefault = colorSchemeCategory10;
+
+export const tintColor = colorSchemeDefault[0];
 
 export const colorScale1 = colorScale("Yellow", "Orange", "Red", "Purple");
 
-export const colorScale2 = colorScale("White", "MediumSeaGreen", "RoyalBlue");
+export const colorScale2 = colorScale(
+    "White",
+    colorSchemeDefault[2],
+    colorSchemeDefault[0]
+);
+
+console.log(colorSchemeDefault[0]);
 
 export function ColorsGenerator(c, d) {
-    let colors = c || colorSchemeLotivis10,
+    let colors = c || colorSchemeDefault,
         data = d || [],
         stackColors,
         labelColors,
@@ -90,78 +98,6 @@ export function ColorsGenerator(c, d) {
     };
 
     return generator;
-}
-
-/**
- *
- * @param {*} data The data to generate colors for
- * @return {DataColors} A data colors object
- */
-export function DataColors(data) {
-    let baseColors = colorSchemeLotivis10,
-        stackColors = new Map(),
-        labelColors = new Map(),
-        stacksToLabels = d3.group(
-            data,
-            (d) => d.stack || d.label,
-            (d) => d.label
-        ),
-        stacks = Array.from(stacksToLabels.keys());
-
-    /**
-     * Returns a collection of label belonging the passed stack.
-     * @private
-     */
-    function stackLabels(stack) {
-        return Array.from((stacksToLabels.get(stack) || []).keys());
-    }
-
-    /**
-     * From the collection of base color returns the color for
-     * the passed stack by calculating the stacks index.
-     * @private
-     */
-    function stackColor(stack) {
-        return baseColors[stacks.indexOf(stack) % baseColors.length];
-    }
-
-    stacks.forEach((stack) => {
-        let labels = stackLabels(stack);
-        let c1 = d3.color(stackColor(stack));
-        let colors = colorScale(c1, darker(c1));
-
-        stackColors.set(stack, c1);
-
-        labels.forEach((label, index) => {
-            labelColors.set(label, colors(index / labels.length));
-        });
-    });
-
-    function main() {}
-
-    /**
-     * Returns the color for the given stack.
-     *
-     * @param {stack} stack The stack
-     * @returns The d3.color for the stack
-     * @public
-     */
-    main.stack = function (stack) {
-        return stackColors ? stackColors.get(stack) || tintColor : tintColor;
-    };
-
-    /**
-     * Returns the color for the given label.
-     *
-     * @param {label} label The label
-     * @returns {d3.Color} The color for the label
-     * @public
-     */
-    main.label = function (label) {
-        return labelColors ? labelColors.get(label) || tintColor : tintColor;
-    };
-
-    return main;
 }
 
 export function colorScale(...colors) {

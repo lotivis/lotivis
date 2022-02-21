@@ -1,6 +1,6 @@
 import assert from "assert";
 import * as samples from "./sample.data.js";
-import * as lotivis from "./lotivis.test.js";
+import { remove } from "../src/js/geojson/remove.js";
 
 describe("remove features from json", function () {
     let geoJSON = samples.readJSON("berlin.geojson");
@@ -16,7 +16,7 @@ describe("remove features from json", function () {
     });
 
     it("the geoJSON contains the right amount of features after removing", function () {
-        let removed = lotivis.removeFeatures(geoJSON, idsToRemove, idAccessor);
+        let removed = remove(geoJSON, idsToRemove, idAccessor);
         assert.equal(removed.features.length, 8);
     });
 });

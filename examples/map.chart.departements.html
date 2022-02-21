@@ -6,7 +6,7 @@
             name="viewport"
             content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"
         />
-        <link rel="stylesheet" href="./dist/lotivis.css" />
+        <link rel="stylesheet" href="../dist/lotivis.css" />
         <link rel="stylesheet" href="./examples.css" />
         <title>MapChart Departements</title>
     </head>
@@ -31,7 +31,7 @@
             </div>
         </div>
 
-        <script src="./dist/lotivis.js"></script>
+        <script src="../dist/lotivis.js"></script>
 
         <script>
             // print debug messages
@@ -41,9 +41,10 @@
             let chart = lotivis
                 .map()
                 .selector("#map-chart")
-                .labels(true)
+                .labels(false)
                 .labelsExclude(["75", "92", "93", "94"])
                 .exclude(["2A", "2B"])
+                .colorScale(lotivis.colorScale1)
                 .featureIDAccessor((f) => f.properties.code)
                 .featureNameAccessor((f) => f.properties.nom);
 

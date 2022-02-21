@@ -1,8 +1,9 @@
 import * as d3 from "d3";
-import { isFunction } from "./common/values";
+import { attributable } from "./common/attributable.js";
 import { uniqueId } from "./common/identifiers.js";
-import { ltv_debug } from "./common/config";
-import { pngDownload } from "./common/download";
+import { ltv_debug } from "./common/config.js";
+import { pngDownload } from "./common/download.js";
+import { Events } from "./common/events.js";
 
 export function baseChart(state) {
     if (!state) throw new Error("no state passed");
@@ -17,31 +18,20 @@ export function baseChart(state) {
     if (!state.selector) state.selector = "body";
     if (!state.debug) state.debug = false;
 
-    // Iterate state keys and create access function for each
-    Object.keys(state).forEach((key) => {
-        // do not override existing functions
-        if (chart[key] && isFunction(chart[key])) return;
-        chart[key] = function (_) {
-            return arguments.length ? ((state[key] = _), this) : state[key];
-        };
-    });
-
-    // public
-
-    /**
-     * Return the property for the given name if it exists, else
-     * the given fallback value.
-     *
-     * @param {string} name The name of the requested property
-     * @param {any} fb The fallback value
-     *
-     * @returns The property for the given name or the fallback.
-     */
-    state.get = function (name, fb) {
-        return state.hasOwnProperty(name) ? state[name] || fb : fb;
-    };
+    attributable(chart, state);
 
     // private
+
+    function filterWillChange(filterName, action, item) {
+        ltv_debug("filterWillChange");
+    }
+
+    function filterDidChange(filterName, action, item) {
+        ltv_debug("filterDidChange", this);
+        if (this === chart) return ltv_debug(chart.id(), "is sender");
+        if (chart.skipFilterUpdate(filterName, action, item))
+            return ltv_debug(chart.id(), "skip filter update", filterName);
+    }
 
     function filterUpdate(sender, filterName, action, item) {
         if (chart === sender) return ltv_debug(chart.id(), "is sender");
@@ -63,6 +53,8 @@ export function baseChart(state) {
         //     chart.update(container, state, calc);
         // });
     }
+
+    function rerender() {}
 
     // public
     chart.on = function (name, callback) {
@@ -113,9 +105,9 @@ export function baseChart(state) {
         pngDownload(state.selector, filename, callback);
     };
 
-    chart.svgDownload = function (callback) {};
-
-    // getter and setter
+    chart.svgDownload = function (callback) {
+        ltv_debug("svgDownload() not implemented");
+    };
 
     /**
      * Gets or sets the data controller.
@@ -231,6 +223,9 @@ export function baseChart(state) {
 
         return chart;
     };
+
+    Events.on("filter-will-change." + chart.id(), filterWillChange);
+    Events.on("filter-did-change." + chart.id(), filterDidChange);
 
     // return generated chart
     return chart;

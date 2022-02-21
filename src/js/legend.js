@@ -1,8 +1,8 @@
 import * as d3 from "d3";
-import { baseChart } from "./chart";
-import { colorSchemeLotivis10, ColorsGenerator } from "./common/colors";
-import { CONFIG } from "./common/config";
-import { uniqueId } from "./common/identifiers";
+import { baseChart } from "./chart.js";
+import { colorSchemeDefault, ColorsGenerator } from "./common/colors.js";
+import { CONFIG } from "./common/config.js";
+import { uniqueId } from "./common/identifiers.js";
 
 export const LABEL_FORMAT = function (l, v, i) {
     return `${l} (${v})`;
@@ -46,7 +46,7 @@ export function legend() {
         // the format of displaying a group
         groupFormat: GROUP_TITLE_FORMAT,
 
-        colorScheme: colorSchemeLotivis10,
+        colorScheme: colorSchemeDefault,
 
         // (optional) title of the legend
         title: null,

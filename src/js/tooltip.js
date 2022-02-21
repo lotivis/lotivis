@@ -1,6 +1,6 @@
-import * as d3 from "d3";
-import { baseChart } from "./chart";
-import { uniqueId } from "./common/identifiers";
+import { uniqueId } from "./common/identifiers.js";
+import { attributable } from "./common/attributable.js";
+import { postfix } from "./common/helpers.js";
 
 /**
  * Reusable Tooltip API class that renders a
@@ -17,82 +17,110 @@ import { uniqueId } from "./common/identifiers";
  *
  */
 export function tooltip() {
-  let state = {
-    // the id of the tooltip
-    id: uniqueId("tooltip"),
+    let main = {},
+        div;
 
-    // the tooltips margin
-    marginLeft: 0,
-    marginTop: 0,
-    marginRight: 0,
-    marginBottom: 0,
-  };
+    attributable(main, {
+        // the id of the tooltip
+        id: uniqueId("tooltip"),
 
-  let main = baseChart(state),
-    container,
-    div;
+        // the tooltips margin
+        marginLeft: 0,
+        marginTop: 0,
+        marginRight: 0,
+        marginBottom: 0,
 
-  // private
-  function withPixels(value) {
-    return typeof value === "string" && value.endsWith("px")
-      ? value
-      : value + "px";
-  }
+        // a container to render the tooltip in
+        container: null,
+    });
 
-  // public api
+    // private
 
-  main.container = function (_container) {
-    return arguments.length ? ((container = _container), main) : container;
-  };
+    function require(div) {
+        if (!div) throw new Error("invalid div");
+        return div;
+    }
 
-  main.html = function (_html) {
-    if (!div) throw new Error("no div of tooltip");
-    return arguments.length ? (div.html(_html), main) : div.attr("x");
-  };
+    // public api
 
-  main.show = function (html) {
-    if (!div) throw new Error("no div of tooltip");
-    return div.style("opacity", 1), main;
-  };
+    /**
+     * Shows the tooltip by setting the opacity to 1.
+     * @returnss {tooltip} The tooltip itself
+     */
+    main.show = function () {
+        return require(div).classed("ltv-tooltip-show", true), main;
+    };
 
-  main.hide = function () {
-    if (!div) throw new Error("no div of tooltip");
-    return div.style("opacity", 0), main;
-  };
+    /**
+     * Hides the tooltip by setting the opacity to 0.
+     * @returns {tooltip} The tooltip itself
+     */
+    main.hide = function () {
+        return require(div).classed("ltv-tooltip-show", false), main;
+    };
 
-  main.top = function (_top) {
-    if (!div) throw new Error("no div of tooltip");
-    if (!arguments.length) return div.style("top");
-    div.style("top", withPixels(_top));
+    /**
+     * Gets or sets the top in pixels.
+     * @param {*} _top
+     * @returns {String|tooltip}
+     */
+    main.top = function (_top) {
+        return arguments.length
+            ? (require(div).style("top", postfix(_top, "px")), main)
+            : require(div).style("top");
+    };
+
+    /**
+     * Gets or sets the left in pixels.
+     * @param {*} _left
+     * @returns {String|tooltip}
+     */
+    main.left = function (_left) {
+        return arguments.length
+            ? (require(div).style("left", postfix(_left, "px")), main)
+            : require(div).style("left");
+    };
+
+    /**
+     * Gets or sets the HTML content of the div container.
+     * @param {String} _html The new HTML to set
+     * @returns {String|tooltip}
+     */
+    main.html = function (_html) {
+        return arguments.length
+            ? (require(div).html(_html), main)
+            : require(div).html();
+    };
+
+    /**
+     * Gets or sets the left in pixels.
+     * @param {*} _div
+     * @returns {div|tooltip}
+     */
+    main.div = function (_div) {
+        return arguments.length ? ((div = _div), main) : div;
+    };
+
+    /**
+     * Gets the size of the tooltip.
+     * @returns The size
+     */
+    main.size = function () {
+        let domRect = require(div).node().getBoundingClientRect();
+        return [domRect.width, domRect.height];
+    };
+
+    /**
+     * Renders the tooltip.
+     * @returns The tooltip itself.
+     */
+    main.run = function () {
+        // render the div of the tooltip
+        div = main.container().append("div").classed("ltv-tooltip", true);
+
+        return main;
+    };
+
+    // return generated chart
     return main;
-  };
-
-  main.left = function (_left) {
-    if (!div) throw new Error("no div of tooltip");
-    if (!arguments.length) return div.style("left");
-    div.style("left", withPixels(_left));
-    return main;
-  };
-
-  main.size = function () {
-    if (!div) throw new Error("no div of tooltip");
-    let domRect = div.node().getBoundingClientRect();
-    return [domRect.width, domRect.height];
-  };
-
-  main.run = function () {
-    // remove any previous rendered tooltip
-    // if (div) div.remove();
-
-    // render the div of the tooltip
-    div = container
-      .append("div")
-      .attr("class", "ltv-tooltip")
-      .style("opacity", 0);
-
-    return main;
-  };
-
-  // return generated chart
-  return main;
 }

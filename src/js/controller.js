@@ -1,11 +1,12 @@
 import * as d3 from "d3";
 import { FILENAME_GENERATOR } from "./common/filename.js";
-import { DEFAULT_DATE_ORDINATOR } from "./common/date.ordinator";
-import { Data } from "./data";
-import { ltv_debug } from "./common/config";
+import { DEFAULT_DATE_ORDINATOR } from "./common/date.ordinator.js";
+import { Data } from "./data.js";
+import { ltv_debug } from "./common/config.js";
 import { uniqueId } from "./common/identifiers.js";
-import { prefix } from "./common/helpers";
-import { datatext, data_preview } from "./datatext";
+import { prefix } from "./common/helpers.js";
+import { datatext, data_preview } from "./datatext.js";
+import { Events } from "./common/events.js";
 
 export class DataController {
     constructor(data) {
@@ -161,8 +162,11 @@ export class DataController {
          * @param {*} sender The sender who made this action
          */
         this.addFilter = function (name, item, sender) {
-            if (this.filters(name).add(item))
-                this.filtersDidChange(name, "add", item, sender);
+            Events.call("filter-will-change", sender, name, "add", item);
+            if (!this.filters(name).add(item)) return;
+            Events.call("filter-did-change", sender, name, "add", item);
+
+            this.filtersDidChange(name, "add", item, sender);
         };
 
         /**
@@ -189,6 +193,10 @@ export class DataController {
                 : this.addFilter(name, item, sender);
         };
 
+        /**
+         * Returns the data applying the filters.
+         * @returns
+         */
         this.filteredData = function () {
             let f = attr.filters;
             return attr.data.filter(
@@ -251,7 +259,6 @@ export class DataController {
         };
 
         // initialize
-        if (false) applyURLParameters();
         calculateSnapshot();
 
         // debug
@@ -259,6 +266,17 @@ export class DataController {
         data_preview(this);
 
         return this;
+    }
+
+    /**
+     * Creates and returns a new datatext with the passed selector. Also sets
+     * the DataController to the receiver.
+     *
+     * @param {String} selector The selctor for the datatext
+     * @returns {datatext} A newly created datatext
+     */
+    datatext(selector = "ltv-data") {
+        return datatext().dataController(this).selector(selector);
     }
 
     /** Returns entries with valid value. */

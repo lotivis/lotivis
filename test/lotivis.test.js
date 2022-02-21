@@ -1072,7 +1072,7 @@ function some(values, test) {
   return false;
 }
 
-function filter$1(values, test) {
+function filter$2(values, test) {
   if (typeof test !== "function") throw new TypeError("test is not a function");
   const array = [];
   let index = -1;
@@ -1579,7 +1579,7 @@ function selection_selectChild(match) {
       : childFind(typeof match === "function" ? match : childMatcher(match)));
 }
 
-var filter = Array.prototype.filter;
+var filter$1 = Array.prototype.filter;
 
 function children() {
   return Array.from(this.children);
@@ -1587,7 +1587,7 @@ function children() {
 
 function childrenFilter(match) {
   return function() {
-    return filter.call(this.children, match);
+    return filter$1.call(this.children, match);
   };
 }
 
@@ -2172,13 +2172,13 @@ function selection_insert(name, before) {
   });
 }
 
-function remove() {
+function remove$1() {
   var parent = this.parentNode;
   if (parent) parent.removeChild(this);
 }
 
 function selection_remove() {
-  return this.each(remove);
+  return this.each(remove$1);
 }
 
 function selection_cloneShallow() {
@@ -8051,7 +8051,7 @@ var csv$2 = dsvFormat(",");
 
 var csvParse$1 = csv$2.parse;
 var csvParseRows = csv$2.parseRows;
-var csvFormat = csv$2.format;
+var csvFormat$1 = csv$2.format;
 var csvFormatBody = csv$2.formatBody;
 var csvFormatRows = csv$2.formatRows;
 var csvFormatRow = csv$2.formatRow;
@@ -14706,7 +14706,7 @@ function polymap(domain, range, interpolate) {
   };
 }
 
-function copy$2(source, target) {
+function copy$3(source, target) {
   return target
       .domain(source.domain())
       .range(source.range())
@@ -14862,7 +14862,7 @@ function linear() {
   var scale = continuous();
 
   scale.copy = function() {
-    return copy$2(scale, linear());
+    return copy$3(scale, linear());
   };
 
   initRange.apply(scale, arguments);
@@ -15045,7 +15045,7 @@ function loggish(transform) {
 
 function log() {
   const scale = loggish(transformer$2()).domain([1, 10]);
-  scale.copy = () => copy$2(scale, log()).base(scale.base());
+  scale.copy = () => copy$3(scale, log()).base(scale.base());
   initRange.apply(scale, arguments);
   return scale;
 }
@@ -15076,7 +15076,7 @@ function symlog() {
   var scale = symlogish(transformer$2());
 
   scale.copy = function() {
-    return copy$2(scale, symlog()).constant(scale.constant());
+    return copy$3(scale, symlog()).constant(scale.constant());
   };
 
   return initRange.apply(scale, arguments);
@@ -15117,7 +15117,7 @@ function pow() {
   var scale = powish(transformer$2());
 
   scale.copy = function() {
-    return copy$2(scale, pow()).exponent(scale.exponent());
+    return copy$3(scale, pow()).exponent(scale.exponent());
   };
 
   initRange.apply(scale, arguments);
@@ -16493,7 +16493,7 @@ function calendar(ticks, tickInterval, year, month, week, day, hour, minute, sec
   };
 
   scale.copy = function() {
-    return copy$2(scale, calendar(ticks, tickInterval, year, month, week, day, hour, minute, second, format));
+    return copy$3(scale, calendar(ticks, tickInterval, year, month, week, day, hour, minute, second, format));
   };
 
   return scale;
@@ -16555,7 +16555,7 @@ function transformer$1() {
   };
 }
 
-function copy$1(source, target) {
+function copy$2(source, target) {
   return target
       .domain(source.domain())
       .interpolator(source.interpolator())
@@ -16567,7 +16567,7 @@ function sequential() {
   var scale = linearish(transformer$1()(identity$4));
 
   scale.copy = function() {
-    return copy$1(scale, sequential());
+    return copy$2(scale, sequential());
   };
 
   return initInterpolator.apply(scale, arguments);
@@ -16577,7 +16577,7 @@ function sequentialLog() {
   var scale = loggish(transformer$1()).domain([1, 10]);
 
   scale.copy = function() {
-    return copy$1(scale, sequentialLog()).base(scale.base());
+    return copy$2(scale, sequentialLog()).base(scale.base());
   };
 
   return initInterpolator.apply(scale, arguments);
@@ -16587,7 +16587,7 @@ function sequentialSymlog() {
   var scale = symlogish(transformer$1());
 
   scale.copy = function() {
-    return copy$1(scale, sequentialSymlog()).constant(scale.constant());
+    return copy$2(scale, sequentialSymlog()).constant(scale.constant());
   };
 
   return initInterpolator.apply(scale, arguments);
@@ -16597,7 +16597,7 @@ function sequentialPow() {
   var scale = powish(transformer$1());
 
   scale.copy = function() {
-    return copy$1(scale, sequentialPow()).exponent(scale.exponent());
+    return copy$2(scale, sequentialPow()).exponent(scale.exponent());
   };
 
   return initInterpolator.apply(scale, arguments);
@@ -16698,7 +16698,7 @@ function diverging$1() {
   var scale = linearish(transformer()(identity$4));
 
   scale.copy = function() {
-    return copy$1(scale, diverging$1());
+    return copy$2(scale, diverging$1());
   };
 
   return initInterpolator.apply(scale, arguments);
@@ -16708,7 +16708,7 @@ function divergingLog() {
   var scale = loggish(transformer()).domain([0.1, 1, 10]);
 
   scale.copy = function() {
-    return copy$1(scale, divergingLog()).base(scale.base());
+    return copy$2(scale, divergingLog()).base(scale.base());
   };
 
   return initInterpolator.apply(scale, arguments);
@@ -16718,7 +16718,7 @@ function divergingSymlog() {
   var scale = symlogish(transformer());
 
   scale.copy = function() {
-    return copy$1(scale, divergingSymlog()).constant(scale.constant());
+    return copy$2(scale, divergingSymlog()).constant(scale.constant());
   };
 
   return initInterpolator.apply(scale, arguments);
@@ -16728,7 +16728,7 @@ function divergingPow() {
   var scale = powish(transformer());
 
   scale.copy = function() {
-    return copy$1(scale, divergingPow()).exponent(scale.exponent());
+    return copy$2(scale, divergingPow()).exponent(scale.exponent());
   };
 
   return initInterpolator.apply(scale, arguments);
@@ -19789,7 +19789,7 @@ var index = /*#__PURE__*/Object.freeze({
   zip: zip,
   every: every,
   some: some,
-  filter: filter$1,
+  filter: filter$2,
   map: map$2,
   reduce: reduce,
   reverse: reverse$3,
@@ -19834,7 +19834,7 @@ var index = /*#__PURE__*/Object.freeze({
   dsvFormat: dsvFormat,
   csvParse: csvParse$1,
   csvParseRows: csvParseRows,
-  csvFormat: csvFormat,
+  csvFormat: csvFormat$1,
   csvFormatBody: csvFormatBody,
   csvFormatRows: csvFormatRows,
   csvFormatRow: csvFormatRow,
@@ -20542,10 +20542,10 @@ var date_ordinator = /*#__PURE__*/Object.freeze({
 });
 
 class DataUnqualifiedError extends Error {
-  constructor(message) {
-    super(message);
-    this.name = "DataUnqualifiedError";
-  }
+    constructor(message) {
+        super(message);
+        this.name = "DataUnqualifiedError";
+    }
 }
 
 function Data(data) {
@@ -20640,7 +20640,6 @@ function pngDownload(selector, filename, callback) {
 const DEFAULT_COLUMNS = ["label", "location", "date", "value", "stack"];
 
 function csvParse(text) {
-    console.log("text: ", text);
     return new DataController(csvParse$1(text, autoType));
 }
 
@@ -20650,8 +20649,9 @@ async function csv(path) {
         .then((csv) => csvParse(csv));
 }
 
-function csvRender(data, columns = DEFAULT_COLUMNS) {
-    return csvFormat(data.data ? data.data() : data, columns);
+/** Renders given data to CSV with headlines. */
+function csvFormat(data, columns = DEFAULT_COLUMNS) {
+    return csvFormat$1(data.data ? data.data() : data, columns);
 }
 
 /**
@@ -20679,8 +20679,89 @@ function isEmpty(value) {
     return value ? value.length === 0 : false;
 }
 
-function copy(object) {
+function copy$1(object) {
     return JSON.parse(JSON.stringify(object));
+}
+
+/**
+ *
+ * @param {*} src
+ * @param {*} attr
+ * @returns
+ */
+function attributable(src, attr) {
+    // Iterate attr keys and create access function for each
+    Object.keys(attr).forEach((key) => {
+        // do not override existing functions
+        if (src[key] && isFunction(src[key])) return;
+        src[key] = function (_) {
+            return arguments.length ? ((attr[key] = _), src) : attr[key];
+        };
+    });
+
+    /**
+     * Return the property for the given name if it exists, else
+     * the given fallback value.
+     *
+     * @param {string} name The name of the requested property
+     * @param {any} fb The fallback value
+     *
+     * @returns The property for the given name or the fallback.
+     */
+    attr.get = function (name, fb) {
+        return attr.hasOwnProperty(name) ? attr[name] || fb : fb;
+    };
+
+    return src;
+}
+
+/**
+ * Events dispatch center.
+ *
+ * Lists of valid actions:
+ * - "filter"
+ * - "data"
+ * - "map-selection-will-change"
+ * - "map-selection-did-change"
+ */
+class Events {
+    /**
+     * Global dispatch object.
+     */
+    static disp = dispatch(
+        "filter-will-change",
+        "filter-did-change",
+        "filter",
+        "data",
+        "data-will-change",
+        "data-did-change",
+        "map-selection-will-change",
+        "map-selection-did-change"
+    );
+
+    /**
+     *
+     * @param {String}  A specified event type.
+     * @param {*} callback
+     */
+    static on(type, callback) {
+        ltv_debug("Events on", type);
+        this.disp.on(type, callback);
+    }
+
+    /**
+     * Invokes each registered callback for the specified type, passing the
+     * callback the specified arguments, with `that` as the `this` context.
+     *
+     * @param type A specified event type.
+     * @param sender The `this` context for the callback.
+     * @param args Additional arguments to be passed to the callback.
+     * @throws "unknown type" on unknown event type.
+     */
+    static call(type, sender, ...params) {
+        ltv_debug("Events on", type);
+        this.disp.call(type, sender, ...params);
+    }
 }
 
 function baseChart(state) {
@@ -20696,31 +20777,20 @@ function baseChart(state) {
     if (!state.selector) state.selector = "body";
     if (!state.debug) state.debug = false;
 
-    // Iterate state keys and create access function for each
-    Object.keys(state).forEach((key) => {
-        // do not override existing functions
-        if (chart[key] && isFunction(chart[key])) return;
-        chart[key] = function (_) {
-            return arguments.length ? ((state[key] = _), this) : state[key];
-        };
-    });
-
-    // public
-
-    /**
-     * Return the property for the given name if it exists, else
-     * the given fallback value.
-     *
-     * @param {string} name The name of the requested property
-     * @param {any} fb The fallback value
-     *
-     * @returns The property for the given name or the fallback.
-     */
-    state.get = function (name, fb) {
-        return state.hasOwnProperty(name) ? state[name] || fb : fb;
-    };
+    attributable(chart, state);
 
     // private
+
+    function filterWillChange(filterName, action, item) {
+        ltv_debug("filterWillChange");
+    }
+
+    function filterDidChange(filterName, action, item) {
+        ltv_debug("filterDidChange", this);
+        if (this === chart) return ltv_debug(chart.id(), "is sender");
+        if (chart.skipFilterUpdate(filterName, action, item))
+            return ltv_debug(chart.id(), "skip filter update", filterName);
+    }
 
     function filterUpdate(sender, filterName, action, item) {
         if (chart === sender) return ltv_debug(chart.id(), "is sender");
@@ -20792,9 +20862,9 @@ function baseChart(state) {
         pngDownload(state.selector, filename, callback);
     };
 
-    chart.svgDownload = function (callback) {};
-
-    // getter and setter
+    chart.svgDownload = function (callback) {
+        ltv_debug("svgDownload() not implemented");
+    };
 
     /**
      * Gets or sets the data controller.
@@ -20911,6 +20981,9 @@ function baseChart(state) {
         return chart;
     };
 
+    Events.on("filter-will-change." + chart.id(), filterWillChange);
+    Events.on("filter-did-change." + chart.id(), filterDidChange);
+
     // return generated chart
     return chart;
 }
@@ -20921,16 +20994,16 @@ function baseChart(state) {
  * @param {dataview} dv
  * @returns {string} JSON the passed data view.
  */
-const JSON_TEXT = function (dt, dv) {
+const datatextJSONData = function (dt, dv) {
     return JSON.stringify(dv.data, null, 2);
 };
 
-const JSON_TEXT_DATA_VIEW = function (dt, dv) {
+const datatextJSON = function (dt, dv) {
     return JSON.stringify(dv, null, 2);
 };
 
-const CSV_TEXT = function (dt, dv) {
-    return csvRender(dv.data);
+const datatextCSV = function (dt, dv) {
+    return csvFormat(dv.data);
 };
 
 function datatext() {
@@ -20955,7 +21028,7 @@ function datatext() {
         title: (dt, dv) => "Data",
 
         // the text to display for the data
-        text: CSV_TEXT,
+        text: datatextCSV,
 
         // the data controller
         dataController: null,
@@ -20995,12 +21068,12 @@ function datatext() {
     chart.download = function () {
         let type, extension;
 
-        if (state.text === CSV_TEXT) {
+        if (state.text === datatextCSV) {
             type = "text/csv";
             extension = "csv";
         } else if (
-            state.text === JSON_TEXT ||
-            state.text === JSON_TEXT_DATA_VIEW
+            state.text === datatextJSONData ||
+            state.text === datatextJSON
         ) {
             type = "text/json";
             extension = "json";
@@ -21065,7 +21138,7 @@ function datatext() {
                 .on("click", state.enabled ? chart.download : null);
         }
 
-        text = unwrap(state.text, chart, dv);
+        text = unwrap(state.text, chart, dv, state.dataController);
         calc.pre = calc.div
             .append("pre")
             .classed("ltv-datatext-pre", true)
@@ -21128,7 +21201,7 @@ class DataController {
          */
         function calculateSnapshot() {
             let f = attr.filters;
-            let snapshot = filter$1(attr.data, (d) => {
+            let snapshot = filter$2(attr.data, (d) => {
                 return !(
                     f.locations.indexOf(d.location) !== -1 ||
                     f.dates.indexOf(d.date) !== -1 ||
@@ -21247,8 +21320,11 @@ class DataController {
          * @param {*} sender The sender who made this action
          */
         this.addFilter = function (name, item, sender) {
-            if (this.filters(name).add(item))
-                this.filtersDidChange(name, "add", item, sender);
+            Events.call("filter-will-change", sender, name, "add", item);
+            if (!this.filters(name).add(item)) return;
+            Events.call("filter-did-change", sender, name, "add", item);
+
+            this.filtersDidChange(name, "add", item, sender);
         };
 
         /**
@@ -21275,6 +21351,10 @@ class DataController {
                 : this.addFilter(name, item, sender);
         };
 
+        /**
+         * Returns the data applying the filters.
+         * @returns
+         */
         this.filteredData = function () {
             let f = attr.filters;
             return attr.data.filter(
@@ -21335,6 +21415,8 @@ class DataController {
                 .dataController(this)
                 .run();
         };
+
+        // initialize
         calculateSnapshot();
 
         // debug
@@ -21342,6 +21424,17 @@ class DataController {
         data_preview(this);
 
         return this;
+    }
+
+    /**
+     * Creates and returns a new datatext with the passed selector. Also sets
+     * the DataController to the receiver.
+     *
+     * @param {String} selector The selctor for the datatext
+     * @returns {datatext} A newly created datatext
+     */
+    datatext(selector = "ltv-data") {
+        return datatext().dataController(this).selector(selector);
     }
 
     /** Returns entries with valid value. */
@@ -21448,17 +21541,17 @@ Array.prototype.remove = function (item) {
 };
 
 function flatDataset(d) {
-  if (Array.isArray(d)) throw new Error("expecting object. found array");
-  if (!d || !d.data) throw new Error("dataset has no data");
-  return d.data.map(function (i) {
-    return {
-      label: d.label,
-      stack: d.stack,
-      location: i.location,
-      date: i.date,
-      value: i.value,
-    };
-  });
+    if (Array.isArray(d)) throw new Error("expecting object. found array");
+    if (!d || !d.data) throw new Error("dataset has no data");
+    return d.data.map(function (i) {
+        return {
+            label: d.label,
+            stack: d.stack,
+            location: i.location,
+            date: i.date,
+            value: i.value,
+        };
+    });
 }
 
 /**
@@ -21467,32 +21560,32 @@ function flatDataset(d) {
  * @returns {Array} The flat version
  */
 function flatDatasets(ds) {
-  return ds.reduce((memo, d) => memo.concat(flatDataset(d)), []);
+    return ds.reduce((memo, d) => memo.concat(flatDataset(d)), []);
 }
 
 function parseDataset(d) {
-  return parseDatasets([d]);
+    return parseDatasets([d]);
 }
 
 function parseDatasets(d) {
-  return new DataController(flatDatasets(d));
+    return new DataController(flatDatasets(d));
 }
 
 function json(path) {
-  return json$1(path).then((json) => {
-    if (!Array.isArray(json)) throw new DataUnqualifiedError();
-    let flat = flatDatasets(json);
-    let controller = new DataController(flat, { original: json });
-    return controller;
-  });
+    return json$1(path).then((json) => {
+        if (!Array.isArray(json)) throw new DataUnqualifiedError();
+        let flat = flatDatasets(json);
+        let controller = new DataController(flat, { original: json });
+        return controller;
+    });
 }
 
 function jsonFlat(path) {
-  return json$1(path).then((json) => {
-    if (!Array.isArray(json)) throw new DataUnqualifiedError();
-    let controller = new DataController(json, { original: json });
-    return controller;
-  });
+    return json$1(path).then((json) => {
+        if (!Array.isArray(json)) throw new DataUnqualifiedError();
+        let controller = new DataController(json, { original: json });
+        return controller;
+    });
 }
 
 /**
@@ -21510,84 +21603,112 @@ function jsonFlat(path) {
  *
  */
 function tooltip() {
-  let state = {
-    // the id of the tooltip
-    id: uniqueId("tooltip"),
+    let main = {},
+        div;
 
-    // the tooltips margin
-    marginLeft: 0,
-    marginTop: 0,
-    marginRight: 0,
-    marginBottom: 0,
-  };
+    attributable(main, {
+        // the id of the tooltip
+        id: uniqueId("tooltip"),
 
-  let main = baseChart(state),
-    container,
-    div;
+        // the tooltips margin
+        marginLeft: 0,
+        marginTop: 0,
+        marginRight: 0,
+        marginBottom: 0,
 
-  // private
-  function withPixels(value) {
-    return typeof value === "string" && value.endsWith("px")
-      ? value
-      : value + "px";
-  }
+        // a container to render the tooltip in
+        container: null,
+    });
 
-  // public api
+    // private
 
-  main.container = function (_container) {
-    return arguments.length ? ((container = _container), main) : container;
-  };
+    function require(div) {
+        if (!div) throw new Error("invalid div");
+        return div;
+    }
 
-  main.html = function (_html) {
-    if (!div) throw new Error("no div of tooltip");
-    return arguments.length ? (div.html(_html), main) : div.attr("x");
-  };
+    // public api
 
-  main.show = function (html) {
-    if (!div) throw new Error("no div of tooltip");
-    return div.style("opacity", 1), main;
-  };
+    /**
+     * Shows the tooltip by setting the opacity to 1.
+     * @returnss {tooltip} The tooltip itself
+     */
+    main.show = function () {
+        return require(div).classed("ltv-tooltip-show", true), main;
+    };
 
-  main.hide = function () {
-    if (!div) throw new Error("no div of tooltip");
-    return div.style("opacity", 0), main;
-  };
+    /**
+     * Hides the tooltip by setting the opacity to 0.
+     * @returns {tooltip} The tooltip itself
+     */
+    main.hide = function () {
+        return require(div).classed("ltv-tooltip-show", false), main;
+    };
 
-  main.top = function (_top) {
-    if (!div) throw new Error("no div of tooltip");
-    if (!arguments.length) return div.style("top");
-    div.style("top", withPixels(_top));
+    /**
+     * Gets or sets the top in pixels.
+     * @param {*} _top
+     * @returns {String|tooltip}
+     */
+    main.top = function (_top) {
+        return arguments.length
+            ? (require(div).style("top", postfix(_top, "px")), main)
+            : require(div).style("top");
+    };
+
+    /**
+     * Gets or sets the left in pixels.
+     * @param {*} _left
+     * @returns {String|tooltip}
+     */
+    main.left = function (_left) {
+        return arguments.length
+            ? (require(div).style("left", postfix(_left, "px")), main)
+            : require(div).style("left");
+    };
+
+    /**
+     * Gets or sets the HTML content of the div container.
+     * @param {String} _html The new HTML to set
+     * @returns {String|tooltip}
+     */
+    main.html = function (_html) {
+        return arguments.length
+            ? (require(div).html(_html), main)
+            : require(div).html();
+    };
+
+    /**
+     * Gets or sets the left in pixels.
+     * @param {*} _div
+     * @returns {div|tooltip}
+     */
+    main.div = function (_div) {
+        return arguments.length ? ((div = _div), main) : div;
+    };
+
+    /**
+     * Gets the size of the tooltip.
+     * @returns The size
+     */
+    main.size = function () {
+        let domRect = require(div).node().getBoundingClientRect();
+        return [domRect.width, domRect.height];
+    };
+
+    /**
+     * Renders the tooltip.
+     * @returns The tooltip itself.
+     */
+    main.run = function () {
+        // render the div of the tooltip
+        div = main.container().append("div").classed("ltv-tooltip", true);
+
+        return main;
+    };
+
+    // return generated chart
     return main;
-  };
-
-  main.left = function (_left) {
-    if (!div) throw new Error("no div of tooltip");
-    if (!arguments.length) return div.style("left");
-    div.style("left", withPixels(_left));
-    return main;
-  };
-
-  main.size = function () {
-    if (!div) throw new Error("no div of tooltip");
-    let domRect = div.node().getBoundingClientRect();
-    return [domRect.width, domRect.height];
-  };
-
-  main.run = function () {
-    // remove any previous rendered tooltip
-    // if (div) div.remove();
-
-    // render the div of the tooltip
-    div = container
-      .append("div")
-      .attr("class", "ltv-tooltip")
-      .style("opacity", 0);
-
-    return main;
-  };
-
-  // return generated chart
-  return main;
 }
 
 function hashString(s) {
@@ -21619,27 +21740,26 @@ function darker(color) {
     return color.darker();
 }
 
-const colorSchemeLotivis10 = [
-    "RoyalBlue",
-    "MediumSeaGreen",
-    "MediumPurple",
-    "Violet",
-    "Orange",
-    "Tomato",
-    "Turquoise",
-    "LightGray",
-    "Gray",
-    "BurlyWood",
-];
+// constants
 
-colorSchemeLotivis10[0];
+const colorSchemeCategory10 = category10;
+
+const colorSchemeDefault = colorSchemeCategory10;
+
+colorSchemeDefault[0];
 
 const colorScale1 = colorScale("Yellow", "Orange", "Red", "Purple");
 
-const colorScale2 = colorScale("White", "MediumSeaGreen", "RoyalBlue");
+const colorScale2 = colorScale(
+    "White",
+    colorSchemeDefault[2],
+    colorSchemeDefault[0]
+);
+
+console.log(colorSchemeDefault[0]);
 
 function ColorsGenerator(c, d) {
-    let colors = c || colorSchemeLotivis10,
+    let colors = c || colorSchemeDefault,
         data = d || [],
         stackColors,
         labelColors,
@@ -21779,7 +21899,7 @@ function plot() {
 
         colorScale: colorScale1,
 
-        colorScheme: colorSchemeLotivis10,
+        colorScheme: colorSchemeDefault,
 
         // Whether the chart is selectable.
         selectable: true,
@@ -22351,7 +22471,7 @@ function legend() {
         // the format of displaying a group
         groupFormat: GROUP_TITLE_FORMAT,
 
-        colorScheme: colorSchemeLotivis10,
+        colorScheme: colorSchemeDefault,
 
         // (optional) title of the legend
         title: null,
@@ -22650,7 +22770,7 @@ function bar() {
 
         style: "stacks",
 
-        colorScheme: colorSchemeLotivis10,
+        colorScheme: colorSchemeDefault,
 
         // the data controller.
         dataController: null,
@@ -22745,8 +22865,9 @@ function bar() {
                 : "white";
         }
 
-        let dc = state.dataController;
-        let dates = state.dates || dv.dates;
+        let dc = state.dataController,
+            dates = state.dates || dv.dates;
+
         calc.svg
             .append("g")
             .attr("transform", transY(state.height - state.marginBottom + 4))
@@ -22806,25 +22927,29 @@ function bar() {
         }
     }
 
-    function renderSelection(calc, dv) {
+    function renderHoverBars(calc, dv) {
+        function rectId(date) {
+            return `ltv-bar-chart-selection-rect-${safeId(String(date))}`;
+        }
+
         calc.selection = calc.svg
             .append("g")
             .selectAll("rect")
             .data(dv.dates)
             .enter()
             .append("rect")
+            .attr("id", (d) => rectId(d))
             .attr("class", "ltv-bar-chart-selection-rect")
-            .attr(
-                "id",
-                (d) => `ltv-bar-chart-selection-rect-${safeId(String(d))}`
-            )
-            .attr("width", calc.xChartScale.bandwidth())
-            .attr("height", calc.graphHeight)
             .attr("x", (d) => calc.xChartScale(d))
             .attr("y", state.marginTop)
-            .attr("opacity", (d) =>
-                state.dataController.isFilter("dates", d) ? 0.3 : 0
-            )
+            .attr("width", calc.xChartScale.bandwidth())
+            .attr("height", calc.graphHeight)
+            // .attr("fill-opacity", 0)
+            // .attr("stroke", "blue")
+            // .attr("stroke-width", 3)
+            // .attr("opacity", (d) =>
+            //     state.dataController.isFilter("dates", d) ? 0.3 : 0
+            // )
             .on("mouseenter", mouseEnter)
             .on("mouseout", mouseOut)
             .on("mousedrag", mouseDrag)
@@ -22834,20 +22959,21 @@ function bar() {
         // #  HANDLERS  ##############################################################
 
         function mouseEnter(event, date) {
-            calc.svg
-                .select(`ltv-bar-chart-selection-rect-${safeId(String(date))}`)
-                .attr("opacity", 0.3);
+            // make hover bar visible
+            select(this).attr("opacity", 0.2);
+
+            // calc.svg.select(rectId(date)).attr("opacity", 0.3);
 
             // position tooltip
-            let tooltipSize = calc.tip.size();
-            let domRect = calc.svg.node().getBoundingClientRect();
-            let factor = domRect.width / state.width;
-            let offset = [
-                domRect.x + window.scrollX,
-                domRect.y + window.scrollY,
-            ];
-            let top = getTop(factor, offset, tooltipSize, calc);
-            let left = calc.xChartScalePadding(date);
+            let tooltipSize = calc.tip.size(),
+                domRect = calc.svg.node().getBoundingClientRect(),
+                factor = domRect.width / state.width,
+                offset = [
+                    domRect.x + window.scrollX,
+                    domRect.y + window.scrollY,
+                ],
+                top = getTop(factor, offset[1], tooltipSize, calc),
+                left = calc.xChartScalePadding(date);
 
             // differ tooltip position on bar position
             if (left > state.width / 2) {
@@ -22864,6 +22990,9 @@ function bar() {
         }
 
         function mouseOut(event, date) {
+            // make hover bar invisible
+            select(this).attr("opacity", 0);
+
             calc.tip.hide();
         }
 
@@ -22878,7 +23007,7 @@ function bar() {
             dc.toggleFilter("dates", date, chart);
 
             calc.svg
-                .select(`#ltv-bar-chart-selection-rect-${safeId(String(date))}`)
+                .select(rectId(date))
                 .attr(`opacity`, (d) => (dc.isFilter("dates", d) ? 0.3 : 0));
 
             // calc.svg
@@ -22888,6 +23017,12 @@ function bar() {
         }
     }
 
+    /**
+     * Renders the bars in "combined" style.
+     *
+     * @param {*} calc The calc object
+     * @param {*} dv The data view
+     */
     function renderCombined(calc, dv) {
         calc.svg
             .append("g")
@@ -22911,6 +23046,12 @@ function bar() {
             .raise();
     }
 
+    /**
+     * Renders the bars in "stacked" style.
+     *
+     * @param {*} calc The calc object
+     * @param {*} dv The data view
+     */
     function renderStacked(calc, dv) {
         calc.svg
             .append("g")
@@ -22954,28 +23095,46 @@ function bar() {
             .append("text")
             .attr("class", "ltv-bar-chart-label")
             .attr("transform", (d) => {
-                let stack = d[0];
-                let value = d[1];
-                let width = calc.xStack.bandwidth() / 2;
-                let x = (calc.xStack(stack) || 0) + width;
-                let y = calc.yChart(value) - 5;
-                let deg = state.labelRotation || -60;
+                let stack = d[0],
+                    value = d[1],
+                    width = calc.xStack.bandwidth() / 2,
+                    x = (calc.xStack(stack) || 0) + width,
+                    y = calc.yChart(value) - 5,
+                    deg = state.labelRotation || -60;
                 return `translate(${x},${y})rotate(${deg})`;
             })
             .text((d) => (d[1] === 0 ? "" : state.numberFormat(d[1])))
             .raise();
     }
 
-    function getTop(factor, offset, tooltipSize, calc) {
-        let top = state.marginTop * factor;
-        top += (calc.graphHeight * factor - tooltipSize[1]) / 2;
-        top += offset[1] - 10;
-        return top;
+    /**
+     *
+     * @param {*} factor
+     * @param {*} yOffset
+     * @param {*} tooltipSize
+     * @param {*} calc
+     * @returns
+     */
+    function getTop(factor, yOffset, tooltipSize, calc) {
+        return (
+            state.marginTop * factor +
+            (calc.graphHeight * factor - tooltipSize[1]) / 2 +
+            (yOffset - 10)
+        );
     }
 
+    /**
+     *
+     * @param {*} date
+     * @param {*} factor
+     * @param {*} offset
+     * @param {*} tooltipSize
+     * @param {*} calc
+     * @returns
+     */
     function getXLeft(date, factor, offset, tooltipSize, calc) {
         return (
-            calc.xChartScalePadding(date) * factor +
+            calc.xChartScale(date) * factor +
             offset[0] -
             tooltipSize[0] -
             22 -
@@ -22983,16 +23142,29 @@ function bar() {
         );
     }
 
+    /**
+     *
+     * @param {*} date
+     * @param {*} factor
+     * @param {*} offset
+     * @param {*} calc
+     * @returns
+     */
     function getXRight(date, factor, offset, calc) {
         return (
-            (calc.xChartScalePadding(date) +
-                calc.xChartScalePadding.bandwidth()) *
-                factor +
+            (calc.xChartScale(date) + calc.xChartScale.bandwidth()) * factor +
             offset[0] +
             CONFIG.tooltipOffset
         );
     }
 
+    /**
+     *
+     * @param {*} date
+     * @param {*} dv
+     * @param {*} calc
+     * @returns
+     */
     function getHTMLForDate(date, dv, calc) {
         let filtered = dv.byDateLabel.get(date);
         if (!filtered) return "No Data";
@@ -23105,11 +23277,13 @@ function bar() {
 
         renderSVG(container, calc);
 
-        if (state.title) renderTitle(calc);
+        if (state.title) {
+            renderTitle(calc);
+        }
 
         renderAxis(calc, dv);
         renderGrid(calc);
-        renderSelection(calc, dv);
+        renderHoverBars(calc, dv);
 
         if (state.style === "combine") {
             renderCombined(calc, dv);
@@ -23117,9 +23291,14 @@ function bar() {
             renderStacked(calc, dv);
         }
 
-        if (state.labels) renderLabels(calc, dv);
+        if (state.labels) {
+            renderLabels(calc, dv);
+        }
 
-        if (state.tooltip) calc.tip = tooltip().container(container).run();
+        if (state.tooltip) {
+            calc.tip = tooltip().container(container).run();
+            calc.tip.div().classed("ltv-bar-chart-tooltip", true);
+        }
 
         if (state.legend) {
             let dc = state.dataController;
@@ -23155,7 +23334,7 @@ function Geometry(type, coordinates) {
 
 /* returns a GeoJSON object */
 function GeoJSON(source) {
-    let geoJSON = copy(source);
+    let geoJSON = copy$1(source);
 
     geoJSON.getCenter = function () {
         let allCoordinates = this.extractAllCoordinates();
@@ -23245,7 +23424,28 @@ function GeoJSON(source) {
     return geoJSON;
 }
 
-function createGeoJSON(locations) {
+/**
+ * Returns a copy the passed
+ * @param {*} json
+ * @param {*} ids
+ * @param {*} featuresFilter
+ * @returns
+ */
+function copy(json, ids, featuresFilter) {
+    if (!Array.isArray(ids)) {
+        throw new Error("invalid ids. not an array");
+    }
+    if (!Array.isArray(json.features)) {
+        throw new Error("no features in geojson");
+    }
+
+    // copy to do not modify original
+    let theCopy = JSON.parse(JSON.stringify(json));
+    theCopy.features = theCopy.features.filter(featuresFilter);
+    return theCopy;
+}
+
+function generate(locations) {
     let columns = 5;
     let rows = Math.ceil(locations.length / columns);
     let span = 0.1;
@@ -23276,6 +23476,43 @@ function createGeoJSON(locations) {
     }
 
     return GeoJSON(FeatureCollection(features));
+}
+
+/**
+ * Default accessor for the id of a feature.
+ * @param {*} f The feature to get an id for
+ * @returns The id of the feature
+ */
+const FEATURE_ID_ACCESSOR = function (f) {
+    if (f.id || f.id === 0) return f.id;
+    if (f.properties && isValue(f.properties.id)) return f.properties.id;
+    if (f.properties && isValue(f.properties.code)) return f.properties.code;
+    return f.properties ? hash(f.properties) : hash(f);
+};
+
+/**
+ * Default accessor for the name of a feature.
+ * @param {*} f The feature to get an name for
+ * @returns The name of the feature
+ */
+const FEATURE_NAME_ACCESSOR = function (f) {
+    if (isValue(f.name)) return f.name;
+    if (f.properties && isValue(f.properties.name)) return f.properties.name;
+    if (f.properties && isValue(f.properties.nom)) return f.properties.nom;
+    return FEATURE_ID_ACCESSOR(f);
+};
+
+/**
+ * Returns a new generated GeoJSON containing only the Features having the
+ * ids specified.
+ *
+ * @param {GeoJSON} json The GeoJSON with Features to remove
+ * @param {Array} ids The ids of Features to remove
+ * @param {*} idValue An id accessor for the Features
+ * @returns {GeoJSON} The new generated GeoJSON
+ */
+function filter(json, ids, idValue = FEATURE_ID_ACCESSOR) {
+    return copy(json, ids, (f) => ids.includes(idValue(f)));
 }
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -23482,7 +23719,7 @@ function hashPoint(point) {
 // and last point {B,C}. For a line, the first and last point are always
 // considered junctions, even if the line is closed; this ensures that a closed
 // line is never rotated.
-function join(topology) {
+function join$1(topology) {
   var coordinates = topology.coordinates,
       lines = topology.lines,
       rings = topology.rings,
@@ -23584,7 +23821,7 @@ function join(topology) {
 // point sequences are identified. The topology can then be subsequently deduped
 // to remove exact duplicate arcs.
 function cut(topology) {
-  var junctions = join(topology),
+  var junctions = join$1(topology),
       coordinates = topology.coordinates,
       lines = topology.lines,
       rings = topology.rings,
@@ -24357,30 +24594,6 @@ function mergeArcs(topology, objects) {
   };
 }
 
-/**
- * Default accessor for the id of a feature.
- * @param {*} f The feature to get an id for
- * @returns The id of the feature
- */
-const FEATURE_ID_ACCESSOR = function (f) {
-    if (f.id || f.id === 0) return f.id;
-    if (f.properties && isValue(f.properties.id)) return f.properties.id;
-    if (f.properties && isValue(f.properties.code)) return f.properties.code;
-    return f.properties ? hash(f.properties) : hash(f);
-};
-
-/**
- * Default accessor for the name of a feature.
- * @param {*} f The feature to get an name for
- * @returns The name of the feature
- */
-const FEATURE_NAME_ACCESSOR = function (f) {
-    if (isValue(f.name)) return f.name;
-    if (f.properties && isValue(f.properties.name)) return f.properties.name;
-    if (f.properties && isValue(f.properties.nom)) return f.properties.nom;
-    return FEATURE_ID_ACCESSOR(f);
-};
-
 function extractObjects(topology) {
     let objects = [];
     for (const topologyKey in topology.objects) {
@@ -24399,21 +24612,11 @@ function extractObjects(topology) {
  * @param {GeoJSON | Array<Feature>} input GeoJSON or array of features
  * @returns A new created GeoJSON
  */
-function joinFeatures(input) {
-    let features = Array.isArray(input) ? input : input.features;
-    let topology$1 = topology(features);
-    let objects = extractObjects(topology$1);
-    let geometry = merge(topology$1, objects);
+function join(input) {
+    let features = Array.isArray(input) ? input : input.features,
+        topology$1 = topology(features),
+        geometry = merge(topology$1, extractObjects(topology$1));
     return FeatureCollection([Feature(geometry)]);
-}
-
-function geojsonCopy(json, ids, featuresFilter) {
-    if (!Array.isArray(ids)) throw new Error("invalid ids. not an array");
-    if (!Array.isArray(json.features))
-        throw new Error("invalid geojson. no features");
-    let theCopy = copy(json);
-    theCopy.features = theCopy.features.filter(featuresFilter);
-    return theCopy;
 }
 
 /**
@@ -24425,43 +24628,9 @@ function geojsonCopy(json, ids, featuresFilter) {
  * @param {*} idValue An id accessor for the Features
  * @returns {GeoJSON} The new generated GeoJSON
  */
-function removeFeatures(json, ids, idValue = FEATURE_ID_ACCESSOR) {
-    return geojsonCopy(json, ids, (f) => !ids.includes(idValue(f)));
+function remove(json, ids, idValue = FEATURE_ID_ACCESSOR) {
+    return copy(json, ids, (f) => !ids.includes(idValue(f)));
 }
-
-/**
- * Returns a new generated GeoJSON containing only the Features having the
- * ids specified.
- *
- * @param {GeoJSON} json The GeoJSON with Features to remove
- * @param {Array} ids The ids of Features to remove
- * @param {*} idValue An id accessor for the Features
- * @returns {GeoJSON} The new generated GeoJSON
- */
-function filterFeatures(json, ids, idValue = FEATURE_ID_ACCESSOR) {
-    return geojsonCopy(json, ids, (f) => ids.includes(idValue(f)));
-}
-
-class Events {
-    static disp = dispatch(
-        "filter",
-        "data",
-        "map-selection-will-change",
-        "map-selection-did-change"
-    );
-
-    static on(name, callback) {
-        ltv_debug("Events on", name);
-        this.disp.on(name, callback);
-    }
-
-    static call(name, sender, ...params) {
-        ltv_debug("Events on", name);
-        this.disp.call(name, this, sender, ...params);
-    }
-}
-
-Events.shared = new Events();
 
 /**
  * Reusable Map Chart API class that renders a
@@ -24513,7 +24682,7 @@ function map() {
 
         colorScale: colorScale2,
 
-        colorScheme: colorSchemeLotivis10,
+        colorScheme: colorSchemeDefault,
 
         radius: CONFIG.barRadius,
 
@@ -24555,14 +24724,14 @@ function map() {
         );
 
         if (Array.isArray(state.exclude)) {
-            state.workGeoJSON = removeFeatures(
+            state.workGeoJSON = remove(
                 state.workGeoJSON,
                 state.exclude
             );
         }
 
         if (Array.isArray(state.include)) {
-            state.workGeoJSON = filterFeatures(
+            state.workGeoJSON = filter(
                 state.workGeoJSON,
                 state.include
             );
@@ -24599,6 +24768,11 @@ function map() {
         );
     }
 
+    /**
+     *
+     * @param {*} features
+     * @returns
+     */
     function htmlTitle(features) {
         if (features.length > 3) {
             let featuresSlice = features.slice(0, 3);
@@ -24617,6 +24791,13 @@ function map() {
         }
     }
 
+    /**
+     *
+     * @param {*} features
+     * @param {*} dv
+     * @param {*} calc
+     * @returns
+     */
     function htmlValues(features, dv, calc) {
         let combinedByLabel = {};
         for (let i = 0; i < features.length; i++) {
@@ -24651,6 +24832,12 @@ function map() {
         return components.length === 0 ? "No Data" : components.join("<br>");
     }
 
+    /**
+     *
+     * @param {*} event
+     * @param {*} feature
+     * @param {*} calc
+     */
     function positionTooltip(event, feature, calc) {
         // position tooltip
         let size = calc.tooltip.size(),
@@ -24673,6 +24860,12 @@ function map() {
         calc.tooltip.left(left).top(top).show();
     }
 
+    /**
+     *
+     * @param {*} arr
+     * @param {*} obj
+     * @returns
+     */
     function contains(arr, obj) {
         return Array.isArray(arr) && arr.indexOf(obj) !== -1;
     }
@@ -24702,7 +24895,7 @@ function map() {
         let geoJSON = state.workGeoJSON;
         if (!geoJSON) return console.log("[ltv]  No GeoJSON to render");
 
-        let bordersGeoJSON = joinFeatures(geoJSON.features);
+        let bordersGeoJSON = join(geoJSON.features);
         if (!bordersGeoJSON) return console.log("[ltv]  No borders to render.");
 
         calc.borders = calc.svg
@@ -24833,7 +25026,7 @@ function map() {
 
     function renderSelection(calc, dv) {
         calc.selectedFeatures = getSelectedFeatures();
-        calc.selectionBorderGeoJSON = joinFeatures(calc.selectedFeatures);
+        calc.selectionBorderGeoJSON = join(calc.selectedFeatures);
         if (!calc.selectionBorderGeoJSON)
             return ltv_debug("no features selected", chart.id());
 
@@ -25056,7 +25249,7 @@ function map() {
         calc.colors = ColorsGenerator(state.colorScheme).data(dv.data);
 
         if (!state.geoJSON) {
-            chart.geoJSON(createGeoJSON(dv.locations));
+            chart.geoJSON(generate(dv.locations));
         }
 
         renderSVG(container, calc);
@@ -25082,18 +25275,15 @@ function map() {
         }
     };
 
-    Events.on(
-        "map-selection-did-change." + chart.id(),
-        function (sender, stack, b, c) {
-            if (sender === chart) return;
-            state.selectedStack = stack;
-            chart.run();
-        }
-    );
+    Events.on("map-selection-did-change." + chart.id(), function (stack) {
+        if (this === chart) return;
+        state.selectedStack = stack;
+        chart.run();
+    });
 
     // return generated chart
     return chart;
 }
 
-export { CONFIG, DataController, date_ordinator as DateOrdinator, bar, config, copy, createGeoJSON, csv, csvParse, csvRender, cut$1 as cut, index as d3, datatext, filterFeatures, isEmpty, isFunction, isNumber, isString, isValue, joinFeatures, json, jsonFlat, legend, ltv_debug, map, parseDataset, parseDatasets, plot, postfix, prefix, removeFeatures, runsInBrowser, safeId, transX, transY, uniqueId };
+export { CONFIG, DataController, date_ordinator as DateOrdinator, bar, config, copy$1 as copy, csv, csvFormat, csvParse, cut$1 as cut, index as d3, datatext, isEmpty, isFunction, isNumber, isString, isValue, json, jsonFlat, legend, ltv_debug, map, parseDataset, parseDatasets, plot, postfix, prefix, runsInBrowser, safeId, transX, transY, uniqueId };
 //# sourceMappingURL=lotivis.test.js.map

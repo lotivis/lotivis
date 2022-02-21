@@ -1,16 +1,16 @@
 import * as d3 from "d3";
-import { baseChart } from "./chart";
-import { CONFIG } from "./common/config";
-import { uniqueId } from "./common/identifiers";
-import { tooltip } from "./tooltip";
-import { hash } from "./common/hash";
-import { transX, transY } from "./common/helpers";
+import { baseChart } from "./chart.js";
+import { CONFIG } from "./common/config.js";
+import { uniqueId } from "./common/identifiers.js";
+import { tooltip } from "./tooltip.js";
+import { hash } from "./common/hash.js";
+import { transX, transY } from "./common/helpers.js";
 import {
     colorScale1,
-    colorSchemeLotivis10,
+    colorSchemeDefault,
     ColorsGenerator,
-} from "./common/colors";
-import { DEFAULT_NUMBER_FORMAT } from "./common/formats";
+} from "./common/colors.js";
+import { DEFAULT_NUMBER_FORMAT } from "./common/formats.js";
 
 export const DATE_ACCESS = function (d) {
     return d;
@@ -87,7 +87,7 @@ export function plot() {
 
         colorScale: colorScale1,
 
-        colorScheme: colorSchemeLotivis10,
+        colorScheme: colorSchemeDefault,
 
         // Whether the chart is selectable.
         selectable: true,

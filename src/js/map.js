@@ -1,27 +1,25 @@
 import * as d3 from "d3";
-import { baseChart } from "./chart";
-import { CONFIG, ltv_debug } from "./common/config";
-import { uniqueId } from "./common/identifiers";
-import { tooltip } from "./tooltip";
-import { createGeoJSON } from "./geojson/from.data";
+import { baseChart } from "./chart.js";
+import { CONFIG, ltv_debug } from "./common/config.js";
+import { uniqueId } from "./common/identifiers.js";
+import { tooltip } from "./tooltip.js";
+import { DataController } from "./controller.js";
+import { DEFAULT_NUMBER_FORMAT } from "./common/formats.js";
+import { cut, postfix } from "./common/helpers.js";
+import { Events } from "./common/events.js";
 import {
-    joinFeatures,
-    removeFeatures,
-    filterFeatures,
-} from "./geojson/features";
+    geojsonGenerate,
+    featuresJoin,
+    featuresRemove,
+    featuresFilter,
+    geojsonAutoFeatureIDAccessor,
+    geojsonAutoFeatureNameAccessor,
+} from "./geojson";
 import {
     colorScale2,
-    colorSchemeLotivis10,
+    colorSchemeDefault,
     ColorsGenerator,
 } from "./common/colors";
-import { DataController } from "./controller";
-import { DEFAULT_NUMBER_FORMAT } from "./common/formats";
-import {
-    FEATURE_ID_ACCESSOR,
-    FEATURE_NAME_ACCESSOR,
-} from "./geojson/feature.accessors";
-import { cut, postfix } from "./common/helpers";
-import { Events } from "./common/events";
 
 /**
  * Reusable Map Chart API class that renders a
@@ -73,7 +71,7 @@ export function map() {
 
         colorScale: colorScale2,
 
-        colorScheme: colorSchemeLotivis10,
+        colorScheme: colorSchemeDefault,
 
         radius: CONFIG.barRadius,
 
@@ -89,9 +87,9 @@ export function map() {
         // the number format
         numberFormat: DEFAULT_NUMBER_FORMAT,
 
-        featureIDAccessor: FEATURE_ID_ACCESSOR,
+        featureIDAccessor: geojsonAutoFeatureIDAccessor,
 
-        featureNameAccessor: FEATURE_NAME_ACCESSOR,
+        featureNameAccessor: geojsonAutoFeatureNameAccessor,
     };
 
     // Create new underlying chart with the specified state.
@@ -115,14 +113,14 @@ export function map() {
         );
 
         if (Array.isArray(state.exclude)) {
-            state.workGeoJSON = removeFeatures(
+            state.workGeoJSON = featuresRemove(
                 state.workGeoJSON,
                 state.exclude
             );
         }
 
         if (Array.isArray(state.include)) {
-            state.workGeoJSON = filterFeatures(
+            state.workGeoJSON = featuresFilter(
                 state.workGeoJSON,
                 state.include
             );
@@ -159,6 +157,11 @@ export function map() {
         );
     }
 
+    /**
+     *
+     * @param {*} features
+     * @returns
+     */
     function htmlTitle(features) {
         if (features.length > 3) {
             let featuresSlice = features.slice(0, 3);
@@ -177,6 +180,13 @@ export function map() {
         }
     }
 
+    /**
+     *
+     * @param {*} features
+     * @param {*} dv
+     * @param {*} calc
+     * @returns
+     */
     function htmlValues(features, dv, calc) {
         let combinedByLabel = {};
         for (let i = 0; i < features.length; i++) {
@@ -211,6 +221,12 @@ export function map() {
         return components.length === 0 ? "No Data" : components.join("<br>");
     }
 
+    /**
+     *
+     * @param {*} event
+     * @param {*} feature
+     * @param {*} calc
+     */
     function positionTooltip(event, feature, calc) {
         // position tooltip
         let size = calc.tooltip.size(),
@@ -233,6 +249,12 @@ export function map() {
         calc.tooltip.left(left).top(top).show();
     }
 
+    /**
+     *
+     * @param {*} arr
+     * @param {*} obj
+     * @returns
+     */
     function contains(arr, obj) {
         return Array.isArray(arr) && arr.indexOf(obj) !== -1;
     }
@@ -262,7 +284,7 @@ export function map() {
         let geoJSON = state.workGeoJSON;
         if (!geoJSON) return console.log("[ltv]  No GeoJSON to render");
 
-        let bordersGeoJSON = joinFeatures(geoJSON.features);
+        let bordersGeoJSON = featuresJoin(geoJSON.features);
         if (!bordersGeoJSON) return console.log("[ltv]  No borders to render.");
 
         calc.borders = calc.svg
@@ -393,7 +415,7 @@ export function map() {
 
     function renderSelection(calc, dv) {
         calc.selectedFeatures = getSelectedFeatures();
-        calc.selectionBorderGeoJSON = joinFeatures(calc.selectedFeatures);
+        calc.selectionBorderGeoJSON = featuresJoin(calc.selectedFeatures);
         if (!calc.selectionBorderGeoJSON)
             return ltv_debug("no features selected", chart.id());
 
@@ -616,7 +638,7 @@ export function map() {
         calc.colors = ColorsGenerator(state.colorScheme).data(dv.data);
 
         if (!state.geoJSON) {
-            chart.geoJSON(createGeoJSON(dv.locations));
+            chart.geoJSON(geojsonGenerate(dv.locations));
         }
 
         renderSVG(container, calc);
@@ -642,14 +664,11 @@ export function map() {
         }
     };
 
-    Events.on(
-        "map-selection-did-change." + chart.id(),
-        function (sender, stack, b, c) {
-            if (sender === chart) return;
-            state.selectedStack = stack;
-            chart.run();
-        }
-    );
+    Events.on("map-selection-did-change." + chart.id(), function (stack) {
+        if (this === chart) return;
+        state.selectedStack = stack;
+        chart.run();
+    });
 
     // return generated chart
     return chart;

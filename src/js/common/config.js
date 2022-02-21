@@ -1,4 +1,4 @@
-import { GERMAN_NUMBER_FORMAT } from "./formats";
+import { GERMAN_NUMBER_FORMAT } from "./formats.js";
 
 /**
  * lotivis wide configuration

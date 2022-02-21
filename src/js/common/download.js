@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { ltv_debug, runsInBrowser } from "./config";
+import { ltv_debug, runsInBrowser } from "./config.js";
 
 export function element(selector) {
     var el = d3.select(selector).node();

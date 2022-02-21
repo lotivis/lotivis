@@ -1,4 +1,4 @@
-import { copy } from "../common/values";
+import { copy } from "../common/values.js";
 
 /* returns a GeoJSON FeatureCollection object */
 export function FeatureCollection(features) {

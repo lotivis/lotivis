@@ -1,11 +1,12 @@
 import assert from "assert";
 import * as samples from "./sample.data.js";
-import * as lotivis from "./lotivis.test.js";
+import { DataController } from "../src/js/controller.js";
+import { generate } from "../src/js/geojson/generate.js";
 
 describe("create geojson from data", function () {
     let json = samples.readJSON("sample.flat.json");
-    let data = new lotivis.DataController(json);
-    let geoJSON = lotivis.createGeoJSON(data.locations());
+    let data = new DataController(json);
+    let geoJSON = generate(data.locations());
 
     it("loads the data", function () {
         assert.ok(data);

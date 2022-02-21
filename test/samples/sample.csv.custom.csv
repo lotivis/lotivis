@@ -1,5 +1,5 @@
-label,stack,value,date,location
-"dataset_1",,0,"2000","1"
+label,value,date,location,stack
+"dataset_1 asdf",,0,"2000","1"
 "dataset_1",,1,"2001","1"
 "dataset_1",,2,"2002","1"
 "dataset_1",,3,"2003","1"

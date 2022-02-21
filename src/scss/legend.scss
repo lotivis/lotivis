@@ -3,13 +3,13 @@
     text-align: left;
 
     .ltv-legend-title {
-        font-size: 12px;
+        font-size: $label-font-size;
         padding-bottom: 5px;
     }
 }
 
 .ltv-legend-group {
-    font-size: 12px;
+    font-size: $label-font-size;
     margin-right: 5px;
     display: block;
     line-height: 1.5;
@@ -35,12 +35,11 @@
 }
 
 .ltv-legend-pill-span {
-    font-size: 10px;
+    font-size: $label-font-size;
     display: inline-flex;
     padding: 2px 7px;
     margin-right: 5px;
     margin-bottom: 5px;
-    // border-radius: 999999px;
     color: white;
     opacity: 0.2;
 }

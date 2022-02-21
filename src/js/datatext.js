@@ -1,9 +1,8 @@
-import { downloadBlob, downloadURL } from "./common/download.js";
-
+import { downloadURL } from "./common/download.js";
 import { postfix } from "./common/helpers.js";
-import { uniqueId } from "./common/identifiers";
-import { csvRender } from "./parse/parse.csv.js";
-import { baseChart } from "./chart";
+import { uniqueId } from "./common/identifiers.js";
+import { csvFormat } from "./parse/parse.csv.js";
+import { baseChart } from "./chart.js";
 import { CONFIG, runsInBrowser } from "./common/config.js";
 
 /**
@@ -12,16 +11,16 @@ import { CONFIG, runsInBrowser } from "./common/config.js";
  * @param {dataview} dv
  * @returns {string} JSON the passed data view.
  */
-const JSON_TEXT = function (dt, dv) {
+export const datatextJSONData = function (dt, dv) {
     return JSON.stringify(dv.data, null, 2);
 };
 
-const JSON_TEXT_DATA_VIEW = function (dt, dv) {
+export const datatextJSON = function (dt, dv) {
     return JSON.stringify(dv, null, 2);
 };
 
-const CSV_TEXT = function (dt, dv) {
-    return csvRender(dv.data);
+export const datatextCSV = function (dt, dv) {
+    return csvFormat(dv.data);
 };
 
 export function datatext() {
@@ -46,7 +45,7 @@ export function datatext() {
         title: (dt, dv) => "Data",
 
         // the text to display for the data
-        text: CSV_TEXT,
+        text: datatextCSV,
 
         // the data controller
         dataController: null,
@@ -86,12 +85,12 @@ export function datatext() {
     chart.download = function () {
         let type, extension;
 
-        if (state.text === CSV_TEXT) {
+        if (state.text === datatextCSV) {
             type = "text/csv";
             extension = "csv";
         } else if (
-            state.text === JSON_TEXT ||
-            state.text === JSON_TEXT_DATA_VIEW
+            state.text === datatextJSONData ||
+            state.text === datatextJSON
         ) {
             type = "text/json";
             extension = "json";
@@ -156,7 +155,7 @@ export function datatext() {
                 .on("click", state.enabled ? chart.download : null);
         }
 
-        text = unwrap(state.text, chart, dv);
+        text = unwrap(state.text, chart, dv, state.dataController);
         calc.pre = calc.div
             .append("pre")
             .classed("ltv-datatext-pre", true)

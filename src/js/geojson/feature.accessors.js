@@ -1,4 +1,4 @@
-import { isValue } from "../common/values";
+import { isValue } from "../common/values.js";
 
 /**
  * Default accessor for the id of a feature.

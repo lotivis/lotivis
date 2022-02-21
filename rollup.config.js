@@ -20,13 +20,13 @@ export default [
                 banner,
                 format: "umd",
             },
-            // {
-            //     sourcemap: true,
-            //     name: pkg.name,
-            //     file: pkg.module,
-            //     banner,
-            //     format: "esm",
-            // },
+            {
+                sourcemap: true,
+                name: pkg.name,
+                file: pkg.module,
+                banner,
+                format: "esm",
+            },
         ],
     },
     // CJS for tests

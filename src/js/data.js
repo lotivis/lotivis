@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { DataUnqualifiedError } from "./parse/data.unqalified.error";
+import { DataUnqualifiedError } from "./parse/data.unqalified.error.js";
 
 export function Data(data) {
     if (!Array.isArray(data))

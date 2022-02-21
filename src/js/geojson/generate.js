@@ -1,6 +1,6 @@
-import { Feature, FeatureCollection, Geometry, GeoJSON } from "./geojson";
+import { Feature, FeatureCollection, Geometry, GeoJSON } from "./geojson.js";
 
-export function createGeoJSON(locations) {
+export function generate(locations) {
     let columns = 5;
     let rows = Math.ceil(locations.length / columns);
     let span = 0.1;
