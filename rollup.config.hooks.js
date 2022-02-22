@@ -11,7 +11,7 @@ const banner = `/*!
 export default [
     {
         input: "src/index.js",
-        plugins: [resolve(), execute("npm run copy")],
+        plugins: [resolve()],
         output: [
             {
                 sourcemap: true,
@@ -26,6 +26,7 @@ export default [
                 file: pkg.module,
                 banner,
                 format: "esm",
+                plugins: [execute("npx mocha"), execute("npm run copy")],
             },
         ],
     },

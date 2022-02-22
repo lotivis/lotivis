@@ -11,7 +11,7 @@ const banner = `/*!
 export default [
     {
         input: "src/index.js",
-        plugins: [resolve(), execute("npm run scss")],
+        plugins: [resolve()],
         output: [
             {
                 sourcemap: true,
@@ -19,6 +19,7 @@ export default [
                 file: pkg.main,
                 banner,
                 format: "umd",
+                plugins: [execute("npm run scss")],
             },
             {
                 sourcemap: true,
