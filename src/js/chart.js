@@ -209,7 +209,9 @@ export function baseChart(state) {
         if (selection.size() === 0)
             throw new Error("empty selection: " + state.selector);
 
+        console.time("dataView " + state.id);
         let dv = chart.dataView(dc);
+        console.timeEnd("dataView " + state.id);
 
         selection.each(function scope() {
             // receive container

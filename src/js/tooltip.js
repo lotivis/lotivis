@@ -37,7 +37,7 @@ export function tooltip() {
     // private
 
     function require(div) {
-        if (!div) throw new Error("invalid div");
+        if (typeof div !== "object") throw new Error("invalid div");
         return div;
     }
 
