@@ -11,7 +11,7 @@ const banner = `/*!
 export default [
     {
         input: "src/index.js",
-        plugins: [resolve(), execute("npm run scss")],
+        plugins: [resolve(), execute("npm run copy")],
         output: [
             {
                 sourcemap: true,

@@ -1,6 +1,5 @@
 import assert from "assert";
 import * as samples from "./sample.data.js";
-import * as lotivis from "./lotivis.test.js";
 
 // describe("dataView.date", function () {
 //   describe("sample.dataset.1.json", function () {

@@ -20353,7 +20353,7 @@ const CONFIG = {
     /**
      * A Boolean value indicating whether the debug logging is enabled
      */
-    debug: true,
+    debug: false,
 
     /**
      * The default margin to use for charts
@@ -20404,6 +20404,9 @@ const CONFIG = {
      * The deault filename generator.
      */
     // filenameGenerator: DEFAULTS.filenameGenerator,
+
+    /** A Boolean value indicating whether logging of third party libraries is enabled */
+    thidPartyLogging: false,
 };
 
 /**
@@ -20654,7 +20657,10 @@ function downloadURL(url, fname) {
 }
 
 function pngDownload(selector, filename, callback) {
-    html2canvas(element(selector), { scale: 4 }).then((canvas) => {
+    html2canvas(element(selector), {
+        scale: 4,
+        logging: CONFIG.thidPartyLogging,
+    }).then((canvas) => {
         downloadURL(canvas.toDataURL(), filename);
         if (callback) callback();
     });

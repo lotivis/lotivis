@@ -1,10 +1,10 @@
 import assert from "assert";
 import * as samples from "./sample.data.js";
-import * as lotivis from "./lotivis.test.js";
+import { DataController } from "../src/js/controller.js";
 
 describe("parse flat data", function () {
     let json = samples.readJSON("sample.flat.json");
-    let dataController = new lotivis.DataController(json);
+    let dataController = new DataController(json);
 
     it("should have the right length", function () {
         assert.strictEqual(dataController.data().length, 9);
