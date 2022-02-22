@@ -39,7 +39,7 @@
         "build:watch:copy": "rollup --config rollup.config.hooks.js --watch",
         "serve": "http-server",
         "scss": "sass src/index.scss > dist/lotivis.css && sass --style compressed src/index.scss > dist/lotivis.min.css",
-        "test": "npx mocha --require esm --reporter spec 'test/test.*.js'",
+        "test": "npx mocha 'test/test.*.js'",
         "copy": "npm run scss && cp dist/lotivis.js ../frc-visualization/public/js/lib && cp dist/lotivis.js.map ../frc-visualization/public/js/lib && cp dist/lotivis.css ../frc-visualization/public/css"
     },
     "devDependencies": {
