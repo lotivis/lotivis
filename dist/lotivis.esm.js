@@ -1,5 +1,5 @@
 /*!
- * lotivis 1.0.102
+ * lotivis 1.0.103
  * Copyright (c) 2022 Lukas Danckwerth
  * Released under MIT License
  */
@@ -21619,6 +21619,14 @@ function flatDatasets(ds) {
     return ds.reduce((memo, d) => memo.concat(flatDataset(d)), []);
 }
 
+function jsonParse(d) {
+    return parseDatasets([d]);
+}
+
+function jsonParseHierarchical(d) {
+    return parseDatasets([d]);
+}
+
 function parseDataset(d) {
     return parseDatasets([d]);
 }
@@ -21630,17 +21638,14 @@ function parseDatasets(d) {
 function json(path) {
     return json$1(path).then((json) => {
         if (!Array.isArray(json)) throw new DataUnqualifiedError();
-        let flat = flatDatasets(json);
-        let controller = new DataController(flat, { original: json });
-        return controller;
+        return new DataController(flatDatasets(json), { original: json });
     });
 }
 
 function jsonFlat(path) {
     return json$1(path).then((json) => {
         if (!Array.isArray(json)) throw new DataUnqualifiedError();
-        let controller = new DataController(json, { original: json });
-        return controller;
+        return new DataController(json, { original: json });
     });
 }
 
@@ -21659,6 +21664,7 @@ function toDataset(data) {
         item,
         set,
         datum;
+
     for (let i = 0; i < data.length; i++) {
         item = data[i];
         set = datasets.find((d) => d.label === item.label);
@@ -21667,11 +21673,8 @@ function toDataset(data) {
             datum = set.data.find(
                 (d) => d.date === item.date && d.location === item.location
             );
-            if (datum) {
-                datum.value += item.value;
-            } else {
-                set.data.push(DataItem(item));
-            }
+
+            datum ? (datum.value += item.value) : set.data.push(DataItem(item));
         } else {
             datasets.push(Dataset(item));
         }
@@ -21930,9 +21933,9 @@ function GeoJSON(source) {
     let geoJSON = copy$1(source);
 
     geoJSON.getCenter = function () {
-        let allCoordinates = this.extractAllCoordinates();
-        let latitudeSum = 0;
-        let longitudeSum = 0;
+        let allCoordinates = this.extractAllCoordinates(),
+            latitudeSum = 0,
+            longitudeSum = 0;
 
         allCoordinates.forEach(function (coordinates) {
             latitudeSum += coordinates[1];
@@ -22039,10 +22042,10 @@ function copy(json, ids, featuresFilter) {
 }
 
 function generate(locations) {
-    let columns = 5;
-    let rows = Math.ceil(locations.length / columns);
-    let span = 0.1;
-    let features = [];
+    let columns = 5,
+        rows = Math.ceil(locations.length / columns),
+        span = 0.1,
+        features = [];
 
     outer: for (let row = 0; row < rows; row++) {
         for (let column = 0; column < columns; column++) {
@@ -25383,5 +25386,5 @@ function plot() {
     return chart;
 }
 
-export { ColorsGenerator, DATE_ACCESS, DATE_TO_NUMBER_ORDINATOR, DEFAULT_COLUMNS, DEFAULT_DATE_ORDINATOR, DEFAULT_ROW, DataController, DataItem, Dataset, GERMAN_DATE_ORDINATOR, GROUP_TITLE_FORMAT, ISO_DATE_ORDINATOR, LABEL_FORMAT, PLOT_SORT, STACK_FORMAT, WEEKDAY_ORDINATOR, bar, colorScale, colorScale1, colorScale2, colorSchemeCategory10, colorSchemeDefault, colorSchemeLotivis10, colorSchemeTableau10, config, csv, csvFormat, csvFormatRows, csvParse, csvParseRows, csvRows, index as d3, data_preview, datatext, datatextCSV, datatextJSON, datatextJSONData, ltv_debug as debug, flatDatasets, json, jsonFlat, legend, map, parseDataset, parseDatasets, plot, tintColor, toDataset };
+export { ColorsGenerator, DATE_ACCESS, DATE_TO_NUMBER_ORDINATOR, DEFAULT_COLUMNS, DEFAULT_DATE_ORDINATOR, DEFAULT_ROW, DataController, DataItem, Dataset, GERMAN_DATE_ORDINATOR, GROUP_TITLE_FORMAT, ISO_DATE_ORDINATOR, LABEL_FORMAT, PLOT_SORT, STACK_FORMAT, WEEKDAY_ORDINATOR, bar, colorScale, colorScale1, colorScale2, colorSchemeCategory10, colorSchemeDefault, colorSchemeLotivis10, colorSchemeTableau10, config, csv, csvFormat, csvFormatRows, csvParse, csvParseRows, csvRows, index as d3, data_preview, datatext, datatextCSV, datatextJSON, datatextJSONData, ltv_debug as debug, flatDataset, flatDatasets, json, jsonFlat, jsonParse, jsonParseHierarchical, legend, map, parseDataset, parseDatasets, plot, tintColor, toDataset };
 //# sourceMappingURL=lotivis.esm.js.map

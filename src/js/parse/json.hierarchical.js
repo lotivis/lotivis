@@ -15,6 +15,7 @@ export function toDataset(data) {
         item,
         set,
         datum;
+
     for (let i = 0; i < data.length; i++) {
         item = data[i];
         set = datasets.find((d) => d.label === item.label);
@@ -23,11 +24,8 @@ export function toDataset(data) {
             datum = set.data.find(
                 (d) => d.date === item.date && d.location === item.location
             );
-            if (datum) {
-                datum.value += item.value;
-            } else {
-                set.data.push(DataItem(item));
-            }
+
+            datum ? (datum.value += item.value) : set.data.push(DataItem(item));
         } else {
             datasets.push(Dataset(item));
         }

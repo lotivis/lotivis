@@ -7,8 +7,8 @@ export { config, ltv_debug as debug } from "./js/common/config.js";
 export * from "./js/controller.js";
 export * from "./js/parse/parse.csv";
 export * from "./js/parse/parse.json.js";
-export * from "./js/parse/data.to.datasets.js";
-export * from "./js/parse/flat.datasets.js";
+export * from "./js/parse/json.hierarchical.js";
+export * from "./js/parse/json.flat.js";
 
 export * from "./js/common/date.ordinator.js";
 export * from "./js/common/colors.js";

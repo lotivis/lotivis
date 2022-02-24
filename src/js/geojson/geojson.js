@@ -20,9 +20,9 @@ export function GeoJSON(source) {
     let geoJSON = copy(source);
 
     geoJSON.getCenter = function () {
-        let allCoordinates = this.extractAllCoordinates();
-        let latitudeSum = 0;
-        let longitudeSum = 0;
+        let allCoordinates = this.extractAllCoordinates(),
+            latitudeSum = 0,
+            longitudeSum = 0;
 
         allCoordinates.forEach(function (coordinates) {
             latitudeSum += coordinates[1];
