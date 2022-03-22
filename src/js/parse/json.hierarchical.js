@@ -6,7 +6,7 @@ export function DataItem(item) {
 
 export function Dataset(item) {
     let set = { label: item.label, data: [DataItem(item)] };
-    if (isValue(item.stack)) set.stack = item.stack;
+    if (isValue(item.group)) set.group = item.group;
     return set;
 }
 

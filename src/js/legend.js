@@ -1,27 +1,23 @@
 import * as d3 from "d3";
-import { baseChart } from "./chart.js";
+import { baseChart } from "./baseChart.js";
 import { colorSchemeDefault, ColorsGenerator } from "./common/colors.js";
-import { CONFIG } from "./common/config.js";
+import { config } from "./common/config.js";
 import { uniqueId } from "./common/identifiers.js";
 
-export const LABEL_FORMAT = function (l, v, i) {
+export const legendLabelFormat = function (l, v, i) {
     return `${l} (${v})`;
 };
 
-export const STACK_FORMAT = function (s, v, ls, i) {
+export const legendGroupFormat = function (s, v, ls, i) {
     return `${s}`;
 };
 
-export const GROUP_TITLE_FORMAT = function (s, v, ls, i) {
+export const legendSectionFormat = function (s, v, ls, i) {
     return `${i + 1}) ${s} (Sum: ${v})`;
 };
 
-// export const GROUP_TITLE_FORMAT = function (s, v, ls, i) {
-//   return `${i}) ${s} (Labels: ${ls.length}, Sum: ${v})`;
-// };
-
 export function legend() {
-    let state = {
+    let attr = {
         // the id of the legend
         id: uniqueId("legend"),
 
@@ -35,36 +31,37 @@ export function legend() {
         enabled: true,
 
         // the number formatter vor values displayed
-        numberFormat: CONFIG.numberFormat,
+        numberFormat: config.numberFormat,
 
         // the format of displaying a datasets label
-        labelFormat: LABEL_FORMAT,
+        labelFormat: legendLabelFormat,
 
-        // the format of displaying a datasets stack
-        stackFormat: STACK_FORMAT,
+        // the format of displaying a datasets group
+        groupFormat: legendGroupFormat,
 
         // the format of displaying a group
-        groupFormat: GROUP_TITLE_FORMAT,
+        sectionFormat: legendSectionFormat,
 
+        // color scheme to use
         colorScheme: colorSchemeDefault,
 
         // (optional) title of the legend
-        title: null,
+        title: null, // (chart) => null
 
-        // whether to display stacks instead of labels
-        stacks: false,
+        // whether to display groups instead of labels
+        groups: false, // (chart) => false
 
-        // whether group the legend (by stacks)
-        group: false,
+        // whether to create separate sections (by groups)
+        sections: false, // (chart) => false
 
         // the data controller
         dataController: null,
     };
 
-    var chart = baseChart(state);
+    var chart = baseChart(attr);
 
     /**
-     * Toggles the filtered state of the passed label.
+     * Toggles the filtered attr of the passed label.
      *
      * @param {Event} event The event of the checkbox
      * @param {String} label The label to be toggled
@@ -72,21 +69,21 @@ export function legend() {
      */
     function toggleLabel(event, label) {
         event.target.checked
-            ? state.dataController.removeFilter("labels", label, chart)
-            : state.dataController.addFilter("labels", label, chart);
+            ? attr.dataController.removeFilter("labels", label, chart)
+            : attr.dataController.addFilter("labels", label, chart);
     }
 
     /**
-     * Toggles the filtered state of the passed stack.
+     * Toggles the filtered attr of the passed group.
      *
      * @param {Event} event The event of the checkbox
-     * @param {String} stack The stack to be toggled
+     * @param {String} group The group to be toggled
      * @private
      */
-    function toggleStack(event, stack) {
+    function toggleGroup(event, group) {
         event.target.checked
-            ? state.dataController.removeFilter("stacks", stack, chart)
-            : state.dataController.addFilter("stacks", stack, chart);
+            ? attr.dataController.removeFilter("groups", group, chart)
+            : attr.dataController.addFilter("groups", group, chart);
     }
 
     /**
@@ -98,62 +95,51 @@ export function legend() {
      * @private
      */
     function labelChecked(label) {
-        return state.dataController.isFilter("labels", label) ? null : true;
+        return attr.dataController.isFilter("labels", label) ? null : true;
     }
 
     /**
      * Returns the value for the "checked" attribute dependant on whether
-     * given stack is filtered by the data controller.
+     * given group is filtered by the data controller.
      *
-     * @param {*} stack The stack to be checked
+     * @param {*} group The group to be checked
      * @returns {null | boolean}
      * @private
      */
-    function stackChecked(stack) {
-        return state.dataController.isFilter("stacks", stack) ? null : true;
+    function groupChecked(group) {
+        return attr.dataController.isFilter("groups", group) ? null : true;
     }
 
-    /**
-     * Formattes the given number.
-     *
-     * @param {Number} value The number to be formatted
-     * @returns The formatted value
-     * @private
-     */
     function format(value) {
-        return state.numberFormat(value);
+        return typeof attr.numberFormat === "function"
+            ? attr.numberFormat(value)
+            : value;
     }
 
-    /**
-     *
-     * @param {*} label
-     * @param {*} index
-     * @param {*} dv
-     * @returns
-     */
     function labelText(label, index, dv) {
-        if (typeof state.labelFormat !== "function") return label;
-        return state.labelFormat(label, format(dv.byLabel.get(label)), index);
+        return typeof attr.labelFormat !== "function"
+            ? label
+            : attr.labelFormat(label, format(dv.byLabel.get(label)), index);
     }
 
-    function stackText(stack, index, dv) {
-        if (typeof state.stackFormat !== "function") return stack;
-        var value = format(dv.byStack.get(stack));
-        var labelsToValue = dv.byStackLabel.get(stack);
-        var labels = Array.from(labelsToValue ? labelsToValue.keys() : []);
-        return state.stackFormat(stack, value, labels, index);
+    function groupText(group, index, dv) {
+        if (typeof attr.groupFormat !== "function") return group;
+        var value = format(dv.byGroup.get(group)),
+            labelsToValue = dv.byGroupLabel.get(group),
+            labels = Array.from(labelsToValue ? labelsToValue.keys() : []);
+        return attr.groupFormat(group, value, labels, index);
     }
 
     function disabled() {
-        return unwrap(state.enabled) ? null : true;
+        return unwrap(attr.enabled) ? null : true;
     }
 
     function isGroups() {
-        return unwrap(state.group) === true;
+        return unwrap(attr.groups) === true;
     }
 
-    function isStacks() {
-        return unwrap(state.stacks) === true;
+    function isSections() {
+        return unwrap(attr.sections) === true;
     }
 
     function unwrap(value) {
@@ -163,16 +149,17 @@ export function legend() {
     /**
      * Calculates the data view for the bar chart.
      *
-     * @param {*} calc The calc object
      * @returns The generated data view
-     *
      * @public
      */
-    chart.dataView = function (dc) {
+    chart.dataView = function () {
+        var dc = attr.dataController;
+        if (!dc) throw new Error("no data controller");
+
         var dv = {};
         dv.data = dc.data();
         dv.labels = dc.labels();
-        dv.stacks = dc.stacks();
+        dv.groups = dc.groups();
         dv.locations = dc.locations();
         dv.dates = dc.dates();
 
@@ -182,16 +169,16 @@ export function legend() {
             (d) => d.label
         );
 
-        dv.byStack = d3.rollup(
+        dv.byGroup = d3.rollup(
             dc.data(),
             (v) => d3.sum(v, (d) => d.value),
-            (d) => d.stack || d.label
+            (d) => d.group || d.label
         );
 
-        dv.byStackLabel = d3.rollup(
+        dv.byGroupLabel = d3.rollup(
             dc.data(),
             (v) => d3.sum(v, (d) => d.value),
-            (d) => d.stack || d.label,
+            (d) => d.group || d.label,
             (d) => d.label
         );
 
@@ -209,67 +196,66 @@ export function legend() {
      * @public
      */
     chart.render = function (container, calc, dv) {
-        calc.colors = ColorsGenerator(state.colorScheme).data(dv.data);
+        calc.colors = ColorsGenerator(attr.colorScheme).data(dv.data);
         calc.div = container
             .append("div")
             .classed("ltv-legend", true)
-            .attr("id", state.id)
-            .style("margin-left", state.marginLeft + "px")
-            .style("margin-top", state.marginTop + "px")
-            .style("margin-right", state.marginRight + "px")
-            .style("margin-bottom", state.marginBottom + "px");
+            .attr("id", attr.id)
+            .style("margin-left", attr.marginLeft + "px")
+            .style("margin-top", attr.marginTop + "px")
+            .style("margin-right", attr.marginRight + "px")
+            .style("margin-bottom", attr.marginBottom + "px");
 
         // if a title is given render div with title inside
-        if (state.title) {
+        if (attr.title) {
             calc.titleDiv = calc.div
                 .append("div")
                 .classed("ltv-legend-title", true)
-                .text(unwrap(state.title));
+                .text(unwrap(attr.title));
         }
 
-        var colorFn = isStacks() ? calc.colors.stack : calc.colors.label;
-        var changeFn = isStacks() ? toggleStack : toggleLabel;
-        var textFn = isStacks() ? stackText : labelText;
+        var colorFn = isGroups() ? calc.colors.group : calc.colors.label,
+            changeFn = isGroups() ? toggleGroup : toggleLabel,
+            textFn = isGroups() ? groupText : labelText;
 
-        calc.groups = calc.div
+        calc.sections = calc.div
             .selectAll(".div")
-            .data(isGroups() ? dv.stacks : [""]) // use single group when mode is not "groups"
+            .data(isSections() ? dv.groups : [""]) // use single group when mode is not "groups"
             .enter()
             .div("ltv-legend-group")
-            .style("color", (s) => calc.colors.stack(s));
+            .style("color", (s) => calc.colors.group(s));
 
-        // draw titles only in "groups" mode
-        if (isGroups()) {
-            calc.titles = calc.groups.append("div").text((stack, index) => {
-                var labelsToValue = dv.byStackLabel.get(stack);
-                return state.groupFormat(
-                    stack,
-                    format(dv.byStack.get(stack)),
-                    Array.from(labelsToValue ? labelsToValue.keys() : []),
-                    index
-                );
+        // draw titles only in "sections" mode
+        if (isSections()) {
+            calc.titles = calc.sections.append("div").text((section, index) => {
+                var labelsToValue = dv.byGroupLabel.get(section),
+                    value = format(dv.byGroup.get(section)),
+                    labels = Array.from(
+                        labelsToValue ? labelsToValue.keys() : []
+                    );
+                return attr.sectionFormat(section, value, labels, index);
             });
         }
 
-        var pillsData = isGroups()
-            ? (d) => (isStacks() ? [d] : dv.byStackLabel.get(d))
-            : isStacks()
-            ? dv.stacks
+        var pillsData = isSections()
+            ? (d) => (isGroups() ? [d] : dv.byGroupLabel.get(d))
+            : isGroups()
+            ? dv.groups
             : dv.labels;
 
-        calc.pills = calc.groups
+        calc.pills = calc.sections
             .selectAll(".label")
             .data(pillsData)
             .enter()
             .append("label")
             .classed("ltv-legend-pill", true)
-            .datum((d) => (isGroups() && !isStacks() ? d[0] : d));
+            .datum((d) => (isSections() && !isGroups() ? d[0] : d));
 
         calc.checkboxes = calc.pills
             .append("input")
             .classed("ltv-legend-checkbox", true)
             .attr("type", "checkbox")
-            .attr("checked", isStacks() ? stackChecked : labelChecked)
+            .attr("checked", isGroups() ? groupChecked : labelChecked)
             .attr("disabled", disabled())
             .on("change", (e, d) => changeFn(e, d));
 
@@ -279,11 +265,11 @@ export function legend() {
             .style("background-color", colorFn)
             .text((d, i) => textFn(d, i, dv));
 
-        if (CONFIG.debug && state.debug) console.log(this);
+        if (attr.debug) console.log(this);
 
         return chart;
     };
 
-    // Return generated chart
+    // return generated chart
     return chart;
 }

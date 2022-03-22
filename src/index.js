@@ -2,7 +2,10 @@ import * as d3 from "d3";
 export { d3 };
 
 import "./js/common/extension.selection.js";
-export { config, ltv_debug as debug } from "./js/common/config.js";
+export {
+    ltv_config as config,
+    ltv_debug as debug,
+} from "./js/common/config.js";
 
 export * from "./js/controller.js";
 export * from "./js/parse/parse.csv";

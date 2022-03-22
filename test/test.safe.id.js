@@ -2,7 +2,7 @@ import assert from "assert";
 import * as samples from "./sample.data.js";
 import { safeId } from "../src/js/common/identifiers.js";
 
-// https://stackoverflow.com/questions/70579/what-are-valid-values-for-the-id-attribute-in-html
+// https://groupoverflow.com/questions/70579/what-are-valid-values-for-the-id-attribute-in-html
 // ids must not contain whitespaces
 // ids should avoid ".", ":" and "/"
 

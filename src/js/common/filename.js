@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 import { prefix } from "./helpers.js";
-import { CONFIG } from "./config.js";
+import { config } from "./config.js";
 
 const MAX_FILENAME_LENGTH_OS = 255;
 
@@ -34,14 +34,14 @@ export const FILENAME_GENERATOR = function (dc, data, extension, suf) {
         .substring(0, MAX_FILENAME_LENGTH);
 
     let labelsCount = data.labels.length;
-    let stacksCount = data.stacks.length;
+    let groupsCount = data.groups.length;
     let dateString = formatTime(new Date());
 
     let name = [
-        CONFIG.downloadFilePrefix,
+        config.downloadFilePrefix,
         trimmed,
         labelsCount ? labelsCount + "L" : null,
-        stacksCount ? stacksCount + "S" : null,
+        groupsCount ? groupsCount + "S" : null,
         dateString,
         // Math.random().toString(36).substring(2, 8), // random
         suf,

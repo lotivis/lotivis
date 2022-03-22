@@ -2,27 +2,43 @@ import { downloadURL } from "./common/download.js";
 import { postfix } from "./common/helpers.js";
 import { uniqueId } from "./common/identifiers.js";
 import { csvFormat } from "./parse/parse.csv.js";
-import { baseChart } from "./chart.js";
-import { CONFIG, runsInBrowser } from "./common/config.js";
+import { baseChart } from "./baseChart.js";
+import { config, runsInBrowser } from "./common/config.js";
 
 /**
- * Returns the JSON string from the passed data view.
- * @param {datatext} dt The
- * @param {dataview} dv
- * @returns {string} JSON the passed data view.
+ * Returns the JSON string from the passed data view's data.
+ * @param {datatext} dt The datatext
+ * @param {dataview} dv The dataview
+ * @returns {string} JSON string from the data view's data.
  */
 export const datatextJSONData = function (dt, dv) {
     return JSON.stringify(dv.data, null, 2);
 };
 
+/**
+ * Returns the JSON string from the passed data view.
+ * @param {datatext} dt The datatext
+ * @param {dataview} dv The dataview
+ * @returns {string} JSON string from the data view.
+ */
 export const datatextJSON = function (dt, dv) {
     return JSON.stringify(dv, null, 2);
 };
 
+/**
+ * Returns the CSV string from the passed data view's data.
+ * @param {datatext} dt The datatext
+ * @param {dataview} dv The dataview
+ * @returns CSV string from the data view's data.
+ */
 export const datatextCSV = function (dt, dv) {
     return csvFormat(dv.data);
 };
 
+/**
+ *
+ * @returns
+ */
 export function datatext() {
     let text;
     let state = {
@@ -99,11 +115,9 @@ export function datatext() {
             extension = "txt";
         }
 
-        let blob = new Blob([text], { type: type });
-        let objectURL = URL.createObjectURL(blob);
-        let filename = state.dataController.filename(extension, "datatext");
-
-        console.log("filename", filename);
+        let blob = new Blob([text], { type: type }),
+            objectURL = URL.createObjectURL(blob),
+            filename = state.dataController.filename(extension, "datatext");
 
         downloadURL(objectURL, filename);
 
@@ -112,16 +126,18 @@ export function datatext() {
 
     /**
      * Calculates and returns the data view for the datatext.
-     * @param {*} dc The data controller
      * @returns dv The generated data view
      * @public
      */
-    chart.dataView = function (dc) {
+    chart.dataView = function () {
+        let dc = attr.dataController;
+        if (!dc) throw new Error("no data controller");
+
         let dv = {};
 
         dv.data = dc.data();
         dv.labels = dc.labels();
-        dv.stacks = dc.stacks();
+        dv.groups = dc.groups();
         dv.locations = dc.locations();
         dv.dates = dc.dates();
 
@@ -177,8 +193,8 @@ export function datatext() {
 }
 
 export function data_preview(dc) {
-    if (!dc || !CONFIG.debug || !runsInBrowser()) return;
+    if (!dc || !config.debug || !runsInBrowser()) return;
     if (!document.getElementById("ltv-data")) return;
-    if (!CONFIG.datatext) CONFIG.datatext = datatext().selector("#ltv-data");
-    CONFIG.datatext.dataController(dc).run();
+    if (!config.datatext) config.datatext = datatext().selector("#ltv-data");
+    config.datatext.dataController(dc).run();
 }

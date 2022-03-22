@@ -5,20 +5,23 @@ import { ltv_debug } from "./common/config.js";
 import { pngDownload } from "./common/download.js";
 import { Events } from "./common/events.js";
 
-export function baseChart(state) {
-    if (!state) throw new Error("no state passed");
+export function baseChart(attr) {
+    if (!attr) throw new Error("no attr passed");
 
-    // Private attributes
-    var chart = {},
-        calc = {},
-        state = state,
-        disp = d3.dispatch("willRender", "didRender");
+    // private attributes
+    let chart = {};
 
-    if (!state.id) state.id = uniqueId("chart");
-    if (!state.selector) state.selector = "body";
-    if (!state.debug) state.debug = false;
+    // create `id` atrribute in case its not exising
+    if (!attr.id) attr.id = uniqueId("chart");
 
-    attributable(chart, state);
+    // create `selector` atrribute with default value "body" (if not existing)
+    if (!attr.selector) attr.selector = "body";
+
+    // create `debug` atrribute with default value `false` (if not existing)
+    if (!attr.debug) attr.debug = false;
+
+    // expose atrributes as getter-setter functions
+    attributable(chart, attr);
 
     // private
 
@@ -28,46 +31,30 @@ export function baseChart(state) {
 
     function filterDidChange(filterName, action, item) {
         ltv_debug("filterDidChange", this);
-        if (this === chart) return ltv_debug(chart.id(), "is sender");
+        if (this === chart) return ltv_debug(attr.id, "is sender");
         if (chart.skipFilterUpdate(filterName, action, item))
-            return ltv_debug(chart.id(), "skip filter update", filterName);
+            return ltv_debug(attr.id, "skip filter update", filterName);
     }
 
     function filterUpdate(sender, filterName, action, item) {
-        if (chart === sender) return ltv_debug(chart.id(), "is sender");
+        if (chart === sender) return ltv_debug(attr.id, "is sender");
         if (chart.skipFilterUpdate(filterName, action, item))
-            return ltv_debug(chart.id(), "skip filter update", filterName);
-
+            return ltv_debug(attr.id, "skip filter update", filterName);
         return chart.run();
-
-        // if (!isString(state.selector))
-        //   throw new Error("invalid selector: " + state.selector);
-
-        // var selector = state.selector;
-        // var selection = d3.selectAll(selector);
-
-        // selection.each(function scope() {
-        //   // Receive container
-        //   var container = d3.select(this);
-        //   if (typeof chart.update === "function")
-        //     chart.update(container, state, calc);
-        // });
     }
 
-    function rerender() {}
-
     // public
-    chart.on = function (name, callback) {
-        disp.on(name, callback);
-    };
+    // chart.on = function (name, callback) {
+    //     disp.on(name, callback);
+    // };
 
-    chart.call = function (name, ...args) {
-        disp.call(name, this, ...args);
-    };
+    // chart.call = function (name, ...args) {
+    //     disp.call(name, this, ...args);
+    // };
 
-    // Define state getter and setter function
-    chart.state = function (_) {
-        return arguments.length ? (Object.assign(state, _), this) : state;
+    // Define attr getter and setter function
+    chart.attr = function (_) {
+        return arguments.length ? (Object.assign(attr, _), this) : attr;
     };
 
     /**
@@ -88,21 +75,21 @@ export function baseChart(state) {
      * @public
      */
     chart.id = function () {
-        return state.id;
+        return attr.id;
     };
 
     /**
      * Generates and downloads a PNG.
      */
     chart.pngDownload = function (callback) {
-        if (!state.dataController) throw new Error("no data controller");
-        if (!state.id) throw new Error("no id");
-        if (!state.selector) throw new Error("no selector");
+        if (!attr.dataController) throw new Error("no data controller");
+        if (!attr.id) throw new Error("no id");
+        if (!attr.selector) throw new Error("no selector");
 
-        let type = state.id.split("-")[1];
-        let filename = state.dataController.filename(".png", type);
+        let type = attr.id.split("-")[1];
+        let filename = attr.dataController.filename(".png", type);
 
-        pngDownload(state.selector, filename, callback);
+        pngDownload(attr.selector, filename, callback);
     };
 
     chart.svgDownload = function (callback) {
@@ -116,14 +103,13 @@ export function baseChart(state) {
      * @returns {dataController || this} The data controller or the chart itself
      */
     chart.dataController = function (dc) {
-        if (!arguments.length) return state.dataController;
+        if (!arguments.length) return attr.dataController;
 
         // remove callback from existing controller
-        if (state.dataController)
-            state.dataController.onFilter(chart.id(), null);
+        if (attr.dataController) attr.dataController.onFilter(chart.id(), null);
 
-        state.dataController = dc;
-        state.dataController.onFilter(chart.id(), filterUpdate);
+        attr.dataController = dc;
+        attr.dataController.onFilter(chart.id(), filterUpdate);
 
         return chart;
     };
@@ -137,16 +123,16 @@ export function baseChart(state) {
     chart.margin = function (_) {
         if (!arguments.length) {
             return {
-                left: state.marginLeft,
-                top: state.marginTop,
-                right: state.marginRight,
-                bottom: state.marginBottom,
+                left: attr.marginLeft,
+                top: attr.marginTop,
+                right: attr.marginRight,
+                bottom: attr.marginBottom,
             };
         }
-        if (_ && _["left"]) this.state({ marginLeft: _["left"] });
-        if (_ && _["top"]) this.state({ marginTop: _["top"] });
-        if (_ && _["right"]) this.state({ marginRight: _["right"] });
-        if (_ && _["bottom"]) this.state({ marginBottom: _["bottom"] });
+        if (_ && _["left"]) this.attr({ marginLeft: _["left"] });
+        if (_ && _["top"]) this.attr({ marginTop: _["top"] });
+        if (_ && _["right"]) this.attr({ marginRight: _["right"] });
+        if (_ && _["bottom"]) this.attr({ marginBottom: _["bottom"] });
         return chart;
     };
 
@@ -200,27 +186,26 @@ export function baseChart(state) {
      */
     chart.run = function (dc) {
         if (dc) chart.dataController(dc);
-        else dc = state.dataController;
+        else dc = attr.dataController;
 
-        if (!state.selector) throw new Error("no selector");
+        if (!attr.selector) throw new Error("no selector");
         if (!dc) throw new Error("no data controller");
 
-        let selection = d3.selectAll(state.selector);
+        let selection = d3.selectAll(attr.selector);
         if (selection.size() === 0)
-            throw new Error("empty selection: " + state.selector);
+            throw new Error("empty selection: " + attr.selector);
 
-        console.time("dataView " + state.id);
+        console.time("dataView " + attr.id);
         let dv = chart.dataView(dc);
-        console.timeEnd("dataView " + state.id);
+        console.timeEnd("dataView " + attr.id);
 
         selection.each(function scope() {
             // receive container
-            let container = d3.select(this);
+            let container = d3.select(this),
+                calc = {};
 
-            disp.call("willRender", chart, dv, calc);
             chart.clear(container, calc, dv);
             chart.render(container, calc, dv);
-            disp.call("didRender", chart, dv, calc);
         });
 
         return chart;

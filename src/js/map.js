@@ -1,6 +1,6 @@
 import * as d3 from "d3";
-import { baseChart } from "./chart.js";
-import { CONFIG, ltv_debug } from "./common/config.js";
+import { baseChart } from "./baseChart.js";
+import { config, ltv_debug } from "./common/config.js";
 import { uniqueId } from "./common/identifiers.js";
 import { tooltip } from "./tooltip.js";
 import { DataController } from "./controller.js";
@@ -73,7 +73,7 @@ export function map() {
 
         colorScheme: colorSchemeDefault,
 
-        radius: CONFIG.barRadius,
+        radius: config.barRadius,
 
         // the geojson wich is drawn
         geoJSON: null,
@@ -81,8 +81,8 @@ export function map() {
         // The data controller.
         dataController: null,
 
-        // presented stack
-        stack: null,
+        // presented group
+        group: null,
 
         // the number format
         numberFormat: DEFAULT_NUMBER_FORMAT,
@@ -228,7 +228,7 @@ export function map() {
     function positionTooltip(event, feature, calc) {
         // position tooltip
         let size = calc.tooltip.size(),
-            tOff = CONFIG.tooltipOffset,
+            tOff = config.tooltipOffset,
             projection = attr.projection,
             fBounds = d3.geoBounds(feature),
             fLowerLeft = projection(fBounds[0]),
@@ -295,7 +295,7 @@ export function map() {
 
     function renderFeatures(calc, dv) {
         function opacity(location) {
-            return filterLocation(location) ? CONFIG.selectionOpacity : 1;
+            return filterLocation(location) ? config.selectionOpacity : 1;
         }
 
         function featureMapID(f) {
@@ -383,6 +383,11 @@ export function map() {
             .raise();
     }
 
+    /**
+     * Renders the labels on the areas.
+     * @param {*} calc
+     * @param {*} dv
+     */
     function renderLabels(calc, dv) {
         // calc.svg.selectAll(".ltv-map-label").remove();
         calc.svg
@@ -425,12 +430,12 @@ export function map() {
     }
 
     function renderLegend(calc, dv) {
-        let label = attr.selectedStack || dv.stacks[0];
+        let label = attr.selectedGroup || dv.groups[0];
         let locationToSum = dv.locationToSum || [];
         let max = d3.max(locationToSum, (item) => item[1]) || 0;
 
         let xOff = 10 + attr.marginLeft;
-        let labelColor = calc.colors.stack(label);
+        let labelColor = calc.colors.group(label);
 
         xOff = 1;
 
@@ -498,8 +503,8 @@ export function map() {
     }
 
     function renderDataSelectionPanel(calc, dv) {
-        let stacks = dv.stacks;
-        let selectedStack = attr.selectedStack || stacks[0];
+        let groups = dv.groups;
+        let selectedGroup = attr.selectedGroup || groups[0];
         let radioName = attr.id + "-radio";
 
         calc.legendPanel = calc.container
@@ -512,7 +517,7 @@ export function map() {
 
         calc.legendPanelPills = calc.legendPanel
             .selectAll(".label")
-            .data(stacks)
+            .data(groups)
             .enter()
             .append("label")
             .classed("ltv-legend-pill", true);
@@ -522,13 +527,13 @@ export function map() {
             .classed("ltv-legend-radio", true)
             .attr("type", "radio")
             .attr("name", radioName)
-            .attr("value", (stack) => stack)
-            .attr("checked", (stack) => (stack == selectedStack ? true : null))
-            .on("change", (event, stack) => {
-                if (selectedStack == stack) return;
-                Events.call("map-selection-will-change", chart, stack);
-                attr.selectedStack = stack;
-                Events.call("map-selection-did-change", chart, stack);
+            .attr("value", (group) => group)
+            .attr("checked", (group) => (group == selectedGroup ? true : null))
+            .on("change", (event, group) => {
+                if (selectedGroup == group) return;
+                Events.call("map-selection-will-change", chart, group);
+                attr.selectedGroup = group;
+                Events.call("map-selection-did-change", chart, group);
                 chart.run();
             });
 
@@ -536,7 +541,7 @@ export function map() {
             .append("span")
             .classed("ltv-legend-pill-span", true)
             .style("border-radius", postfix(attr.radius, "px"))
-            .style("background-color", (stack) => calc.colors.stack(stack))
+            .style("background-color", (group) => calc.colors.group(group))
             .text((d, i) => cut(d, 20));
     }
 
@@ -563,41 +568,43 @@ export function map() {
 
     /**
      * Calculates the data view for the bar chart.
-     * @param {*} calc
      * @returns
      */
-    chart.dataView = function (dc) {
-        var dv = {};
+    chart.dataView = function () {
+        let dc = attr.dataController;
+        if (!dc) throw new Error("no data controller");
+
+        let dv = {};
 
         dv.snapshot = dc.snapshot();
         dv.data = dc.snapshot();
         dv.labels = dc.data().labels;
-        dv.stacks = dc.data().stacks;
+        dv.groups = dc.data().groups;
         dv.locations = dc.data().locations;
 
-        if (!dv.stacks.includes(attr.selectedStack)) attr.selectedStack = null;
+        if (!dv.groups.includes(attr.selectedGroup)) attr.selectedGroup = null;
 
-        dv.selectedStack = attr.selectedStack || dv.stacks[0];
-        dv.selectedStackData = dv.data.filter(
-            (d) => (d.stack || d.label) == dv.selectedStack
+        dv.selectedGroup = attr.selectedGroup || dv.groups[0];
+        dv.selectedGroupData = dv.data.filter(
+            (d) => (d.group || d.label) == dv.selectedGroup
         );
 
         dv.byLocationLabel = d3.rollup(
-            dv.selectedStackData,
+            dv.selectedGroupData,
             (v) => d3.sum(v, (d) => d.value),
             (d) => d.location,
             (d) => d.label
         );
 
-        dv.byLocationStack = d3.rollup(
-            dv.selectedStackData,
+        dv.byLocationGroup = d3.rollup(
+            dv.selectedGroupData,
             (v) => d3.sum(v, (d) => d.value),
             (d) => d.location,
-            (d) => d.stack
+            (d) => d.group
         );
 
         dv.locationToSum = d3.rollup(
-            dv.selectedStackData,
+            dv.selectedGroupData,
             (v) => d3.sum(v, (d) => d.value),
             (d) => d.location
         );
@@ -606,7 +613,7 @@ export function map() {
         dv.maxLabel = d3.max(dv.byLocationLabel, (i) =>
             d3.max(i[1], (d) => d[1])
         );
-        dv.maxStack = d3.max(dv.byLocationStack, (i) =>
+        dv.maxGroup = d3.max(dv.byLocationGroup, (i) =>
             d3.max(i[1], (d) => d[1])
         );
 
@@ -655,9 +662,9 @@ export function map() {
         }
     };
 
-    Events.on("map-selection-did-change." + chart.id(), function (stack) {
-        if (this === chart) return;
-        attr.selectedStack = stack;
+    Events.on("map-selection-did-change." + chart.id(), function (group) {
+        if (this === chart) return ltv_debug(chart.id(), "map is sender");
+        attr.selectedGroup = group;
         chart.run();
     });
 

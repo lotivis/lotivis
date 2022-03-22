@@ -1,5 +1,5 @@
 import * as d3 from "d3";
-import { CONFIG, ltv_debug, runsInBrowser } from "./config.js";
+import { config, ltv_debug, runsInBrowser } from "./config.js";
 
 export function element(selector) {
     var el = d3.select(selector).node();
@@ -25,7 +25,7 @@ export function downloadBlob(blob, fname) {
 export function pngDownload(selector, filename, callback) {
     html2canvas(element(selector), {
         scale: 4,
-        logging: CONFIG.thidPartyLogging,
+        logging: config.thidPartyLogging,
     }).then((canvas) => {
         downloadURL(canvas.toDataURL(), filename);
         if (callback) callback();

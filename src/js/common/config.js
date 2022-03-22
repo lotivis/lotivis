@@ -3,7 +3,7 @@ import { GERMAN_NUMBER_FORMAT } from "./formats.js";
 /**
  * lotivis wide configuration
  */
-export const CONFIG = {
+export const config = {
     /**
      * A Boolean value indicating whether the debug logging is enabled
      */
@@ -67,20 +67,20 @@ export const CONFIG = {
  * Gets or sets the configuration of lotivis.
  * @param {*} input
  */
-export function config(input) {
+export function ltv_config(input) {
     // return config object for no arguments
-    if (!arguments.length) return CONFIG;
+    if (!arguments.length) return config;
 
     // return the value for the given key if input is string
     if (arguments.length === 1 && typeof input === "string")
-        return Object.hasOwnProperty.call(CONFIG, input) ? CONFIG[input] : null;
+        return Object.hasOwnProperty.call(config, input) ? config[input] : null;
 
     // iterate values of input, add them to lotivis config
     for (const key in input) {
         if (!Object.hasOwnProperty.call(input, key)) continue;
-        if (Object.hasOwnProperty.call(CONFIG, key)) {
-            CONFIG[key] = input[key];
-            ltv_debug("update config", key, " = ", CONFIG[key]);
+        if (Object.hasOwnProperty.call(config, key)) {
+            config[key] = input[key];
+            ltv_debug("update config", key, " = ", config[key]);
         } else {
             ltv_debug("unknown config key", key);
         }
@@ -96,11 +96,11 @@ export function runsInBrowser() {
  * @param {Boolean} enabled Enable debug logging
  */
 export function ltv_debug(...args) {
-    if (!arguments.length) return CONFIG.debug;
-
-    if (arguments.length === 1 && typeof args[0] === "boolean") {
-        config({ debug: args[0] });
-    } else if (CONFIG.debug) {
+    if (!arguments.length) {
+        return config.debug;
+    } else if (arguments.length === 1 && typeof args[0] === "boolean") {
+        ltv_config({ debug: args[0] });
+    } else if (config.debug) {
         console.log("[ltv] ", ...args);
     }
 }

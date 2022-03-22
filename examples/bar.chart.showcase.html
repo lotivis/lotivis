@@ -35,7 +35,7 @@
             let datasets = [
                 {
                     label: "dataset_1",
-                    stack: "dataset_1",
+                    group: "dataset_1",
                     data: [
                         {
                             date: 2000,
@@ -81,7 +81,7 @@
                 },
                 {
                     label: "dataset_2",
-                    stack: "dataset_2, dataset_3",
+                    group: "dataset_2, dataset_3",
                     data: [
                         {
                             date: 2000,
@@ -127,7 +127,7 @@
                 },
                 {
                     label: "dataset_3",
-                    stack: "dataset_2, dataset_3",
+                    group: "dataset_2, dataset_3",
                     data: [
                         {
                             date: 2000,
@@ -183,7 +183,7 @@
                 .width(600)
                 .height(400)
                 .marginTop(40)
-                .title("stacked")
+                .title("grouped")
                 .colorScheme(lotivis.colorSchemeLotivis10)
                 .dataController(dataController)
                 .run();
@@ -195,7 +195,7 @@
                 .height(400)
                 .marginTop(40)
                 .labels(true)
-                .title("stacked labels")
+                .title("grouped labels")
                 .colorScheme(lotivis.colorSchemeCategory10)
                 .dataController(dataController)
                 .run();

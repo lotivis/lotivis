@@ -1,10 +1,10 @@
 export function flatDataset(d) {
     if (Array.isArray(d)) throw new Error("expecting object. found array");
     if (!d || !d.data) throw new Error("dataset has no data");
-    return d.data.map(function (i) {
+    return d.data.map((i) => {
         return {
             label: d.label,
-            stack: d.stack,
+            group: d.group,
             location: i.location,
             date: i.date,
             value: i.value,

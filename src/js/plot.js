@@ -1,6 +1,6 @@
 import * as d3 from "d3";
-import { baseChart } from "./chart.js";
-import { CONFIG } from "./common/config.js";
+import { baseChart } from "./baseChart.js";
+import { config } from "./common/config.js";
 import { uniqueId } from "./common/identifiers.js";
 import { tooltip } from "./tooltip.js";
 import { hash } from "./common/hash.js";
@@ -71,7 +71,7 @@ export function plot() {
         marginBottom: 20,
 
         // bar radius
-        radius: CONFIG.barRadius,
+        radius: config.barRadius,
 
         // whether to draw the x axis grid
         xGrid: true,
@@ -85,15 +85,17 @@ export function plot() {
         // the plot's color mode, "single" or "multi"
         colorMode: "multi",
 
+        // the plot's color scale which is used in "multi" color mode
         colorScale: colorScale1,
 
+        // the plot's color scheme used in "single" color mode
         colorScheme: colorSchemeDefault,
 
         // Whether the chart is selectable.
         selectable: true,
 
         // the border style of the data preview
-        border: CONFIG.defaultBorder,
+        border: config.defaultBorder,
 
         // transformes a given date into a numeric value.
         dateAccess: DATE_ACCESS,
@@ -422,7 +424,6 @@ export function plot() {
 
         let count = ds.data.length,
             latestDate = ds.lastDate,
-            dataController = chart.dataController(),
             dataColors = ColorsGenerator(state.colorScheme),
             isSingle = state.colorMode === "single",
             colors = isSingle ? dataColors.label : state.colorScale;
@@ -468,7 +469,7 @@ export function plot() {
             calc.yChart(ds.label) * factor +
             offset[1] +
             state.barHeight * factor +
-            CONFIG.tooltipOffset;
+            config.tooltipOffset;
 
         calc.tooltip
             .left(calc.xChart(ds.firstDate) * factor + offset[0])
@@ -516,13 +517,14 @@ export function plot() {
     /**
      * Calculates the data view for the bar chart.
      *
-     * @param {*} calc The calc object
      * @returns The generated data view
-     *
      * @public
      */
-    chart.dataView = function (dc) {
-        var dv = {};
+    chart.dataView = function () {
+        let dc = attr.dataController;
+        if (!dc) throw new Error("no data controller");
+
+        let dv = {};
         dv.dates = dc.dates().sort();
         dv.labels = dc.labels();
         dv.data = dc.snapshot();

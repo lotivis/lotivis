@@ -42,10 +42,10 @@ console.log(colorSchemeDefault[0]);
 export function ColorsGenerator(c, d) {
     let colors = c || colorSchemeDefault,
         data = d || [],
-        stackColors,
+        groupColors,
         labelColors,
-        stacksToLabels,
-        stacks;
+        groupsToLabels,
+        groups;
 
     function fallback() {
         return Array.isArray(colors) && colors.length ? colors[0] : "RoyalBlue";
@@ -56,25 +56,25 @@ export function ColorsGenerator(c, d) {
     }
 
     function calc() {
-        stackColors = new Map();
+        groupColors = new Map();
         labelColors = new Map();
-        stacksToLabels = d3.group(
+        groupsToLabels = d3.group(
             data,
-            (d) => d.stack || d.label,
+            (d) => d.group || d.label,
             (d) => d.label
         );
-        stacks = Array.from(stacksToLabels.keys());
+        groups = Array.from(groupsToLabels.keys());
 
-        stacks.forEach((stack) => {
-            let labels = Array.from((stacksToLabels.get(stack) || []).keys());
-            let stackColor = colors[stacks.indexOf(stack) % colors.length];
-            let c1 = d3.color(stackColor);
-            let stackScale = colorScale(c1, darker(c1));
+        groups.forEach((group) => {
+            let labels = Array.from((groupsToLabels.get(group) || []).keys());
+            let groupColor = colors[groups.indexOf(group) % colors.length];
+            let c1 = d3.color(groupColor);
+            let groupScale = colorScale(c1, darker(c1));
 
-            stackColors.set(stack, c1);
+            groupColors.set(group, c1);
 
             labels.forEach((label, index) => {
-                labelColors.set(label, stackScale(index / labels.length));
+                labelColors.set(label, groupScale(index / labels.length));
             });
         });
 
@@ -89,8 +89,8 @@ export function ColorsGenerator(c, d) {
         return arguments.length ? ((colors = _), calc()) : colors;
     };
 
-    generator.stack = function (stack) {
-        return stackColors ? stackColors.get(stack) || fallback() : fallback();
+    generator.group = function (group) {
+        return groupColors ? groupColors.get(group) || fallback() : fallback();
     };
 
     generator.label = function (label) {

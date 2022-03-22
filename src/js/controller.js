@@ -7,35 +7,46 @@ import { uniqueId } from "./common/identifiers.js";
 import { prefix } from "./common/helpers.js";
 import { datatext, data_preview } from "./datatext.js";
 import { Events } from "./common/events.js";
+import { attributable } from "./common/attributable.js";
 
 export class DataController {
+    /**
+     * Creates a new DataController with the passed data.
+     *
+     * @param {*} data
+     * @returns
+     */
     constructor(data) {
         if (!Array.isArray(data)) throw new Error("data not an array.");
-
-        let id = uniqueId("dc");
 
         // create data model
         data = Data(data);
 
-        let disp = d3.dispatch("filter", "data");
-        let attr = {
-            data: data,
-            snapshot: data,
-            filters: { labels: [], locations: [], dates: [], stacks: [] },
-            filenameGenerator: FILENAME_GENERATOR,
-            dateAccess: DEFAULT_DATE_ORDINATOR,
-        };
+        let id = uniqueId("dc"),
+            disp = d3.dispatch("filter", "data"),
+            attr = {
+                id: id,
 
-        // expose attributes
-        Object.keys(attr).forEach((key) => {
-            // do not override existing functions
-            if (typeof this[key] === "function") return;
-            this[key] = function (_) {
-                return arguments.length ? ((attr[key] = _), this) : attr[key];
+                // the controlled data
+                data: data,
+
+                // the controlled filtered data
+                snapshot: data,
+
+                // the applied filters
+                filters: { labels: [], locations: [], dates: [], groups: [] },
+
+                // a filename generator
+                filenameGenerator: FILENAME_GENERATOR,
+
+                dateAccess: DEFAULT_DATE_ORDINATOR,
             };
-        });
 
-        // private
+        // expose atrributes as getter-setter functions
+        attributable(this, attr);
+
+        this.id = id;
+        attr.id = id;
 
         /**
          *
@@ -48,7 +59,7 @@ export class DataController {
                     f.locations.indexOf(d.location) !== -1 ||
                     f.dates.indexOf(d.date) !== -1 ||
                     f.labels.indexOf(d.label) !== -1 ||
-                    f.stacks.indexOf(d.stack) !== -1
+                    f.groups.indexOf(d.group) !== -1
                 );
             });
             attr.snapshot = Data(snapshot);
@@ -57,7 +68,6 @@ export class DataController {
         }
 
         // listeners
-        this.id = id;
 
         /**
          * Adds a listener with the passed name for filter changes.
@@ -91,11 +101,7 @@ export class DataController {
 
         this.filtersDidChange = function (name, action, item, sender) {
             if (!sender) throw new Error("missing sender");
-
-            // do calculations
             calculateSnapshot();
-
-            // call listeners
             disp.call("filter", this, sender, name, action, item);
             return this;
         };
@@ -121,7 +127,7 @@ export class DataController {
             return arguments.length
                 ? this.filters(name).length > 0
                 : this.hasFilters("labels") ||
-                      this.hasFilters("stacks") ||
+                      this.hasFilters("groups") ||
                       this.hasFilters("locations") ||
                       this.hasFilters("dates");
         };
@@ -139,7 +145,7 @@ export class DataController {
                     labels: [],
                     locations: [],
                     dates: [],
-                    stacks: [],
+                    groups: [],
                 };
                 this.filtersDidChange("all", "clear", null, sender);
             }
@@ -205,7 +211,7 @@ export class DataController {
                         f.locations.indexOf(d.location) !== -1 ||
                         f.dates.indexOf(d.date) !== -1 ||
                         f.labels.indexOf(d.label) !== -1 ||
-                        f.stacks.indexOf(d.stack) !== -1
+                        f.groups.indexOf(d.group) !== -1
                     )
             );
         };
@@ -262,7 +268,7 @@ export class DataController {
         calculateSnapshot();
 
         // debug
-        ltv_debug("data controller", this.id, this);
+        ltv_debug("data controller", attr.id, this);
         data_preview(this);
 
         return this;
@@ -288,8 +294,8 @@ export class DataController {
         return d3.group(this.data(), (d) => d.label);
     }
 
-    byStack() {
-        return d3.group(this.data(), (d) => d.stack || d.label);
+    byGroup() {
+        return d3.group(this.data(), (d) => d.group || d.label);
     }
 
     byLocation() {
@@ -304,8 +310,8 @@ export class DataController {
         return Array.from(this.byLabel().keys());
     }
 
-    stacks() {
-        return Array.from(this.byStack().keys());
+    groups() {
+        return Array.from(this.byGroup().keys());
     }
 
     locations() {
@@ -316,8 +322,8 @@ export class DataController {
         return Array.from(this.byDate().keys());
     }
 
-    dataStack(s) {
-        return this.data().filter((d) => d.stack === s);
+    dataGroup(s) {
+        return this.data().filter((d) => d.group === s);
     }
 
     dataLabel(l) {
@@ -332,8 +338,8 @@ export class DataController {
         return this.data().filter((d) => d.date === d);
     }
 
-    sumOfStack(s) {
-        return d3.sum(this.dataStack(s), (d) => d.value);
+    sumOfGroup(s) {
+        return d3.sum(this.dataGroup(s), (d) => d.value);
     }
 
     sumOfLabel(l) {
