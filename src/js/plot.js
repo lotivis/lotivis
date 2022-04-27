@@ -624,8 +624,6 @@ export function plot() {
                 break;
         }
 
-        console.log("dv.datasets", dv.datasets);
-
         dv.firstDate = dv.dates[0];
         dv.lastDate = dv.dates[dv.dates.length - 1];
         dv.max = d3.max(dv.datasets, (d) => d3.max(d.data, (i) => i.value));

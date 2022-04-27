@@ -23511,7 +23511,10 @@
               .attr("class", "ltv-map-background")
               .attr("width", attr.width)
               .attr("height", attr.height)
-              .on("click", () => attr.dataController.clear("locations", chart));
+              .on("click", () => {
+                  attr.dataController.clear("locations", chart);
+                  renderSelection(calc);
+              });
       }
 
       function renderExteriorBorders(calc, dv) {
@@ -23596,7 +23599,8 @@
                   feature.lotivisId,
                   chart
               );
-              // chart.emit("click", event, feature);
+
+              renderSelection(calc);
           }
 
           let locationToSum = dv.locationToSum;
@@ -23655,6 +23659,7 @@
       function renderSelection(calc, dv) {
           calc.selectedFeatures = getSelectedFeatures();
           calc.selectionBorderGeoJSON = join(calc.selectedFeatures);
+
           if (!calc.selectionBorderGeoJSON)
               return ltv_debug("no features selected", chart.id());
 
@@ -24314,6 +24319,33 @@
               .attr("viewBox", `0 0 ${attr.width} ${attr.height}`);
       }
 
+      /**
+       * Renders the background rect of the chart.
+       *
+       * @param {calc} calc The calc object.
+       * @private
+       */
+      function renderBackground(calc) {
+          calc.svg
+              .append("rect")
+              .attr("class", "ltv-bar-chart-background")
+              .attr("x", 0)
+              .attr("y", 0)
+              .attr("width", attr.width)
+              .attr("height", attr.height)
+              .on("click", (e, l) => {
+                  if (!attr.enabled) return;
+                  attr.dataController.clear("dates", chart);
+                  calc.svg
+                      .selectAll(`.ltv-bar-chart-selection-rect`)
+                      .attr(`opacity`, (d) =>
+                          attr.dataController.isFilter("dates", d)
+                              ? config.selectionOpacity
+                              : 0
+                      );
+              });
+      }
+
       function renderTitle(calc, dv) {
           calc.title = calc.svg
               .append("text")
@@ -24334,43 +24366,15 @@
           // let leftAxis =
 
           if (Number.isInteger(attr.ticks)) {
-              calc.svg
+              calc.axisLeft = calc.svg
                   .append("g")
                   .call(axisLeft(calc.yChart).ticks(attr.ticks))
                   .attr("transform", transX(attr.marginLeft))
                   .attr("class", "ltv-bar-chart-axis-label");
           }
 
-          function datesLabelColor(date) {
-              return attr.dataController.isFilter("dates", date)
-                  ? "gray"
-                  : "white";
-          }
-
-          let dc = attr.dataController,
-              dates = attr.dates || dv.dates;
-
-          calc.svg
-              .append("g")
-              .attr("transform", transY(attr.height - attr.marginBottom + 4))
-              .selectAll("g")
-              .data(dates)
-              .enter()
-              .append("rect")
-              .attr("fill", datesLabelColor)
-              .attr("cursor", "pointer")
-              .attr("x", (d) => calc.xChartScale(d))
-              .attr("width", calc.xChartScale.bandwidth())
-              .attr("height", 20)
-              .radius(attr.radius)
-              .text((d) => d)
-              .on("click", (e, d, some) => {
-                  dc.toggleFilter("dates", d, chart);
-                  select(e.target).attr("fill", datesLabelColor);
-              });
-
           // bottom axis
-          calc.svg
+          calc.axisBottom = calc.svg
               .append("g")
               .call(axisBottom(calc.xChartScale))
               .attr("transform", transY(attr.height - attr.marginBottom))
@@ -24409,7 +24413,7 @@
           }
       }
 
-      function renderHoverBars(calc, dv) {
+      function renderSelectionBars(calc, dv) {
           function rectId(date) {
               return `ltv-bar-chart-selection-rect-${safeId(String(date))}`;
           }
@@ -24426,25 +24430,36 @@
               .attr("y", attr.marginTop)
               .attr("width", calc.xChartScale.bandwidth())
               .attr("height", calc.graphHeight)
-              // .attr("fill-opacity", 0)
-              // .attr("stroke", "blue")
-              // .attr("stroke-width", 3)
-              // .attr("opacity", (d) =>
-              //     attr.dataController.isFilter("dates", d) ? 0.3 : 0
-              // )
+              .attr("opacity", 0);
+      }
+
+      function renderHoverBars(calc, dv) {
+          function rectId(date) {
+              return `ltv-bar-chart-hover-bar-${safeId(String(date))}`;
+          }
+
+          calc.selection = calc.svg
+              .append("g")
+              .selectAll("rect")
+              .data(dv.dates)
+              .enter()
+              .append("rect")
+              .attr("id", (d) => rectId(d))
+              .attr("class", "ltv-bar-chart-hover-bar")
+              .attr("x", (d) => calc.xChartScale(d))
+              .attr("y", attr.marginTop)
+              .attr("width", calc.xChartScale.bandwidth())
+              .attr("height", calc.graphHeight)
+              .attr("opacity", 0)
               .on("mouseenter", mouseEnter)
               .on("mouseout", mouseOut)
               .on("mousedrag", mouseDrag)
               .on("click", click)
               .raise();
 
-          // #  HANDLERS  ##############################################################
-
           function mouseEnter(event, date) {
               // make hover bar visible
-              select(this).attr("opacity", 0.2);
-
-              // calc.svg.select(rectId(date)).attr("opacity", 0.3);
+              select(this).attr("opacity", config.selectionOpacity);
 
               // position tooltip
               let tooltipSize = calc.tip.size(),
@@ -24489,13 +24504,8 @@
               dc.toggleFilter("dates", date, chart);
 
               calc.svg
-                  .select(rectId(date))
+                  .selectAll(`.ltv-bar-chart-selection-rect`)
                   .attr(`opacity`, (d) => (dc.isFilter("dates", d) ? 0.3 : 0));
-
-              // calc.svg
-              //   .selectAll(`.ltv-bar-chart-dates-area`)
-              //   .attr(`opacity`, (d) => (dc.isFilterDate(d[0]) ? 1 : 0.3))
-              //   .raise();
           }
       }
 
@@ -24759,8 +24769,10 @@
           createScales(calc, dv);
 
           renderSVG(container, calc);
-          renderAxis(calc, dv);
+          renderBackground(calc);
+          renderAxis(calc);
           renderGrid(calc);
+          renderSelectionBars(calc, dv);
           renderHoverBars(calc, dv);
 
           if (attr.style === "combine") {
@@ -25426,8 +25438,6 @@
                   dv.datasets = dv.datasets.reverse();
                   break;
           }
-
-          console.log("dv.datasets", dv.datasets);
 
           dv.firstDate = dv.dates[0];
           dv.lastDate = dv.dates[dv.dates.length - 1];

@@ -282,7 +282,10 @@ export function map() {
             .attr("class", "ltv-map-background")
             .attr("width", attr.width)
             .attr("height", attr.height)
-            .on("click", () => attr.dataController.clear("locations", chart));
+            .on("click", () => {
+                attr.dataController.clear("locations", chart);
+                renderSelection(calc, dv);
+            });
     }
 
     function renderExteriorBorders(calc, dv) {
@@ -367,7 +370,8 @@ export function map() {
                 feature.lotivisId,
                 chart
             );
-            // chart.emit("click", event, feature);
+
+            renderSelection(calc, dv);
         }
 
         let locationToSum = dv.locationToSum;
@@ -426,6 +430,7 @@ export function map() {
     function renderSelection(calc, dv) {
         calc.selectedFeatures = getSelectedFeatures();
         calc.selectionBorderGeoJSON = featuresJoin(calc.selectedFeatures);
+
         if (!calc.selectionBorderGeoJSON)
             return ltv_debug("no features selected", chart.id());
 

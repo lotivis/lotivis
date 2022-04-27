@@ -76,7 +76,7 @@
                 .selector("#map-chart")
                 .labels(true)
                 .exclude(["2A", "2B"])
-                .featureIDAccessor((f) => +f.properties.code)
+                .featureIDAccessor((f) => "" + f.properties.code)
                 .featureNameAccessor((f) => f.properties.nom);
 
             let mapChartMetropole = lotivis
@@ -87,7 +87,7 @@
                 .labels(true)
                 .include(["75", "92", "93", "94"])
                 .legend(false)
-                .featureIDAccessor((f) => +f.properties.code)
+                .featureIDAccessor((f) => "" + f.properties.code)
                 .featureNameAccessor((f) => f.properties.nom);
 
             lotivis.d3.json("./assets/departements.geojson").then((json) => {
@@ -97,6 +97,10 @@
                 lotivis
                     .csv("./assets/frcv.data.nike.csv")
                     .then((dc) => {
+                        dc.data().forEach((d) => {
+                            d.location = "" + d.location;
+                        });
+
                         mapChart.run(dc);
                         mapChartMetropole.run(dc);
 

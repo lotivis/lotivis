@@ -3,7 +3,8 @@
 // .ltv-bar-chart-tooltip
 
 .ltv-bar-chart-background {
-    pointer-events: none;
+    fill: transparent;
+    cursor: pointer;
 }
 
 .ltv-bar-chart-grid {
