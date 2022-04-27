@@ -7,19 +7,20 @@ import { DataController } from "./controller.js";
 import { DEFAULT_NUMBER_FORMAT } from "./common/formats.js";
 import { cut, postfix } from "./common/helpers.js";
 import { Events } from "./common/events.js";
+import { generate as geojsonGenerate } from "./geojson/generate.js";
+import { join as featuresJoin } from "./geojson/join.js";
+import { remove as featuresRemove } from "./geojson/remove.js";
+import { filter as featuresFilter } from "./geojson/filter.js";
 import {
-    geojsonGenerate,
-    featuresJoin,
-    featuresRemove,
-    featuresFilter,
-    geojsonAutoFeatureIDAccessor,
-    geojsonAutoFeatureNameAccessor,
-} from "./geojson";
+    FEATURE_ID_ACCESSOR,
+    FEATURE_NAME_ACCESSOR,
+} from "./geojson/feature.accessors.js";
 import {
     colorScale2,
     colorSchemeDefault,
     ColorsGenerator,
-} from "./common/colors";
+} from "./common/colors.js";
+import { copy } from "./common/values.js";
 
 /**
  * Reusable Map Chart API class that renders a
@@ -65,8 +66,10 @@ export function map() {
         // whether to display a tooltip.
         tooltip: true,
 
+        // array of area ids to remove from the geojson (before rendering)
         exclude: null,
 
+        // array of area ids to filter out from the geojson (before rendering)
         include: null,
 
         colorScale: colorScale2,
@@ -87,9 +90,9 @@ export function map() {
         // the number format
         numberFormat: DEFAULT_NUMBER_FORMAT,
 
-        featureIDAccessor: geojsonAutoFeatureIDAccessor,
+        featureIDAccessor: FEATURE_ID_ACCESSOR,
 
-        featureNameAccessor: geojsonAutoFeatureNameAccessor,
+        featureNameAccessor: FEATURE_NAME_ACCESSOR,
     };
 
     // Create new underlying chart with the specified attr.
@@ -104,20 +107,12 @@ export function map() {
     function geoJSONDidChange() {
         if (!attr.geoJSON) return;
 
-        attr.workGeoJSON = attr.geoJSON;
+        attr.workGeoJSON = copy(attr.geoJSON);
 
         // precalculate the center of each feature
         attr.workGeoJSON.features.forEach(
             (f) => (f.center = d3.geoCentroid(f))
         );
-
-        if (Array.isArray(attr.exclude)) {
-            attr.workGeoJSON = featuresRemove(attr.workGeoJSON, attr.exclude);
-        }
-
-        if (Array.isArray(attr.include)) {
-            attr.workGeoJSON = featuresFilter(attr.workGeoJSON, attr.include);
-        }
 
         // precalculate lotivis feature ids
         let feature, id;
@@ -125,6 +120,24 @@ export function map() {
             feature = attr.workGeoJSON.features[i];
             id = attr.featureIDAccessor(feature);
             attr.workGeoJSON.features[i].lotivisId = id;
+        }
+
+        // exclude features
+        if (Array.isArray(attr.exclude) && attr.exclude.length > 0) {
+            attr.workGeoJSON = featuresRemove(
+                attr.workGeoJSON,
+                attr.exclude,
+                attr.featureIDAccessor
+            );
+        }
+
+        // only use included features
+        if (Array.isArray(attr.include) && attr.include.length > 0) {
+            attr.workGeoJSON = featuresFilter(
+                attr.workGeoJSON,
+                attr.include,
+                attr.featureIDAccessor
+            );
         }
 
         chart.zoomTo(attr.workGeoJSON);

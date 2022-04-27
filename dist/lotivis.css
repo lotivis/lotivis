@@ -161,7 +161,7 @@
   pointer-events: none;
 }
 
-.ltv-plot-chart-hover-bar {
+.ltv-plot-chart-hover-rect {
   border-radius: 10px;
   fill: dodgerblue;
 }
@@ -177,7 +177,7 @@
 }
 
 .ltv-plot-label {
-  fill: steelblue;
+  fill: white;
   text-anchor: start;
   font-size: 10px;
   pointer-events: none;

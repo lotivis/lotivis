@@ -8,11 +8,11 @@ export function isValue(value) {
 }
 
 export function isString(value) {
-    return value && typeof value === "string";
+    return typeof value === "string";
 }
 
 export function isFunction(value) {
-    return value && typeof value === "function";
+    return typeof value === "function";
 }
 
 export function isNumber(value) {

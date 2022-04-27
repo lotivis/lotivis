@@ -1,39 +1,26 @@
 import assert from "assert";
 import * as samples from "./sample.data.js";
+import { parseDatasets } from "../src/js/parse/parse.json.js";
 
-// describe("datasets create", function () {
-//   it("creates an empty dataset collection for an empty flat samples list", function () {
-//     let createdDatasets = lotivis.parseDatasets([]);
-//     assert.strictEqual(createdDatasets.length, 0);
-//   });
+describe("parse hierarchic data", function () {
+    let json = samples.readJSON("data.json");
+    let dataController = parseDatasets(json);
 
-//   describe("sample.dataset.1.json", function () {
-//     let dataset1 = samples.readJSON("sample.dataset.1.json");
-//     let flatData = lotivis.flatDataset(dataset1);
-//     let createdDatasets = lotivis.createDatasets(flatData);
+    it("should have the right length", function () {
+        assert.strictEqual(dataController.data().length, 9);
+    });
 
-//     it("has a length of 1", function () {
-//       assert.strictEqual(createdDatasets.length, 1);
-//     });
+    it("has the right labels", function () {
+        let labels = dataController.labels();
+        assert.ok(labels.includes("label_1"));
+        assert.ok(labels.includes("label_2"));
+        assert.ok(labels.includes("label_3"));
+    });
 
-//     it("samples has a length of 10", function () {
-//       assert.strictEqual(createdDatasets[0].data.length, 10);
-//     });
-//   });
-
-//   describe("sample.datasets.1.json", function () {
-//     let datasets = samples.readJSON("sample.datasets.1.json");
-//     let datasetsFlat = lotivis.flatDatasets(datasets);
-//     let createdDatasets = lotivis.createDatasets(datasetsFlat);
-
-//     it("has a length of 3", function () {
-//       assert.strictEqual(createdDatasets.length, 3);
-//     });
-
-//     it("samples has a length of 10", function () {
-//       assert.strictEqual(createdDatasets[0].data.length, 10);
-//       assert.strictEqual(createdDatasets[1].data.length, 10);
-//       assert.strictEqual(createdDatasets[2].data.length, 10);
-//     });
-//   });
-// });
+    it("has the right dates", function () {
+        let dates = dataController.dates();
+        assert.ok(dates.includes(2001));
+        assert.ok(dates.includes(2002));
+        assert.ok(dates.includes(2003));
+    });
+});

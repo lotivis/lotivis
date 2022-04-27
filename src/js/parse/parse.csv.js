@@ -21,6 +21,7 @@ export function csvParseRows(csv, row = DEFAULT_ROW) {
 
 /** Renders given data to CSV with headlines. */
 export function csvFormat(data, columns = DEFAULT_COLUMNS) {
+    console.log("dv.data", data);
     return d3.csvFormat(data.data ? data.data() : data, columns);
 }
 

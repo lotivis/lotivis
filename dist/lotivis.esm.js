@@ -20696,6 +20696,7 @@ function csvParseRows(csv, row = DEFAULT_ROW) {
 
 /** Renders given data to CSV with headlines. */
 function csvFormat(data, columns = DEFAULT_COLUMNS) {
+    console.log("dv.data", data);
     return csvFormat$1(data.data ? data.data() : data, columns);
 }
 
@@ -20726,11 +20727,11 @@ function isValue(value) {
 }
 
 function isString(value) {
-    return value && typeof value === "string";
+    return typeof value === "string";
 }
 
 function isFunction(value) {
-    return value && typeof value === "function";
+    return typeof value === "function";
 }
 
 function copy$1(object) {
@@ -21067,7 +21068,7 @@ const datatextCSV = function (dt, dv) {
  */
 function datatext() {
     let text;
-    let state = {
+    let attr = {
         // the id of the datatext
         id: uniqueId("datatext"),
 
@@ -21093,8 +21094,8 @@ function datatext() {
         dataController: null,
     };
 
-    // expose state
-    let chart = baseChart(state);
+    // expose attr
+    let chart = baseChart(attr);
 
     // private
 
@@ -21127,12 +21128,12 @@ function datatext() {
     chart.download = function () {
         let type, extension;
 
-        if (state.text === datatextCSV) {
+        if (attr.text === datatextCSV) {
             type = "text/csv";
             extension = "csv";
         } else if (
-            state.text === datatextJSONData ||
-            state.text === datatextJSON
+            attr.text === datatextJSONData ||
+            attr.text === datatextJSON
         ) {
             type = "text/json";
             extension = "json";
@@ -21143,7 +21144,7 @@ function datatext() {
 
         let blob = new Blob([text], { type: type }),
             objectURL = URL.createObjectURL(blob),
-            filename = state.dataController.filename(extension, "datatext");
+            filename = attr.dataController.filename(extension, "datatext");
 
         downloadURL(objectURL, filename);
 
@@ -21182,30 +21183,30 @@ function datatext() {
         calc.div = container
             .append("div")
             .classed("ltv-datatext", true)
-            .attr("id", state.id)
-            .style("padding-left", state.marginLeft + "px")
-            .style("padding-top", state.marginTop + "px")
-            .style("padding-right", state.marginRight + "px")
-            .style("padding-bottom", state.marginBottom + "px");
+            .attr("id", attr.id)
+            .style("padding-left", attr.marginLeft + "px")
+            .style("padding-top", attr.marginTop + "px")
+            .style("padding-right", attr.marginRight + "px")
+            .style("padding-bottom", attr.marginBottom + "px");
 
-        if (state.title) {
+        if (attr.title) {
             calc.title = calc.div
                 .append("div")
                 .classed("ltv-datatext-title", true)
-                .text(unwrap(state.title, chart, dv))
-                .style("cursor", state.enabled ? "pointer" : null)
-                .on("click", state.enabled ? chart.download : null);
+                .text(unwrap(attr.title, chart, dv))
+                .style("cursor", attr.enabled ? "pointer" : null)
+                .on("click", attr.enabled ? chart.download : null);
         }
 
-        text = unwrap(state.text, chart, dv, state.dataController);
+        text = unwrap(attr.text, chart, dv, attr.dataController);
         calc.pre = calc.div
             .append("pre")
             .classed("ltv-datatext-pre", true)
             .html(html(text));
 
-        if (isType(state.height, "string", "number")) {
+        if (isType(attr.height, "string", "number")) {
             calc.pre
-                .style("height", postfix(state.height, "px"))
+                .style("height", postfix(attr.height, "px"))
                 .style("overflow", "scroll");
         }
 
@@ -21650,7 +21651,7 @@ function parseDatasets(d) {
 function json(path) {
     return json$1(path).then((json) => {
         if (!Array.isArray(json)) throw new DataUnqualifiedError();
-        return new DataController(flatDatasets(json), { original: json });
+        return new DataController(flatDatasets(json));
     });
 }
 
@@ -21661,7 +21662,7 @@ function jsonDatasets(path) {
 function jsonFlat(path) {
     return json$1(path).then((json) => {
         if (!Array.isArray(json)) throw new DataUnqualifiedError();
-        return new DataController(json, { original: json });
+        return new DataController(json);
     });
 }
 
@@ -22036,27 +22037,6 @@ function GeoJSON(source) {
     return geoJSON;
 }
 
-/**
- * Returns a copy the passed
- * @param {*} json
- * @param {*} ids
- * @param {*} featuresFilter
- * @returns
- */
-function copy(json, ids, featuresFilter) {
-    if (!Array.isArray(ids)) {
-        throw new Error("invalid ids. not an array");
-    }
-    if (!Array.isArray(json.features)) {
-        throw new Error("no features in geojson");
-    }
-
-    // copy to do not modify original
-    let theCopy = JSON.parse(JSON.stringify(json));
-    theCopy.features = theCopy.features.filter(featuresFilter);
-    return theCopy;
-}
-
 function generate(locations) {
     let columns = 5,
         rows = Math.ceil(locations.length / columns),
@@ -22088,43 +22068,6 @@ function generate(locations) {
     }
 
     return GeoJSON(FeatureCollection(features));
-}
-
-/**
- * Default accessor for the id of a feature.
- * @param {*} f The feature to get an id for
- * @returns The id of the feature
- */
-const FEATURE_ID_ACCESSOR = function (f) {
-    if (f.id || f.id === 0) return f.id;
-    if (f.properties && isValue(f.properties.id)) return f.properties.id;
-    if (f.properties && isValue(f.properties.code)) return f.properties.code;
-    return f.properties ? hash(f.properties) : hash(f);
-};
-
-/**
- * Default accessor for the name of a feature.
- * @param {*} f The feature to get an name for
- * @returns The name of the feature
- */
-const FEATURE_NAME_ACCESSOR = function (f) {
-    if (isValue(f.name)) return f.name;
-    if (f.properties && isValue(f.properties.name)) return f.properties.name;
-    if (f.properties && isValue(f.properties.nom)) return f.properties.nom;
-    return FEATURE_ID_ACCESSOR(f);
-};
-
-/**
- * Returns a new generated GeoJSON containing only the Features having the
- * ids specified.
- *
- * @param {GeoJSON} json The GeoJSON with Features to remove
- * @param {Array} ids The ids of Features to remove
- * @param {*} idValue An id accessor for the Features
- * @returns {GeoJSON} The new generated GeoJSON
- */
-function filter(json, ids, idValue = FEATURE_ID_ACCESSOR) {
-    return copy(json, ids, (f) => ids.includes(idValue(f)));
 }
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -23232,6 +23175,51 @@ function join(input) {
 }
 
 /**
+ * Returns a copy the passed
+ * @param {*} json
+ * @param {*} ids
+ * @param {*} featuresFilter
+ * @returns
+ */
+function copy(json, ids, featuresFilter) {
+    if (!Array.isArray(ids)) {
+        throw new Error("invalid ids. not an array");
+    }
+    if (!Array.isArray(json.features)) {
+        throw new Error("no features in geojson");
+    }
+
+    // copy to do not modify original
+    let theCopy = JSON.parse(JSON.stringify(json));
+    theCopy.features = theCopy.features.filter(featuresFilter);
+    return theCopy;
+}
+
+/**
+ * Default accessor for the id of a feature.
+ * @param {*} f The feature to get an id for
+ * @returns The id of the feature
+ */
+const FEATURE_ID_ACCESSOR = function (f) {
+    if (f.id || f.id === 0) return f.id;
+    if (f.properties && isValue(f.properties.id)) return f.properties.id;
+    if (f.properties && isValue(f.properties.code)) return f.properties.code;
+    return f.properties ? hash(f.properties) : hash(f);
+};
+
+/**
+ * Default accessor for the name of a feature.
+ * @param {*} f The feature to get an name for
+ * @returns The name of the feature
+ */
+const FEATURE_NAME_ACCESSOR = function (f) {
+    if (isValue(f.name)) return f.name;
+    if (f.properties && isValue(f.properties.name)) return f.properties.name;
+    if (f.properties && isValue(f.properties.nom)) return f.properties.nom;
+    return FEATURE_ID_ACCESSOR(f);
+};
+
+/**
  * Returns a new generated GeoJSON without the Feature having the ids
  * specified.
  *
@@ -23242,6 +23230,19 @@ function join(input) {
  */
 function remove(json, ids, idValue = FEATURE_ID_ACCESSOR) {
     return copy(json, ids, (f) => !ids.includes(idValue(f)));
+}
+
+/**
+ * Returns a new generated GeoJSON containing only the Features having the
+ * ids specified.
+ *
+ * @param {GeoJSON} json The GeoJSON with Features to remove
+ * @param {Array} ids The ids of Features to remove
+ * @param {*} idValue An id accessor for the Features
+ * @returns {GeoJSON} The new generated GeoJSON
+ */
+function filter(json, ids, idValue = FEATURE_ID_ACCESSOR) {
+    return copy(json, ids, (f) => ids.includes(idValue(f)));
 }
 
 /**
@@ -23288,8 +23289,10 @@ function map() {
         // whether to display a tooltip.
         tooltip: true,
 
+        // array of area ids to remove from the geojson (before rendering)
         exclude: null,
 
+        // array of area ids to filter out from the geojson (before rendering)
         include: null,
 
         colorScale: colorScale2,
@@ -23327,20 +23330,12 @@ function map() {
     function geoJSONDidChange() {
         if (!attr.geoJSON) return;
 
-        attr.workGeoJSON = attr.geoJSON;
+        attr.workGeoJSON = copy$1(attr.geoJSON);
 
         // precalculate the center of each feature
         attr.workGeoJSON.features.forEach(
             (f) => (f.center = centroid$1(f))
         );
-
-        if (Array.isArray(attr.exclude)) {
-            attr.workGeoJSON = remove(attr.workGeoJSON, attr.exclude);
-        }
-
-        if (Array.isArray(attr.include)) {
-            attr.workGeoJSON = filter(attr.workGeoJSON, attr.include);
-        }
 
         // precalculate lotivis feature ids
         let feature, id;
@@ -23348,6 +23343,24 @@ function map() {
             feature = attr.workGeoJSON.features[i];
             id = attr.featureIDAccessor(feature);
             attr.workGeoJSON.features[i].lotivisId = id;
+        }
+
+        // exclude features
+        if (Array.isArray(attr.exclude) && attr.exclude.length > 0) {
+            attr.workGeoJSON = remove(
+                attr.workGeoJSON,
+                attr.exclude,
+                attr.featureIDAccessor
+            );
+        }
+
+        // only use included features
+        if (Array.isArray(attr.include) && attr.include.length > 0) {
+            attr.workGeoJSON = filter(
+                attr.workGeoJSON,
+                attr.include,
+                attr.featureIDAccessor
+            );
         }
 
         chart.zoomTo(attr.workGeoJSON);
@@ -24653,12 +24666,13 @@ function bar() {
 
     /**
      * Calculates the data view for the bar chart.
-     *
-     * @param {*} calc
      * @returns
      */
-    chart.dataView = function (dc) {
-        var dv = {};
+    chart.dataView = function () {
+        let dc = attr.dataController;
+        if (!dc) throw new Error("no data controller");
+
+        let dv = {};
 
         dv.data = dc.data();
         dv.snapshot = dc.snapshot();
@@ -24764,14 +24778,14 @@ function bar() {
 
         if (attr.legend) {
             let dc = attr.dataController;
-            let dv = attr.legend.dataView(dc);
+            let dv = attr.legend.dataController(dc).dataView();
             let calc = {};
             attr.legend
                 .marginLeft(attr.marginLeft)
                 .marginRight(attr.marginRight)
                 .colorScheme(attr.colorScheme);
             attr.legend.skipFilterUpdate = () => true;
-            attr.legend.dataController(dc).render(container, calc, dv);
+            attr.legend.render(container, calc, dv);
         }
     };
 
@@ -24843,7 +24857,7 @@ const PLOT_SORT = {
  *
  */
 function plot() {
-    let state = {
+    let attr = {
         id: uniqueId("plot"),
 
         // width of the svg
@@ -24910,8 +24924,8 @@ function plot() {
         dataController: null,
     };
 
-    // create new underlying chart with the specified state
-    let chart = baseChart(state);
+    // create new underlying chart with the specified attr
+    let chart = baseChart(attr);
 
     // private
 
@@ -24923,26 +24937,27 @@ function plot() {
      * @private
      */
     function createScales(calc, dv) {
-        // preferre dates from state if specified. fallback to
+        // preferre dates from attr if specified. fallback to
         // dates of data view
-        let dates = Array.isArray(state.dates) ? state.dates : dv.dates;
+        let dates = Array.isArray(attr.dates) ? attr.dates : dv.dates;
+        let labels = dv.datasets.map((d) => d.label);
 
         // Sort date according to access function
-        dates = dates.sort((a, b) => state.dateAccess(a) - state.dateAccess(b));
+        dates = dates.sort((a, b) => attr.dateAccess(a) - attr.dateAccess(b));
 
         calc.xChart = band()
             .domain(dates)
-            .rangeRound([state.marginLeft, calc.graphRight])
+            .rangeRound([attr.marginLeft, calc.graphRight])
             .paddingInner(0.1);
 
         calc.yChartPadding = band()
-            .domain(dv.labels)
-            .rangeRound([calc.graphBottom, state.marginTop])
+            .domain(labels)
+            .rangeRound([calc.graphBottom, attr.marginTop])
             .paddingInner(0.1);
 
         calc.yChart = band()
-            .domain(dv.labels)
-            .rangeRound([calc.graphBottom, state.marginTop]);
+            .domain(labels)
+            .rangeRound([calc.graphBottom, attr.marginTop]);
 
         calc.xAxisGrid = axisBottom(calc.xChart)
             .tickSize(-calc.graphHeight)
@@ -24966,7 +24981,31 @@ function plot() {
             .append("svg")
             .attr("class", "ltv-chart-svg ltv-bar-chart-svg")
             .attr("preserveAspectRatio", "xMidYMid meet")
-            .attr("viewBox", `0 0 ${state.width} ${calc.height}`);
+            .attr("viewBox", `0 0 ${attr.width} ${calc.height}`);
+    }
+
+    /**
+     * Renders the background rect of the chart.
+     *
+     * @param {calc} calc The calc object.
+     * @private
+     */
+    function renderBackground(calc) {
+        calc.svg
+            .append("rect")
+            .attr("class", "ltv-plot-chart-background")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", attr.width)
+            .attr("height", calc.height)
+            .on("click", (e, l) => {
+                attr.dataController.clear("labels", chart);
+                calc.svg
+                    .selectAll(".ltv-plot-chart-selection-rect")
+                    .classed("ltv-selected", (d) =>
+                        attr.dataController.isFilter("labels", d)
+                    );
+            });
     }
 
     /**
@@ -24980,20 +25019,20 @@ function plot() {
         calc.svg
             .append("g")
             .call(axisTop(calc.xChart))
-            .attr("transform", transY(state.marginTop));
+            .attr("transform", transY(attr.marginTop));
 
         // left
         calc.svg
             .append("g")
             .call(axisRight(calc.yChart))
-            .attr("transform", transX(state.marginLeft + calc.graphWidth));
+            .attr("transform", transX(attr.marginLeft + calc.graphWidth));
 
         // bottom
-        if (state.drawBottomAxis) {
+        if (attr.drawBottomAxis) {
             calc.svg
                 .append("g")
                 .call(axisBottom(calc.xChart))
-                .attr("transform", transY(calc.height - state.marginBottom));
+                .attr("transform", transY(calc.height - attr.marginBottom));
         }
     }
 
@@ -25004,19 +25043,19 @@ function plot() {
      * @private
      */
     function renderGrid(calc) {
-        if (state.xGrid) {
+        if (attr.xGrid) {
             calc.svg
                 .append("g")
                 .classed("ltv-plot-grid ltv-plot-grid-x", true)
-                .attr("transform", transY(calc.height - state.marginBottom))
+                .attr("transform", transY(calc.height - attr.marginBottom))
                 .call(calc.xAxisGrid);
         }
 
-        if (state.yGrid) {
+        if (attr.yGrid) {
             calc.svg
                 .append("g")
                 .classed("ltv-plot-grid ltv-plot-grid-y", true)
-                .attr("transform", transX(state.marginLeft))
+                .attr("transform", transX(attr.marginLeft))
                 .call(calc.yAxisGrid);
         }
     }
@@ -25035,27 +25074,53 @@ function plot() {
             .data(dv.labels)
             .enter()
             .append("rect")
-            .attr("class", "ltv-plot-chart-selection-rect")
+            .classed("ltv-plot-chart-selection-rect", true)
             .attr(`opacity`, 0)
-            .attr("x", state.marginLeft)
+            .attr("x", attr.marginLeft)
+            .attr("y", (l) => calc.yChart(l))
+            .attr("width", calc.graphWidth)
+            .attr("height", calc.yChart.bandwidth());
+    }
+
+    function renderHoverBars(calc, dv) {
+        calc.svg
+            .append("g")
+            .selectAll("g")
+            .data(dv.labels)
+            .enter()
+            .append("rect")
+            .classed("ltv-plot-chart-hover-rect", true)
+            .attr(`opacity`, 0)
+            .attr("x", attr.marginLeft)
             .attr("y", (l) => calc.yChart(l))
             .attr("width", calc.graphWidth)
             .attr("height", calc.yChart.bandwidth())
-            .on("mouseenter", (_, l) =>
+            .on("mouseenter", (e, l) => {
+                calc.svg
+                    .selectAll(".ltv-plot-chart-hover-rect")
+                    .attr(`opacity`, (d) => {
+                        return d === l ? config.selectionOpacity : 0;
+                    });
+
                 showTooltip(
                     calc,
                     dv.datasets.find((d) => d.label === l)
-                )
-            )
-            .on("mouseout", () => calc.tooltip.hide())
+                );
+            })
+            .on("mouseout", (e, l) => {
+                calc.svg
+                    .selectAll(".ltv-plot-chart-hover-rect")
+                    .attr(`opacity`, 0);
+
+                calc.tooltip.hide();
+            })
             .on("click", (e, l) => {
-                state.dataController.toggleFilter("labels", l, chart);
-                chart.run();
-                // calc.svg
-                //     .selectAll(".ltv-plot-chart-selection-rect")
-                //     .classed("ltv-selected", (d) =>
-                //         state.dataController.isFilter("labels", d.label)
-                //     );
+                attr.dataController.toggleFilter("labels", l, chart);
+                calc.svg
+                    .selectAll(".ltv-plot-chart-selection-rect")
+                    .classed("ltv-selected", (d) =>
+                        attr.dataController.isFilter("labels", d)
+                    );
             });
     }
 
@@ -25066,10 +25131,10 @@ function plot() {
      * @param {*} dv The data view
      */
     function renderBarsFraction(calc, dv) {
-        let colors = state.colorScale || colorScale1;
+        let colors = attr.colorScale || colorScale1;
         let brush = dv.max / 2;
         let dataColors = calc.colors;
-        let isSingle = state.colorMode === "single";
+        let isSingle = attr.colorMode === "single";
 
         calc.barsData = calc.svg
             .append("g")
@@ -25096,9 +25161,9 @@ function plot() {
             .attr("opacity", (d) =>
                 isSingle ? (d[1] + brush) / (dv.max + brush) : 1
             )
-            .radius(state.radius);
+            .radius(attr.radius);
 
-        if (state.labels === true) {
+        if (attr.labels === true) {
             calc.labels = calc.barsData
                 .append("g")
                 .attr(
@@ -25114,7 +25179,7 @@ function plot() {
                 .attr("class", "ltv-plot-label")
                 .attr("y", (d) => calc.yBandwidth / 2)
                 .attr("x", (d) => calc.xChart(d[0]) + 4)
-                .text((d) => (d.sum === 0 ? null : state.numberFormat(d[1])));
+                .text((d) => (d.sum === 0 ? null : attr.numberFormat(d[1])));
         }
     }
 
@@ -25143,9 +25208,9 @@ function plot() {
                 "transform",
                 (d) => `translate(0,${calc.yChartPadding(d.label)})`
             )
-            .attr("fill", (d) => `url(#${state.id}-${hash$1(d.label)})`)
+            .attr("fill", (d) => `url(#${attr.id}-${hash$1(d.label)})`)
             .attr("class", "ltv-plot-bar")
-            .radius(state.radius)
+            .radius(attr.radius)
             .attr("x", (d) =>
                 calc.xChart(d.duration < 0 ? d.lastDate : d.firstDate || 0)
             )
@@ -25159,7 +25224,7 @@ function plot() {
                 );
             });
 
-        if (state.labels === true) {
+        if (attr.labels === true) {
             calc.labels = calc.barsData
                 .append("text")
                 .attr("transform", `translate(0,${calc.yBandwidth / 2 + 4})`)
@@ -25180,7 +25245,7 @@ function plot() {
                 )
                 .text(function (dataset) {
                     if (dataset.sum === 0) return;
-                    return `${state.numberFormat(
+                    return `${attr.numberFormat(
                         dataset.sum
                     )} (${dataset.duration + 1} years)`;
                 });
@@ -25197,7 +25262,7 @@ function plot() {
     function createGradient(ds, dv, calc) {
         let gradient = calc.definitions
             .append("linearGradient")
-            .attr("id", state.id + "-" + hash$1(ds.label))
+            .attr("id", attr.id + "-" + hash$1(ds.label))
             .attr("x1", "0%")
             .attr("x2", "100%")
             .attr("y1", "0%")
@@ -25207,9 +25272,9 @@ function plot() {
 
         let count = ds.data.length,
             latestDate = ds.lastDate,
-            dataColors = ColorsGenerator(state.colorScheme),
-            isSingle = state.colorMode === "single",
-            colors = isSingle ? dataColors.label : state.colorScale;
+            dataColors = ColorsGenerator(attr.colorScheme),
+            isSingle = attr.colorMode === "single",
+            colors = isSingle ? dataColors.label : attr.colorScale;
 
         function append(value, percent) {
             gradient
@@ -25240,18 +25305,18 @@ function plot() {
      * @param {*} ds
      */
     function showTooltip(calc, ds) {
-        if (!state.tooltip || !ds) return;
+        if (!attr.tooltip || !ds) return;
         calc.tooltip.html(tooltipHTML(ds));
 
         // position tooltip
         let domRect = calc.svg.node().getBoundingClientRect(),
-            factor = domRect.width / state.width,
+            factor = domRect.width / attr.width,
             offset = [domRect.x + window.scrollX, domRect.y + window.scrollY];
 
         let top =
             calc.yChart(ds.label) * factor +
             offset[1] +
-            state.barHeight * factor +
+            attr.barHeight * factor +
             config.tooltipOffset;
 
         calc.tooltip
@@ -25280,13 +25345,13 @@ function plot() {
                 "Start: " + ds.firstDate,
                 "End: " + ds.lastDate,
                 "",
-                "Sum: " + state.numberFormat(sum),
+                "Sum: " + attr.numberFormat(sum),
                 "",
             ];
 
         for (let i = 0; i < filtered.length; i++) {
             let entry = filtered[i];
-            let frmt = state.numberFormat(entry.value);
+            let frmt = attr.numberFormat(entry.value);
             comps.push(`${entry.date}: ${frmt}`);
         }
 
@@ -25296,6 +25361,8 @@ function plot() {
     // chart.skipFilterUpdate = function (filter) {
     //     return filter === "labels";
     // };
+
+    // public
 
     /**
      * Calculates the data view for the bar chart.
@@ -25336,7 +25403,7 @@ function plot() {
             return { label, data, sum, firstDate, lastDate, duration };
         });
 
-        switch (state.sort) {
+        switch (attr.sort) {
             case "alphabetically":
                 dv.datasets = dv.datasets.sort(PLOT_SORT.alphabetically);
                 break;
@@ -25353,6 +25420,8 @@ function plot() {
                 dv.datasets = dv.datasets.reverse();
                 break;
         }
+
+        console.log("dv.datasets", dv.datasets);
 
         dv.firstDate = dv.dates[0];
         dv.lastDate = dv.dates[dv.dates.length - 1];
@@ -25374,28 +25443,30 @@ function plot() {
     chart.render = function (container, calc, dv) {
         // calculations
         calc.container = container;
-        calc.graphWidth = state.width - state.marginLeft - state.marginRight;
-        calc.graphHeight = dv.labels.length * state.barHeight;
-        calc.height = calc.graphHeight + state.marginTop + state.marginBottom;
-        calc.graphLeft = state.width - state.marginLeft;
-        calc.graphTop = calc.height - state.marginTop;
-        calc.graphRight = state.width - state.marginRight;
-        calc.graphBottom = calc.height - state.marginBottom;
-        calc.colors = ColorsGenerator(state.colorScheme).data(dv.data);
+        calc.graphWidth = attr.width - attr.marginLeft - attr.marginRight;
+        calc.graphHeight = dv.labels.length * attr.barHeight;
+        calc.height = calc.graphHeight + attr.marginTop + attr.marginBottom;
+        calc.graphLeft = attr.width - attr.marginLeft;
+        calc.graphTop = calc.height - attr.marginTop;
+        calc.graphRight = attr.width - attr.marginRight;
+        calc.graphBottom = calc.height - attr.marginBottom;
+        calc.colors = ColorsGenerator(attr.colorScheme).data(dv.data);
 
         // scales
         createScales(calc, dv);
 
         // render
         renderSVG(calc);
+        renderBackground(calc);
         renderAxis(calc);
         renderGrid(calc);
         renderSelection(calc, dv);
+        renderHoverBars(calc, dv);
 
-        if (state.style === "fraction") {
-            renderBarsFraction(calc, dv, state.dataController);
+        if (attr.style === "fraction") {
+            renderBarsFraction(calc, dv, attr.dataController);
         } else {
-            renderBarsGradient(calc, dv, state.dataController);
+            renderBarsGradient(calc, dv, attr.dataController);
         }
 
         calc.tooltip = tooltip().container(container).run();

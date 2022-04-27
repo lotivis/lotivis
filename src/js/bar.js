@@ -504,12 +504,13 @@ export function bar() {
 
     /**
      * Calculates the data view for the bar chart.
-     *
-     * @param {*} calc
      * @returns
      */
-    chart.dataView = function (dc) {
-        var dv = {};
+    chart.dataView = function () {
+        let dc = attr.dataController;
+        if (!dc) throw new Error("no data controller");
+
+        let dv = {};
 
         dv.data = dc.data();
         dv.snapshot = dc.snapshot();
@@ -615,14 +616,14 @@ export function bar() {
 
         if (attr.legend) {
             let dc = attr.dataController;
-            let dv = attr.legend.dataView(dc);
+            let dv = attr.legend.dataController(dc).dataView();
             let calc = {};
             attr.legend
                 .marginLeft(attr.marginLeft)
                 .marginRight(attr.marginRight)
                 .colorScheme(attr.colorScheme);
             attr.legend.skipFilterUpdate = () => true;
-            attr.legend.dataController(dc).render(container, calc, dv);
+            attr.legend.render(container, calc, dv);
         }
     };
 

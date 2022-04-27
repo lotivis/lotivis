@@ -41,7 +41,7 @@ export const datatextCSV = function (dt, dv) {
  */
 export function datatext() {
     let text;
-    let state = {
+    let attr = {
         // the id of the datatext
         id: uniqueId("datatext"),
 
@@ -67,8 +67,8 @@ export function datatext() {
         dataController: null,
     };
 
-    // expose state
-    let chart = baseChart(state);
+    // expose attr
+    let chart = baseChart(attr);
 
     // private
 
@@ -101,12 +101,12 @@ export function datatext() {
     chart.download = function () {
         let type, extension;
 
-        if (state.text === datatextCSV) {
+        if (attr.text === datatextCSV) {
             type = "text/csv";
             extension = "csv";
         } else if (
-            state.text === datatextJSONData ||
-            state.text === datatextJSON
+            attr.text === datatextJSONData ||
+            attr.text === datatextJSON
         ) {
             type = "text/json";
             extension = "json";
@@ -117,7 +117,7 @@ export function datatext() {
 
         let blob = new Blob([text], { type: type }),
             objectURL = URL.createObjectURL(blob),
-            filename = state.dataController.filename(extension, "datatext");
+            filename = attr.dataController.filename(extension, "datatext");
 
         downloadURL(objectURL, filename);
 
@@ -156,30 +156,30 @@ export function datatext() {
         calc.div = container
             .append("div")
             .classed("ltv-datatext", true)
-            .attr("id", state.id)
-            .style("padding-left", state.marginLeft + "px")
-            .style("padding-top", state.marginTop + "px")
-            .style("padding-right", state.marginRight + "px")
-            .style("padding-bottom", state.marginBottom + "px");
+            .attr("id", attr.id)
+            .style("padding-left", attr.marginLeft + "px")
+            .style("padding-top", attr.marginTop + "px")
+            .style("padding-right", attr.marginRight + "px")
+            .style("padding-bottom", attr.marginBottom + "px");
 
-        if (state.title) {
+        if (attr.title) {
             calc.title = calc.div
                 .append("div")
                 .classed("ltv-datatext-title", true)
-                .text(unwrap(state.title, chart, dv))
-                .style("cursor", state.enabled ? "pointer" : null)
-                .on("click", state.enabled ? chart.download : null);
+                .text(unwrap(attr.title, chart, dv))
+                .style("cursor", attr.enabled ? "pointer" : null)
+                .on("click", attr.enabled ? chart.download : null);
         }
 
-        text = unwrap(state.text, chart, dv, state.dataController);
+        text = unwrap(attr.text, chart, dv, attr.dataController);
         calc.pre = calc.div
             .append("pre")
             .classed("ltv-datatext-pre", true)
             .html(html(text));
 
-        if (isType(state.height, "string", "number")) {
+        if (isType(attr.height, "string", "number")) {
             calc.pre
-                .style("height", postfix(state.height, "px"))
+                .style("height", postfix(attr.height, "px"))
                 .style("overflow", "scroll");
         }
 

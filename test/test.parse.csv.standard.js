@@ -1,20 +1,26 @@
 import assert from "assert";
 import * as samples from "./sample.data.js";
+import { csvParse, csvFormat } from "../src/js/parse/parse.csv.js";
 
-// describe("parseCSVDate", function () {
-//   it("parses a csv file", function () {
-//     let csvString = samples.read("sample.csv.dataset.date.1.csv");
-//     let parsedDatasets = lotivis.parseCSVDate(csvString);
-//     assert.strictEqual(parsedDatasets.length, 3);
-//     assert.strictEqual(parsedDatasets[0].label, "dataset_1");
-//     assert.strictEqual(parsedDatasets[1].label, "dataset_2");
-//     assert.strictEqual(parsedDatasets[2].label, "dataset_3");
-//     assert.strictEqual(parsedDatasets[0].data.length, 4);
-//     assert.strictEqual(parsedDatasets[1].data.length, 4);
-//     assert.strictEqual(parsedDatasets[2].data.length, 4);
-//     let flatData = lotivis.flatDatasets(parsedDatasets);
-//     assert.strictEqual(lotivis.sumOfDataset(flatData, "dataset_1"), 0);
-//     assert.strictEqual(lotivis.sumOfDataset(flatData, "dataset_2"), 10);
-//     assert.strictEqual(lotivis.sumOfDataset(flatData, "dataset_3"), 8);
-//   });
-// });
+describe("parse csv", function () {
+    let content = samples.read("data.csv.standard.csv");
+    let dataController = csvParse(content);
+
+    it("parses the data", function () {
+        assert.ok(dataController);
+    });
+
+    it("data has correct length", function () {
+        assert.strictEqual(dataController.data().length, 9);
+    });
+});
+
+describe("render csv", function () {
+    let content = samples.read("data.csv.standard.csv");
+    let dataController = csvParse(content);
+    let rendered = csvFormat(dataController);
+
+    it("renders correct csv", function () {
+        assert.equal(content, rendered);
+    });
+});

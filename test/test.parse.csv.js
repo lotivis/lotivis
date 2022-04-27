@@ -2,8 +2,8 @@ import assert from "assert";
 import * as samples from "./sample.data.js";
 import { csvParse, csvFormat } from "../src/js/parse/parse.csv.js";
 
-describe("parse csv", function () {
-    let content = samples.read("sample.csv.standard.csv");
+describe("parse csv custom", function () {
+    let content = samples.read("data.csv.custom.csv");
     let dataController = csvParse(content);
 
     it("parses the data", function () {
@@ -11,16 +11,10 @@ describe("parse csv", function () {
     });
 
     it("data has correct length", function () {
-        assert.strictEqual(dataController.data().length, 9);
+        assert.strictEqual(dataController.data().length, 10);
     });
-});
 
-describe("render csv", function () {
-    let content = samples.read("sample.csv.standard.csv");
-    let dataController = csvParse(content);
-    let rendered = csvFormat(dataController);
-
-    it("renders correct csv", function () {
-        assert.equal(content, rendered);
+    it("data has correct amount of dates", function () {
+        assert.strictEqual(dataController.dates().length, 5);
     });
 });

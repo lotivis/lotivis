@@ -26,7 +26,7 @@ export function parseDatasets(d) {
 export function json(path) {
     return d3.json(path).then((json) => {
         if (!Array.isArray(json)) throw new DataUnqualifiedError();
-        return new DataController(flatDatasets(json), { original: json });
+        return new DataController(flatDatasets(json));
     });
 }
 
@@ -37,6 +37,6 @@ export function jsonDatasets(path) {
 export function jsonFlat(path) {
     return d3.json(path).then((json) => {
         if (!Array.isArray(json)) throw new DataUnqualifiedError();
-        return new DataController(json, { original: json });
+        return new DataController(json);
     });
 }

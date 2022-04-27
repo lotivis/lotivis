@@ -1,42 +1,40 @@
 import assert from "assert";
 import * as samples from "./sample.data.js";
+import { plot } from "../src/js/plot.js";
+import { parseDatasets } from "../src/js/parse/parse.json.js";
 
-// describe("dataView.map.chart", function () {
-//   describe("sample.dataset.1.json", function () {
-//     let dataset = samples.readJSON("sample.dataset.1.json");
-//     let controller = new lotivis.DatasetsController([dataset]);
-//     let plotDataview = controller.getPlotDataview();
-//     let firstDataset = plotDataview.datasets[0];
+describe("dataView plot chart", function () {
+    let json = samples.readJSON("data.json");
+    let dc = parseDatasets(json);
+    let chart = plot();
 
-//     it("has exactly one dataset", function () {
-//       assert.strictEqual(plotDataview.datasets.length, 1);
-//     });
+    let dataView = chart.dataController(dc).dataView();
 
-//     it("has the correct labels count", function () {
-//       assert.strictEqual(plotDataview.labelsCount, 1);
-//     });
+    it("has the correct amout of dataset", function () {
+        assert.strictEqual(dataView.datasets.length, 3);
+    });
 
-//     it("has the correct labels", function () {
-//       assert.deepStrictEqual(plotDataview.labels, ["dataset_1"]);
-//     });
+    it("has the correct labels", function () {
+        assert.deepStrictEqual(dataView.labels, [
+            "label_1",
+            "label_2",
+            "label_3",
+        ]);
+    });
 
-//     it("has the correct dates", function () {
-//       assert.deepStrictEqual(
-//         plotDataview.dates,
-//         [2000, 2001, 2002, 2003, 2004]
-//       );
-//     });
+    it("has the correct dates", function () {
+        assert.deepStrictEqual(dataView.dates, [2001, 2002, 2003]);
+    });
 
-//     it("has the correct max value", function () {
-//       assert.strictEqual(plotDataview.max, 10);
-//     });
+    it("has the correct max value", function () {
+        assert.strictEqual(dataView.max, 3);
+    });
 
-//     it("dataset has the correct first date", function () {
-//       assert.strictEqual(firstDataset.firstDate, 2000);
-//     });
+    it("dataset has the correct first date", function () {
+        assert.strictEqual(dataView.firstDate, 2001);
+    });
 
-//     it("dataset has the correct last date", function () {
-//       assert.strictEqual(firstDataset.lastDate, 2004);
-//     });
-//   });
-// });
+    it("dataset has the correct last date", function () {
+        assert.strictEqual(dataView.lastDate, 2003);
+    });
+});

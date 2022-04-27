@@ -3,7 +3,7 @@ import * as samples from "./sample.data.js";
 import { DataController } from "../src/js/controller.js";
 
 describe("parse flat data", function () {
-    let json = samples.readJSON("sample.flat.json");
+    let json = samples.readJSON("data.flat.json");
     let dataController = new DataController(json);
 
     it("should have the right length", function () {

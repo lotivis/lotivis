@@ -4,7 +4,7 @@ import { DataController } from "../src/js/controller.js";
 import { generate } from "../src/js/geojson/generate.js";
 
 describe("create geojson from data", function () {
-    let json = samples.readJSON("sample.flat.json");
+    let json = samples.readJSON("data.flat.json");
     let data = new DataController(json);
     let geoJSON = generate(data.locations());
 
