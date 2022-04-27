@@ -4,6 +4,7 @@ import { uniqueId } from "./common/identifiers.js";
 import { csvFormat } from "./parse/parse.csv.js";
 import { baseChart } from "./baseChart.js";
 import { config, runsInBrowser } from "./common/config.js";
+import { isString } from "./common/values.js";
 
 /**
  * Returns the JSON string from the passed data view's data.
@@ -40,7 +41,7 @@ export const datatextCSV = function (dt, dv) {
  * @returns
  */
 export function datatext() {
-    let text;
+    let text, cachedHTML;
     let attr = {
         // the id of the datatext
         id: uniqueId("datatext"),
@@ -171,11 +172,15 @@ export function datatext() {
                 .on("click", attr.enabled ? chart.download : null);
         }
 
-        text = unwrap(attr.text, chart, dv, attr.dataController);
+        if (!cachedHTML) {
+            text = unwrap(attr.text, chart, dv, attr.dataController);
+            cachedHTML = html(text);
+        }
+
         calc.pre = calc.div
             .append("pre")
             .classed("ltv-datatext-pre", true)
-            .html(html(text));
+            .html(cachedHTML);
 
         if (isType(attr.height, "string", "number")) {
             calc.pre

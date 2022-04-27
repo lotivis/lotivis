@@ -106,10 +106,15 @@ export function baseChart(attr) {
         if (!arguments.length) return attr.dataController;
 
         // remove callback from existing controller
-        if (attr.dataController) attr.dataController.onFilter(chart.id(), null);
+        if (attr.dataController) {
+            attr.dataController.onFilter(chart.id(), null);
+        }
 
         attr.dataController = dc;
-        attr.dataController.onFilter(chart.id(), filterUpdate);
+
+        if (attr.dataController) {
+            attr.dataController.onFilter(chart.id(), filterUpdate);
+        }
 
         return chart;
     };
