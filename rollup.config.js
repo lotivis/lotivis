@@ -19,15 +19,11 @@ export default [
                 file: pkg.main,
                 banner,
                 format: "umd",
-                plugins: [execute("npm run scss")],
-            },
-            {
-                sourcemap: true,
-                name: pkg.name,
-                file: pkg.module,
-                banner,
-                format: "esm",
             },
         ],
+        onwarn(message, warn) {
+            if (message.code === "CIRCULAR_DEPENDENCY") return;
+            warn(message);
+        },
     },
 ];
