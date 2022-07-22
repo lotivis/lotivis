@@ -33,8 +33,7 @@
   "scripts": {
     "build": "rollup --config",
     "build:watch": "rollup --config --watch",
-    "test": "npx mocha 'test/test.*.js'",
-    "copy": "npm run scss && cp dist/lotivis.js ../frc-visualization/public/js/lib && cp dist/lotivis.js.map ../frc-visualization/public/js/lib && cp dist/lotivis.css ../frc-visualization/public/css"
+    "test": "npx mocha 'test/test.*.js'"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^13.3.0",
@@ -46,6 +45,7 @@
   },
   "dependencies": {
     "lotivis-csv": "^1.0.1",
-    "lotivis-export": "^1.0.0"
+    "lotivis-export": "^1.0.0",
+    "lotivis-geojson": "^1.0.1"
   }
 }
