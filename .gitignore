@@ -25,3 +25,5 @@ build/
 *.swp
 *.groupdump
 got git
+
+dist/
