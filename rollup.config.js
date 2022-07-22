@@ -1,5 +1,5 @@
 import resolve from "@rollup/plugin-node-resolve";
-import execute from "rollup-plugin-execute";
+import postcss from "rollup-plugin-postcss";
 import * as pkg from "./package.json";
 
 const banner = `/*!
@@ -11,7 +11,12 @@ const banner = `/*!
 export default [
     {
         input: "src/index.js",
-        plugins: [resolve()],
+        plugins: [
+            resolve(),
+            postcss({
+                plugins: [],
+            }),
+        ],
         output: [
             {
                 sourcemap: true,

@@ -1,46 +1,51 @@
 {
-    "name": "lotivis",
-    "version": "1.0.103",
-    "description": "Location and time data visualization",
-    "license": "MIT",
-    "author": "Lukas Danckwerth",
-    "type": "module",
-    "keywords": [
-        "location",
-        "time",
-        "data",
-        "visualization"
-    ],
-    "homepage": "https://github.com/lukasdanckwerth/lotivis#readme",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/lukasdanckwerth/lotivis.git"
-    },
-    "main": "dist/lotivis.js",
-    "module": "dist/lotivis.esm.js",
-    "jsdelivr": [
-        "dist/lotivis.css",
-        "dist/lotivis.min.css",
-        "dist/lotivis.js",
-        "dist/lotivis.js.map",
-        "dist/lotivis.esm.js",
-        "dist/lotivis.esm.js.map"
-    ],
-    "files": [
-        "dist/**/*",
-        "src/**/*"
-    ],
-    "scripts": {
-        "build": "rollup --config",
-        "build:watch": "rollup --config --watch",
-        "build:watch:copy": "rollup --config rollup.config.hooks.js --watch",
-        "test": "npx mocha 'test/test.*.js'",
-        "copy": "npm run scss && cp dist/lotivis.js ../frc-visualization/public/js/lib && cp dist/lotivis.js.map ../frc-visualization/public/js/lib && cp dist/lotivis.css ../frc-visualization/public/css"
-    },
-    "devDependencies": {
-        "lotivis-charts": "^1.0.0",
-        "lotivis-controller": "^1.0.0",
-        "lotivis-data": "^1.0.0",
-        "lotivis-geojson": "^1.0.0"
-    }
+  "name": "lotivis",
+  "version": "1.0.103",
+  "description": "Location and time data visualization",
+  "license": "MIT",
+  "author": "Lukas Danckwerth",
+  "type": "module",
+  "keywords": [
+    "location",
+    "time",
+    "data",
+    "visualization"
+  ],
+  "homepage": "https://github.com/lukasdanckwerth/lotivis#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lukasdanckwerth/lotivis.git"
+  },
+  "main": "dist/lotivis.js",
+  "module": "dist/lotivis.esm.js",
+  "jsdelivr": [
+    "dist/lotivis.css",
+    "dist/lotivis.min.css",
+    "dist/lotivis.js",
+    "dist/lotivis.js.map",
+    "dist/lotivis.esm.js",
+    "dist/lotivis.esm.js.map"
+  ],
+  "files": [
+    "dist/**/*",
+    "src/**/*"
+  ],
+  "scripts": {
+    "build": "rollup --config",
+    "build:watch": "rollup --config --watch",
+    "test": "npx mocha 'test/test.*.js'",
+    "copy": "npm run scss && cp dist/lotivis.js ../frc-visualization/public/js/lib && cp dist/lotivis.js.map ../frc-visualization/public/js/lib && cp dist/lotivis.css ../frc-visualization/public/css"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "node-sass": "^7.0.1",
+    "postcss": "^8.4.14",
+    "rollup": "^2.76.0",
+    "rollup-plugin-postcss": "^4.0.2",
+    "rollup-plugin-terser": "7"
+  },
+  "dependencies": {
+    "lotivis-csv": "^1.0.1",
+    "lotivis-export": "^1.0.0"
+  }
 }
