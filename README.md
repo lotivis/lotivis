@@ -6,9 +6,7 @@
 
 - [Use](#Use)
 - [Development](#Development)
-<!-- - API Reference -->
 - [Releases](https://github.com/lotivis/lotivis/releases)
-<!-- - [Examples](https://lukasdanckwerth.github.io/lotivis/) -->
 
 ## Installing
 
@@ -78,11 +76,3 @@ npm version patch
 git push --follow-tags
 
 ```
-
-## Dependency
-
-- [D3.js](https://github.com/mbostock/d3) `^5.0.0`
-
-## License
-
-MIT

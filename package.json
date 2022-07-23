@@ -19,12 +19,8 @@
   "main": "dist/lotivis.js",
   "module": "dist/lotivis.esm.js",
   "jsdelivr": [
-    "dist/lotivis.css",
-    "dist/lotivis.min.css",
     "dist/lotivis.js",
-    "dist/lotivis.js.map",
-    "dist/lotivis.esm.js",
-    "dist/lotivis.esm.js.map"
+    "dist/lotivis.js.map"
   ],
   "files": [
     "dist/**/*",
