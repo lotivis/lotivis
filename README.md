@@ -1,46 +1,51 @@
 # lotivis: location time visualization
 
-[![Node.js Test](https://github.com/lukasdanckwerth/lotivis/actions/workflows/npm-test.yml/badge.svg)](https://github.com/lukasdanckwerth/lotivis/actions/workflows/npm-test.yml) [![license](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat)](https://github.com/c3js/c3/blob/master/LICENSE) [![](https://data.jsdelivr.com/v1/package/npm/lotivis/badge?style=rounded)](https://www.jsdelivr.com/package/npm/lotivis)
-
-> lotivis.js is a D3-based chart library to visualize location and time specific data.
-
-**lotivis** (or **lotivis.js**) is a JavaScript library for
-visualizing location and time specific data using [D3](https://github.com/d3/d3).
+**lotivis** (or **lotivis.js**) is a JavaScript library for visualizing location and time specific data using [D3](https://github.com/d3/d3).
 
 ## Resources
 
 - [Use](#Use)
 - [Development](#Development)
 - API Reference
-- [Releases](https://github.com/lukasdanckwerth/lotivis/releases)
-- [Examples](https://lukasdanckwerth.github.io/lotivis/)
+- [Releases](https://github.com/lotivis/lotivis/releases)
+<!-- - [Examples](https://lukasdanckwerth.github.io/lotivis/) -->
 
-## Use
+## Installing
 
-**lotivis.js** is available through jsDelivr.
+If you use npm, `npm install lotivis`. You can also download the [latest release on GitHub](https://github.com/lotivis/lotivis/releases/latest). For vanilla HTML in modern browsers, import lotivis from Skypack:
 
 ```html
-<!-- lotivis.js stylesheet -->
-<linkrel
-  ="stylesheet"
-  href="https://cdn.jsdelivr.net/npm/lotivis@1/dist/lotivis.css"
-/>
+<script type="module">
 
-<!-- lotivis.js dependencies and library -->
-<script src="https://cdn.jsdelivr.net/npm/d3@6.5.0/dist/d3.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/lotivis@1/dist/lotivis.min.js"></script>
+import * as lotivis from "https://cdn.skypack.dev/lotivis@1";
+
+const barChart = lotivis.bar();
+
+</script>
 ```
 
-If you downloaded and build this project you can find the **lotivis.js** library files in the `dist` directory.
+For legacy environments, you can load lotivis’s UMD bundle from an npm-based CDN such as jsDelivr; a `lotivis` global is exported:
 
-```text
-dist/
-  |
-  |- lotivis.css                   <-- You need these two files
-  |- lotivis.js                    <-- in order to use lotivis.
-  |- lotivis.js.map
-  |- lotivis.tests.js
-  |- lotivis.tests.js.map
+```html
+<script src="https://cdn.jsdelivr.net/npm/lotivis@1"></script>
+<script>
+
+const barChart = lotivis.bar();
+
+</script>
+```
+
+You can also use the standalone lotivis microlibraries. For example, [lotivis-data](https://github.com/lotivis/lotivis-data):
+
+```html
+<script type="module">
+
+import { DataController } from "https://cdn.skypack.dev/lotivis-data@1";
+
+const data = [/* */]
+const dc = new DataController(data);
+
+</script>
 ```
 
 ## Development
