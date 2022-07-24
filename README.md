@@ -74,5 +74,4 @@ npm version patch
 
 # puch version update
 git push --follow-tags
-
 ```

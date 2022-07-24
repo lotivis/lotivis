@@ -28,7 +28,9 @@
   ],
   "scripts": {
     "build": "rollup --config",
-    "build:watch": "rollup --config --watch"
+    "build:watch": "rollup --config --watch",
+    "test": "mocha test/**/*-test.js",
+    "status": "./bin/library.js"
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "13",
