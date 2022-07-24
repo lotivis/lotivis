@@ -1,4 +1,4 @@
-# lotivis: location time visualization [![Node.js Test](https://github.com/lotivis/lotivis/actions/workflows/npm-test.yml/badge.svg?branch=main)](https://github.com/lotivis/lotivis/actions/workflows/npm-test.yml)
+# lotivis: location time visualization [![Node.js CI](https://github.com/lotivis/lotivis/actions/workflows/node.js.yml/badge.svg?branch=main)](https://github.com/lotivis/lotivis/actions/workflows/node.js.yml)
 
 **lotivis** (or **lotivis.js**) is a JavaScript library for visualizing location and time specific data using [D3](https://github.com/d3/d3).
 
