@@ -2,13 +2,13 @@
 
 ## Create package directory
 
-```shell
+```sh
 mkdir lotivis-$PACKAGE_NAME
 ```
 
 ## Add rollup dependencies
 
-```shell
+```sh
 yarn add --dev rollup @rollup/plugin-node-resolve rollup-plugin-terser
 
 # for tests add mocha
