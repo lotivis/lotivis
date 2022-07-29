@@ -8,4 +8,5 @@ export * from "lotivis-datatext";
 export * from "lotivis-export";
 export * from "lotivis-gantt";
 export * from "lotivis-geojson";
+export * from "lotivis-legend";
 export * from "lotivis-map";
