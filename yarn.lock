@@ -1671,6 +1671,14 @@ lotivis-chart@1, lotivis-chart@^1.0.8:
     d3 "7"
     lotivis-data "1"
 
+lotivis-chart@^1.0.12:
+  version "1.0.12"
+  resolved "https://registry.yarnpkg.com/lotivis-chart/-/lotivis-chart-1.0.12.tgz#0be964a3e2d89d03ddfdca7a0430aa408e206efb"
+  integrity sha512-WTVdNXMEsTV9ugL54T2ym/6IXtl0WB/Z7MVwY+hSlZUiPw1zZ/4qbvto2r9H80lgCkw9BNDZtFU4ie7f5iVz9Q==
+  dependencies:
+    d3 "7"
+    lotivis-data "^1.0.1"
+
 lotivis-colors@1:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/lotivis-colors/-/lotivis-colors-1.0.0.tgz#b61f6253d37f8c71236d6eac9c7a12359694ba45"
@@ -1688,7 +1696,7 @@ lotivis-csv@1:
   dependencies:
     d3-dsv "^3.0.1"
 
-lotivis-data@1:
+lotivis-data@1, lotivis-data@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/lotivis-data/-/lotivis-data-1.0.1.tgz#b27a99d90fa592000a5fce1292387a02ac8a29de"
   integrity sha512-pHIPP9TwpEKQLawKPScFq3geFxKQRkU85U/1pG+3jcwVegz+Bs6IT76jCD1meWtvwnAKTf0d5dPnDCSQKqXdRg==
