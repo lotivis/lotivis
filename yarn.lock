@@ -126,9 +126,9 @@
   integrity sha512-jhuKLIRrhvCPLqwPcx6INqmKeiA5EWrsCOPhrlFSrbrmU4ZMPjj5Ul/oLCMDO98XRUIwVm78xICz4EPCektzeQ==
 
 "@types/node@*":
-  version "18.0.6"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.0.6.tgz#0ba49ac517ad69abe7a1508bc9b3a5483df9d5d7"
-  integrity sha512-/xUq6H2aQm261exT6iZTMifUySEt4GR5KX8eYyY+C4MSNPqSh9oNIP7tz2GLKTlFaiBbgZNxffoR3CVRG+cljw==
+  version "18.6.2"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.6.2.tgz#ffc5f0f099d27887c8d9067b54e55090fcd54126"
+  integrity sha512-KcfkBq9H4PI6Vpu5B/KoPeuVDAbmi+2mDBqGPGUgoL7yXQtcWGu2vJWmmRkneWK3Rh0nIAX192Aa87AqKHYChQ==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -237,9 +237,9 @@ are-we-there-yet@^2.0.0:
     readable-stream "^3.6.0"
 
 are-we-there-yet@^3.0.0:
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/are-we-there-yet/-/are-we-there-yet-3.0.0.tgz#ba20bd6b553e31d62fc8c31bd23d22b95734390d"
-  integrity sha512-0GWpv50YSOcLXaN6/FAKY3vfRbllXWV2xvfA/oKJF8pzFhWXPV+yjhJXDBbjscDYowv7Yw1A3uigpzn5iEGTyw==
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/are-we-there-yet/-/are-we-there-yet-3.0.1.tgz#679df222b278c64f2cdba1175cdc00b0d96164bd"
+  integrity sha512-QZW4EDmGwlYur0Yyf/b2uGucHQMa8aFUP7eu9ddR73vvhFyt4V0Vl3QHPcTNJ8l6qYOBdxgXdnBXQrHilfRQBg==
   dependencies:
     delegates "^1.0.0"
     readable-stream "^3.6.0"
@@ -336,14 +336,14 @@ browser-stdout@1.3.1:
   integrity sha512-qhAVI1+Av2X7qelOfAIYwXONood6XlZE/fXaBSmW/T5SzLAmCgzi+eiWE7fUvbHaeNBQH13UftjpXxsfLkMpgw==
 
 browserslist@^4.0.0, browserslist@^4.16.6, browserslist@^4.20.3:
-  version "4.21.2"
-  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-4.21.2.tgz#59a400757465535954946a400b841ed37e2b4ecf"
-  integrity sha512-MonuOgAtUB46uP5CezYbRaYKBNt2LxP0yX+Pmj4LkcDFGkn9Cbpi83d9sCjwQDErXsIJSzY5oKGDbgOlF/LPAA==
+  version "4.21.3"
+  resolved "https://registry.yarnpkg.com/browserslist/-/browserslist-4.21.3.tgz#5df277694eb3c48bc5c4b05af3e8b7e09c5a6d1a"
+  integrity sha512-898rgRXLAyRkM1GryrrBHGkqA5hlpkV5MhtZwg9QXeiyLUYs2k00Un05aX5l2/yJIOObYKOpS2JNo8nJDE7fWQ==
   dependencies:
-    caniuse-lite "^1.0.30001366"
-    electron-to-chromium "^1.4.188"
+    caniuse-lite "^1.0.30001370"
+    electron-to-chromium "^1.4.202"
     node-releases "^2.0.6"
-    update-browserslist-db "^1.0.4"
+    update-browserslist-db "^1.0.5"
 
 buffer-from@^1.0.0:
   version "1.1.2"
@@ -408,10 +408,10 @@ caniuse-api@^3.0.0:
     lodash.memoize "^4.1.2"
     lodash.uniq "^4.5.0"
 
-caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001366:
-  version "1.0.30001368"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001368.tgz#c5c06381c6051cd863c45021475434e81936f713"
-  integrity sha512-wgfRYa9DenEomLG/SdWgQxpIyvdtH3NW8Vq+tB6AwR9e56iOIcu1im5F/wNdDf04XlKHXqIx4N8Jo0PemeBenQ==
+caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001370:
+  version "1.0.30001373"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001373.tgz#2dc3bc3bfcb5d5a929bec11300883040d7b4b4be"
+  integrity sha512-pJYArGHrPp3TUqQzFYRmP/lwJlj8RCbVe3Gd3eJQkAV8SAC6b19XS9BjMvRdvaS8RMkaTN8ZhoHP6S1y8zzwEQ==
 
 caseless@~0.12.0:
   version "0.12.0"
@@ -997,10 +997,10 @@ ecc-jsbn@~0.1.1:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
 
-electron-to-chromium@^1.4.188:
-  version "1.4.198"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.198.tgz#36a8e7871046f7f94c01dc0133912fd5cf226c6a"
-  integrity sha512-jwqQPdKGeAslcq8L+1SZZgL6uDiIDmTe9Gq4brsdWAH27y7MJ2g9Ue6MyST3ogmSM49EAQP7bype1V5hsuNrmQ==
+electron-to-chromium@^1.4.202:
+  version "1.4.206"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.4.206.tgz#580ff85b54d7ec0c05f20b1e37ea0becdd7b0ee4"
+  integrity sha512-h+Fadt1gIaQ06JaIiyqPsBjJ08fV5Q7md+V8bUvQW/9OvXfL2LRICTz2EcnnCP7QzrFTS6/27MRV6Bl9Yn97zA==
 
 emoji-regex@^8.0.0:
   version "8.0.0"
@@ -1653,19 +1653,20 @@ log-symbols@4.1.0:
     is-unicode-supported "^0.1.0"
 
 lotivis-bar@1:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/lotivis-bar/-/lotivis-bar-1.0.0.tgz#11b6fc602dba64901994c3138d9fd945ac33e635"
-  integrity sha512-wUQE37fWQimNiGr3unFedJfIs+HAeBMsnazWxegqfAv1NJ3GtAxGMBCfz3zJd/YP6KYEG05yzdXv5oRzRtPMsg==
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/lotivis-bar/-/lotivis-bar-1.0.2.tgz#95e6ae1defe7b9aaca5e8b1c29a87b247c9554d4"
+  integrity sha512-3z4fWH9i3aaGTTagMXXbhbpWGrmxjIlF/TlaPnuZFCZQD5S162x6msfezxbqsvSmaoH8mBwIOTTntAWjFaqETw==
   dependencies:
     d3 "7"
-    lotivis-chart "1"
+    lotivis-chart "^1.0.8"
     lotivis-colors "1"
     lotivis-datasets "1"
+    lotivis-legend "^1.0.0"
 
-lotivis-chart@1:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/lotivis-chart/-/lotivis-chart-1.0.2.tgz#b42b7328b9adc955026388e6121c2d890a669205"
-  integrity sha512-HjKk6ef80DcalSFZ6n1rkap3Lo2+Fft5T94KMOW9uY/sS/y80wJeLbeiTKR8xY7+qqpyinDP3+Rsh6zDhgWL0w==
+lotivis-chart@1, lotivis-chart@^1.0.8:
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/lotivis-chart/-/lotivis-chart-1.0.11.tgz#9340c2d087b07dcb7065a828517bc3ad8d9373d3"
+  integrity sha512-dyiAMYXMqcPk1Y1mTUYzPX+JpXVtpAxX3s9JlGqxIHWblJIhKYtSMURkTSyvArI2A53Yw5qgeHtNmgIrBPeELg==
   dependencies:
     d3 "7"
     lotivis-data "1"
@@ -1681,16 +1682,16 @@ lotivis-colors@1:
     d3-scale-chromatic "^3.0.0"
 
 lotivis-csv@1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/lotivis-csv/-/lotivis-csv-1.0.1.tgz#321231d6746e815acf9152e31d2345f750b3fae9"
-  integrity sha512-8+Wp0ivBlDW820XOXErFj29OcqyNmR9jlGaCKZj98atbkTQuW+xS1Sf5TueT4QHCCXKt8vKDZEKwfOuJGyZ1JA==
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/lotivis-csv/-/lotivis-csv-1.0.2.tgz#8da20eedcc642eb7ff7b519f58158882966fd625"
+  integrity sha512-qcaL2OL0a8sDKpjX1C1Sd3fi775vgygBJgkmvRjciANB41p436Hue+/XrD2Y/9blv0hDvCln52mGmSl8BELdjA==
   dependencies:
     d3-dsv "^3.0.1"
 
 lotivis-data@1:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/lotivis-data/-/lotivis-data-1.0.0.tgz#cd7af82655c9ac737957d6a6be57cbbba7c39e1e"
-  integrity sha512-g73OXzUei5958TDizuvJRyfZLMsas/Bw1u8A31T+8qGyeg01oJtHEECbtPufq6o/JAlTawYIKUl3rio8eD/PNQ==
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/lotivis-data/-/lotivis-data-1.0.1.tgz#b27a99d90fa592000a5fce1292387a02ac8a29de"
+  integrity sha512-pHIPP9TwpEKQLawKPScFq3geFxKQRkU85U/1pG+3jcwVegz+Bs6IT76jCD1meWtvwnAKTf0d5dPnDCSQKqXdRg==
   dependencies:
     d3-array "^3.2.0"
     d3-dispatch "^3.0.1"
@@ -1702,9 +1703,9 @@ lotivis-datasets@1:
   integrity sha512-mEIcU2kJY2XLIkkxLE7BI4G892X1LH3TLGBj0gusz5olBY01dOhxE157fO7OxQ16iDgcmpThAreUPkbWJF0ttw==
 
 lotivis-datatext@1:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/lotivis-datatext/-/lotivis-datatext-1.0.0.tgz#905d6457b90b5f83170f9fc077705950c221c89c"
-  integrity sha512-1Dhbj1gutsUG4E7JhfF3AgMMh12xChCneTruAvGrHt0l79/cgDn14a03Gm3M7Md+hLVnhnin2vCKRkriw8wNNg==
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/lotivis-datatext/-/lotivis-datatext-1.0.1.tgz#264c5235df45640872577aa9c35f264b4fb976ab"
+  integrity sha512-xfSkzG3Bzjuw9jkpIzgZONS/M3+Pp5E7yMwmLW0MyaHLCMlKDCG/7HXfzJf7rtOrLndDs2BdntqyvgJHGuHL2Q==
   dependencies:
     lotivis-chart "1"
     lotivis-colors "1"
@@ -1717,9 +1718,9 @@ lotivis-export@1:
   integrity sha512-fgzNmJPk8PEWwe6m1zQ+D4Kv7+tPj4StM2Sq1Mm/hh8Aw6kxKNUddc8ucx/DNQw6TyaqbUCb+knR8RAy7IMgxw==
 
 lotivis-gantt@1:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/lotivis-gantt/-/lotivis-gantt-1.0.0.tgz#e10ba5070b26e6007ed31b7b90e0fc2ce3ca058b"
-  integrity sha512-jEJhA2GGEuajmhvWrdKvumRs+0ZN+M5TLK14XxkTAcd785wuMDgVm7ETxFaaI1SeJZcvw7dq9aZb0HsdSjY/FQ==
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/lotivis-gantt/-/lotivis-gantt-1.0.1.tgz#8d12519d5eed1d584d9513ef8e1274d161186c1d"
+  integrity sha512-/fRm78KFaduvfUkPKu99X0R22OYhQIhWWpNoNlJpWC0Jl2dqmWSvxnQpa08iuydjDUv7+bmamLywdue3/fEBMw==
   dependencies:
     d3 "7"
     lotivis-chart "1"
@@ -1727,15 +1728,15 @@ lotivis-gantt@1:
     lotivis-datasets "1"
 
 lotivis-geojson@1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/lotivis-geojson/-/lotivis-geojson-1.0.1.tgz#16a907573189eca0239acda5605a4cf4a08842b8"
-  integrity sha512-UhNmDnhDwGoceo58ap1/1HGRL62un/TlgOIxiWY5EOh76Br51Dls7kRpp/7mL0BPF0pAycm7M+sTSsQv7KRutw==
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/lotivis-geojson/-/lotivis-geojson-1.0.2.tgz#8d27461044181edf7931a38558dfa499e8728574"
+  integrity sha512-vMkaB/woNNbDCSWqtRBhhEYUZ+EJ0iN4JPHStMgrJyS3rY22tfJPBCMu9XmLVZnvqLgdNFCWYir9c1ftXYdnnw==
   dependencies:
     topojson-client "^3.1.0"
     topojson-server "^3.0.1"
     topojson-simplify "^3.0.3"
 
-lotivis-legend@1:
+lotivis-legend@1, lotivis-legend@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/lotivis-legend/-/lotivis-legend-1.0.0.tgz#4639ca1876aa16bd171891307c736880fc612309"
   integrity sha512-BqVpkUl1/YSM96RNGiUR0dYDKaRFj6a0Olab6qwl0FVVMEjq9P/yomyLWHuG/0iQHPSRKMcfNMMFdMcTGAZ7OQ==
@@ -1746,9 +1747,9 @@ lotivis-legend@1:
     lotivis-datasets "1"
 
 lotivis-map@1:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/lotivis-map/-/lotivis-map-1.0.0.tgz#c85f949d2dd67fd356121f1f7591447f02a5e12a"
-  integrity sha512-eov7lWe3/uwBDyfUIlpJF0tM9MDYuvW8UVkKaQuB2W5vs1fa8PvYbtX6u+e42uMuZ6rtl7PwvXayNWR4dz54jA==
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/lotivis-map/-/lotivis-map-1.0.1.tgz#7c9baa9fbce1fd4a37ee93c85606f5af30916f25"
+  integrity sha512-PMa+eQ70IVCEO/2jpVdBZLFpTdc86efBRia2D3MH6zWBtt9SapaFsTe9achvsLM8KdozzZWFd3BJbN5x5B1OGQ==
   dependencies:
     d3 "7"
     lotivis-chart "1"
@@ -2694,9 +2695,9 @@ rollup-pluginutils@^2.8.2:
     estree-walker "^0.6.1"
 
 rollup@2:
-  version "2.77.0"
-  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.77.0.tgz#749eaa5ac09b6baa52acc076bc46613eddfd53f4"
-  integrity sha512-vL8xjY4yOQEw79DvyXLijhnhh+R/O9zpF/LEgkCebZFtb6ELeN9H3/2T0r8+mp+fFTBHZ5qGpOpW2ela2zRt3g==
+  version "2.77.2"
+  resolved "https://registry.yarnpkg.com/rollup/-/rollup-2.77.2.tgz#6b6075c55f9cc2040a5912e6e062151e42e2c4e3"
+  integrity sha512-m/4YzYgLcpMQbxX3NmAqDvwLATZzxt8bIegO78FZLl+lAgKJBd1DRAOeEiZcKOIOPjxE6ewHWHNgGEalFXuz1g==
   optionalDependencies:
     fsevents "~2.3.2"
 
@@ -3107,7 +3108,7 @@ unique-slug@^2.0.0:
   dependencies:
     imurmurhash "^0.1.4"
 
-update-browserslist-db@^1.0.4:
+update-browserslist-db@^1.0.5:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/update-browserslist-db/-/update-browserslist-db-1.0.5.tgz#be06a5eedd62f107b7c19eb5bcefb194411abf38"
   integrity sha512-dteFFpCyvuDdr9S/ff1ISkKt/9YZxKjI9WlRR99c180GaztJtRa/fn18FdxGVKVsnPY7/a/FDN68mcvUmP4U7Q==
