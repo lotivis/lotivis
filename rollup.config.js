@@ -28,6 +28,7 @@ export default [
     ],
     onwarn(message, warn) {
       if (message.code === "CIRCULAR_DEPENDENCY") return;
+      // if (message.code === "NAMESPACE_CONFLICT") return;
       warn(message);
     },
   },

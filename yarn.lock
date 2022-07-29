@@ -435,6 +435,11 @@ chalk@^4.1.0, chalk@^4.1.2:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
+chalk@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/chalk/-/chalk-5.0.1.tgz#ca57d71e82bb534a296df63bbacc4a1c22b2a4b6"
+  integrity sha512-Fo07WOYGqMfCWHOzSXOt2CxDbC6skS/jO9ynEcmpANMoPrD+W1r1K6Vx7iNm+AQmETU1Xr2t+n8nzkV9t6xh3w==
+
 chokidar@3.5.3:
   version "3.5.3"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-3.5.3.tgz#1cf37c8707b932bd1af1ae22c0432e2acd1903bd"
@@ -1647,6 +1652,16 @@ log-symbols@4.1.0:
     chalk "^4.1.0"
     is-unicode-supported "^0.1.0"
 
+lotivis-bar@1:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/lotivis-bar/-/lotivis-bar-1.0.0.tgz#11b6fc602dba64901994c3138d9fd945ac33e635"
+  integrity sha512-wUQE37fWQimNiGr3unFedJfIs+HAeBMsnazWxegqfAv1NJ3GtAxGMBCfz3zJd/YP6KYEG05yzdXv5oRzRtPMsg==
+  dependencies:
+    d3 "7"
+    lotivis-chart "1"
+    lotivis-colors "1"
+    lotivis-datasets "1"
+
 lotivis-chart@1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/lotivis-chart/-/lotivis-chart-1.0.2.tgz#b42b7328b9adc955026388e6121c2d890a669205"
@@ -1686,10 +1701,30 @@ lotivis-datasets@1:
   resolved "https://registry.yarnpkg.com/lotivis-datasets/-/lotivis-datasets-1.0.0.tgz#07e60268d4bd0d070ae4a118452187708aa63b05"
   integrity sha512-mEIcU2kJY2XLIkkxLE7BI4G892X1LH3TLGBj0gusz5olBY01dOhxE157fO7OxQ16iDgcmpThAreUPkbWJF0ttw==
 
+lotivis-datatext@1:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/lotivis-datatext/-/lotivis-datatext-1.0.0.tgz#905d6457b90b5f83170f9fc077705950c221c89c"
+  integrity sha512-1Dhbj1gutsUG4E7JhfF3AgMMh12xChCneTruAvGrHt0l79/cgDn14a03Gm3M7Md+hLVnhnin2vCKRkriw8wNNg==
+  dependencies:
+    lotivis-chart "1"
+    lotivis-colors "1"
+    lotivis-csv "1"
+    lotivis-datasets "1"
+
 lotivis-export@1:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/lotivis-export/-/lotivis-export-1.0.0.tgz#cc167603b277509d75ac869083731d2dc487a8ac"
   integrity sha512-fgzNmJPk8PEWwe6m1zQ+D4Kv7+tPj4StM2Sq1Mm/hh8Aw6kxKNUddc8ucx/DNQw6TyaqbUCb+knR8RAy7IMgxw==
+
+lotivis-gantt@1:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/lotivis-gantt/-/lotivis-gantt-1.0.0.tgz#e10ba5070b26e6007ed31b7b90e0fc2ce3ca058b"
+  integrity sha512-jEJhA2GGEuajmhvWrdKvumRs+0ZN+M5TLK14XxkTAcd785wuMDgVm7ETxFaaI1SeJZcvw7dq9aZb0HsdSjY/FQ==
+  dependencies:
+    d3 "7"
+    lotivis-chart "1"
+    lotivis-colors "1"
+    lotivis-datasets "1"
 
 lotivis-geojson@1:
   version "1.0.1"
@@ -1699,6 +1734,27 @@ lotivis-geojson@1:
     topojson-client "^3.1.0"
     topojson-server "^3.0.1"
     topojson-simplify "^3.0.3"
+
+lotivis-legend@1:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/lotivis-legend/-/lotivis-legend-1.0.0.tgz#4639ca1876aa16bd171891307c736880fc612309"
+  integrity sha512-BqVpkUl1/YSM96RNGiUR0dYDKaRFj6a0Olab6qwl0FVVMEjq9P/yomyLWHuG/0iQHPSRKMcfNMMFdMcTGAZ7OQ==
+  dependencies:
+    d3 "7"
+    lotivis-chart "1"
+    lotivis-colors "1"
+    lotivis-datasets "1"
+
+lotivis-map@1:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/lotivis-map/-/lotivis-map-1.0.0.tgz#c85f949d2dd67fd356121f1f7591447f02a5e12a"
+  integrity sha512-eov7lWe3/uwBDyfUIlpJF0tM9MDYuvW8UVkKaQuB2W5vs1fa8PvYbtX6u+e42uMuZ6rtl7PwvXayNWR4dz54jA==
+  dependencies:
+    d3 "7"
+    lotivis-chart "1"
+    lotivis-colors "1"
+    lotivis-datasets "1"
+    lotivis-geojson "1"
 
 lru-cache@^6.0.0:
   version "6.0.0"

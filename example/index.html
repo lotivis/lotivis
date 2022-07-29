@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Token: Nike +</title>
+    <style>
+      body {
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .ltv-container {
+        max-width: 1000px;
+        margin: auto;
+      }
+
+      h1 {
+        text-align: center;
+      }
+
+      .chart-wrapper {
+        display: inline-block;
+        width: 48%;
+        vertical-align: top;
+        margin-bottom: 40px;
+      }
+    </style>
+  </head>
+  <body>
+    <div style="margin: 50px">
+      <h5>Token: Nike +</h5>
+
+      <div class="chart-wrapper">
+        <div id="bar-chart">
+          <!-- Bar Chart Here -->
+        </div>
+      </div>
+
+      <div class="chart-wrapper">
+        <div id="map-chart">
+          <!-- Map Chart Here -->
+        </div>
+      </div>
+
+      <div class="chart-wrapper">
+        <div id="gantt-chart">
+          <!-- Plot Chart Here -->
+        </div>
+      </div>
+
+      <div class="chart-wrapper">
+        <div id="map-chart-metropole" style="width: 50%">
+          <!-- Map Chart Metropole Here -->
+        </div>
+      </div>
+
+      <div id="ltv-data">
+        <!-- Data Here -->
+      </div>
+    </div>
+
+    <script src="../dist/lotivis.js"></script>
+
+    <script>
+      lotivis.debug(true);
+
+      let dates = Array.from(Array(26).keys()).map((i) => i + 1995);
+
+      let barChart = lotivis
+        .bar()
+        .selector("#bar-chart")
+        .labels(true)
+        .dates(dates);
+
+      let ganttChart = lotivis
+        .gantt()
+        .selector("#gantt-chart")
+        .style("fraction")
+        .colorMode("multi");
+
+      let mapChart = lotivis
+        .map()
+        .debug(true)
+        .selector("#map-chart")
+        .labels(true)
+        .exclude(["2A", "2B"])
+        .featureIDAccessor((f) => "" + f.properties.code)
+        .featureNameAccessor((f) => f.properties.nom);
+
+      let mapChartMetropole = lotivis
+        .map()
+        .selector("#map-chart-metropole")
+        .width(300)
+        .height(300)
+        .labels(true)
+        .include(["75", "92", "93", "94"])
+        .legend(false)
+        .featureIDAccessor((f) => "" + f.properties.code)
+        .featureNameAccessor((f) => f.properties.nom);
+
+      lotivis.fetchJSON("./departements.geojson").then((json) => {
+        mapChart.geoJSON(json);
+        mapChartMetropole.geoJSON(json);
+
+        lotivis
+          .fetchCSV("./frcv.data.nike.csv")
+          .then((data) => {
+            data.forEach((d) => {
+              d.location = "" + d.location;
+            });
+
+            let dc = lotivis.dataController(data);
+
+            mapChart.run(dc);
+            mapChartMetropole.run(dc);
+
+            barChart.run(dc);
+            ganttChart.run(dc);
+          })
+          .catch((error) => {
+            console.error(error);
+            alert(error);
+          });
+      });
+    </script>
+  </body>
+</html>
