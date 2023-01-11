@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "13",
-    "chalk": "^5.0.1",
+    "chalk": "5",
     "mocha": "10",
     "node-sass": "7",
     "postcss": "8",
@@ -49,7 +49,7 @@
   },
   "dependencies": {
     "lotivis-bar": "1",
-    "lotivis-chart": "^1.0.12",
+    "lotivis-chart": "1",
     "lotivis-colors": "1",
     "lotivis-csv": "1",
     "lotivis-data": "1",
